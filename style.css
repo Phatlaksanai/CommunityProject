@@ -1,0 +1,153 @@
+body{
+    background-color: #94B3CA;
+    margin: 0;
+}
+.TopPage{
+    background-color: #171C2E;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+}
+.TopPage a{
+    color:  black;
+    text-decoration: none;
+    /* margin: auto; */
+}
+#NamePage::first-letter{
+    font-size: 2em;
+    font-style: italic;
+}
+#NamePage{
+    font-size: 50px;
+    text-shadow: #000000 2px 2px 4px;
+    color: white;
+    display: inline;
+}
+#NamePage:hover{
+    color: rgb(238, 181, 23);
+}
+#Home{
+    border: 3px solid black;
+    border-radius: 30px;
+    display: inline;
+    text-align: center;
+    /* margin-left: 250px; */
+    cursor: pointer;
+}
+#Home:hover{
+    background-color: rgb(26, 194, 220);
+    color: rgb(0, 0, 0);
+    font-size: 1.1em;
+}
+#report{
+    border: 3px solid black;
+    border-radius: 30px;
+    /* margin-left: 50px; */
+    cursor: pointer;
+}
+#report:hover{
+    background-color: rgb(255, 0, 110);
+    color: white;
+    font-size: 1.1em;
+}
+#upload{
+    border: 3px solid black;
+    border-radius: 30px;
+    /* margin-left: 50px; */
+    cursor: pointer;
+}
+#upload:hover{
+    background-color: rgb(0, 255, 136);
+    color: black;
+    font-size: 1.1em;
+}
+.top{
+    margin: 0;
+    font-size: 20px;
+    background-color: #273959; 
+    color: white;
+    padding: 8px 50px;
+}
+#profile{
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    float: right;
+}
+#box1{
+    width: 900px;
+    height: 200px;
+    border: #000000 5px solid;
+    background-color: rgb(243, 243, 243);
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px;
+}
+#robloxlogo{
+    width: 100px;
+    height: 100px;
+    float: left;
+    border-radius: 50%;
+}
+.container{
+    display: flex;
+    flex-direction: column;
+    float: left;
+    background-color: #171C2E;
+}
+.box{
+    width: 100px;
+    height: 100px;
+    font-size: 5em;
+    text-align: center;
+    border-radius: 15px
+}
+#box11{
+    background-color: rgb(252, 132, 132);
+}
+#box12{
+    background-color: rgb(245, 229, 52);
+}
+#box13{
+    background-color: rgb(132, 252, 173);
+}
+#box14{
+    background-color: rgb(132, 192, 252);
+}
+.navbar ul{
+    list-style: none;
+    background-color: #171C2E;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+.navbar li{
+    float: left;
+}
+.navbar a{
+    color: white;
+    text-decoration: none;
+    padding: 15px;
+    display: block;
+    text-align: center;
+}
+.navbar a:hover{
+    background-color: rgb(0, 0, 0);
+}
+.icons{
+    text-align: center;
+}
+.fa-brands.fa-github.fa-5x{
+    color: rgb(8, 45, 95);
+}
+.fa-brands.fa-twitch.fa-5x{
+    color: rgb(136, 71, 255);
+}
+.fa-brands.fa-discord.fa-5x{
+    color: rgb(88, 101, 242);
+}
