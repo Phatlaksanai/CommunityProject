@@ -5,11 +5,165 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload</title>
     <link rel="stylesheet" href="style.css">
+    <title>3DLControl</title>
+    <!-- <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #fileInput {
+            position: absolute;
+            z-index: 1;
+            top: 10px;
+            left: 10px;
+        }
+    </style> -->
 </head>
 <body>
-    <h1>Hello</h1>
-    <button>Choose file</button> <br><br>
-    sdfs
+    <h1>Upload</h1>
+    <input type="file" id="fileInput" accept=".glb,.gltf">
     <a href="index.html"><button>back</button></a>
+
+    <!-- core three.js -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        const scene = new THREE.Scene();
+
+        // กล้อง
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 2, 5);
+        camera.lookAt(0, 0, 0);
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // Ambient Light
+        const ambientLight = new THREE.AmbientLight(0x454040);
+        scene.add(ambientLight);
+        
+        // Spot Light
+        const spotLight = new THREE.SpotLight(0xffffff, 5);
+        spotLight.angle = Math.PI / 5;
+        spotLight.position.set(4.3, 0.6, 4.3);
+        spotLight.target.position.set(0, 0, 0);
+        spotLight.castShadow = true;
+        spotLight.distance = 10;
+        scene.add(spotLight);
+        scene.add(spotLight.target);
+
+        // Spot Light
+        const spotLight2 = new THREE.SpotLight(0xffffff, 5);
+        spotLight2.angle = Math.PI / 5;
+        spotLight2.position.set(-4.3, 0.6, 4.3);
+        spotLight2.target.position.set(0, 0, 0);
+        spotLight2.castShadow = true;
+        spotLight2.distance = 10;
+        scene.add(spotLight2);
+        scene.add(spotLight2.target);
+
+        // Spot Light
+        const spotLight3 = new THREE.SpotLight(0xffffff, 5);
+        spotLight3.angle = Math.PI / 5;
+        spotLight3.position.set(4.3, 0.6, -4.3);
+        spotLight3.target.position.set(0, 0, 0);
+        spotLight3.castShadow = true;
+        spotLight3.distance = 10;
+        scene.add(spotLight3);
+        scene.add(spotLight3.target);
+
+        // Spot Light
+        const spotLight4 = new THREE.SpotLight(0xffffff, 5);
+        spotLight4.angle = Math.PI / 5;
+        spotLight4.position.set(-4.3, 0.6, -4.3);
+        spotLight4.target.position.set(0, 0, 0);
+        spotLight4.castShadow = true;
+        spotLight4.distance = 10;
+        scene.add(spotLight4);
+        scene.add(spotLight4.target);
+
+        // Spot Light
+        const spotLight5 = new THREE.SpotLight(0xffffff, .7);
+        spotLight5.angle = Math.PI / 5;
+        spotLight5.position.set(0, 5, 0);
+        spotLight5.target.position.set(0, 0, 0);
+        spotLight5.castShadow = true;
+        spotLight5.distance = 10;
+        scene.add(spotLight5);
+        scene.add(spotLight5.target);
+
+        // Environment map
+        const cubeUrls = [
+            'https://threejs.org/examples/textures/cube/Bridge2/posx.jpg',
+            'https://threejs.org/examples/textures/cube/Bridge2/negx.jpg',
+            'https://threejs.org/examples/textures/cube/Bridge2/posy.jpg',
+            'https://threejs.org/examples/textures/cube/Bridge2/negy.jpg',
+            'https://threejs.org/examples/textures/cube/Bridge2/posz.jpg',
+            'https://threejs.org/examples/textures/cube/Bridge2/negz.jpg'
+        ];
+        const envMap = new THREE.CubeTextureLoader().load(cubeUrls);
+        envMap.encoding = THREE.sRGBEncoding;
+        scene.environment = envMap;
+
+        const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.4, roughness: 0.2 });
+
+        // Floor
+        const floorMesh = new THREE.PlaneGeometry(10, 10);
+        const floor = new THREE.Mesh(floorMesh, mat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // GLTF loader
+        const loader = new THREE.GLTFLoader();
+        const objectGroup = new THREE.Group();
+        scene.add(objectGroup);
+        
+        document.getElementById('fileInput').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const url = URL.createObjectURL(file);
+
+            loader.load(url, (gltf) => {
+                objectGroup.clear();
+
+                const object = gltf.scene;
+                object.castShadow = true;
+                object.traverse(child => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                object.position.set(0, 0, 0);
+                object.rotation.set(0, 0, 0);
+                objectGroup.add(object);
+
+                URL.revokeObjectURL(url);
+            }, undefined, (error) => {
+                console.error('Error loading GLTF:', error);
+            });
+        });
+
+        function animate(t) {
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate(0);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+    
 </body>
 </html>
