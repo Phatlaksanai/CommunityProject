@@ -1,0 +1,51 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --main-color: #94B3CA;
+    --second-color: #171C2E;
+    --text-color: #ffffff;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #273959;
+
+    
+}
+
+.box {
+    width: 70%;
+    height: 70%;
+    background: #171C2E;
+    display: flex;
+    position: relative;
+    border-radius: 50px;
+
+        .Temu {
+        width: 50%;
+        height: 100%;
+        color: #ffffff;
+        padding: 100px;
+        }
+
+        .login {
+            width: 70%;
+            height: 95%;
+            background: #94B3CA;
+            border-radius: 50px;
+            position: absolute;
+            right: 0;
+            top: 20px;
+            right: 20px;
+        }
+}
+
+
