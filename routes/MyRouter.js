@@ -4,6 +4,9 @@ const router = express.Router()
 router.get("/",(req,res)=>{
     res.render("login.ejs")
 })
+router.get("/home",(req,res)=>{
+    res.render("home.ejs")
+})
 // router.get("/",(req,res)=>{
 //     res.sendFile(path.join(__dirname,"../login.html"))
 // })
