@@ -1,6 +1,6 @@
 const express = require('express')
 const path = require('path')
-const router = require('./routes/MyRouter')
+const router = require('./routes/MyRouter.js')
 const app = express()
 
 app.set('views',path.join(__dirname,'views'))
