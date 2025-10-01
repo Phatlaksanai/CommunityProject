@@ -34,6 +34,7 @@ body {
     color: var(--text-color);
     flex: 1;
     padding: 60px 100px;
+    
 }
 
 .left-panel h1 {
