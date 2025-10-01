@@ -135,10 +135,10 @@
                 objectGroup.clear();
 
                 const object = gltf.scene;
-                object.castShadow = true;
+                //object.castShadow = true;
                 object.traverse(child => {
                     if (child.isMesh) {
-                        child.castShadow = true;
+                        //child.castShadow = true;
                         child.receiveShadow = true;
                     }
                 });
