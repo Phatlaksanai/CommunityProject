@@ -1,153 +1,169 @@
-body{
-    background-color: #94B3CA;
+@import url('https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
     margin: 0;
+    box-sizing: border-box;
 }
+
+:root{
+    --BG-color: #94B3CA;
+    --Top-color: #171C2E;
+    --Button-color: #273959;
+    --BT-shine: #485365;
+    --main-font-color: white;
+}
+body{
+    background-color: var(--BG-color)
+}
+
 .TopPage{
-    background-color: #171C2E;
+    width: 100%;
+    height: 70px;
+    background-color: var(--Top-color);
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     position: sticky;
+    top: 0;
+    padding: 10px 20px;
 }
-.TopPage a{
-    color:  black;
-    text-decoration: none;
-    /* margin: auto; */
-}
-#NamePage::first-letter{
+
+.Logo::first-letter{
     font-size: 2em;
     font-style: italic;
 }
-#NamePage{
-    font-size: 50px;
+.Logo{
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-family: "Jaro", sans-serif;
     text-shadow: #000000 2px 2px 4px;
-    color: white;
+    color: var(--main-font-color);
     display: inline;
-}
-#NamePage:hover{
-    color: rgb(238, 181, 23);
-}
-#Home{
-    border: 3px solid black;
-    border-radius: 30px;
-    display: inline;
-    text-align: center;
-    /* margin-left: 250px; */
-    cursor: pointer;
-}
-#Home:hover{
-    background-color: rgb(26, 194, 220);
-    color: rgb(0, 0, 0);
-    font-size: 1.1em;
-}
-#report{
-    border: 3px solid black;
-    border-radius: 30px;
-    /* margin-left: 50px; */
-    cursor: pointer;
-}
-#report:hover{
-    background-color: rgb(255, 0, 110);
-    color: white;
-    font-size: 1.1em;
-}
-#upload{
-    border: 3px solid black;
-    border-radius: 30px;
-    /* margin-left: 50px; */
-    cursor: pointer;
-}
-#upload:hover{
-    background-color: rgb(0, 255, 136);
-    color: black;
-    font-size: 1.1em;
-}
-.top{
-    margin: 0;
-    font-size: 20px;
-    background-color: #273959; 
-    color: white;
-    padding: 8px 50px;
 }
 #profile{
-    width: 70px;
-    height: 70px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    float: right;
+    margin-left: auto;
 }
-#box1{
-    width: 900px;
-    height: 200px;
-    border: #000000 5px solid;
-    background-color: rgb(243, 243, 243);
-    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
-    margin: auto;
+
+/* box คลุมปุ่ม */
+.menubar{
+    width: 500px;
+    height: 40px;
+    margin: 0px 20px;
     display: flex;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
-    font-size: 50px;
 }
-#robloxlogo{
-    width: 100px;
-    height: 100px;
-    float: left;
-    border-radius: 50%;
+.button{
+    margin: 0;
+    background-color: var(--Button-color); 
+
+    font-size: 16px;
+    color: var(--main-font-color);
+    padding: 8px 20px;
+
+    border: 3px solid black;
+    border-radius: 30px;
+
+    display: inline;
+    
+    text-align: center;
+
+    cursor: pointer; /*รูปมือเวลาจี้*/
+}
+.button:hover{
+    background-color: var(--BT-shine);
+    font-size: 16px;
+}
+
+/* =================================== Space ====================================== */
+.all-space {
+    display: flex;
+    height: calc(100vh - 70px); /* เต็มหน้าจอ ลบความสูงแท็บบน */
+}
+/* ---------------------------------------- left ---------------------------------------- */
+.L-space {
+    flex: 1; /*25*/
+    /* background: lightblue; */
 }
 .container{
+    width: 60px;
+    border-radius: 60px;
+    border: #000000 5px solid;
+    background: var(--Button-color);
+
     display: flex;
     flex-direction: column;
-    float: left;
-    background-color: #171C2E;
+    gap: 10px;
+    
+    /* position: sticky;
+    top: 0; */
+
+    margin: 10px 0px 0px 10px;
+    align-items: center;
 }
 .box{
-    width: 100px;
-    height: 100px;
-    font-size: 5em;
-    text-align: center;
-    border-radius: 15px
-}
-#box11{
-    background-color: rgb(252, 132, 132);
-}
-#box12{
-    background-color: rgb(245, 229, 52);
-}
-#box13{
+    width: 40px;
+    height: 40px;
     background-color: rgb(132, 252, 173);
-}
-#box14{
-    background-color: rgb(132, 192, 252);
-}
-.navbar ul{
-    list-style: none;
-    background-color: #171C2E;
-    padding: 0;
-    margin: 0;
+    font-size: 35px;
     overflow: hidden;
-}
-.navbar li{
-    float: left;
-}
-.navbar a{
-    color: white;
-    text-decoration: none;
-    padding: 15px;
-    display: block;
     text-align: center;
+    border-radius: 100px;
+    gap: 30px;
 }
-.navbar a:hover{
-    background-color: rgb(0, 0, 0);
+
+/* ---------------------------------------- mid ---------------------------------------- */
+.M-space {
+    flex: 2; /*50*/
+    /* background: lightgray; */
+    overflow: auto;
+    padding: 0px 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
-.icons{
-    text-align: center;
+/* ป้ายเลื่อน ๆ */
+#news{
+    width: 100%;
+    height: 100px;
+    border: var(--BG-color) 3px solid;
+    background-color: rgb(243, 243, 243);
+    display: flex;
+    
+    justify-content: center; /*x*/
+    align-items: center; /*y*/
+
+    font-size: 50px;
 }
-.fa-brands.fa-github.fa-5x{
-    color: rgb(8, 45, 95);
+
+/* other step */
+.step {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
 }
-.fa-brands.fa-twitch.fa-5x{
-    color: rgb(136, 71, 255);
+/* start step */
+.step.active {
+    display: flex;
 }
-.fa-brands.fa-discord.fa-5x{
-    color: rgb(88, 101, 242);
+
+/* -------------------------------- right ------------------------------------------------ */
+.R-space {
+    flex: 1; /*25*/
+    /* background: lightgreen; */
+}
+/* ======================================================================================= */
+
+/* Responsive */
+@media (max-width: 700px){
+    .login-container {
+        flex-direction: column;
+        width: 90%;
+    }
 }
