@@ -10,6 +10,9 @@ router.get("/login",(req,res)=>{
 router.get("/register",(req,res)=>{
     res.render("register.ejs")
 })
+router.get("/upload",(req,res)=>{
+    res.render("upload.ejs")
+})
 router.post("/regiter",(req,res)=>{
     console.log("regiter.ejs")
 })
