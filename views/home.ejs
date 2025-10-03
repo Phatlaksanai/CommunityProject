@@ -16,6 +16,11 @@
             <a href="/register"><button id="register" class="button">Register</button></a>
             <a href="/login"><button id="login" class="button">Login</button></a>
         </div>
+        <% if (typeof success !== "undefined") { %>
+            <div style="color:#00ff00; margin-left:10px;">
+                <%= success %>
+            </div>
+        <% } %>
         <a
             href="https://www.google.com/?hl=th-th"><img
             src="https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg"

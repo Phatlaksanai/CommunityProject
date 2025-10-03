@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Temu Login</title>
-<link rel="stylesheet" href="Login.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temu Login</title>
+    <link rel="stylesheet" href="Login.css">
 </head>
+
 <body>
     <div class="login-container">
         <div class="left-panel">
@@ -14,21 +16,32 @@
         </div>
         <div class="right-panel">
             <h2>Login</h2>
-            <form action="/" method="GET" class="form-login">
+            <% if (typeof error !== "undefined") { %>
+                <div style="color:red; margin-bottom:10px;">
+                    <%= error %>
+                </div>
+            <% } %>
+            <% if (typeof success !== "undefined") { %>
+                <div style="color:#00ff00; margin-bottom:10px;">
+                    <%= success %>
+                </div>
+            <% } %>
+            <form action="/login" method="POST" class="form-login">
                 <label for="username">Username</label>
-                <input type="text" id="username">
+                <input type="text" id="username" name="username" required>
 
                 <label for="password">Password</label>
-                <input type="password" id="password">
+                <input type="password" id="password" name="password" required>
 
                 <a href="#" class="forgot">forgot password</a>
 
                 <div class="btns">
-                    <button type="button" class="create">create</button>
+                    <a href="/register"><button type="button" class="create">create</button></a>
                     <a href=""><button type="submit" class="login-btn">login</button></a>
                 </div>
             </form>
         </div>
     </div>
 </body>
+
 </html>

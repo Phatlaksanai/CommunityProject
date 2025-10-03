@@ -14,16 +14,21 @@
         </div>
         <div class="right-panel">
             <h2>Register</h2>
-            <form class = "form-register" action="/login" method="GET">
+            <% if (typeof error !== "undefined") { %>
+                <div style="color:red; margin-bottom:10px;">
+                    <%= error %>
+                </div>
+            <% } %>
+            <form class = "form-register" method="POST" action="/register">
                 <div id="step1" class="step active">
                     <label for="username">Username</label>
-                    <input type="text" id="username">
+                    <input type="text" id="username" name="username" required>
 
                     <label for="password">Password</label>
-                    <input type="password" id="password">
-
+                    <input type="password" id="password" name="password" required>
+                    
                     <label for="Confirm password">Confirm Password</label>
-                    <input type="password" id="password2">
+                    <input type="password" id="password2" name="password2" required>
 
                     <div class="btns">
                         <!-- <button type="button" class="create">create</button> -->
@@ -34,7 +39,7 @@
 
                 <div id="step2" class="step">
                     <label for="gamil">gmail</label>
-                    <input type="email" id="email">
+                    <input type="email" id="email" name="email" required>
 
                     <!-- <label for="OTP">รหัส OTP</label>
                     <input type="text" id="otp"> -->
