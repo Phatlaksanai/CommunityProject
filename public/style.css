@@ -120,20 +120,25 @@ body{
 
 /* ---------------------------------------- mid ---------------------------------------- */
 .M-space {
+    
     flex: 2; /*50*/
     /* background: lightgray; */
-    overflow: auto;
+    overflow-y: auto;
     padding: 0px 50px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: block;
 }
+.M-space .BarWrite {
+    margin-bottom: 10px;  /* เว้นช่องว่างโพสต์ */
+}
+
 /* ป้ายเลื่อน ๆ */
 #news{
+    margin: 10px 0px;
     width: 100%;
     height: 100px;
     border: var(--BG-color) 3px solid;
     background-color: rgb(243, 243, 243);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     display: flex;
     
     justify-content: center; /*x*/
@@ -142,16 +147,66 @@ body{
     font-size: 50px;
 }
 
-/* other step */
-.step {
-    display: none;
+.BarWrite {
+    display: flex;
+    flex: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+.but{
+    background-color: var(--Button-color);
+    font-size: 16px;
+    color: var(--main-font-color);
+    padding: 5px 14px;
+    border: 3px solid black;
+    border-radius: 30px;
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Left panel */
+.left-panel {
+    
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    /* flex: 1; */
+    padding: 10px;
+
+}
+
+/* Right panel */
+.right-panel {
+    /* max-width: 400px; */
+    background-color: var(--secondary-color);
+    flex: 1;
+    padding: 10px;
+    /* font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal; */
+    display: flex;
+    flex-direction: column;
+}
+.right-panel p{
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Form */
+form {
+    display: flex;
     flex-direction: column;
     gap: 12px;
 }
-/* start step */
-.step.active {
-    display: flex;
+form input {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--accent-color);
+    font-size: 16px;
 }
+
 
 /* -------------------------------- right ------------------------------------------------ */
 .R-space {
