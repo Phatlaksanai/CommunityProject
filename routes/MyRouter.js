@@ -26,12 +26,12 @@ router.post("/login",(req,res)=>{
     if (!username || !password) {
         return res.render("login.ejs", {error: "Please enter username or password."});
     }
-    db.query('select * from user where username = ? AND password = ?',[username, password],(error,result)=>{
+    db.query('select * from users where username = ? AND password = ?',[username, password],(error,result)=>{
         if(error){
             console.log(error)
         }
         if(result.length > 0){
-            return res.render("home.ejs",{success: "Login success."})
+            return res.render("home.ejs",{profilename: username})
         }else{
             return res.render("login.ejs", {error: "Username or Password is incorrect."})
         }
@@ -45,7 +45,7 @@ router.post("/register",(req,res)=>{
     if(password != password2){
         return res.render("register.ejs", {error: "Passwords are not same."})
     }
-    db.query('select * from user where gmail = ?',[email],(error,result)=>{
+    db.query('select * from users where email = ?',[email],(error,result)=>{
         if(error){
             console.log(error)
         }
@@ -55,12 +55,11 @@ router.post("/register",(req,res)=>{
         const user_data = {
             username: username,
             password: password,
-            password2: password2,
-            gmail: email
+            email: email
         }
-        db.query('insert into user set ?',user_data,(error2,result)=>{
-            if(error2){
-                console.log(error2)
+        db.query('insert into users set ?',user_data,(error,result)=>{
+            if(error){
+                console.log(error)
             }else{
                 return res.render("login.ejs",{success: "Register success."})
             }

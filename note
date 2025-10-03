@@ -1,8 +1,7 @@
 ตาราง database
-create table user(
+create table users(
 	user_id int auto_increment primary key,
 	username varchar(255),
     password varchar(255),
-    password2 varchar(255),
-    gmail varchar(255)
+    email varchar(255)
 );
