@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Phatlaksanai/CommunityProject#readme",
   "dependencies": {
+    "cloudinary": "^2.7.0",
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
