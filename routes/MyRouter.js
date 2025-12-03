@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const mysql = require('mysql2');
+const bcrypt = require('bcryptjs');
+
 require('dotenv').config();
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
@@ -51,16 +53,19 @@ router.post("/register",(req,res)=>{
     if(password != password2){
         return res.render("register.ejs", {error: "Passwords are not same."})
     }
-    db.query('select * from users where email = ?',[email],(error,result)=>{
+    db.query('select * from users where email = ?',[email],async (error,result)=>{
         if(error){
             console.log(error)
         }
         if(result.length > 0){
             return res.render("register.ejs",{error: "This email has been used."})
         }
+
+        let hashedPassword = await bcrypt.hash(password, 8);
+
         const user_data = {
             username: username,
-            password: password,
+            password: hashedPassword,
             email: email
         }
         db.query('insert into users set ?',user_data,(error,result)=>{
