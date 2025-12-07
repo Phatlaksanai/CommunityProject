@@ -68,12 +68,6 @@ router.post("/send-otp", async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000);
     const expiresAt = Date.now() + 5 * 60 * 1000; // หมดอายุใน 5 นาที
 
-    // บันทึก OTP
-    await User.updateOne(
-        { email },
-        { otp: otp, otp_expire: expiresAt },
-        { upsert: true }
-    );
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
@@ -90,27 +84,45 @@ router.post("/send-otp", async (req, res) => {
             text: `รหัส OTP ของคุณคือ: ${otp}`,   // ใช้ตัวแปร otp
             html: `<h2>รหัส OTP ของคุณคือ</h2><h1>${otp}</h1>`, // ใช้ otp
         });
-        console.log("Message sent:", info.messageId);
-    
+        // console.log("Message sent:", info.messageId);
+
+    // บันทึก OTP ลง DB
+    db.query(
+        "UPDATE users SET otp=?, otp_expire=? WHERE email=?",
+        [otp, expiresAt, email],
+        (err) => {
+            if (err) return res.json({ error: "DB Error" });
+            res.json({ message: "ส่ง OTP สำเร็จแล้ว!" });
+        }
+    );
 })
 
 router.post("/verify-otp", async (req, res) => {
     const { email, otp } = req.body
 
-    const user = await User.findOne({ email });
+    db.query(
+        "SELECT * FROM users WHERE email = ?",
+        [email],
+        (err, rows) => {
+            if (err) return res.json({ error: "Error DB" });
 
-    if (!user) return res.json({ error: "ไม่พบผู้ใช้" });
-    if (Date.now() > user.otpExpires)
-        return res.json({ error: "OTP หมดอายุแล้ว กรุณาขอใหม่" });
+            const user = rows[0];
 
-    if (otp != user.otp)
-        return res.json({ error: "OTP ไม่ถูกต้อง" });
+            if (!user) return res.json({ error: "ไม่พบผู้ใช้" });
 
-    res.json({ message: "ยืนยันสำเร็จ!" });
+            if (Date.now() > user.otp_expire)
+                return res.json({ error: "OTP หมดอายุแล้ว กรุณาขอใหม่" });
+
+            if (otp != user.otp)
+                return res.json({ error: "OTP ไม่ถูกต้อง" });
+
+            return res.json({ message: "ยืนยัน OTP สำเร็จ!" });
+        }
+    );
 })
 
 router.post("/register", (req, res) => {
-    const { username, password, password2, email, otp, otp_expire, OTP } = req.body
+    const { username, password, password2, email, otp, otp_expire} = req.body
 
     if (password != password2) {
         return res.render("register.ejs", { error: "Passwords are not same." })
@@ -128,7 +140,9 @@ router.post("/register", (req, res) => {
         const user_data = {
             username: username,
             password: hashedPassword,
-            email: email
+            email: email,
+            otp: otp,
+            otp_expire: otp_expire
         }
 
         db.query('insert into users set ?', user_data, (error, result) => {
