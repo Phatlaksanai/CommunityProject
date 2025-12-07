@@ -41,10 +41,11 @@
                     <label for="gmail">gmail</label>
                     <input type="email" id="email" name="email" required>
 
-                    <!-- <label for="OTP">รหัส OTP</label>
-                    <input type="text" id="otp"> -->
+                    <label for="OTP">รหัส OTP</label>
+                    <input type="text" id="otp">
 
-                    <div class="btns">
+                    <div class="btns">  
+                        <button type="button" id = "OTP" class="back">OTP</button>
                         <button type="button" onclick="prevStep()" class="back">Back</button>
                         <a href=""><button type="submit" class="submit">submit</button></a>
                     </div>
@@ -61,6 +62,22 @@
                     document.getElementById("step2").classList.remove("active");
                     document.getElementById("step1").classList.add("active");
                 }
+
+                document.getElementById("OTP").addEventListener("click", function() {
+                    const email = document.getElementById("email").value;
+
+                    fetch("/send-otp", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ email })
+                    })
+                    .then(res => res.json())
+                    .then(data => alert(data.message || data.error))
+                    .catch(err => console.error(err));
+                });
+                
             </script>
         </div>
     </div>
