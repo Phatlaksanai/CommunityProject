@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Temu Login</title>
-<link rel="stylesheet" href="register.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temu Login</title>
+    <link rel="stylesheet" href="register.css">
 </head>
+
 <body>
     <div class="register-container">
         <div class="left-panel">
@@ -14,27 +16,27 @@
         </div>
         <div class="right-panel">
             <h2>Register</h2>
-            
-            <form class = "form-register" method="POST" action="/register">
+
+            <form class="form-register" method="POST" action="/register">
                 <div id="step1" class="step active">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" required>
 
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required>
-                    
+
                     <label for="Confirm password">Confirm Password</label>
                     <input type="password" id="password2" name="password2" required>
-                    <% if (typeof error !== "undefined") { %>
+                    <% if (typeof error !=="undefined" ) { %>
                         <div style="color:red; margin-bottom:10px;">
                             <%= error %>
                         </div>
-                    <% } %>
-                    <div class="btns">
-                        <!-- <button type="button" class="create">create</button> -->
-                        <button type="button" onclick="nextStep()" class="next">Next</button>
-                    </div>
-                    
+                        <% } %>
+                            <div class="btns">
+                                <!-- <button type="button" class="create">create</button> -->
+                                <button type="button" onclick="nextStep()" class="next">Next</button>
+                            </div>
+
                 </div>
 
                 <div id="step2" class="step">
@@ -42,12 +44,12 @@
                     <input type="email" id="email" name="email" required>
 
                     <label for="OTP">รหัส OTP</label>
-                    <input type="text" id="otp">
+                    <input type="text" id="otp" name="otp">
 
-                    <div class="btns">  
-                        <button type="button" id = "OTP" class="back">OTP</button>
+                    <div class="btns">
+                        <button type="button" id="btnOTP" class="back">OTP</button>
                         <button type="button" onclick="prevStep()" class="back">Back</button>
-                        <a href=""><button type="submit" class="submit">submit</button></a>
+                        <button type="submit" class="submit">submit</button>
                     </div>
                 </div>
 
@@ -63,23 +65,31 @@
                     document.getElementById("step1").classList.add("active");
                 }
 
-                document.getElementById("OTP").addEventListener("click", function() {
-                    const email = document.getElementById("email").value;
+                document.getElementById("btnOTP").addEventListener("click", function () {
+                    const email = document.getElementById("email").value.trim();
 
+                    if (!email) {
+                        alert("กรุณากรอกอีเมลก่อนกด OTP");
+                        return;
+                    }
                     fetch("/send-otp", {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
+                        headers: {"Content-Type": "application/json"},
                         body: JSON.stringify({ email })
                     })
-                    .then(res => res.json())
-                    .then(data => alert(data.message || data.error))
-                    .catch(err => console.error(err));
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert("ส่งรหัส OTP แล้ว!");
+                            } else {
+                                alert(data.error);
+                            }
+                        })
                 });
-                
+
             </script>
         </div>
     </div>
 </body>
+
 </html>

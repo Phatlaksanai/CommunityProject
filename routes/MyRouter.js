@@ -66,7 +66,7 @@ router.post("/send-otp", async (req, res) => {
     const { email } = req.body
 
     const otp = Math.floor(100000 + Math.random() * 900000);
-    const expiresAt = Date.now() + 5 * 60 * 1000; // หมดอายุใน 5 นาที
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // หมดอายุใน 5 นาที
 
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -77,52 +77,62 @@ router.post("/send-otp", async (req, res) => {
             pass: process.env.NODEMAIL_PASS,
         },
     });
-        await transporter.sendMail({
-            from: process.env.NODEMAIL_USER,
-            to: email,
-            subject: "your OTP code",
-            text: `รหัส OTP ของคุณคือ: ${otp}`,   // ใช้ตัวแปร otp
-            html: `<h2>รหัส OTP ของคุณคือ</h2><h1>${otp}</h1>`, // ใช้ otp
-        });
+    const mailOptions = {
+        from: process.env.NODEMAIL_USER,
+        to: email,
+        subject: "Your OTP Code",
+        text: `รหัส OTP ของคุณคือ: ${otp}`,   // ใช้ตัวแปร otp
+        html: `<h2>รหัส OTP ของคุณคือ</h2><h1>${otp}</h1>`, // ใช้ otp
+    };
+    transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+            console.log(err);
+            return res.json({ success: false, error: "ส่ง OTP ไม่สำเร็จ" });
+        }
         // console.log("Message sent:", info.messageId);
 
-    // บันทึก OTP ลง DB
-    db.query(
-        "UPDATE users SET otp=?, otp_expire=? WHERE email=?",
-        [otp, expiresAt, email],
-        (err) => {
-            if (err) return res.json({ error: "DB Error" });
-            res.json({ message: "ส่ง OTP สำเร็จแล้ว!" });
-        }
-    );
+        // บันทึก OTP ลง DB
+        db.query(`INSERT INTO users (email, otp, otp_expire) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE otp = VALUES(otp), otp_expire = VALUES(otp_expire)`,
+            [email, otp, expiresAt],
+
+            (error) => {
+                if (error) {
+                    console.log(error);
+                    return res.json({ success: false, error: "บันทึก OTP ไม่สำเร็จ" });
+                }
+                return res.json({ success: true });
+            }
+        );
+    });
+    console.log("Send OTP to email:", email, "OTP =", otp);
 })
 
-router.post("/verify-otp", async (req, res) => {
-    const { email, otp } = req.body
+// router.post("/verify-otp", async (req, res) => {
+//     const { email, otp } = req.body
 
-    db.query(
-        "SELECT * FROM users WHERE email = ?",
-        [email],
-        (err, rows) => {
-            if (err) return res.json({ error: "Error DB" });
+//     db.query(
+//         "SELECT * FROM users WHERE email = ?",
+//         [email],
+//         (err, rows) => {
+//             if (err) return res.json({ error: "Error DB" });
 
-            const user = rows[0];
+//             const user = rows[0];
 
-            if (!user) return res.json({ error: "ไม่พบผู้ใช้" });
+//             if (!user) return res.json({ error: "ไม่พบผู้ใช้" });
 
-            if (Date.now() > user.otp_expire)
-                return res.json({ error: "OTP หมดอายุแล้ว กรุณาขอใหม่" });
+//             if (Date.now() > user.otp_expire)
+//                 return res.json({ error: "OTP หมดอายุแล้ว กรุณาขอใหม่" });
 
-            if (otp != user.otp)
-                return res.json({ error: "OTP ไม่ถูกต้อง" });
+//             if (otp != user.otp)
+//                 return res.json({ error: "OTP ไม่ถูกต้อง" });
 
-            return res.json({ message: "ยืนยัน OTP สำเร็จ!" });
-        }
-    );
-})
+//             return res.json({ message: "ยืนยัน OTP สำเร็จ!" });
+//         }
+//     );
+// })
 
 router.post("/register", (req, res) => {
-    const { username, password, password2, email, otp, otp_expire} = req.body
+    const { username, password, password2, email, otp } = req.body
 
     if (password != password2) {
         return res.render("register.ejs", { error: "Passwords are not same." })
@@ -131,21 +141,43 @@ router.post("/register", (req, res) => {
         if (error) {
             console.log(error)
         }
-        if (result.length > 0) {
-            return res.render("register.ejs", { error: "This email has been used." })
+        // if (result.length > 0) {
+        //     return res.render("register.ejs", { error: "This email has been used." })
+        // }
+        if (result.length === 0) {
+            return res.render("register.ejs", { error: "กดรับ OTP ก่อนลงทะเบียน" });
+        }
+        const user = result[0];
+
+        if (user.username !== null) {
+            return res.render("register.ejs", { error: "อีเมลนี้ถูกใช้แล้ว" });
+        }
+
+        if (!user.otp) {
+            return res.render("register.ejs", { error: "กดรับ OTP ก่อนลงทะเบียน" });
+        }
+
+        if (String(otp) !== String(user.otp)) {
+            return res.render("register.ejs", { error: "รหัส OTP ไม่ถูกต้อง" });
+        }
+
+
+        // ❌ หมดอายุ
+        if (new Date() > user.otp_expire) {
+            return res.render("register.ejs", { error: "รหัส OTP หมดอายุแล้ว" });
         }
 
         let hashedPassword = await bcrypt.hash(password, 8);
 
         const user_data = {
             username: username,
-            password: hashedPassword,
-            email: email,
-            otp: otp,
-            otp_expire: otp_expire
+            password: hashedPassword
+            // email: email,
+            // otp: otp,
+            // otp_expire: otp_expire
         }
 
-        db.query('insert into users set ?', user_data, (error, result) => {
+        db.query('UPDATE users set ? WHERE email = ?', [user_data, email], (error, result) => {
             if (error) {
                 console.log(error)
             } else {
@@ -153,6 +185,8 @@ router.post("/register", (req, res) => {
             }
         });
     })
+    console.log("Register email: ", email);
+    console.log("Register otp: ", otp);
 })
 
 module.exports = router
