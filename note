@@ -8,6 +8,9 @@ create table users(
     otp_expire datetime
 );
 
+ALTER TABLE users ADD UNIQUE(email); //email เดิมจะ insert ไม่ได้ซ้ำอีก
+TRUNCATE TABLE users; //ลบข้อมูลในตารางทั้งหมด
+
 
 Object 3D
 1.กดแล้วโชว์ ไม่เข้าเครื่อง
