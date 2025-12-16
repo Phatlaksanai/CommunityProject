@@ -77,19 +77,6 @@ export default function Register() {
     // });
 
 
-    const res = await fetch("/api/send-otp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      alert("ส่งรหัส OTP แล้ว!");
-    } else {
-      alert(data.message);
-    }
   };
 
   // ================= REGISTER =================
@@ -124,12 +111,14 @@ export default function Register() {
 
     const data = await res.json();
 
-    if (!data.success) {
-      setError(data.message);
-    } else {
+    // เช็ค status code (ถ้าไม่ใช่ 200-299 ถือว่า error)
+      if (!res.ok) {
+        // ดึง key "error" ที่ backend ส่งมา
+        setError(data.error || "การลงทะเบียนล้มเหลว");
+        return;
+      }
       alert("Register success!");
       navigate("/login");
-    }
   };
 
   return (
