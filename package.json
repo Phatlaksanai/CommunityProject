@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "project",
   "version": "1.0.0",
   "description": "",
@@ -10,11 +11,23 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Phatlaksanai/CommunityProject.git"
+=======
+  "name": "final",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "npm start --prefix server",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+>>>>>>> ef19773 (change ejs to react)
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+<<<<<<< HEAD
   "bugs": {
     "url": "https://github.com/Phatlaksanai/CommunityProject/issues"
   },
@@ -28,5 +41,9 @@
     "mysql2": "^3.15.1",
     "nodemailer": "^7.0.11",
     "nodemon": "^3.1.10"
+=======
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+>>>>>>> ef19773 (change ejs to react)
   }
 }

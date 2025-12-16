@@ -1,0 +1,223 @@
+@import url('https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+:root{
+    --BG-color: #94B3CA;
+    --Top-color: #171C2E;
+    --Button-color: #273959;
+    --BT-shine: #485365;
+    --main-font-color: white;
+}
+* {
+    margin: 0;
+    box-sizing: border-box;
+}
+.Home {
+    
+    background-color: var(--BG-color); 
+
+    .TopPage{
+        width: 100%;
+        height: 70px;
+        background-color: var(--Top-color);
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        padding: 10px 20px;
+    }
+
+    .Logo::first-letter{
+        font-size: 2em;
+        font-style: italic;
+    }
+    .Logo{
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-family: "Jaro", sans-serif;
+        text-shadow: #000000 2px 2px 4px;
+        color: var(--main-font-color);
+        display: inline;
+    }
+    #profile{
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    /* box คลุมปุ่ม */
+    .menubar{
+        width: 500px;
+        height: 40px;
+        margin: 0px 20px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .button{
+        margin: 0;
+        background-color: var(--Button-color); 
+
+        font-size: 16px;
+        color: var(--main-font-color);
+        padding: 8px 20px;
+
+        border: 3px solid black;
+        border-radius: 30px;
+
+        display: inline;
+        
+        text-align: center;
+
+        cursor: pointer; /*รูปมือเวลาจี้*/
+    }
+    .button:hover{
+        background-color: var(--BT-shine);
+        font-size: 16px;
+    }
+
+    /* =================================== Space ====================================== */
+    .all-space {
+        background-color: var(--BG-color);
+        display: flex;
+        height: calc(100vh - 70px); /* เต็มหน้าจอ ลบความสูงแท็บบน */
+    }
+    /* ---------------------------------------- left ---------------------------------------- */
+    .L-space {
+        flex: 1; /*25*/
+        /* background: lightblue; */
+    }
+    .container{
+        width: 60px;
+        border-radius: 60px;
+        border: #000000 5px solid;
+        background: var(--Button-color);
+
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        
+        /* position: sticky;
+        top: 0; */
+
+        margin: 10px 0px 0px 10px;
+        align-items: center;
+    }
+    .box{
+        width: 40px;
+        height: 40px;
+        background-color: rgb(132, 252, 173);
+        font-size: 35px;
+        overflow: hidden;
+        text-align: center;
+        border-radius: 100px;
+        gap: 30px;
+    }
+
+    /* ---------------------------------------- mid ---------------------------------------- */
+    .M-space {
+        
+        flex: 2; /*50*/
+        /* background: lightgray; */
+        overflow-y: auto;
+        padding: 0px 50px;
+        display: block;
+    }
+    .M-space .BarWrite {
+        margin-bottom: 10px;  /* เว้นช่องว่างโพสต์ */
+    }
+
+    /* ป้ายเลื่อน ๆ */
+    #news{
+        margin: 10px 0px;
+        width: 100%;
+        height: 100px;
+        border: var(--BG-color) 3px solid;
+        background-color: rgb(243, 243, 243);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        display: flex;
+        
+        justify-content: center; /*x*/
+        align-items: center; /*y*/
+
+        font-size: 50px;
+    }
+
+    .BarWrite {
+        display: flex;
+        flex: 1;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .but{
+        background-color: var(--Button-color);
+        font-size: 16px;
+        color: var(--main-font-color);
+        padding: 5px 14px;
+        border: 3px solid black;
+        border-radius: 30px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    /* Left panel */
+    .left-panel {
+        
+        /* background-color: var(--primary-color); */
+        /* color: var(--text-color); */
+        /* flex: 1; */
+        padding: 10px;
+
+    }
+
+    /* Right panel */
+    .right-panel {
+        /* max-width: 400px; */
+        /* background-color: var(--secondary-color); */
+        flex: 1;
+        padding: 10px;
+        /* font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal; */
+        display: flex;
+        flex-direction: column;
+    }
+    .right-panel p{
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    }
+
+    /* Form */
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    form input {
+        padding: 8px 12px;
+        border-radius: 6px;
+        /* border: 1px solid var(--accent-color); */
+        font-size: 16px;
+    }
+
+
+    /* -------------------------------- right ------------------------------------------------ */
+    .R-space {
+        flex: 1; /*25*/
+        /* background: lightgreen; */
+    }
+    /* ======================================================================================= */
+
+    /* Responsive */
+    @media (max-width: 700px){
+        .login-container {
+            flex-direction: column;
+            width: 90%;
+        }
+    }
+}
