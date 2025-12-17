@@ -167,7 +167,7 @@ export default function Register() {
                 />
 
                 <div className="btns">
-                  <button type="button" className="next" onClick={nextStep}>
+                  <button type="submit" className="next" onClick={nextStep}>
                     Next
                   </button>
                 </div>

@@ -3,7 +3,9 @@ const path = require('path')
 const app = express()
 const mysql = require('mysql2');
 const dotenv = require('dotenv');
-// const router = require('./routes/MyRouter.js')
+
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 dotenv.config({path: './.env'})
 
@@ -25,7 +27,10 @@ db.connect((err) => {
 // app.set('view engine', 'ejs')
 app.use(express.json());//new+++++
 app.use(express.urlencoded({extended:false}))
-// app.use(router)
+
+app.use(cookieParser());
+app.use(cors({origin: ["http://localhost:5173","http://10.40.148.108:5173",],credentials: true, }));//new+++++
+
 app.use('/api', require('./routes/MyRouter')) // API        new++++++++++++++
 app.use(express.static(path.join(__dirname, 'public')))
 

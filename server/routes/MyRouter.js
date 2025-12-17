@@ -2,7 +2,9 @@ const express = require('express')
 const router = express.Router()
 const mysql = require('mysql2');
 const bcrypt = require('bcryptjs');
-const nodemailer = require("nodemailer");//new--------------------
+const nodemailer = require("nodemailer");
+const jwt = require("jsonwebtoken");//new--------------------
+const verifyToken = require("../middleware/verifyToken");//new--------------------
 
 
 require('dotenv').config();
@@ -19,80 +21,51 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_KEY_SECRET
 })
 
-// router.get("/", (req, res) => {
-//     res.render("home.ejs")
-// })
-// router.get("/login", (req, res) => {
-//     res.render("login.ejs")
-// })
-// router.get("/register", (req, res) => {
-//     res.render("register.ejs")
-// })
-// router.get("/upload", (req, res) => {
-//     res.render("upload.ejs")
-// })
-
-
-// router.post("/login", (req, res) => {
-//     const { username, password } = req.body
-//     // if (!username || !password) {
-//     //     return res.render("login.ejs", {error: "Please enter username or password."});
-//     // } ไม่ได้ใช้
-
-//     db.query('select * from users where username = ?', [username], async (error, result) => {
-//         if (error) {
-//             console.log(error)
-//         }
-
-//         if (result.length === 0) {
-//             return res.status(401).json({ error: "Username or Password incorrect" });
-//         }
-//         // ดึง hash จาก database
-//         const hashedPassword = result[0].password;
-
-//         // เทียบ password ที่ผู้ใช้กรอก กับ hash ในระบบ
-//         const isMatch = await bcrypt.compare(password, hashedPassword);
-
-//         if (!isMatch) {
-//             return res.status(401).json({ error: "Username or Password incorrect" })
-//         }
-
-//         return res.json({success: true, profilename: username})
-//     });
-// })
+router.post("/", verifyToken, (req, res) => { // NEw Verify Token
+  res.json("Create post by user " + req.user.user_id);
+  console.log("cookies:", req.cookies);//chack log
+});
 
 router.post("/login", (req, res) => {
     const { username, password } = req.body
 
     db.query('select * from users where username = ?', [username], async (error, result) => {
-        // 1. ถ้า Database Error ต้อง return ทันที ห้ามรันต่อ
         if (error) {
             console.log(error)
             return res.status(500).json({ error: "Database error" });
         }
 
-        // 2. ถ้าไม่พบชื่อผู้ใช้
         if (result.length === 0) {
             return res.status(401).json({ error: "Username or Password incorrect" });
         }
 
         const user = result[0];
         const hashedPassword = user.password;
-//         const hashedPassword = result[0].password;
 
-
-        // 3. เช็ค Password
         const isMatch = await bcrypt.compare(password, hashedPassword);
 
         if (!isMatch) {
             return res.status(401).json({ error: "Username or Password incorrect" })
         }
+        // สร้าง JWT
+        const token = jwt.sign( { user_id: user.user_id }, process.env.JWT_SECRETKEY, { expiresIn: "1d" }); 
 
         // ส่งกลับเป็น success: true เพื่อให้ Frontend เช็คง่ายๆ
-        return res.json({ success: true, username: user.username })
+        res.cookie("accessToken", token, { httpOnly: true,sameSite: "lax",}).status(200).json({success: true,username: user.username,});
     });
 })
 
+// LOGOUT 
+router.post("/logout", (req, res) => {
+  res
+    .clearCookie("accessToken", {
+      httpOnly: true,
+      sameSite: "lax", // dev
+      // secure: true, // เปิดตอน https (production)
+    })
+    .status(200)
+    .json({ success: true });
+});
 
 
 router.post("/send-otp", async (req, res) => {
@@ -140,32 +113,13 @@ router.post("/send-otp", async (req, res) => {
     console.log("Send OTP to email:", email, "OTP =", otp);
 })
 
-// router.post("/verify-otp", async (req, res) => {
-//     const { email, otp } = req.body
-
-//     db.query(
-//         "SELECT * FROM users WHERE email = ?",
-//         [email],
-//         (err, rows) => {
-//             if (err) return res.json({ error: "Error DB" });
-
-//             const user = rows[0];
-
-//             if (!user) return res.json({ error: "ไม่พบผู้ใช้" });
-
-//             if (Date.now() > user.otp_expire)
-//                 return res.json({ error: "OTP หมดอายุแล้ว กรุณาขอใหม่" });
-
-//             if (otp != user.otp)
-//                 return res.json({ error: "OTP ไม่ถูกต้อง" });
-
-//             return res.json({ message: "ยืนยัน OTP สำเร็จ!" });
-//         }
-//     );
-// })
 
 router.post("/register", (req, res) => {
     const { username, password, password2, email, otp } = req.body
+
+    if (!username || !password) {
+        return res.status(400).json({ error: "Please enter username or password." })
+    }
 
     if (password != password2) {
         return res.status(400).json({ error: "Passwords not match" })

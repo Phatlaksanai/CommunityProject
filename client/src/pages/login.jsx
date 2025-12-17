@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
+import { makeRequest } from "../api/axios";//new*----------------------
 
 export default function Login({ setUser }) {
   const navigate = useNavigate();
@@ -21,26 +22,48 @@ export default function Login({ setUser }) {
     //   body: JSON.stringify({ username, password }),
     // });
 
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+    // const res = await fetch("/api/login", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ username, password }),
+    // });
+
+    // const data = await res.json();
+
+    // if (!data.success) {
+    //   setError(data.message);
+    //   setError(data.error || "Login Failed");
+    // } else {
+    //   setSuccess("Login success");
+    //   // setUser(data.user);   
+    //   // เก็บ user ไว้ใช้ทั้ง app
+    //   // ✅ แก้ตรงนี้ 1: รับค่า username มาสร้างเป็น Object
+    // setUser({ username: data.username });
+
+    //   navigate("/");        // ไปหน้า Home
+    // }
+
+     try {
+    const res = await makeRequest.post("/login", {
+      username,
+      password,
     });
 
-    const data = await res.json();
-
-    if (!data.success) {
-      setError(data.message);
-      setError(data.error || "Login Failed");
-    } else {
+    // Backend ส่ง { success: true, username }
+    if (res.data.success) {
       setSuccess("Login success");
-      // setUser(data.user);   
-      // เก็บ user ไว้ใช้ทั้ง app
-      // ✅ แก้ตรงนี้ 1: รับค่า username มาสร้างเป็น Object
-    setUser({ username: data.username });
 
-      navigate("/");        // ไปหน้า Home
+      // เก็บ user ไว้ใช้ทั้ง app
+      setUser({ username: res.data.username });
+
+      navigate("/");
     }
+  } catch (err) {
+    setError(
+      err.response?.data?.error || "Login Failed"
+    );
+  }
+
   };
   
   return (
