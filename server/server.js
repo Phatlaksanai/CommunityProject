@@ -35,13 +35,13 @@ app.use('/api', require('./routes/MyRouter')) // API        new++++++++++++++
 app.use(express.static(path.join(__dirname, 'public')))
 
 // ===== SERVE REACT =====
-const clientBuildPath = path.join(__dirname, '../client/dist')
-app.use(express.static(clientBuildPath))
+// const clientBuildPath = path.join(__dirname, '../client/dist')
+// app.use(express.static(clientBuildPath))
 
-// สำคัญมาก: ให้ React Router ทำงาน
-app.get(/(.*)/, (req, res) => {
-  res.sendFile(path.join(clientBuildPath, 'index.html'))
-})
+// // สำคัญมาก: ให้ React Router ทำงาน
+// app.get(/(.*)/, (req, res) => {
+//   res.sendFile(path.join(clientBuildPath, 'index.html'))
+// })
 
 app.use((req, res) => {
     res.status(404).json({ error: "API route not found" });

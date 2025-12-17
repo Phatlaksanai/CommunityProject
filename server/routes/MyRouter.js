@@ -55,6 +55,72 @@ router.post("/login", (req, res) => {
     });
 })
 
+router.get("/", (req, res) => {
+  // สั่ง JOIN เพื่อเอาชื่อคนโพสต์ (u.username) และรูป (u.profilePic) มาโชว์คู่กับโพสต์
+  const q = `SELECT p.*, p.description AS \`desc\`, u.user_id AS userId, u.username, u.profilePic 
+             FROM posts AS p 
+             JOIN users AS u ON (u.user_id = p.user_id) 
+             ORDER BY p.createdAt DESC`;
+
+  db.query(q, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json(data);
+  });
+});
+// router.post("/", verifyToken, (req, res) => {
+//   const q = "INSERT INTO posts (`description`, `img`, `createdAt`, `user_id`) VALUES (?)";
+  
+//   const values = [
+//     req.body.desc, // รับมาจากหน้าบ้าน (หน้าบ้านส่งมาชื่อ desc ได้ครับ ไม่ต้องแก้หน้าบ้าน)
+//     req.body.img,  
+//     new Date(),    // ส่งเวลาปัจจุบันไป
+//     req.user_id    // ไอดีคนโพสต์ (จาก Token)
+//   ];
+
+//   db.query(q, [values], (err, data) => {
+//     if (err) {
+//         console.error(err);
+//         return res.status(500).json(err);
+//     }
+//     return res.status(200).json("Post created!");
+//   });
+// });
+router.post("/", verifyToken, (req, res) => {
+  // --- ส่วน Debug: ปริ้นท์ค่าออกมาดูทุกขั้นตอน ---
+  console.log("========== เริ่มต้นการโพสต์ ==========");
+  console.log("1. ข้อมูลที่ส่งมา (Body):", req.body);
+  console.log("2. ข้อมูลคนโพสต์ (User Token):", req.user);
+  
+  // เช็คว่า User ID มีค่าไหม?
+  if (!req.user || !req.user.user_id) {
+    console.error("❌ Error: หา user_id ไม่เจอ! (Token อาจจะผิด หรือชื่อตัวแปรผิด)");
+    return res.status(403).json("Token invalid: No user_id found");
+  }
+
+  // เตรียมคำสั่ง SQL
+  const q = "INSERT INTO posts (`description`, `img`, `createdAt`, `user_id`) VALUES (?)";
+  
+  const values = [
+    req.body.desc,      // ต้องมีค่า text ที่พิมพ์
+    req.body.img,       // เป็น null หรือชื่อไฟล์
+    new Date(),         // เวลาปัจจุบัน
+    req.user.user_id    // ไอดีคนโพสต์
+  ];
+
+  console.log("3. ค่าที่จะยัดลง DB:", values);
+
+  // ยิงลง Database
+  db.query(q, [values], (err, data) => {
+    if (err) {
+      console.error("❌ SQL ERROR (พังตรงนี้):", err.sqlMessage || err); // ดู Error ภาษาคน
+      return res.status(500).json(err);
+    }
+    
+    console.log("✅ สำเร็จ! บันทึกลง Database เรียบร้อย");
+    return res.status(200).json("Post created!");
+  });
+});
+
 // LOGOUT 
 router.post("/logout", (req, res) => {
   res
