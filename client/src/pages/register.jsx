@@ -125,9 +125,9 @@ export default function Register() {
     <div className="register">
       <div className="register-container">
         <div className="left-panel">
-          <h1>Temu</h1>
+          <h1>PM</h1>
           <p>
-            Welcome to Temu community
+            Welcome to PM community
             <br />
             There is a lot of fun !!!!
           </p>

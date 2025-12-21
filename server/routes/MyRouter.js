@@ -21,6 +21,17 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_KEY_SECRET
 })
 
+router.get("/posts", (req, res) => {
+ // สั่ง JOIN เพื่อเอาชื่อคนโพสต์ (u.username) และรูป (u.profilePic) มาโชว์คู่กับโพสต์
+  const q = `SELECT p.*, p.description AS \`desc\`, u.user_id AS userId, u.username, u.profilePic 
+             FROM posts AS p 
+             JOIN users AS u ON (u.user_id = p.user_id) 
+             ORDER BY p.createdAt DESC`;
+  db.query(q, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json(data);
+  });
+});
 router.post("/", verifyToken, (req, res) => { // NEw Verify Token
   res.json("Create post by user " + req.user.user_id);
   console.log("cookies:", req.cookies);//chack log
@@ -55,18 +66,6 @@ router.post("/login", (req, res) => {
     });
 })
 
-router.get("/", (req, res) => {
-  // สั่ง JOIN เพื่อเอาชื่อคนโพสต์ (u.username) และรูป (u.profilePic) มาโชว์คู่กับโพสต์
-  const q = `SELECT p.*, p.description AS \`desc\`, u.user_id AS userId, u.username, u.profilePic 
-             FROM posts AS p 
-             JOIN users AS u ON (u.user_id = p.user_id) 
-             ORDER BY p.createdAt DESC`;
-
-  db.query(q, (err, data) => {
-    if (err) return res.status(500).json(err);
-    return res.status(200).json(data);
-  });
-});
 // router.post("/", verifyToken, (req, res) => {
 //   const q = "INSERT INTO posts (`description`, `img`, `createdAt`, `user_id`) VALUES (?)";
   
@@ -85,39 +84,33 @@ router.get("/", (req, res) => {
 //     return res.status(200).json("Post created!");
 //   });
 // });
-router.post("/", verifyToken, (req, res) => {
-  // --- ส่วน Debug: ปริ้นท์ค่าออกมาดูทุกขั้นตอน ---
-  console.log("========== เริ่มต้นการโพสต์ ==========");
-  console.log("1. ข้อมูลที่ส่งมา (Body):", req.body);
-  console.log("2. ข้อมูลคนโพสต์ (User Token):", req.user);
-  
-  // เช็คว่า User ID มีค่าไหม?
-  if (!req.user || !req.user.user_id) {
-    console.error("❌ Error: หา user_id ไม่เจอ! (Token อาจจะผิด หรือชื่อตัวแปรผิด)");
-    return res.status(403).json("Token invalid: No user_id found");
-  }
-
-  // เตรียมคำสั่ง SQL
+// แก้ไขจาก router.post("/") เดิมทั้งหมด
+router.post("/posts", verifyToken, (req, res) => {
+  // 1. ตรวจสอบชื่อ Column ใน Database ของคุณ
+  // จากโค้ด SELECT คุณใช้ `description` และ `user_id` 
+  // แต่ใน INSERT เดิมคุณเขียน `desc` และ `userId` ซึ่งอาจจะไม่ตรงกับตารางจริง
   const q = "INSERT INTO posts (`description`, `img`, `createdAt`, `user_id`) VALUES (?)";
   
   const values = [
-    req.body.desc,      // ต้องมีค่า text ที่พิมพ์
-    req.body.img,       // เป็น null หรือชื่อไฟล์
-    new Date(),         // เวลาปัจจุบัน
-    req.user.user_id    // ไอดีคนโพสต์
+    req.body.desc,    // รับจากหน้าบ้าน
+    req.body.img || null, 
+    new Date(),       // วันที่ปัจจุบัน
+    req.user.user_id  // ดึงมาจาก Token (ที่ verifyToken ใส่มาให้)
   ];
 
-  console.log("3. ค่าที่จะยัดลง DB:", values);
-
-  // ยิงลง Database
   db.query(q, [values], (err, data) => {
     if (err) {
-      console.error("❌ SQL ERROR (พังตรงนี้):", err.sqlMessage || err); // ดู Error ภาษาคน
+      console.error("DB Error:", err);
       return res.status(500).json(err);
     }
     
-    console.log("✅ สำเร็จ! บันทึกลง Database เรียบร้อย");
-    return res.status(200).json("Post created!");
+    // ส่งข้อมูลกลับไปให้หน้าบ้านเพื่ออัปเดต UI ทันที
+    return res.status(200).json({ 
+        post_id: data.insertId, 
+        description: req.body.desc, 
+        createdAt: new Date(),
+        username: req.body.username, // ส่งชื่อกลับไปโชว์ด้วยถ้าต้องการ
+    });
   });
 });
 

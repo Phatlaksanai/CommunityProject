@@ -27,27 +27,42 @@ export default function Home({ user, setUser}) {
     fetchPosts();
   }, []); // [] แปลว่าทำครั้งเดียวตอนเปิดหน้าเว็บ
   
-  const addPost = async (e) => {
-    e.preventDefault();
+const addPost = async (e) => {
+  e.preventDefault();
 
-    if (text.trim() === "") {
-      alert("กรุณากรอกข้อความก่อนโพสต์");
-      return;
-    }
+  if (text.trim() === "") {
+    alert("กรุณากรอกข้อความก่อนโพสต์");
+    return;
+  }
 
-    try {
-      // ส่งแค่ text, userId ไม่ต้องส่งเพราะอยู่ใน Cookie/Token แล้ว
-      await makeRequest.post("/posts", { desc: text, img: null });
-      setText("");
-      // รีโหลดหน้าจอเพื่อดึงข้อมูลใหม่มาโชว์ (วิธีง่ายสุด)
-      window.location.reload(); 
-    } catch (err) {
-      console.log(err);
-    }
-    setPosts([...posts, text]);
-    // setText("");
+  try {
+    // 1. ส่งข้อมูลไปเซฟใน Database ผ่าน API
+    const res = await makeRequest.post("/posts", {
+      desc: text,
+    });
+
+    // 2. สร้าง Object ใหม่สำหรับแสดงผลหน้าเว็บทันที (ไม่ต้องรอ Refresh)
+    // โดยเอาข้อมูลที่ได้จาก Database (res.data) มาผสมกับข้อมูล User ปัจจุบัน
+    const newPostForUI = {
+      post_id: res.data.post_id, // ID ที่ได้จาก DB
+      username: user?.username || "Guest",
+      profilePic: user?.profilePic || "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg",
+      desc: text,
+      img: null,
+      createdAt: new Date(), // แสดงเวลาปัจจุบันไปก่อน
+    };
+
+    // 3. อัปเดต State posts ให้โพสต์ใหม่ไปอยู่บนสุด
+    setPosts([newPostForUI, ...posts]);
     
-  };
+    // 4. ล้างช่องกรอกข้อความ
+    setText(""); 
+    
+  } catch (err) {
+    console.error(err);
+    alert("บันทึกโพสต์ไม่สำเร็จ: " + (err.response?.data || err.message));
+  }
+};
 
   // logout
   const navigate = useNavigate();
@@ -82,8 +97,8 @@ export default function Home({ user, setUser}) {
             )}
             {user && (<button className="button" onClick={handleLogout}>Logout</button>)}
 
-            {/* ปุ่มทดสอบ API (คงไว้ตามเดิม) */}
-            <button onClick={async () => {
+            
+            {/* <button onClick={async () => {
               try {
                 const res = await makeRequest.post("/");
                 alert(res.data);
@@ -93,7 +108,7 @@ export default function Home({ user, setUser}) {
               }
             }}>
               ทดสอบยิง API
-            </button>
+            </button> */}
           </div>
 
           {user && (
