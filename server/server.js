@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
-dotenv.config({path: './.env'})
+dotenv.config({path: '../.env'})
 
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
