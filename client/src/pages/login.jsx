@@ -37,7 +37,7 @@ export default function Login({ setUser }) {
     //   setSuccess("Login success");
     //   // setUser(data.user);   
     //   // เก็บ user ไว้ใช้ทั้ง app
-    //   // ✅ แก้ตรงนี้ 1: รับค่า username มาสร้างเป็น Object
+    //   //  แก้ตรงนี้ 1: รับค่า username มาสร้างเป็น Object
     // setUser({ username: data.username });
 
     //   navigate("/");        // ไปหน้า Home
@@ -52,10 +52,20 @@ export default function Login({ setUser }) {
     // Backend ส่ง { success: true, username }
     if (res.data.success) {
       setSuccess("Login success");
-
+      //-------------------------------------------------------------------------New refesh ไม่หาย---------------------------
+      // 1. สร้างก้อนข้อมูล user ที่เราต้องการจะใช้ (ให้มีหน้าตาเหมือนกันทั้งแอป)
+    const userData = { 
+      username: res.data.username,
+      // ถ้ามี profilePic หรือ id ก็ใส่เพิ่มตรงนี้ได้
+    };
+      // 2. เก็บลง LocalStorage (ต้องเป็นก้อนเดียวกับที่จะ setUser)
+    localStorage.setItem("accessToken", res.data.accessToken);
+    localStorage.setItem("user", JSON.stringify(userData)); //  เก็บ userData ที่เราสร้าง
+      // 3. อัปเดต State
+    setUser(userData);
+      //----------------------------------------------------------------------------------------------------
       // เก็บ user ไว้ใช้ทั้ง app
-      setUser({ username: res.data.username });
-
+      //setUser({ username: res.data.username });// ลบอันเก่าออก
       navigate("/");
     }
   } catch (err) {

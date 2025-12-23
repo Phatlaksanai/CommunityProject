@@ -17,6 +17,7 @@ export default function Register() {
 
   // message
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [message, setMessage] = useState("");
 
   // ================= STEP CONTROL =================
@@ -43,6 +44,7 @@ export default function Register() {
     const sendOTP = async () => {
     // 1. ล้าง Error เก่าทิ้งก่อน
     setError(""); 
+    setSuccess("");
 
     if (!email.trim()) {
       // 2. เปลี่ยนจาก alert เป็น setError
@@ -58,10 +60,13 @@ export default function Register() {
       });
 
       const data = await res.json();
-
       if (data.success) {
-        alert("ส่งรหัส OTP แล้ว! (เช็คในอีเมล)"); // อันนี้อาจจะยังใช้ alert ได้ เพราะเป็นข่าวดี
-      } else {
+      setSuccess("ส่งรหัส OTP แล้ว!");
+      }
+      // if (data.success) {
+      //   alert("ส่งรหัส OTP แล้ว!"); 
+      // } 
+      else {
         // 3. ถ้า Backend แจ้ง error มา (เช่น ส่งไม่ไป) ก็โชว์ตัวหนังสือสีแดง
         setError(data.error || "ส่ง OTP ไม่สำเร็จ");
       }
@@ -83,6 +88,7 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
     // const res = await fetch("http://localhost:8080/api/register", {
     //   method: "POST",
@@ -117,7 +123,10 @@ export default function Register() {
         setError(data.error || "การลงทะเบียนล้มเหลว");
         return;
       }
-      alert("Register success!");
+      if (data.success) {
+      setSuccess("Register success");
+      }
+      // alert("Register success!");
       navigate("/login");
   };
 
@@ -173,6 +182,8 @@ export default function Register() {
                 </div>
               </div>
             )}
+
+            {success && (<div style={{ color: "#00ff00", marginBottom: 10 }}>{success}</div>)}
 
             {/* ================= STEP 2 ================= */}
             {step === 2 && (

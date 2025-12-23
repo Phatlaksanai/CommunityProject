@@ -69,6 +69,13 @@ const addPost = async (e) => {
   const handleLogout = async () => {
     try {
       await makeRequest.post("/logout"); // => /api/logout
+
+
+      // --- เพิ่ม 2 บรรทัดนี้ ---
+    localStorage.removeItem("user");//-------------------------------Naw refash ไม่หาย--------------------------------
+    localStorage.removeItem("accessToken");//----------------------------Naw refash ไม่หาย----------------------------
+
+
       setUser(null);                     // ล้าง user
       navigate("/");                // หรือ "/"
     } catch (err) {
@@ -76,6 +83,15 @@ const addPost = async (e) => {
       alert("Logout failed");
     }
   };
+  //   const handleLogout = async () => {
+  //   try {
+  //     await localStorage.removeItem("user"); 
+  //     window.location.reload();              // หรือ "/"
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert("Logout failed");
+  //   }
+  // };
 
   return (
     <>
