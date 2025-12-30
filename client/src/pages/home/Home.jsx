@@ -1,8 +1,8 @@
 import { useState ,useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import "./Home.css"; // เอา css เดิมมาใช้ได้เลย
-import { makeRequest } from "../api/axios";
+import "./home.scss"; // เอา css เดิมมาใช้ได้เลย
+import { makeRequest } from "../../api/axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime"; // โหลด Plugin "เมื่อสักครู่"
 import "dayjs/locale/th"; // โหลดภาษาไทย (ถ้าอยากได้อังกฤษไม่ต้องใส่)
