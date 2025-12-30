@@ -7,10 +7,14 @@ import "./login.scss";
 const Login = () => {
 
   const navigate = useNavigate()
+  const { setUser } = useContext(AuthContext); // ใช้ context ตรง ๆ
+  
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,6 +33,8 @@ const Login = () => {
         // สร้างก้อนข้อมูล user ที่เราต้องการจะใช้ (ให้มีหน้าตาเหมือนกันทั้งแอป)
         const userData = {
           username: res.data.username,
+          name: res.data.name || res.data.username,
+          profilePic: res.data.profilePic || "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg"
           // ถ้ามี profilePic หรือ id ก็ใส่เพิ่มตรงนี้ได้
         };
         // เก็บลง LocalStorage (ต้องเป็นก้อนเดียวกับที่จะ setUser)
