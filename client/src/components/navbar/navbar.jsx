@@ -16,6 +16,7 @@ import { makeRequest } from "../../api/axios";
 const Navbar = () => {
   const { toggle, darkMode } = useContext(DarkModeContext);
   const { currentUser, setUser } = useContext(AuthContext);
+  const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   const navigate = useNavigate();
   const handleLogout = async () => {
@@ -34,7 +35,7 @@ const Navbar = () => {
       alert("Logout failed");
     }
   };
-  const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
+  
   return (
     <div className="navbar">
       <div className="left">
@@ -65,7 +66,7 @@ const Navbar = () => {
         <EmailOutlinedIcon />
         <NotificationsOutlinedIcon />
         <div className="user">
-          <img src={currentUser?.profilePic || defaultPic} alt="user avatar" />
+          <img src={currentUser?.profilePic || defaultPic} alt="" />
           <span>{currentUser?.name || "Guest"}</span>
           {currentUser && (
             <button onClick={handleLogout} style={{ marginLeft: "10px", cursor: "pointer" }}>

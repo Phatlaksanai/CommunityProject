@@ -62,7 +62,7 @@ router.post("/login", (req, res) => {
         const token = jwt.sign( { user_id: user.user_id }, process.env.JWT_SECRETKEY, { expiresIn: "1d" }); 
 
         // ส่งกลับเป็น success: true เพื่อให้ Frontend เช็คง่ายๆ
-        res.cookie("accessToken", token, { httpOnly: true,sameSite: "lax",}).status(200).json({success: true,username: user.username,});
+        res.cookie("accessToken", token, { httpOnly: true,sameSite: "lax",}).status(200).json({success: true,username: user.username, profilePic: user.profilePic || ""});
     });
 })
 

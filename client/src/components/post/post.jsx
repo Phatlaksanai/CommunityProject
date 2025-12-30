@@ -20,6 +20,7 @@ const Post = ({ post }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
+const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   // const { isLoading, error, data } = useQuery(["likes", post.id], () =>
   //   makeRequest.get("/likes?postId=" + post.id).then((res) => {
@@ -92,7 +93,7 @@ const Post = ({ post }) => {
       <div className="container">
         <div className="user">
           <div className="userInfo">
-            <img src={"/upload/" + post.profilePic} alt="" />
+            <img src={post.profilePic || defaultPic} alt="" />
             <div className="details">
               <Link
                 to={`/profile/${post.userId}`}

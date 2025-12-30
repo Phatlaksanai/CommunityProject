@@ -18,16 +18,14 @@ import { useContext } from "react";
 const LeftBar = () => {
 
   const { currentUser } = useContext(AuthContext);
+  const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   return (
     <div className="leftBar">
       <div className="container">
         <div className="menu">
           <div className="user">
-            <img
-              src={currentUser?.profilePic || "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg"}
-              alt=""
-            />
+            <img src={currentUser?.profilePic || defaultPic} alt="" />
             <span>{currentUser?.name || "Guest"}</span>
           </div>
           <div className="item">

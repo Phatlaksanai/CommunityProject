@@ -12,6 +12,7 @@ const Share = () => {
   const [file, setFile] = useState(null); // เก็บรูป 
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
+  const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   const mutation = useMutation({
     mutationFn: (newPost) => {
@@ -30,18 +31,15 @@ const Share = () => {
     setFile(null);
   };
 
-  // ค่า default ถ้า currentUser เป็น null
-  const profilePic = currentUser?.profilePic || "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
-  const name = currentUser?.name || "Guest";
-
   return (
     <div className="share">
       <div className="container">
         <div className="top">
-          <img src={profilePic} alt="Profile" />
+          <img src={currentUser?.profilePic || defaultPic} alt="" />
+          <span>{currentUser?.name || "Guest"}</span>
           <input
             type="text"
-            placeholder={`What's on your mind ${name}?`}
+            placeholder={`What's on your mind ?`}
             onChange={(e) => setDesc(e.target.value)}
             value={desc}
           />
