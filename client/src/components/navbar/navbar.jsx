@@ -26,13 +26,22 @@ const Navbar = () => {
       localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
 
-      // ถ้าใน Context มีฟังก์ชันล้าง user ให้เรียกใช้ (ถ้าไม่มีให้ข้ามบรรทัดนี้)
-      // setUser(null); 
+    // รีเฟรชหน้าเพื่อโหลด state ใหม่
+    window.location.reload();
 
-      navigate("/login"); // เด้งไปหน้า Login
+      navigate("/"); // เด้งไปหน้า Login
     } catch (err) {
       console.error(err);
       alert("Logout failed");
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      navigate("/login"); // เด้งไปหน้า Login
+    } catch (err) {
+      console.error(err);
+      alert("Login failed");
     }
   };
   
@@ -68,6 +77,11 @@ const Navbar = () => {
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" />
           <span>{currentUser?.name || "Guest"}</span>
+          {!currentUser && (
+            <button onClick={handleLogin} style={{ marginLeft: "10px", cursor: "pointer" }}>
+              Login
+            </button>
+          )}
           {currentUser && (
             <button onClick={handleLogout} style={{ marginLeft: "10px", cursor: "pointer" }}>
               Logout
