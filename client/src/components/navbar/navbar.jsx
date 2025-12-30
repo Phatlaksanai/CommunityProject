@@ -65,10 +65,15 @@ const Navbar = () => {
         <EmailOutlinedIcon />
         <NotificationsOutlinedIcon />
         <div className="user">
-          <img src={currentUser.profilePic} alt="" />
-          <span>{currentUser.name}</span>
-          <button onClick={handleLogout} style={{marginLeft: "10px", cursor: "pointer"}}>Logout</button>
+          <img src={currentUser?.profilePic || defaultPic} alt="user avatar" />
+          <span>{currentUser?.name || "Guest"}</span>
+          {currentUser && (
+            <button onClick={handleLogout} style={{ marginLeft: "10px", cursor: "pointer" }}>
+              Logout
+            </button>
+          )}
         </div>
+
       </div>
     </div>
   );

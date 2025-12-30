@@ -8,10 +8,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 
 const Share = () => {
-
   const [desc, setDesc] = useState(""); // เก็บข้อความ
   const [file, setFile] = useState(null); // เก็บรูป 
-  const { currentUser } = useContext(AuthContext)
+  const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -19,11 +18,11 @@ const Share = () => {
       return makeRequest.post("/posts", newPost);
     },
     onSuccess: () => {
-      // เมื่อโพสต์สำเร็จ ให้สั่งรีเฟรชข้อมูล key "posts" ทันที
       queryClient.invalidateQueries(["posts"]);
     },
   });
-  const handleClick = async (e) => {
+
+  const handleClick = (e) => {
     e.preventDefault();
     if (desc.trim() === "") return; // ถ้าว่างไม่ต้องทำอะไร
     mutation.mutate({ desc, img: file }); // ส่งข้อมูลไปหลังบ้าน
@@ -31,32 +30,43 @@ const Share = () => {
     setFile(null);
   };
 
+  // ค่า default ถ้า currentUser เป็น null
+  const profilePic = currentUser?.profilePic || "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
+  const name = currentUser?.name || "Guest";
+
   return (
     <div className="share">
       <div className="container">
         <div className="top">
-          <img src={currentUser.profilePic} alt="" />
-          <input type="text" placeholder={`What's on your mind ${currentUser.name}?`}
+          <img src={profilePic} alt="Profile" />
+          <input
+            type="text"
+            placeholder={`What's on your mind ${name}?`}
             onChange={(e) => setDesc(e.target.value)}
-            value={desc} />
+            value={desc}
+          />
         </div>
         <hr />
         <div className="bottom">
           <div className="left">
-            <input type="file" id="file" style={{ display: "none" }}
-              onChange={(e) => setFile(e.target.files[0])} />
+            <input
+              type="file"
+              id="file"
+              style={{ display: "none" }}
+              onChange={(e) => setFile(e.target.files[0])}
+            />
             <label htmlFor="file">
               <div className="item">
-                <img src={Image} alt="" />
+                <img src={Image} alt="Add" />
                 <span>Add Image</span>
               </div>
             </label>
             <div className="item">
-              <img src={Map} alt="" />
+              <img src={Map} alt="Map" />
               <span>Add Place</span>
             </div>
             <div className="item">
-              <img src={Friend} alt="" />
+              <img src={Friend} alt="Friend" />
               <span>Tag Friends</span>
             </div>
           </div>

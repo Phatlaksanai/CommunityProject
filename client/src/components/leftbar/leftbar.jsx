@@ -25,10 +25,10 @@ const LeftBar = () => {
         <div className="menu">
           <div className="user">
             <img
-              src={currentUser.profilePic}
+              src={currentUser?.profilePic || "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg"}
               alt=""
             />
-            <span>{currentUser.name}</span>
+            <span>{currentUser?.name || "Guest"}</span>
           </div>
           <div className="item">
             <img src={Friends} alt="" />
