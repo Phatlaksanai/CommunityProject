@@ -14,6 +14,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
+import ModelViewer from "../modelViewer/ModelViewer";
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
@@ -112,6 +113,7 @@ const Post = ({ post }) => {
         <div className="content">
           <p>{post.description}</p>
           <img src={post.img} alt="" />
+          {post.model && <ModelViewer modelUrl={post.model} />}
         </div>
         <div className="info">
           <div className="item">

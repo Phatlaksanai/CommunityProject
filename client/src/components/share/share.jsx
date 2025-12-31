@@ -1,6 +1,5 @@
 import "./share.scss";
 import Image from "../../assets/1.png";
-import Model from "../../assets/1.png";
 import Friend from "../../assets/1.png";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
@@ -120,12 +119,6 @@ const Share = () => {
               <div className="item">
                 <img src={Image} alt="Add" />
                 <span>Add Image</span>
-              </div>
-            </label>
-            <label htmlFor="file">
-              <div className="item">
-                <img src={Model} alt="Model" />
-                <span>Add Model</span>
               </div>
             </label>
             <div className="item">
