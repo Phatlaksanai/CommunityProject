@@ -14,6 +14,7 @@ npm install @mui/icons-material @mui/material @emotion/styled @emotion/react // 
 npm install -D sass-embedded // client 
 npm install @tanstack/react-query // client 
 npm install multer-storage-cloudinary multer --legacy-peer-deps // server =============new
+npm install three // client ================new
 
 สิ่งที่ต้องเพิ่ม
 แจ้งเตือนมีเมลแล้วก่อนส่ง otp

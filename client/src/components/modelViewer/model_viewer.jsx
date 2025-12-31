@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
@@ -6,16 +6,20 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 
 const ModelViewer = ({ modelUrl }) => {
   const containerRef = useRef(null);
+  
+  // 1. เพิ่ม State เพื่อควบคุมการแสดงผล
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!modelUrl) return;
+    // 2. ถ้ายังไม่กดดู (isVisible = false) หรือไม่มี URL ให้หยุดทำงานทันที
+    if (!modelUrl || !isVisible) return;
 
     const container = containerRef.current;
     if (!container) return;
 
     /* ================= Scene ================= */
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf2f2f2);
+    scene.background = new THREE.Color(0x999999);
 
     /* ================= Camera ================= */
     const camera = new THREE.PerspectiveCamera(
@@ -26,7 +30,7 @@ const ModelViewer = ({ modelUrl }) => {
     );
 
     /* ================= Renderer ================= */
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.outputEncoding = THREE.sRGBEncoding;
@@ -130,24 +134,76 @@ const ModelViewer = ({ modelUrl }) => {
 
       controls.dispose();
       renderer.dispose();
+      
+      // ล้างค่า Environment Map ด้วยเพื่อคืน memory
+      envMap.dispose(); 
 
       if (renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
     };
-  }, [modelUrl]);
+  }, [modelUrl, isVisible]); // เพิ่ม isVisible เป็น dependency
 
+  // 3. ส่วนแสดงผล UI (Placeholder) ตอนยังไม่กดโหลด
+  if (!isVisible) {
+    return (
+      <div
+        onClick={() => setIsVisible(true)}
+        style={{
+          width: "100%",
+          height: "400px",
+          marginTop: "10px",
+          borderRadius: "10px",
+          background: "#e0e0e0", // สีพื้นหลังตอนยังไม่โหลด
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          border: "1px solid #ccc"
+        }}
+      >
+        <div style={{ fontSize: "50px" }}>📦</div>
+        <div style={{ marginTop: "10px", fontWeight: "bold", color: "#555" }}>
+          Click to Load 3D Model
+        </div>
+      </div>
+    );
+  }
+
+  // 4. ส่วนแสดงผล Viewer ของจริง (เมื่อกดแล้ว)
   return (
-    <div
-      ref={containerRef}
-      style={{
-        width: "100%",
-        height: "400px",
-        borderRadius: "10px",
-        overflow: "hidden",
-        marginTop: "10px",
-      }}
-    />
+    <div style={{ position: "relative", marginTop: "10px" }}>
+      {/* Container ของ Three.js */}
+      <div
+        ref={containerRef}
+        style={{
+          width: "100%",
+          height: "400px",
+          borderRadius: "10px",
+          overflow: "hidden",
+        }}
+      />
+      
+      {/* ปุ่ม Close เพื่อปิดโมเดล (คืน Memory) */}
+      <button
+        onClick={() => setIsVisible(false)}
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          background: "rgba(0,0,0,0.6)",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          padding: "5px 10px",
+          cursor: "pointer",
+          zIndex: 10,
+        }}
+      >
+        Close
+      </button>
+    </div>
   );
 };
 

@@ -6,15 +6,14 @@ import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Link } from "react-router-dom";
 import Comments from "../comments/comments";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import dayjs from "dayjs"; // moment to dayjs
 import relativeTime from "dayjs/plugin/relativeTime"; // โหลด Plugin "เมื่อสักครู่"
 import "dayjs/locale/th"; // โหลดภาษาไทย (ถ้าอยากได้อังกฤษไม่ต้องใส่)
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
-import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
-import ModelViewer from "../modelViewer/ModelViewer";
+import ModelViewer from "../modelViewer/model_viewer";
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
@@ -112,8 +111,17 @@ const Post = ({ post }) => {
         </div>
         <div className="content">
           <p>{post.description}</p>
-          <img src={post.img} alt="" />
           {post.model && <ModelViewer modelUrl={post.model} />}
+          {/* {models.length > 0 && models.map((modelUrl, index) => (
+            <div key={index} className="model-wrapper" style={{ marginTop: "20px" }}>
+              <div style={{ textAlign: "right", marginTop: "5px" }}>
+                <a href={modelUrl} download style={{ fontSize: "12px", color: "gray" }}>
+                  Download Model
+                </a>
+              </div>
+            </div>
+          ))} */}
+          <img src={post.img} alt="" />
         </div>
         <div className="info">
           <div className="item">
