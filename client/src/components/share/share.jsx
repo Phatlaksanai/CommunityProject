@@ -1,6 +1,6 @@
 import "./share.scss";
 import Image from "../../assets/1.png";
-import Map from "../../assets/1.png";
+import Model from "../../assets/1.png";
 import Friend from "../../assets/1.png";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
@@ -41,12 +41,26 @@ const Share = () => {
   const handleClick = async (e) => {
     e.preventDefault();
     if (desc.trim() === "" && !file) return;  // ถ้าไม่มีข้อความและไม่มีรูป ก็ไม่ต้องทำอะไร
-    let imgUrl = "";
-    if (file) { // ถ้ามีรูป ให้ทำการอัปโหลด
-      imgUrl = await upload();
-      if (!imgUrl) return alert("Upload failed!");
+    let imgUrl = null;
+    let modelUrl = null;
+    if (file) {
+      const url = await upload(); // ได้ URL จาก Cloudinary มา 
+      if (url) {
+        const isModel = /\.(obj|glb|gltf)$/i.test(file.name); // เช็คว่าเป็นไฟล์ 3D ไหม
+        if (isModel) {
+          modelUrl = url; // ถ้าเป็นโมเดล ให้ใส่ตัวแปรนี้
+          imgUrl = null;
+        } else {
+          imgUrl = url;   // ถ้าเป็นรูป ให้ใส่ตัวแปรนี้
+          modelUrl = null;
+        }
+      }
     }
-    mutation.mutate({ desc, img: imgUrl }); // ส่งข้อมูลเข้า Database 
+    mutation.mutate({ 
+      desc, 
+      img: imgUrl, 
+      model: modelUrl 
+    }); // ส่งข้อมูลเข้า Database 
   };
 
   const handleFileChange = (e) => {
@@ -99,7 +113,7 @@ const Share = () => {
               type="file"
               id="file"
               style={{ display: "none" }}
-              accept=".jpg,.png,.jpeg,.obj,.glb,.gltf" 
+              accept=".jpg,.png,.jpeg,.obj,.glb,.gltf"
               onChange={handleFileChange}
             />
             <label htmlFor="file">
@@ -108,10 +122,12 @@ const Share = () => {
                 <span>Add Image</span>
               </div>
             </label>
-            <div className="item">
-              <img src={Map} alt="Map" />
-              <span>Add Place</span>
-            </div>
+            <label htmlFor="file">
+              <div className="item">
+                <img src={Model} alt="Model" />
+                <span>Add Model</span>
+              </div>
+            </label>
             <div className="item">
               <img src={Friend} alt="Friend" />
               <span>Tag Friends</span>

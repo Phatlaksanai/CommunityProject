@@ -115,11 +115,12 @@ router.post("/posts", verifyToken, (req, res) => {
   // 1. ตรวจสอบชื่อ Column ใน Database ของคุณ
   // จากโค้ด SELECT คุณใช้ `description` และ `user_id` 
   // แต่ใน INSERT เดิมคุณเขียน `desc` และ `userId` ซึ่งอาจจะไม่ตรงกับตารางจริง
-  const q = "INSERT INTO posts (`description`, `img`, `createdAt`, `user_id`) VALUES (?)";
+  const q = "INSERT INTO posts (`description`, `img`, `model`, `createdAt`, `user_id`) VALUES (?)";
   
   const values = [
     req.body.desc,    // รับจากหน้าบ้าน
     req.body.img || null, 
+    req.body.model || null,
     new Date(),       // วันที่ปัจจุบัน
     req.user.user_id  // ดึงมาจาก Token (ที่ verifyToken ใส่มาให้)
   ];
