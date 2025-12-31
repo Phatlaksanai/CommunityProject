@@ -3,7 +3,6 @@ const path = require('path')
 const app = express()
 const mysql = require('mysql2');
 const dotenv = require('dotenv');
-
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 

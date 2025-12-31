@@ -14,21 +14,58 @@ const Share = () => {
   const queryClient = useQueryClient();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
+  const [filePreview, setFilePreview] = useState(null);  //โชว์รูปตัวอย่าง
+
+  const upload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await makeRequest.post("/upload", formData);
+      return res.data; // เอา data ข้างในเป็น URL ที่หลังบ้านส่งมา
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const mutation = useMutation({
     mutationFn: (newPost) => {
       return makeRequest.post("/posts", newPost);
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["posts"]);
+      setDesc("");
+      setFile(null);
+      setFilePreview(null);
     },
   });
 
-  const handleClick = (e) => {
+  const handleClick = async (e) => {
     e.preventDefault();
-    if (desc.trim() === "") return; // ถ้าว่างไม่ต้องทำอะไร
-    mutation.mutate({ desc, img: file }); // ส่งข้อมูลไปหลังบ้าน
-    setDesc(""); // ล้างค่าในช่องกรอก
-    setFile(null);
+    if (desc.trim() === "" && !file) return;  // ถ้าไม่มีข้อความและไม่มีรูป ก็ไม่ต้องทำอะไร
+    let imgUrl = "";
+    if (file) { // ถ้ามีรูป ให้ทำการอัปโหลด
+      imgUrl = await upload();
+      if (!imgUrl) return alert("Upload failed!");
+    }
+    mutation.mutate({ desc, img: imgUrl }); // ส่งข้อมูลเข้า Database 
+  };
+
+  const handleFileChange = (e) => {
+    const selected = e.target.files[0];
+    if (selected) {
+      if (/\.(jpg|jpeg|png|obj|glb|gltf)$/i.test(selected.name)) { // เช็คนามสกุลไฟล์
+        setFile(selected);
+
+        if (/\.(jpg|jpeg|png)$/i.test(selected.name)) {  // สร้าง Preview 
+          setFilePreview(URL.createObjectURL(selected));
+        } else {
+          setFilePreview(null); // ถ้าเป็นโมเดล อาจจะไม่โชว์รูปตัวอย่าง
+        }
+
+      } else {
+        alert("รองรับเฉพาะไฟล์รูปภาพ (.jpg, .png) และโมเดล 3D (.obj, .glb, .gltf) เท่านั้น");
+        e.target.value = null; // reset input
+      }
+    }
   };
 
   return (
@@ -43,6 +80,18 @@ const Share = () => {
             value={desc}
           />
         </div>
+        <div className="right">
+          {file && (
+            <div className="preview">
+              {filePreview ? (
+                <img className="file" alt="" src={filePreview} style={{ width: "50px", height: "50px", objectFit: "cover" }} />
+              ) : (
+                <span style={{ fontSize: "12px", color: "gray" }}>📦 {file.name}</span>
+              )}
+              <button onClick={() => { setFile(null); setFilePreview(null); }} style={{ marginLeft: "10px", color: "red", border: "none", background: "none", cursor: "pointer" }}>X</button>
+            </div>
+          )}
+        </div>
         <hr />
         <div className="bottom">
           <div className="left">
@@ -50,7 +99,8 @@ const Share = () => {
               type="file"
               id="file"
               style={{ display: "none" }}
-              onChange={(e) => setFile(e.target.files[0])}
+              accept=".jpg,.png,.jpeg,.obj,.glb,.gltf" 
+              onChange={handleFileChange}
             />
             <label htmlFor="file">
               <div className="item">

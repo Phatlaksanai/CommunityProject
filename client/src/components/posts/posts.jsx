@@ -20,11 +20,6 @@ const Posts = () => {
       <Post post={post} key={post.post_id || post.id} />
     ))}
   </div>
-  // <div className="posts">
-  //   {posts.map(post=>(
-  //     <Post post={post} key={post.id}/>
-  //   ))}
-  // </div>;
 
 };
 

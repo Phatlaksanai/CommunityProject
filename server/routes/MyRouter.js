@@ -3,23 +3,49 @@ const router = express.Router()
 const mysql = require('mysql2');
 const bcrypt = require('bcryptjs');
 const nodemailer = require("nodemailer");
-const jwt = require("jsonwebtoken");//new--------------------
-const verifyToken = require("../middleware/verifyToken");//new--------------------
+const jwt = require("jsonwebtoken");
+const verifyToken = require("../middleware/verifyToken");
+const cloudinary = require('cloudinary').v2
+const multer = require("multer"); //new--------------------
+const { CloudinaryStorage } = require("multer-storage-cloudinary"); //new--------------------
 
-
-require('dotenv').config();
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE
 });
-const cloudinary = require('cloudinary').v2
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_KEY_SECRET
+    api_secret: process.env.CLOUDINARY_API_SECRET
 })
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    const isModel = file.originalname.endsWith(".obj") || 
+                    file.originalname.endsWith(".glb") || 
+                    file.originalname.endsWith(".gltf");
+
+    return {
+      folder: isModel ? "Cloudinary/models" : "Cloudinary/Pictures", // ชื่อโฟลเดอร์ใน Cloudinary
+      resource_type: isModel ? "raw" : "image", 
+      public_id: isModel ? Date.now() + "-" + file.originalname // เก็บชื่อเต็มพร้อมนามสกุล 
+                         : Date.now() + "-" + file.originalname.replace(/\.[^/.]+$/, ""), // รูป: ตัดนามสกุลออก
+      allowed_formats: isModel ? undefined : ["jpg", "png", "jpeg", "gif"], 
+    };
+  },
+});
+const upload = multer({ storage: storage });
+
+router.post("/upload", upload.single("file"), (req, res) => {
+  try {
+    res.status(200).json(req.file.path); // cloudinaryส่ง URL นี้กลับไปให้ Frontend เพื่อ Save ลง DB
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
 
 router.get("/posts", (req, res) => {
  // สั่ง JOIN เพื่อเอาชื่อคนโพสต์ (u.username) และรูป (u.profilePic) มาโชว์คู่กับโพสต์
@@ -108,6 +134,7 @@ router.post("/posts", verifyToken, (req, res) => {
     return res.status(200).json({ 
         post_id: data.insertId, 
         description: req.body.desc, 
+        img: req.body.img || null,
         createdAt: new Date(),
         username: req.body.username, // ส่งชื่อกลับไปโชว์ด้วยถ้าต้องการ
     });

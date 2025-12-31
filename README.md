@@ -10,9 +10,10 @@ npm install jsonwebtoken //server
 npm install axios //client
 npm install cors //server
 npm install dayjs //server + client
-npm install @mui/icons-material @mui/material @emotion/styled @emotion/react // client ==============new
-npm install -D sass-embedded // client ==============new
-npm install @tanstack/react-query // client ==============new
+npm install @mui/icons-material @mui/material @emotion/styled @emotion/react // client 
+npm install -D sass-embedded // client 
+npm install @tanstack/react-query // client 
+npm install multer-storage-cloudinary multer --legacy-peer-deps // server =============new
 
 สิ่งที่ต้องเพิ่ม
 แจ้งเตือนมีเมลแล้วก่อนส่ง otp
