@@ -49,7 +49,7 @@ const Share = () => {
     for (const file of files) {
       const url = await upload(file); // ได้ URL จาก Cloudinary มา
       if (url) {
-        const isModel = /\.(obj|glb|gltf)$/i.test(file.name); // เช็คว่าเป็นไฟล์ 3D ไหม
+        const isModel = /\.(glb|gltf)$/i.test(file.name); // เช็คว่าเป็นไฟล์ 3D ไหม
         if (isModel) {
           modelUrls.push(url);
         } else {
@@ -69,7 +69,7 @@ const Share = () => {
     const selectedFiles = Array.from(e.target.files);
 
     const validFiles = selectedFiles.filter((file) =>
-      /\.(jpg|jpeg|png|obj|glb|gltf)$/i.test(file.name)
+      /\.(jpg|jpeg|png|glb|gltf)$/i.test(file.name)
     );
     setFiles((prev) => prev.concat(validFiles));
 
@@ -137,7 +137,7 @@ const Share = () => {
               id="file"
               multiple  
               style={{ display: "none" }}
-              accept=".jpg,.png,.jpeg,.obj,.glb,.gltf"
+              accept=".jpg,.png,.jpeg,.glb,.gltf"
               onChange={handleFileChange}
             />
             <label htmlFor="file">

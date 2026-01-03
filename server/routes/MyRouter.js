@@ -23,8 +23,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
-    const isModel = file.originalname.endsWith(".obj") || 
-                    file.originalname.endsWith(".glb") || 
+    const isModel = file.originalname.endsWith(".glb") || 
                     file.originalname.endsWith(".gltf");
 
     return {

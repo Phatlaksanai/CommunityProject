@@ -100,9 +100,6 @@ const ModelViewer = ({ modelUrl }) => {
     if (ext === "glb" || ext === "gltf") {
       const loader = new GLTFLoader();
       loader.load(modelUrl, (gltf) => onModelLoaded(gltf.scene));
-    } else if (ext === "obj") {
-      const loader = new OBJLoader();
-      loader.load(modelUrl, (obj) => onModelLoaded(obj));
     } else {
       console.warn("Unsupported model format");
     }
