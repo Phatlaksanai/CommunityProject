@@ -8,14 +8,15 @@ import { makeRequest } from "../../api/axios";
 
 const Share = () => {
   const [desc, setDesc] = useState(""); // เก็บข้อความ
-  const [file, setFile] = useState(null); // เก็บรูป 
+  const [files, setFiles] = useState([]); // เก็บหลายไฟล์
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
-  const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
+  const defaultPic =
+    "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
-  const [filePreview, setFilePreview] = useState(null);  //โชว์รูปตัวอย่าง
+  const [filePreviews, setFilePreviews] = useState([]); // โชว์รูปตัวอย่างหลายไฟล์
 
-  const upload = async () => {
+  const upload = async (file) => {
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -25,6 +26,7 @@ const Share = () => {
       console.log(err);
     }
   };
+
   const mutation = useMutation({
     mutationFn: (newPost) => {
       return makeRequest.post("/posts", newPost);
@@ -32,53 +34,56 @@ const Share = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["posts"]);
       setDesc("");
-      setFile(null);
-      setFilePreview(null);
+      setFiles([]);
+      setFilePreviews([]);
     },
   });
 
   const handleClick = async (e) => {
     e.preventDefault();
-    if (desc.trim() === "" && !file) return;  // ถ้าไม่มีข้อความและไม่มีรูป ก็ไม่ต้องทำอะไร
-    let imgUrl = null;
-    let modelUrl = null;
-    if (file) {
-      const url = await upload(); // ได้ URL จาก Cloudinary มา 
+    if (desc.trim() === "" && files.length === 0) return; // ถ้าไม่มีข้อความและไม่มีรูป ก็ไม่ต้องทำอะไร
+
+    let imgUrls = [];
+    let modelUrls = [];
+
+    for (const file of files) {
+      const url = await upload(file); // ได้ URL จาก Cloudinary มา
       if (url) {
         const isModel = /\.(obj|glb|gltf)$/i.test(file.name); // เช็คว่าเป็นไฟล์ 3D ไหม
         if (isModel) {
-          modelUrl = url; // ถ้าเป็นโมเดล ให้ใส่ตัวแปรนี้
-          imgUrl = null;
+          modelUrls.push(url);
         } else {
-          imgUrl = url;   // ถ้าเป็นรูป ให้ใส่ตัวแปรนี้
-          modelUrl = null;
+          imgUrls.push(url);
         }
       }
     }
-    mutation.mutate({ 
-      desc, 
-      img: imgUrl, 
-      model: modelUrl 
-    }); // ส่งข้อมูลเข้า Database 
+
+    mutation.mutate({
+      desc,
+      img: imgUrls.length ? imgUrls : null,
+      model: modelUrls.length ? modelUrls : null,
+    }); // ส่งข้อมูลเข้า Database
   };
 
   const handleFileChange = (e) => {
-    const selected = e.target.files[0];
-    if (selected) {
-      if (/\.(jpg|jpeg|png|obj|glb|gltf)$/i.test(selected.name)) { // เช็คนามสกุลไฟล์
-        setFile(selected);
+    const selectedFiles = Array.from(e.target.files);
 
-        if (/\.(jpg|jpeg|png)$/i.test(selected.name)) {  // สร้าง Preview 
-          setFilePreview(URL.createObjectURL(selected));
-        } else {
-          setFilePreview(null); // ถ้าเป็นโมเดล อาจจะไม่โชว์รูปตัวอย่าง
-        }
+    const validFiles = selectedFiles.filter((file) =>
+      /\.(jpg|jpeg|png|obj|glb|gltf)$/i.test(file.name)
+    );
+    setFiles((prev) => prev.concat(validFiles));
 
-      } else {
-        alert("รองรับเฉพาะไฟล์รูปภาพ (.jpg, .png) และโมเดล 3D (.obj, .glb, .gltf) เท่านั้น");
-        e.target.value = null; // reset input
-      }
-    }
+    const previews = validFiles.map((file) =>
+      /\.(jpg|jpeg|png)$/i.test(file.name)
+        ? URL.createObjectURL(file)
+        : null
+    );
+    setFilePreviews((prev) => prev.concat(previews));
+  };
+
+  const removeFile = (index) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setFilePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -93,17 +98,36 @@ const Share = () => {
             value={desc}
           />
         </div>
+
         <div className="right">
-          {file && (
-            <div className="preview">
-              {filePreview ? (
-                <img className="file" alt="" src={filePreview} style={{ width: "50px", height: "50px", objectFit: "cover" }} />
+          {files.map((file, i) => (
+            <div className="preview" key={i}>
+              {filePreviews[i] ? (
+                <img
+                  className="file"
+                  alt=""
+                  src={filePreviews[i]}
+                  style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                />
               ) : (
-                <span style={{ fontSize: "12px", color: "gray" }}>📦 {file.name}</span>
+                <span style={{ fontSize: "12px", color: "gray" }}>
+                  📦 {file.name}
+                </span>
               )}
-              <button onClick={() => { setFile(null); setFilePreview(null); }} style={{ marginLeft: "10px", color: "red", border: "none", background: "none", cursor: "pointer" }}>X</button>
+              <button
+                onClick={() => removeFile(i)}
+                style={{
+                  marginLeft: "10px",
+                  color: "red",
+                  border: "none",
+                  background: "none",
+                  cursor: "pointer",
+                }}
+              >
+                X
+              </button>
             </div>
-          )}
+          ))}
         </div>
         <hr />
         <div className="bottom">
@@ -111,6 +135,7 @@ const Share = () => {
             <input
               type="file"
               id="file"
+              multiple  
               style={{ display: "none" }}
               accept=".jpg,.png,.jpeg,.obj,.glb,.gltf"
               onChange={handleFileChange}
