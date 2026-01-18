@@ -2,26 +2,23 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
+import "./model_viewer.scss";
 
 const ModelViewer = ({ modelUrl }) => {
   const containerRef = useRef(null);
-  
-  // 1. เพิ่ม State เพื่อควบคุมการแสดงผล
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // 2. ถ้ายังไม่กดดู (isVisible = false) หรือไม่มี URL ให้หยุดทำงานทันที
     if (!modelUrl || !isVisible) return;
 
     const container = containerRef.current;
     if (!container) return;
 
-    /* ================= Scene ================= */
+    /* ===== Scene ===== */
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x999999);
 
-    /* ================= Camera ================= */
+    /* ===== Camera ===== */
     const camera = new THREE.PerspectiveCamera(
       60,
       container.clientWidth / container.clientHeight,
@@ -29,25 +26,24 @@ const ModelViewer = ({ modelUrl }) => {
       1000
     );
 
-    /* ================= Renderer ================= */
+    /* ===== Renderer ===== */
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.outputEncoding = THREE.sRGBEncoding;
     container.appendChild(renderer.domElement);
 
-    /* ================= Controls ================= */
+    /* ===== Controls ===== */
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
 
-    /* ================= Lights ================= */
+    /* ===== Lights ===== */
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-
     const dirLight = new THREE.DirectionalLight(0xffffff, 1);
     dirLight.position.set(5, 10, 7);
     scene.add(dirLight);
 
-    /* ================= Environment ================= */
+    /* ===== Environment ===== */
     const envMap = new THREE.CubeTextureLoader().load([
       "https://threejs.org/examples/textures/cube/Bridge2/posx.jpg",
       "https://threejs.org/examples/textures/cube/Bridge2/negx.jpg",
@@ -59,7 +55,7 @@ const ModelViewer = ({ modelUrl }) => {
     envMap.encoding = THREE.sRGBEncoding;
     scene.environment = envMap;
 
-    /* ================= Utils ================= */
+    /* ===== Utils ===== */
     const fitCameraToObject = (object) => {
       const box = new THREE.Box3().setFromObject(object);
       const size = box.getSize(new THREE.Vector3());
@@ -81,32 +77,29 @@ const ModelViewer = ({ modelUrl }) => {
       controls.update();
     };
 
-    /* ================= Load Model ================= */
+    /* ===== Load Model ===== */
     const ext = modelUrl.split(".").pop().toLowerCase();
-
-    const onModelLoaded = (model) => {
-      model.traverse((child) => {
-        if (child.isMesh) {
-          child.material.side = THREE.DoubleSide;
-          child.castShadow = true;
-          child.receiveShadow = true;
-        }
-      });
-
-      scene.add(model);
-      fitCameraToObject(model);
-    };
 
     if (ext === "glb" || ext === "gltf") {
       const loader = new GLTFLoader();
-      loader.load(modelUrl, (gltf) => onModelLoaded(gltf.scene));
-    } else {
-      console.warn("Unsupported model format");
+      loader.load(modelUrl, (gltf) => {
+        const model = gltf.scene;
+
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.material.side = THREE.DoubleSide;
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+
+        scene.add(model);
+        fitCameraToObject(model);
+      });
     }
 
-    /* ================= Animate ================= */
+    /* ===== Animate ===== */
     let isMounted = true;
-
     const animate = () => {
       if (!isMounted) return;
       requestAnimationFrame(animate);
@@ -115,88 +108,45 @@ const ModelViewer = ({ modelUrl }) => {
     };
     animate();
 
-    /* ================= Resize ================= */
+    /* ===== Resize ===== */
     const handleResize = () => {
-      if (!container) return;
       camera.aspect = container.clientWidth / container.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
     };
     window.addEventListener("resize", handleResize);
 
-    /* ================= Cleanup ================= */
+    /* ===== Cleanup ===== */
     return () => {
       isMounted = false;
       window.removeEventListener("resize", handleResize);
-
       controls.dispose();
       renderer.dispose();
-      
-      // ล้างค่า Environment Map ด้วยเพื่อคืน memory
-      envMap.dispose(); 
+      envMap.dispose();
 
       if (renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
     };
-  }, [modelUrl, isVisible]); // เพิ่ม isVisible เป็น dependency
+  }, [modelUrl, isVisible]);
 
-  // 3. ส่วนแสดงผล UI (Placeholder) ตอนยังไม่กดโหลด
+  /* ===== UI ===== */
   if (!isVisible) {
     return (
-      <div
-        onClick={() => setIsVisible(true)}
-        style={{
-          width: "100%",
-          height: "400px",
-          marginTop: "10px",
-          borderRadius: "10px",
-          background: "#e0e0e0", // สีพื้นหลังตอนยังไม่โหลด
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          border: "1px solid #ccc"
-        }}
-      >
-        <div style={{ fontSize: "50px" }}>📦</div>
-        <div style={{ marginTop: "10px", fontWeight: "bold", color: "#555" }}>
-          Click to Load 3D Model
-        </div>
+      <div className="model-placeholder" onClick={() => setIsVisible(true)}>
+        <div className="icon">📦</div>
+        <div className="text">Click to Load 3D Model</div>
       </div>
     );
   }
 
-  // 4. ส่วนแสดงผล Viewer ของจริง (เมื่อกดแล้ว)
   return (
-    <div style={{ position: "relative", marginTop: "10px" }}>
-      {/* Container ของ Three.js */}
-      <div
-        ref={containerRef}
-        style={{
-          width: "100%",
-          height: "400px",
-          borderRadius: "10px",
-          overflow: "hidden",
-        }}
-      />
-      
-      {/* ปุ่ม Close เพื่อปิดโมเดล (คืน Memory) */}
+    <div className="model-viewer">
+      <div ref={containerRef} className="viewer-canvas" />
+
       <button
+        className="close-btn"
         onClick={() => setIsVisible(false)}
-        style={{
-          position: "absolute",
-          top: "10px",
-          right: "10px",
-          background: "rgba(0,0,0,0.6)",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          padding: "5px 10px",
-          cursor: "pointer",
-          zIndex: 10,
-        }}
       >
         Close
       </button>

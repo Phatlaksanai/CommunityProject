@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 // import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './pages/login/Login1'
 import Register from './pages/register/Register1'
+//import Download from './pages/download/Download1';
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
@@ -11,6 +12,7 @@ import Profile from "./pages/profile/Profile";
 import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/leftbar/leftbar";
 import RightBar from "./components/rightbar/rightbar";
+
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";

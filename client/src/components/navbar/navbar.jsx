@@ -7,6 +7,7 @@ import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import DownloadIcon from '@mui/icons-material/Download';
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { DarkModeContext } from "../../context/darkModeContext";
@@ -36,6 +37,15 @@ const Navbar = () => {
     }
   };
 
+  const DL = async () => {
+    try {
+      navigate("/"); // เด้งไปหน้า Login
+    } catch (err) {
+      console.error(err);
+      alert("Logout failed");
+    }
+  };
+
   const handleLogin = async () => {
     try {
       navigate("/login"); // เด้งไปหน้า Login
@@ -58,6 +68,7 @@ const Navbar = () => {
           <DarkModeOutlinedIcon onClick={toggle} />
         )}
         <GridViewOutlinedIcon />
+        <DownloadIcon/>
         <div className="search">
           <SearchOutlinedIcon />
           <input type="text" placeholder="Search..." />
