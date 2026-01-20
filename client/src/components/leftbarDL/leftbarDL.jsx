@@ -1,86 +1,106 @@
 import "./leftbarDL.scss";
 import { AuthContext } from "../../context/authContext";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
-const LeftBar = () => {
-
+const LeftBarDownload = () => {
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
+  const [filters, setFilters] = useState({
+    category: {
+      Vehicles: false,
+      Characters: false,
+      Furniture: false,
+      Sports: false,
+      FoodDrink: false,
+      Electronics: false,
+    },
+    date: {
+      AllTime: false,
+      ThisMonth: false,
+      ThisWeek: false,
+      ThisDay: false,
+    },
+    others: {
+      Downloadable: false,
+    },
+  });
+
+const dateLabels = {
+  AllTime: "All time",
+  ThisMonth: "This month",
+  ThisWeek: "This week",
+  ThisDay: "This day",
+};
+
+
+  const handleChange = (group, name) => {
+    setFilters((prev) => ({
+      ...prev,
+      [group]: {
+        ...prev[group],
+        [name]: !prev[group][name],
+      },
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Filters:", filters);
+  };
+
   return (
-    <div className="leftBar">
-      <div className="container">
-        <div className="menu">
-          <div className="user">
-            <img src={currentUser?.profilePic || defaultPic} alt="" />
-            <span>{currentUser?.name || "Guest"}</span>
-          </div>
-          <div className="item">
-            <img src={Friends} alt="" />
-            <span>Friends</span>
-          </div>
-          <div className="item">
-            <img src={Groups} alt="" />
-            <span>Groups</span>
-          </div>
-          <div className="item">
-            <img src={Market} alt="" />
-            <span>Marketplace</span>
-          </div>
-          <div className="item">
-            <img src={Watch} alt="" />
-            <span>Watch</span>
-          </div>
-          <div className="item">
-            <img src={Memories} alt="" />
-            <span>Memories</span>
-          </div>
-        </div>
-
-        <hr />{/* ส่วน 2 */}
-        <div className="menu">
-          <span>Your shortcuts</span>
-          <div className="item">
-            <img src={Events} alt="" />
-            <span>Events</span>
-          </div>
-          <div className="item">
-            <img src={Gaming} alt="" />
-            <span>Gaming</span>
-          </div>
-          <div className="item">
-            <img src={Gallery} alt="" />
-            <span>Gallery</span>
-          </div>
-          <div className="item">
-            <img src={Videos} alt="" />
-            <span>Videos</span>
-          </div>
-          <div className="item">
-            <img src={Messages} alt="" />
-            <span>Messages</span>
-          </div>
-        </div>
-
-        <hr />{/* ส่วน 3 */}
-        <div className="menu">
-          <span>Others</span>
-          <div className="item">
-            <img src={Fund} alt="" />
-            <span>Fundraiser</span>
-          </div>
-          <div className="item">
-            <img src={Tutorials} alt="" />
-            <span>Tutorials</span>
-          </div>
-          <div className="item">
-            <img src={Courses} alt="" />
-            <span>Courses</span>
-          </div>
-        </div>
+    <div className="leftBarDownload">
+      <div className="leftBarDownloadItem">
+        <img src={currentUser?.profilePic || defaultPic} alt="profile" />
+        <span>{currentUser?.username}</span>
       </div>
+      
+      <h3>ค้นหาแบบละเอียด</h3>
+      <hr />
+      <form onSubmit={handleSubmit}>
+        <p>Category</p>
+        {Object.keys(filters.category).map((item) => (
+          <div key={item}>
+            <input
+              type="checkbox"
+              id={item}
+              checked={filters.category[item]}
+              onChange={() => handleChange("category", item)}
+            />
+            <label htmlFor={item}>
+              {" "}
+              {item === "FoodDrink" ? "Food & Drink" : item}
+            </label>
+          </div>
+        ))}
+        <hr />
+        <p>Date</p>
+        {Object.keys(filters.date).map((item) => (
+          <div key={item}>
+            <input
+              type="checkbox"
+              id={item}
+              checked={filters.date[item]}
+              onChange={() => handleChange("date", item)}
+            />
+            <label htmlFor={item}>{dateLabels[item]}</label>
+          </div>
+        ))}
+        <hr />
+        <p>Others</p>
+        <div>
+          <input
+            type="checkbox"
+            id="Downloadable"
+            checked={filters.others.Downloadable}
+            onChange={() => handleChange("others", "Downloadable")}
+          />
+          <label htmlFor="Downloadable"> Downloadable</label>
+        </div>
+      </form>
     </div>
   );
 };
 
-export default LeftBar;
+export default LeftBarDownload;

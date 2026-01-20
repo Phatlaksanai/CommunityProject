@@ -1,8 +1,8 @@
 @use "../../style.scss" as *;
 
-.leftBar {
+.leftBarDownload {
   @include themify($themes) {
-    flex: 2;
+    flex: 1.5;
     position: sticky;
     top: 70px;
     height: calc(100vh - 70px);
@@ -10,7 +10,7 @@
     background-color: themed("bg");
     color: themed("textColor");
 
-    @include mobile{
+    @include mobile {
       display: none;
     }
 
@@ -18,54 +18,65 @@
       display: none;
     }
 
-    .container {
-      padding: 20px;
+    padding: 20px;
 
-      hr {
-        margin: 20px 0px;
-        border: none;
-        height: 0.5px;
-        background-color: themed("border");
+    h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    hr {
+      margin: 15px 0;
+      border: none;
+      height: 0.5px;
+      background-color: themed("border");
+    }
+
+    /* user section */
+    .leftBarDownloadItem {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+
+      img {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        object-fit: cover;
       }
 
-      .menu {
+      span {
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+
+    /* filter section */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      p {
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+
+      div {
         display: flex;
-        flex-direction: column;
-        gap: 20px;
+        align-items: center;
+        gap: 8px;
 
-        span {
-          font-size: 12px;
+        input[type="checkbox"] {
+          cursor: pointer;
+          accent-color: themed("primary");
         }
 
-        .user {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-
-          img {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-          }
-
-          span {
-            font-size: 14px;
-          }
-        }
-
-        .item {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-
-          img {
-            width: 30px;
-          }
-
-          span {
-            font-size: 14px;
-          }
+        label {
+          font-size: 13px;
+          cursor: pointer;
         }
       }
     }
