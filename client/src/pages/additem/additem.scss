@@ -1,0 +1,121 @@
+@use "../../style.scss" as *;
+
+.add-item {
+  @include themify($themes) {
+    min-height: calc(100vh - 70px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: themed("bg");
+    color: themed("textColor");
+
+    &__form {
+      width: 100%;
+      max-width: 520px;
+      padding: 30px;
+      border-radius: 12px;
+      background-color: themed("cardBg");
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    &__title {
+      text-align: center;
+      font-size: 26px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      label {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      input[type="text"],
+      input[type="file"] {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid themed("border");
+        background-color: transparent;
+        color: themed("textColor");
+        font-size: 14px;
+
+        &:focus {
+          outline: none;
+          border-color: themed("button");
+        }
+      }
+    }
+
+   .category {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  &__title {
+    grid-column: 1 / -1;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  &__option {
+    position: relative;
+
+    input[type="radio"] {
+      display: none;
+    }
+
+    label {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid themed("border");
+      cursor: pointer;
+      font-size: 14px;
+      background-color: themed("bg");
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    label:hover {
+      border-color: #b0b0b0;
+    }
+
+    input[type="radio"]:checked + label {
+      background-color: #e5e5e5;  
+      border-color: #c0c0c0;
+      color: #333;
+      font-weight: 600;
+      box-shadow: inset 0 0 0 1px #c0c0c0;
+    }
+  }
+}
+    &__submit {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      background-color: themed("button");
+      color: themed("buttonText");
+      transition: transform 0.15s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+      }
+    }
+  }
+}

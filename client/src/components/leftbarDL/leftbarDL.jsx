@@ -15,24 +15,18 @@ const LeftBarDownload = () => {
       FoodDrink: false,
       Electronics: false,
     },
-    date: {
-      AllTime: false,
-      ThisMonth: false,
-      ThisWeek: false,
-      ThisDay: false,
-    },
+    date: "AllTime",
     others: {
       Downloadable: false,
     },
   });
 
-const dateLabels = {
-  AllTime: "All time",
-  ThisMonth: "This month",
-  ThisWeek: "This week",
-  ThisDay: "This day",
-};
-
+  const dateLabels = {
+    AllTime: "All time",
+    ThisMonth: "This month",
+    ThisWeek: "This week",
+    ThisDay: "This day",
+  };
 
   const handleChange = (group, name) => {
     setFilters((prev) => ({
@@ -41,6 +35,12 @@ const dateLabels = {
         ...prev[group],
         [name]: !prev[group][name],
       },
+    }));
+  };
+  const handleDateChange = (value) => {
+    setFilters((prev) => ({
+      ...prev,
+      date: value,
     }));
   };
 
@@ -55,7 +55,7 @@ const dateLabels = {
         <img src={currentUser?.profilePic || defaultPic} alt="profile" />
         <span>{currentUser?.username}</span>
       </div>
-      
+
       <h3>ค้นหาแบบละเอียด</h3>
       <hr />
       <form onSubmit={handleSubmit}>
@@ -76,13 +76,14 @@ const dateLabels = {
         ))}
         <hr />
         <p>Date</p>
-        {Object.keys(filters.date).map((item) => (
+        {Object.keys(dateLabels).map((item) => (
           <div key={item}>
             <input
-              type="checkbox"
+              type="radio"
               id={item}
-              checked={filters.date[item]}
-              onChange={() => handleChange("date", item)}
+              name="date"
+              checked={filters.date === item}
+              onChange={() => handleDateChange(item)}
             />
             <label htmlFor={item}>{dateLabels[item]}</label>
           </div>
