@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 // import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './pages/login/Login1'
 import Register from './pages/register/Register1'
-//import Download from './pages/download/Download1';
+import Download from './pages/download/Download1';
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
@@ -43,6 +43,21 @@ function App() {
     )
   }
 
+  const TopTab = () => {
+    return (
+      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        <Navbar />
+        <div style={{ display: "flex" }}>
+          <LeftBar />
+          <div style={{ flex: 6 }}>
+            <Outlet />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
       return <Navigate to="/login" />
@@ -63,6 +78,7 @@ function App() {
           path: "/",
           element: <Home />
         },
+        
         // ,{
         //   path:"/profile/:id",
         //   element:<Profile/>
@@ -76,6 +92,20 @@ function App() {
     {
       path: "/login",
       element: <Login />,
+    },
+    {
+      path: "/download",
+      element: (
+        <ProtectedRoute>
+          <TopTab />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          path: "/download",
+          element: <Download />
+        },
+      ]
     },
   ]);
   //ระบบใหม่++++++++++++++++++++++
