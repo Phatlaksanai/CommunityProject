@@ -12,7 +12,7 @@ import Profile from "./pages/profile/Profile";
 import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/leftbar/leftbar";
 import RightBar from "./components/rightbar/rightbar";
-
+import LeftBarDL from "./components/leftbarDL/leftbarDL";
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
@@ -48,7 +48,7 @@ function App() {
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
         <div style={{ display: "flex" }}>
-          <LeftBar />
+          <LeftBarDL />
           <div style={{ flex: 6 }}>
             <Outlet />
           </div>
@@ -96,9 +96,7 @@ function App() {
     {
       path: "/download",
       element: (
-        <ProtectedRoute>
           <TopTab />
-        </ProtectedRoute>
       ),
       children: [
         {
