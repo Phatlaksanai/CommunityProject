@@ -11,6 +11,7 @@ import Home from "./pages/home/Home1";
 import Profile from "./pages/profile/Profile";
 import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/leftbar/leftbar";
+import LeftBarDL from "./components/leftbarDL/leftbarDL";
 import RightBar from "./components/rightbar/rightbar";
 
 //ระบบใหม่++++++++++++++++++++++
@@ -48,7 +49,7 @@ function App() {
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
         <div style={{ display: "flex" }}>
-          <LeftBar />
+          <LeftBarDL />
           <div style={{ flex: 6 }}>
             <Outlet />
           </div>
