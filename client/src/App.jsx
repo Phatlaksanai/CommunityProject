@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Login from './pages/login/Login1'
 import Register from './pages/register/Register1'
 import Download from './pages/download/Download1';
+import AddItem from './pages/additem/Additem';
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
@@ -13,7 +14,6 @@ import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/leftbar/leftbar";
 import LeftBarDL from "./components/leftbarDL/leftbarDL";
 import RightBar from "./components/rightbar/rightbar";
-import LeftBarDL from "./components/leftbarDL/leftbarDL";
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
@@ -58,6 +58,18 @@ function App() {
     )
   }
 
+    const AddItemDL = () => {
+    return (
+      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        <Navbar />
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 6 }}>
+            <Outlet />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
@@ -103,6 +115,18 @@ function App() {
         {
           path: "/download",
           element: <Download />
+        },
+      ]
+    },
+    {
+      path: "/addItem",
+      element: (
+          <AddItemDL />
+      ),
+      children: [
+        {
+          path: "/addItem",
+          element: <AddItem />
         },
       ]
     },
