@@ -1,10 +1,11 @@
 
+import Items from "../../components/items/items"
 import "./download.scss"
 
 const download = () => {
   return (
     <div className="download">
-        <h1>Download</h1>
+        <Items />
     </div>
   )
 }
