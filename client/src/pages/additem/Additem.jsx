@@ -1,6 +1,9 @@
 import "./addItem.scss";
+import { useState } from "react";
 
 const AddItem = () => {
+  const [category, setCategory] = useState("");
+
   return (
     <div className="add-item">
 
@@ -32,37 +35,26 @@ const AddItem = () => {
         </div>
 
         <div className="category">
-          <p className="category__title">หมวดหมู่</p>
+          <label htmlFor="category" className="category__title">
+            หมวดหมู่
+          </label>
 
-          <div className="category__option">
-            <input type="radio" id="Vehicles" name="choice" value="Vehicles" />
-            <label htmlFor="Vehicles">Vehicles</label>
-          </div>
-
-          <div className="category__option">
-            <input type="radio" id="Electronics" name="choice" value="Electronics" />
-            <label htmlFor="Electronics">Electronics</label>
-          </div>
-
-          <div className="category__option">
-            <input type="radio" id="Characters" name="choice" value="Characters" />
-            <label htmlFor="Characters">Characters</label>
-          </div>
-
-          <div className="category__option">
-            <input type="radio" id="Furniture" name="choice" value="Furniture" />
-            <label htmlFor="Furniture">Furniture</label>
-          </div>
-
-          <div className="category__option">
-            <input type="radio" id="Sports" name="choice" value="Sports" />
-            <label htmlFor="Sports">Sports</label>
-          </div>
-
-          <div className="category__option">
-            <input type="radio" id="FoodDrink" name="choice" value="Food&Drink" />
-            <label htmlFor="FoodDrink">Food & Drink</label>
-          </div>
+          <select
+            id="category"
+            className="category__select"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="" disabled>
+              เลือกหมวดหมู่
+            </option>
+            <option value="Vehicles">Vehicles</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Characters">Characters</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Sports">Sports</option>
+            <option value="Food&Drink">Food & Drink</option>
+          </select>
         </div>
 
         <input type="submit" value="Submit" className="add-item__submit" />
