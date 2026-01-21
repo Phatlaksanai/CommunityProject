@@ -20,7 +20,7 @@ const Share = () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await makeRequest.post("/upload", formData);
+      const res = await makeRequest.post("/upload/post", formData);
       return res.data; // เอา data ข้างในเป็น URL ที่หลังบ้านส่งมา
     } catch (err) {
       console.log(err);

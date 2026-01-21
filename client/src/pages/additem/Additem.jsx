@@ -28,7 +28,7 @@ const AddItem = () => {
       return;
     }
 
-    setImg(file);e.target.value = "";
+    setImg(file); e.target.value = "";
     setError("");
   };
 
@@ -41,12 +41,23 @@ const AddItem = () => {
       return;
     }
 
-    setModel(file);e.target.value = "";
+    setModel(file); e.target.value = "";
     setError("");
+  };
+  const uploadFile = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("/api/upload/item", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+
+    return await res.json();
   };
 
 
-  // ================= REGISTER =================
   const handleAdditem = async (e) => {
     e.preventDefault();
     setError("");
@@ -58,17 +69,23 @@ const AddItem = () => {
     }
 
     try {
-      const formData = new FormData();
-      formData.append("modelName", modelName);
-      formData.append("description", description);
-      formData.append("price", price);
-      formData.append("category", category);
-      formData.append("img", img);
-      formData.append("model", model);
+      const imgURL = await uploadFile(img);
+      const modelURL = await uploadFile(model);
 
       const res = await fetch("/api/additem", {
         method: "POST",
-        body: formData, // ห้ามใส่ headers
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          modelName,
+          description,
+          price,
+          category,
+          img: imgURL,
+          model: modelURL,
+        }),
       });
 
       const data = await res.json();
@@ -78,43 +95,46 @@ const AddItem = () => {
         return;
       }
 
+
       setSuccess("add item success");
       navigate("/download");
     } catch (err) {
+      console.error(err);
       setError("เชื่อมต่อ Server ไม่ได้");
     }
-  };//----------------------------------------------------------
+  };
+
 
   return (
     <div className="add-item">
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {success && <p style={{ color: "green" }}>{success}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {success && <p style={{ color: "green" }}>{success}</p>}
 
       <div className="add-item__form">
         <h1 className="add-item__title">เพิ่มสินค้า</h1>
         <form onSubmit={handleAdditem}>
           <div className="form-group">
             <label htmlFor="itemName">ชื่อสินค้า</label>
-            <input type="text" id="itemName" placeholder="ชื่อสินค้า" 
+            <input type="text" id="itemName" placeholder="ชื่อสินค้า"
               value={modelName}
               onChange={(e) => setModelName(e.target.value)}
-              required/>
+              required />
           </div>
 
           <div className="form-group">
             <label htmlFor="itemDetail">รายละเอียดสินค้า</label>
-            <input type="text" id="itemDetail" placeholder="รายละเอียดสินค้า" 
+            <input type="text" id="itemDetail" placeholder="รายละเอียดสินค้า"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              required/>
+              required />
           </div>
 
           <div className="form-group">
             <label htmlFor="price">ราคา</label>
-            <input type="text" id="price" placeholder="ราคา" 
+            <input type="text" id="price" placeholder="ราคา"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              required/>
+              required />
           </div>
 
           <div className="form-group">
