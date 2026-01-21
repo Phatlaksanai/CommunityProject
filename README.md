@@ -21,3 +21,104 @@ npm install three // client ================new
 
 เพิ่มหน้า download
 กับแก้ใน App
+```
+CommunityProject
+├─ client
+│  ├─ eslint.config.js
+│  ├─ index.html
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ public
+│  │  └─ vite.svg
+│  ├─ README.md
+│  ├─ src
+│  │  ├─ 404.jsx
+│  │  ├─ api
+│  │  │  └─ axios.js
+│  │  ├─ App.jsx
+│  │  ├─ assets
+│  │  │  ├─ 1.png
+│  │  │  └─ react.svg
+│  │  ├─ components
+│  │  │  ├─ comments
+│  │  │  │  ├─ comments.jsx
+│  │  │  │  └─ comments.scss
+│  │  │  ├─ item
+│  │  │  │  ├─ item.jsx
+│  │  │  │  └─ item.scss
+│  │  │  ├─ items
+│  │  │  │  ├─ items.jsx
+│  │  │  │  └─ items.scss
+│  │  │  ├─ leftbar
+│  │  │  │  ├─ leftbar.jsx
+│  │  │  │  └─ leftbar.scss
+│  │  │  ├─ leftbarDL
+│  │  │  │  ├─ leftbarDL.jsx
+│  │  │  │  └─ leftbarDL.scss
+│  │  │  ├─ modelViewer
+│  │  │  │  ├─ model_viewer.jsx
+│  │  │  │  └─ model_viewer.scss
+│  │  │  ├─ navbar
+│  │  │  │  ├─ navbar.jsx
+│  │  │  │  └─ navbar.scss
+│  │  │  ├─ post
+│  │  │  │  ├─ post.jsx
+│  │  │  │  └─ post.scss
+│  │  │  ├─ posts
+│  │  │  │  ├─ posts.jsx
+│  │  │  │  └─ posts.scss
+│  │  │  ├─ rightbar
+│  │  │  │  ├─ rightbar.jsx
+│  │  │  │  └─ rightbar.scss
+│  │  │  └─ share
+│  │  │     ├─ share.jsx
+│  │  │     └─ share.scss
+│  │  ├─ context
+│  │  │  ├─ authContext.jsx
+│  │  │  └─ darkModeContext.jsx
+│  │  ├─ index.css
+│  │  ├─ main.jsx
+│  │  ├─ pages
+│  │  │  ├─ additem
+│  │  │  │  ├─ Additem.jsx
+│  │  │  │  └─ additem.scss
+│  │  │  ├─ download
+│  │  │  │  ├─ download.scss
+│  │  │  │  └─ Download1.jsx
+│  │  │  ├─ home
+│  │  │  │  ├─ Home.jsx
+│  │  │  │  ├─ home.scss
+│  │  │  │  ├─ Home1.jsx
+│  │  │  │  └─ home1.scss
+│  │  │  ├─ login
+│  │  │  │  ├─ login.scss
+│  │  │  │  └─ Login1.jsx
+│  │  │  ├─ Login.css
+│  │  │  ├─ login.jsx
+│  │  │  ├─ profile
+│  │  │  │  ├─ Profile.jsx
+│  │  │  │  └─ profile.scss
+│  │  │  ├─ register
+│  │  │  │  ├─ register.scss
+│  │  │  │  └─ Register1.jsx
+│  │  │  ├─ register.css
+│  │  │  └─ register.jsx
+│  │  └─ style.scss
+│  └─ vite.config.js
+├─ note
+├─ package-lock.json
+├─ package.json
+├─ README.md
+├─ report.html
+├─ server
+│  ├─ middleware
+│  │  └─ verifyToken.js
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ README.md
+│  ├─ routes
+│  │  └─ MyRouter.js
+│  └─ server.js
+└─ upload.html
+
+```
