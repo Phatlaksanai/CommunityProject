@@ -1,63 +1,179 @@
 import "./addItem.scss";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";//-------------------------------------
 
 const AddItem = () => {
+  //----------------------------------------------------------
+  const navigate = useNavigate();
+
+  // form data
+  const [modelName, setModelName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [img, setImg] = useState(null);
+  const [model, setModel] = useState(null);
   const [category, setCategory] = useState("");
+
+  // message
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  // ================= UPLOAD FILES TO CLOUDINARY =================
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!/\.(jpg|jpeg|png)$/i.test(file.name)) {
+      setError("กรุณาเลือกไฟล์รูป jpg หรือ png");
+      return;
+    }
+
+    setImg(file);e.target.value = "";
+    setError("");
+  };
+
+  const handleModelChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!/\.(glb|gltf)$/i.test(file.name)) {
+      setError("กรุณาเลือกไฟล์ .glb หรือ .gltf");
+      return;
+    }
+
+    setModel(file);e.target.value = "";
+    setError("");
+  };
+
+
+  // ================= REGISTER =================
+  const handleAdditem = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!img || !model) {
+      setError("กรุณาเลือกรูปและไฟล์โมเดล");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("modelName", modelName);
+      formData.append("description", description);
+      formData.append("price", price);
+      formData.append("category", category);
+      formData.append("img", img);
+      formData.append("model", model);
+
+      const res = await fetch("/api/additem", {
+        method: "POST",
+        body: formData, // ห้ามใส่ headers
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "add item failed");
+        return;
+      }
+
+      setSuccess("add item success");
+      navigate("/download");
+    } catch (err) {
+      setError("เชื่อมต่อ Server ไม่ได้");
+    }
+  };//----------------------------------------------------------
 
   return (
     <div className="add-item">
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          {success && <p style={{ color: "green" }}>{success}</p>}
 
       <div className="add-item__form">
         <h1 className="add-item__title">เพิ่มสินค้า</h1>
-        <div className="form-group">
-          <label htmlFor="itemName">ชื่อสินค้า</label>
-          <input type="text" id="itemName" placeholder="ชื่อสินค้า" />
-        </div>
+        <form onSubmit={handleAdditem}>
+          <div className="form-group">
+            <label htmlFor="itemName">ชื่อสินค้า</label>
+            <input type="text" id="itemName" placeholder="ชื่อสินค้า" 
+              value={modelName}
+              onChange={(e) => setModelName(e.target.value)}
+              required/>
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="itemDetail">รายละเอียดสินค้า</label>
-          <input type="text" id="itemDetail" placeholder="รายละเอียดสินค้า" />
-        </div>
+          <div className="form-group">
+            <label htmlFor="itemDetail">รายละเอียดสินค้า</label>
+            <input type="text" id="itemDetail" placeholder="รายละเอียดสินค้า" 
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required/>
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="price">ราคา</label>
-          <input type="text" id="price" placeholder="ราคา" />
-        </div>
+          <div className="form-group">
+            <label htmlFor="price">ราคา</label>
+            <input type="text" id="price" placeholder="ราคา" 
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              required/>
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="image">รูปภาพ</label>
-          <input type="file" id="image" name="image" accept=".png,.jpg,.gif" />
-        </div>
+          <div className="form-group">
+            <label>รูปภาพ</label>
 
-        <div className="form-group">
-          <label htmlFor="model">ไฟล์โมเดล</label>
-          <input type="file" id="model" name="model" accept=".glb,.gltf" />
-        </div>
+            <label htmlFor="image" className="file-input">
+              {img ? img.name : "ไม่มีไฟล์ที่เลือก"}
+            </label>
 
-        <div className="category">
-          <label htmlFor="category" className="category__title">
-            หมวดหมู่
-          </label>
+            <input
+              type="file"
+              id="image"
+              accept=".png,.jpg,.jpeg"
+              onChange={handleImageChange}
+              hidden
+            />
+          </div>
 
-          <select
-            id="category"
-            className="category__select"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="" disabled>
-              เลือกหมวดหมู่
-            </option>
-            <option value="Vehicles">Vehicles</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Characters">Characters</option>
-            <option value="Furniture">Furniture</option>
-            <option value="Sports">Sports</option>
-            <option value="Food&Drink">Food & Drink</option>
-          </select>
-        </div>
+          <div className="form-group">
+            <label>ไฟล์โมเดล</label>
 
-        <input type="submit" value="Submit" className="add-item__submit" />
+            <label htmlFor="model" className="file-input">
+              {model ? model.name : "ไม่มีไฟล์ที่เลือก"}
+            </label>
+
+            <input
+              type="file"
+              id="model"
+              accept=".glb,.gltf"
+              onChange={handleModelChange}
+              hidden
+            />
+          </div>
+
+          <div className="category">
+            <label htmlFor="category" className="category__title">
+              หมวดหมู่
+            </label>
+
+            <select
+              id="category"
+              className="category__select"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="" disabled>
+                เลือกหมวดหมู่
+              </option>
+              <option value="Vehicles">Vehicles</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Characters">Characters</option>
+              <option value="Furniture">Furniture</option>
+              <option value="Sports">Sports</option>
+              <option value="Food&Drink">Food & Drink</option>
+            </select>
+          </div>
+
+          <input type="submit" value="Submit" className="add-item__submit" />
+        </form>
       </div>
     </div>
   );

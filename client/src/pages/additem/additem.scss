@@ -54,6 +54,21 @@
       }
     }
 
+    .file-input {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid themed("border");
+      background-color: transparent;
+      color: themed("textColor");
+      font-size: 14px;
+      cursor: pointer;
+
+      &:hover {
+        border-color: themed("button");
+      }
+    }
+
+
 .category {
   display: flex;
   flex-direction: column;

@@ -69,12 +69,12 @@ const Share = () => {
     const selectedFiles = Array.from(e.target.files);
 
     const validFiles = selectedFiles.filter((file) =>
-      /\.(jpg|jpeg|png|glb|gltf)$/i.test(file.name)
+      /\.(jpg|jpeg|png|gif|glb|gltf)$/i.test(file.name)
     );
-    setFiles((prev) => prev.concat(validFiles));
+    setFiles((prev) => prev.concat(validFiles));e.target.value = "";
 
     const previews = validFiles.map((file) =>
-      /\.(jpg|jpeg|png)$/i.test(file.name)
+      /\.(jpg|jpeg|png|gif)$/i.test(file.name)
         ? URL.createObjectURL(file)
         : null
     );
@@ -137,7 +137,7 @@ const Share = () => {
               id="file"
               multiple  
               style={{ display: "none" }}
-              accept=".jpg,.png,.jpeg,.glb,.gltf"
+              accept=".jpg,.png,.jpeg,.gif,.glb,.gltf"
               onChange={handleFileChange}
             />
             <label htmlFor="file">
