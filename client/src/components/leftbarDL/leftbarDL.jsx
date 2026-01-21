@@ -1,10 +1,12 @@
 import "./leftbarDL.scss";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { AuthContext } from "../../context/authContext";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 
 const LeftBarDownload = () => {
   const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
 
@@ -55,9 +57,10 @@ const LeftBarDownload = () => {
     <div className="leftBarDownload">
       <div className="leftBarDownloadItem">
         <img src={currentUser?.profilePic || defaultPic} alt="profile" />
-        <span>{currentUser?.username}</span><AddShoppingCartIcon />
+        <span>{currentUser?.username}</span>
+        <AddShoppingCartIcon onClick={() => navigate("/additem")} style={{ cursor: "pointer" }}/>
       </div>
-
+      
       
       <h3>ค้นหาแบบละเอียด</h3>
       <hr />

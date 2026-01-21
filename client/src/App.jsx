@@ -119,13 +119,13 @@ function App() {
       ]
     },
     {
-      path: "/addItem",
+      path: "/additem",
       element: (
           <AddItemDL />
       ),
       children: [
         {
-          path: "/addItem",
+          path: "/additem",
           element: <AddItem />
         },
       ]

@@ -61,14 +61,14 @@ const Navbar = () => {
         <Link to="/" style={{ textDecoration: "none" }}>
           <h1 className="Logo">PM</h1>
         </Link>
-        <HomeOutlinedIcon />
+        <HomeOutlinedIcon onClick={() => navigate("/")} style={{ cursor: "pointer" }}/>
         {darkMode ? (
-          <WbSunnyOutlinedIcon onClick={toggle} />
+          <WbSunnyOutlinedIcon onClick={toggle}  style={{ cursor: "pointer" }}/>
         ) : (
-          <DarkModeOutlinedIcon onClick={toggle} />
+          <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }}/>
         )}
         <GridViewOutlinedIcon />
-        <DownloadIcon/>
+        <DownloadIcon onClick={() => navigate("/download")} style={{ cursor: "pointer" }}/>
         <div className="search">
           <SearchOutlinedIcon />
           <input type="text" placeholder="Search..." />
