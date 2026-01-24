@@ -58,6 +58,18 @@ router.get("/posts", (req, res) => {
     return res.status(200).json(data);
   });
 });
+
+router.get("/items", (req, res) => {
+  // สั่ง JOIN เพื่อเอาชื่อคนโพสต์ (u.username) และรูป (u.profilePic) มาโชว์คู่กับโพสต์
+  const q = `SELECT *
+             FROM items 
+             ORDER BY createAt DESC`;
+  db.query(q, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json(data);
+  });
+});
+
 router.post("/", verifyToken, (req, res) => {
   // NEw Verify Token
   res.json("Create post by user " + req.user.user_id);

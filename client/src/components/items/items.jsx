@@ -1,13 +1,13 @@
-import Post from "../item/item";
+import Item from "../item/item";
 import "./items.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 
 const Items = () => {
   const { isLoading, error, data } = useQuery({
-    queryKey: ["posts"],
+    queryKey: ["items"],
     queryFn: () =>
-      makeRequest.get("/posts").then((res) => {
+      makeRequest.get("/items").then((res) => {
         return res.data;
       }),
   });
@@ -16,8 +16,8 @@ const Items = () => {
   if (error) return "Something went wrong!";
 
   return <div className="items">
-    {data.map((post) => (  // วนลูปแสดงข้อมูลจริงจาก Database
-      <Post post={post} key={post.post_id || post.id} />
+    {data.map((item) => (  // วนลูปแสดงข้อมูลจริงจาก Database
+      <Item item={item} key={item.item_id} />
     ))}
   </div>
 
