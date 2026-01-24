@@ -4,6 +4,7 @@ import Login from './pages/login/Login1'
 import Register from './pages/register/Register1'
 import Download from './pages/download/Download1';
 import AddItem from './pages/additem/Additem';
+import DescItem from './pages/descItem/DescItem';
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
@@ -59,6 +60,18 @@ function App() {
   }
 
     const AddItemDL = () => {
+    return (
+      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        <Navbar />
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 6 }}>
+            <Outlet />
+          </div>
+        </div>
+      </div>
+    )
+  }
+  const DescriptionItem = () => {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
@@ -127,6 +140,18 @@ function App() {
         {
           path: "/additem",
           element: <AddItem />
+        },
+      ]
+    },
+     {
+      path: "/descitem",
+      element: (
+          <DescriptionItem />
+      ),
+      children: [
+        {
+          path: "/descitem",
+          element: <DescItem />
         },
       ]
     },
