@@ -15,8 +15,8 @@ import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/leftbar/leftbar";
 import LeftBarDL from "./components/leftbarDL/leftbarDL";
 import RightBar from "./components/rightbar/rightbar";
-import RightDI from "./components/rightDI/rightDI"
-import LeftDI from "./components/leftDI/leftDI"
+import LeftDI from "./components/leftDI/leftDI";
+import RightDI from "./components/rightDI/rightDI";
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
