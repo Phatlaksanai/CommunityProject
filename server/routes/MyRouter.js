@@ -27,7 +27,7 @@ const storage = new CloudinaryStorage({
       file.originalname.endsWith(".glb") || file.originalname.endsWith(".gltf");
 
     return {
-      folder: isModel ? "Cloudinary/models" : "Cloudinary/Pictures", // ชื่อโฟลเดอร์ใน Cloudinary
+      folder: isModel ? "Posts/models" : "Posts/Pictures", // ชื่อโฟลเดอร์ใน Cloudinary
       resource_type: isModel ? "raw" : "image",
       public_id: isModel
         ? Date.now() + "-" + file.originalname // เก็บชื่อเต็มพร้อมนามสกุล
@@ -319,7 +319,7 @@ const storage_item = new CloudinaryStorage({
       file.originalname.endsWith(".glb") || file.originalname.endsWith(".gltf");
 
     return {
-      folder: isModel ? "Item/models" : "Item/Pictures", // ชื่อโฟลเดอร์ใน Cloudinary
+      folder: isModel ? "Items/models" : "Items/Pictures", // ชื่อโฟลเดอร์ใน Cloudinary
       resource_type: isModel ? "raw" : "image",
       public_id: isModel
         ? Date.now() + "-" + file.originalname // เก็บชื่อเต็มพร้อมนามสกุล
