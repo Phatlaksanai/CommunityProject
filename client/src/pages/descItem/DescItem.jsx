@@ -1,4 +1,5 @@
 import "./descItem.scss";
+
 import { useState } from "react";
 
 const DescItem = () => {
@@ -7,7 +8,7 @@ const DescItem = () => {
 
     return (
         <div className="descItem">
-            <h1>หน้ารายละเอียดสินค้า</h1>
+            
         </div>
     );
 }
