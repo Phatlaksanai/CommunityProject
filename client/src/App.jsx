@@ -78,7 +78,9 @@ function App() {
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
         <div style={{ display: "flex" }}>
-          <LeftDI />
+          <div style={{ flex: 5 }}>
+            <LeftDI />
+          </div>
           <RightDI />
         </div>
       </div>
