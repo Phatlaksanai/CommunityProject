@@ -1,4 +1,6 @@
 import "./descItem.scss";
+import LeftDI from "../../components/leftDI/leftDI"
+import RightDI from "../../components/rightDI/rightDI"
 import { useState } from "react";
 
 const DescItem = () => {
@@ -7,7 +9,13 @@ const DescItem = () => {
 
     return (
         <div className="descItem">
-            <h1>หน้ารายละเอียดสินค้า</h1>
+            <div className="descItemleft">
+                <LeftDI />
+            </div>
+
+            <div className="descItemright">
+                <RightDI />
+            </div>
         </div>
     );
 }

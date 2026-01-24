@@ -15,6 +15,8 @@ import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/leftbar/leftbar";
 import LeftBarDL from "./components/leftbarDL/leftbarDL";
 import RightBar from "./components/rightbar/rightbar";
+import LeftDI from "./components/leftDI/leftDI";
+import RightDI from "./components/rightDI/rightDI";
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
@@ -76,9 +78,8 @@ function App() {
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
         <div style={{ display: "flex" }}>
-          <div style={{ flex: 6 }}>
-            <Outlet />
-          </div>
+          <LeftDI />
+          <RightDI />
         </div>
       </div>
     )
