@@ -14,6 +14,7 @@ import Courses from "../../assets/1.png";
 import Fund from "../../assets/1.png";
 import { AuthContext } from "../../context/authContext";
 import { useContext } from "react";
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 
 const RightDI = ({ item }) => {
   if (!item) return null;
@@ -48,6 +49,7 @@ const RightDI = ({ item }) => {
             <img src={Memories} alt="" />
             <span>Memories</span>
           </div>
+          < ShoppingBasketIcon />
         </div>
 
         <hr />{/* ส่วน 2 */}
