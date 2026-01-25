@@ -9,6 +9,7 @@
     overflow: scroll;
     background-color: themed("bg");
     color: themed("textColor");
+    border-radius: 10px;
 
     @include mobile{
       display: none;
@@ -20,6 +21,7 @@
 
     .container {
       padding: 20px;
+      
 
       hr {
         margin: 20px 0px;
@@ -31,42 +33,50 @@
       .menu {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 10px;
 
-        span {
-          font-size: 12px;
+        h2, h3, h4, h5 {
+          margin: 0px;
         }
 
-        .user {
+        .buttons {
+            display: flex;
+            align-items: center;
+            
+            button {
+              border: none;
+              flex: 1;
+              padding: 20px 0;
+              color: white;
+              font-size: 15px;
+              cursor: pointer;
+              background-color: #5271ff;
+              border-radius: 10px;
+            }
+        }
+          
+      }
+
+      .text {
           display: flex;
-          align-items: center;
-          gap: 10px;
-
-          img {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
+          flex-direction: column;
+          margin: 20px 0px;
+          h3 {
+            margin: 0;
           }
 
-          span {
-            font-size: 14px;
+          .info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
           }
-        }
-
-        .item {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-
-          img {
-            width: 30px;
+          
+          .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
           }
-
-          span {
-            font-size: 14px;
-          }
-        }
       }
     }
   }
