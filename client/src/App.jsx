@@ -6,6 +6,7 @@ import Register from './pages/register/Register1'
 import Download from './pages/download/Download1';
 import AddItem from './pages/additem/Additem';
 import DescItem from './pages/descItem/DescItem';
+import Buyitem from './pages/buyitem/Buyitem';
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
@@ -16,8 +17,8 @@ import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/leftbar/leftbar";
 import LeftBarDL from "./components/leftbarDL/leftbarDL";
 import RightBar from "./components/rightbar/rightbar";
-import LeftDI from "./components/leftDI/leftDI";
-import RightDI from "./components/rightDI/rightDI";
+import Lbuy from "./components/Lbuy/Lbuy";
+import Rbuy from "./components/Rbuy/Rbuy";
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
@@ -80,7 +81,18 @@ function App() {
       </div>
     )
   }
-
+  const BuyItem = () => {
+    return (
+      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        <Navbar />
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 6 }}>
+            <Outlet />
+          </div>
+        </div>
+      </div>
+    )
+  }
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
       return <Navigate to="/login" />
@@ -149,6 +161,18 @@ function App() {
         {
           path: ":id",
           element: <DescItem />
+        },
+      ]
+    },
+    {
+      path: "/buyitem",
+      element: (
+        <BuyItem />
+      ),
+      children: [
+        {
+          path: "/buyitem",
+          element: <Buyitem />
         },
       ]
     },

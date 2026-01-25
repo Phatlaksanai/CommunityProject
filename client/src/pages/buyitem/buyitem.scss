@@ -1,0 +1,26 @@
+@use "../../style.scss" as *;
+
+.buyitem{
+  display: flex;
+  gap: 24px;
+  @include themify($themes) {
+    padding: 20px 20px;
+    background-color: themed("bgSoft");
+    min-height: 100vh;
+
+    @include mobile {
+      padding: 10px;
+    }
+
+    @include tablet{
+      padding: 20px;
+    }
+  }
+ }
+ .Lbuyitem {
+  flex: 2.5;
+}
+
+.Rbuyitem {
+  flex: 1;
+}
