@@ -1,11 +1,15 @@
-import "./rightDI.scss";
+import "./Rbuy.scss";
+import { AuthContext } from "../../context/authContext";
+import { useContext } from "react";
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 
-const RightDI = ({ item }) => {
+const Rbuy = ({ item }) => {
   if (!item) return null;
+  const { currentUser } = useContext(AuthContext);
+  const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   return (
-    <div className="rightDI">
+    <div className="Rbuy">
       <div className="container">
         <div className="menu">
           <h2>{item.modelName}</h2>
@@ -46,4 +50,4 @@ const RightDI = ({ item }) => {
   );
 };
 
-export default RightDI;
+export default Rbuy;
