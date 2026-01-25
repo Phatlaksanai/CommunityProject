@@ -15,8 +15,8 @@ import Fund from "../../assets/1.png";
 import { AuthContext } from "../../context/authContext";
 import { useContext } from "react";
 
-const RightDI = () => {
-
+const RightDI = ({ item }) => {
+  if (!item) return null;
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 

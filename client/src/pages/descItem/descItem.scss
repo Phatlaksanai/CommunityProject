@@ -1,8 +1,9 @@
 @use "../../style.scss" as *;
 
 .descItem{
+  display: flex;
   @include themify($themes) {
-    padding: 20px 70px;
+    padding: 20px 20px;
     background-color: themed("bgSoft");
     min-height: 100vh;
 
@@ -15,3 +16,10 @@
     }
   }
  }
+ .descItemleft {
+  flex: 2.5;
+}
+
+.descItemright {
+  flex: 1;
+}

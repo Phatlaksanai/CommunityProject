@@ -70,6 +70,18 @@ router.get("/items", (req, res) => {
   });
 });
 
+router.get("/items/:id", (req, res) => {
+  const { id } = req.params;
+
+  db.query("SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?", [id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    if (result.length === 0)
+      return res.status(404).json({ error: "Item not found" });
+
+    res.json(result[0]);
+  });
+});
+
 router.post("/", verifyToken, (req, res) => {
   // NEw Verify Token
   res.json("Create post by user " + req.user.user_id);
@@ -304,7 +316,6 @@ router.post("/register", (req, res) => {
 });
 
 router.post("/additem", verifyToken, (req, res) => {
-    
   const q = `INSERT INTO items (modelName, description, price, img, model, createAt, category, user_id)VALUES (?)`;
 
   const values = [
@@ -318,7 +329,7 @@ router.post("/additem", verifyToken, (req, res) => {
     req.user.user_id,
   ];
 
-   db.query(q, [values], (err, data) => {
+  db.query(q, [values], (err, data) => {
     if (err) return res.status(500).json(err);
     res.status(200).json({ success: true });
   });

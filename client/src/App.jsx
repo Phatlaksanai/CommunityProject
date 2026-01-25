@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 // import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './pages/login/Login1'
 import Register from './pages/register/Register1'
@@ -23,8 +24,6 @@ import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./style.scss";
-
-
 
 
 function App() {
@@ -61,7 +60,7 @@ function App() {
     )
   }
 
-    const AddItemDL = () => {
+  const AddItemDL = () => {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
@@ -77,12 +76,7 @@ function App() {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
-        <div style={{ display: "flex" }}>
-          <div style={{ flex: 5 }}>
-            <LeftDI />
-          </div>
-          <RightDI />
-        </div>
+        <Outlet />
       </div>
     )
   }
@@ -107,7 +101,7 @@ function App() {
           path: "/",
           element: <Home />
         },
-        
+
         // ,{
         //   path:"/profile/:id",
         //   element:<Profile/>
@@ -125,7 +119,7 @@ function App() {
     {
       path: "/download",
       element: (
-          <TopTab />
+        <TopTab />
       ),
       children: [
         {
@@ -137,7 +131,7 @@ function App() {
     {
       path: "/additem",
       element: (
-          <AddItemDL />
+        <AddItemDL />
       ),
       children: [
         {
@@ -146,14 +140,14 @@ function App() {
         },
       ]
     },
-     {
+    {
       path: "/descitem",
       element: (
-          <DescriptionItem />
+        <DescriptionItem />
       ),
       children: [
         {
-          path: "/descitem",
+          path: ":id",
           element: <DescItem />
         },
       ]
@@ -202,8 +196,5 @@ function App() {
     </div>
   );
 }
-
-
-
 
 export default App;

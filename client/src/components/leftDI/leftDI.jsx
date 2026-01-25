@@ -1,30 +1,33 @@
 import "./leftDI.scss";
+import ModelViewer from "../modelViewer/model_viewer";
 
-const LeftDI = () => {
+const LeftDI = ({ item }) => {
+  if (!item) return null;
   return (
     <div className="leftDI">
       <div className="container">
         <div className="item">
-          <img
-                src="https://cdn.vcgamers.com/news/wp-content/uploads/2023/02/PODUSZKA-ROBLOX-MAN-FACE-PREZENT.jpg"
-                alt=""
-              />
+          {/* <img
+            src={item.img}
+            alt=""
+          /> */}
+          {item.model && <ModelViewer modelUrl={item.model} />}
         </div>
         <div className="item">
-            <h2>Description</h2>
-            <span>good good good good good good good good good good good good good good good good good good good good good good good good 11111111111111111111111111111111111111111111111111111111111111111111111111111111</span> 
+          <h2>Description</h2>
+          <span>{item.description}</span>
         </div>
 
         <div className="item">
-          <h2>Omner</h2>
+          <h2>Owner</h2>
           <div className="user">
             <div className="userInfo">
               <img
-                src="https://cdn.vcgamers.com/news/wp-content/uploads/2023/02/PODUSZKA-ROBLOX-MAN-FACE-PREZENT.jpg"
+                src={item.profilePic}
                 alt=""
               />
               <div className="online" />
-              <span>Bob man</span>
+              <span>{item.username}</span>
             </div>
             <div className="buttons">
               <button>follow</button>
@@ -42,7 +45,7 @@ const LeftDI = () => {
               />
               <div className="online" />
               <span>Nino</span>
-               <p>:</p>
+              <p>:</p>
               <p>That's a great product!</p>
             </div>
             <p>1 minago</p>
