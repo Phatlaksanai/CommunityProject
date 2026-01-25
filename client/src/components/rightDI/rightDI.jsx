@@ -8,7 +8,7 @@ const RightDI = ({ item }) => {
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   return (
-    <div className="leftBar">
+    <div className="rightDI">
       <div className="container">
         <div className="menu">
           <h2>{item.modelName}</h2>
