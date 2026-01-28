@@ -26,7 +26,7 @@ const LeftBar = () => {
         <div className="menu">
           <div className="user">
             <img src={currentUser?.profilePic || defaultPic} alt="" />
-            <span>{currentUser?.name || "Guest"}</span>
+            <span>{currentUser?.username || "Guest"}</span>
           </div>
           <div className="item">
             <img src={Friends} alt="" />

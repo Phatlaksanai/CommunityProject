@@ -17,6 +17,7 @@ import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/leftbar/leftbar";
 import LeftBarDL from "./components/leftbarDL/leftbarDL";
 import RightBar from "./components/rightbar/rightbar";
+import ProfileDetail from "./components/profileDetail/ProfileDetail";
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
@@ -32,6 +33,7 @@ function App() {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
+        <ProfileDetail />
         <div style={{ display: "flex" }}>
           <div style={{ flex: 6 }}>
             <Outlet />
@@ -130,7 +132,7 @@ function App() {
     {
       path: "/profile",
       element: (
-        <DescriptionItem />
+        <ProfileUser />
       ),
       children: [
         {

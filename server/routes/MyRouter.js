@@ -130,7 +130,9 @@ router.post("/login", (req, res) => {
         .json({
           success: true,
           username: user.username,
-          profilePic: user.profilePic || "",
+          name: user.name,
+          profilePic: user.profilePic,
+          coverPic: user.coverPic,
         });
     },
   );

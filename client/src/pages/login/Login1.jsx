@@ -8,7 +8,7 @@ const Login = () => {
 
   const navigate = useNavigate()
   const { setUser } = useContext(AuthContext); // ใช้ context ตรง ๆ
-  
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -26,25 +26,10 @@ const Login = () => {
         password,
       });
 
-      // Backend ส่ง { success: true, username }
+      // Backend ส่งของ user data มาให้
       if (res.data.success) {
-        setSuccess("Login success");
-        //-------------------------------------------------------------------------New refesh ไม่หาย---------------------------
-        // สร้างก้อนข้อมูล user ที่เราต้องการจะใช้ (ให้มีหน้าตาเหมือนกันทั้งแอป)
-        const userData = {
-          username: res.data.username,
-          name: res.data.name || res.data.username,
-          profilePic: res.data.profilePic || "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg"
-          // ถ้ามี profilePic หรือ id ก็ใส่เพิ่มตรงนี้ได้
-        };
-        // เก็บลง LocalStorage (ต้องเป็นก้อนเดียวกับที่จะ setUser)
-        localStorage.setItem("accessToken", res.data.accessToken);
-        localStorage.setItem("user", JSON.stringify(userData)); //  เก็บ userData ที่เราสร้าง
-        // อัปเดต State
-        setUser(userData);
-        //----------------------------------------------------------------------------------------------------
-        // เก็บ user ไว้ใช้ทั้ง app
-        //setUser({ username: res.data.username });// ลบอันเก่าออก
+        setUser(res.data);
+        localStorage.setItem("user", JSON.stringify(res.data));
         navigate("/");
       }
     } catch (err) {

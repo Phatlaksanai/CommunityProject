@@ -87,7 +87,7 @@ const Navbar = () => {
         <NotificationsOutlinedIcon />
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" />
-          <span>{currentUser?.name || "Guest"}</span>
+          <span>{currentUser?.username || "Guest"}</span>
           {!currentUser && (
             <button onClick={handleLogin} style={{ marginLeft: "10px", cursor: "pointer" }}>
               Login

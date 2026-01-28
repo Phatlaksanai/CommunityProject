@@ -1,50 +1,97 @@
 import "./Rbuy.scss";
+import Friends from "../../assets/1.png";
+import Groups from "../../assets/1.png";
+import Market from "../../assets/1.png";
+import Watch from "../../assets/1.png";
+import Memories from "../../assets/1.png";
+import Events from "../../assets/1.png";
+import Gaming from "../../assets/1.png";
+import Gallery from "../../assets/1.png";
+import Videos from "../../assets/1.png";
+import Messages from "../../assets/1.png";
+import Tutorials from "../../assets/1.png";
+import Courses from "../../assets/1.png";
+import Fund from "../../assets/1.png";
 import { AuthContext } from "../../context/authContext";
 import { useContext } from "react";
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 
-const Rbuy = ({ item }) => {
-  if (!item) return null;
+const Rbuy = () => {
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   return (
-    <div className="Rbuy">
+    <div className="leftBar">
       <div className="container">
         <div className="menu">
-          <h2>{item.modelName}</h2>
-          <h4>Taxes</h4>
-          <h4>5 ★ ★ ★ ★ ★ (1)</h4>
-
+          <div className="user">
+            <img src={currentUser?.profilePic || defaultPic} alt="" />
+            <span>{currentUser?.name || "Guest"}</span>
+          </div>
+          <div className="item">
+            <img src={Friends} alt="" />
+            <span>Friends</span>
+          </div>
+          <div className="item">
+            <img src={Groups} alt="" />
+            <span>Groups</span>
+          </div>
+          <div className="item">
+            <img src={Market} alt="" />
+            <span>Marketplace</span>
+          </div>
+          <div className="item">
+            <img src={Watch} alt="" />
+            <span>Watch</span>
+          </div>
+          <div className="item">
+            <img src={Memories} alt="" />
+            <span>Memories</span>
+          </div>
+          < ShoppingBasketIcon />
         </div>
 
         <hr />{/* ส่วน 2 */}
-        <div className="text">
-          <div className="row">
-            <h3>price</h3>
-            <p>{item.price} $</p>
+        <div className="menu">
+          <span>Your shortcuts</span>
+          <div className="item">
+            <img src={Events} alt="" />
+            <span>Events</span>
           </div>
-
-          <div className="row">
-            <h3>Sale discount</h3>
-            <p>None</p>
+          <div className="item">
+            <img src={Gaming} alt="" />
+            <span>Gaming</span>
+          </div>
+          <div className="item">
+            <img src={Gallery} alt="" />
+            <span>Gallery</span>
+          </div>
+          <div className="item">
+            <img src={Videos} alt="" />
+            <span>Videos</span>
+          </div>
+          <div className="item">
+            <img src={Messages} alt="" />
+            <span>Messages</span>
           </div>
         </div>
-
 
         <hr />{/* ส่วน 3 */}
-        <div className="text">
-          <div className="row">
-            <h3>Subtotal</h3>
-            <p>{item.price} $</p>
-          </div>
-        </div>
         <div className="menu">
-          <div className="buttons">
-              <button>Check Out</button>
+          <span>Others</span>
+          <div className="item">
+            <img src={Fund} alt="" />
+            <span>Fundraiser</span>
+          </div>
+          <div className="item">
+            <img src={Tutorials} alt="" />
+            <span>Tutorials</span>
+          </div>
+          <div className="item">
+            <img src={Courses} alt="" />
+            <span>Courses</span>
           </div>
         </div>
-        
       </div>
     </div>
   );

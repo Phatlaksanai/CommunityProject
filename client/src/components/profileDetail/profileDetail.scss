@@ -1,0 +1,120 @@
+@use "../../style.scss" as *;
+
+.profileDetail {
+  @include themify($themes) {
+    flex: 2;
+    top: 70px;
+    // height: calc(100vh - 70px);
+    overflow: scroll;
+    background-color: themed("bg");
+    color: themed("textColor");
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .container {
+      padding: 0;
+
+      /* ===== COVER ===== */
+      .cover {
+        width: 100%;
+        height: 220px;
+        overflow: hidden;
+        border-radius: 0 0 20px 20px;
+
+        .coverImg {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      /* ===== PROFILE HEADER ===== */
+      .profileHeader {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 20px;
+
+        .profileImg {
+          margin-top: -60px;
+
+          img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid themed("bg");
+            object-fit: cover;
+          }
+        }
+
+        .profileInfo {
+
+  .nameRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    h1 {
+      font-size: 26px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .actions {
+      .followBtn {
+        padding: 8px 18px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .handle {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    opacity: 0.7;
+  }
+}
+
+      }
+
+      /* ===== TABS ===== */
+      .tabs {
+        display: flex;
+        gap: 25px;
+        padding: 15px 20px;
+        border-bottom: 1px solid themed("border");
+
+        span {
+          cursor: pointer;
+          font-size: 14px;
+          padding-bottom: 8px;
+        }
+
+        .active {
+          font-weight: bold;
+          border-bottom: 2px solid themed("textColor");
+        }
+      }
+
+      /* ===== CONTENT ===== */
+      .content {
+        padding: 20px;
+        font-size: 14px;
+        opacity: 0.8;
+      }
+
+      hr {
+        margin: 0;
+        border: none;
+      }
+    }
+  }
+}
