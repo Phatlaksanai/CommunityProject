@@ -121,7 +121,11 @@ const Post = ({ post }) => {
               </div>
             </div>
           ))} */}
-          <img src={post.img} alt="" />
+          {post.img && (
+            <div className="postImage">
+              <img src={post.img} alt="" />
+            </div>
+          )}
         </div>
         <div className="info">
           <div className="item">
