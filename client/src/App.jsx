@@ -112,13 +112,20 @@ function App() {
         {
           path: "/",
           element: <Home />
-        },
-
-        // ,{
-        //   path:"/profile/:id",
-        //   element:<Profile/>
-        // }
+        }
       ],
+    },
+    {
+      path: "/profile",
+      element: (
+        <DescriptionItem />
+      ),
+      children: [
+        {
+          path: "/profile",
+          element: <Profile />
+        },
+      ]
     },
     {
       path: "/register",
