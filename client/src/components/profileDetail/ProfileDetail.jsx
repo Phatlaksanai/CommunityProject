@@ -27,7 +27,7 @@ const ProfileDetail = () => {
           </div>
           <div className="profileInfo">
             <div className="nameRow">
-              <h1>{currentUser?.name}</h1>
+              <h1>{currentUser?.name || currentUser?.username}</h1>
               <div className="actions">
                 <button className="followBtn">จัดการโปรไฟล์</button>
               </div>
