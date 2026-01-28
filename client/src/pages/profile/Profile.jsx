@@ -1,10 +1,14 @@
-import "./profile.scss";
+import Items from "../../components/items/items"
+import Share from "../../components/share/share"
+import "./profile.scss"
 
 const Profile = () => {
-
   return (
-    <h1>hello</h1>
-  );
-};
+    <div className="profile">
+      <Share />
+      <Items />
+    </div>
+  )
+}
 
-export default Profile;
+export default Profile

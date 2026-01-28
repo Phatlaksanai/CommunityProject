@@ -124,13 +124,13 @@ function App() {
         {
           path: "/",
           element: <Home />
-        },
+        }
       ],
     },
     {
       path: "/profile",
       element: (
-        <ProfileUser />
+        <DescriptionItem />
       ),
       children: [
         {
