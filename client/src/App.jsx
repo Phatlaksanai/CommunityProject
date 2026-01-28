@@ -1,29 +1,25 @@
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 // import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from "./pages/home/Home1";
 import Login from './pages/login/Login1'
 import Register from './pages/register/Register1'
 import Download from './pages/download/Download1';
 import AddItem from './pages/additem/Additem';
 import DescItem from './pages/descItem/DescItem';
 import Buyitem from './pages/buyitem/Buyitem';
+import Profile from "./pages/profile/Profile";
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
 //ระบบใหม่++++++++++++++++++++++
-import Home from "./pages/home/Home1";
-import Profile from "./pages/profile/Profile";
 import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/leftbar/leftbar";
 import LeftBarDL from "./components/leftbarDL/leftbarDL";
 import RightBar from "./components/rightbar/rightbar";
-import Lbuy from "./components/Lbuy/Lbuy";
-import Rbuy from "./components/Rbuy/Rbuy";
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
-import { AuthContext } from "./context/authContext";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./style.scss";
 
 
@@ -32,6 +28,18 @@ function App() {
   const { darkMode } = useContext(DarkModeContext);//newwwwwwwwwwwwwwwwwww
   const currentUser = true; // สถานะผู้ใช้ false วาปหน้าไม่ได้ true วาปหน้าได้
 
+  const ProfileUser = () => {
+    return (
+      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        <Navbar />
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 6 }}>
+            <Outlet />
+          </div>
+        </div>
+      </div>
+    )
+  }
   const Layout = () => {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
@@ -77,7 +85,11 @@ function App() {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
-        <Outlet />
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 6 }}>
+            <Outlet />
+          </div>
+        </div>
       </div>
     )
   }
@@ -113,12 +125,19 @@ function App() {
           path: "/",
           element: <Home />
         },
-
-        // ,{
-        //   path:"/profile/:id",
-        //   element:<Profile/>
-        // }
       ],
+    },
+    {
+      path: "/profile",
+      element: (
+        <ProfileUser />
+      ),
+      children: [
+        {
+          path: "/profile",
+          element: <Profile />
+        },
+      ]
     },
     {
       path: "/register",
