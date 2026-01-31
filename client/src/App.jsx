@@ -18,6 +18,7 @@ import LeftBar from "./components/leftbar/leftbar";
 import LeftBarDL from "./components/leftbarDL/leftbarDL";
 import RightBar from "./components/rightbar/rightbar";
 import ProfileDetail from "./components/profileDetail/ProfileDetail";
+import Items from "./components/items/items"
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
@@ -136,9 +137,17 @@ function App() {
       ),
       children: [
         {
-          path: "/profile",
+          index: true,
           element: <Profile />
         },
+        {
+          path: "items",
+          element: <Items />
+        },
+        // {
+        //   path: "projects",
+        //   element: <Projects />
+        // }
       ]
     },
     {
