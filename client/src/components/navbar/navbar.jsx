@@ -85,8 +85,8 @@ const Navbar = () => {
         <PersonOutlinedIcon />
         <EmailOutlinedIcon />
         <NotificationsOutlinedIcon />
-        <div className="user" onClick={() => navigate("/profile")} style={{ cursor: "pointer" }}>
-          <img src={currentUser?.profilePic || defaultPic} alt="" />
+        <div className="user">
+          <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate("/profile")} style={{ cursor: "pointer" }}/>
           <span>{currentUser?.username || "Guest"}</span>
           {!currentUser && (
             <button onClick={handleLogin} style={{ marginLeft: "10px", cursor: "pointer" }}>
