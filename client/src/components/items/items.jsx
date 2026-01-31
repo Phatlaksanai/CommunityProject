@@ -3,13 +3,15 @@ import "./items.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 
-const Items = () => {
+const Items = ({ userId }) => {
   const { isLoading, error, data } = useQuery({
-    queryKey: ["items"],
-    queryFn: () =>
-      makeRequest.get("/items").then((res) => {
-        return res.data;
-      }),
+    queryKey: ["items", userId],
+    queryFn: () => {
+      if (userId) {
+        return makeRequest.get(`/items/user/${userId}`).then(res => res.data);
+      }
+      return makeRequest.get("/items").then(res => res.data);
+    }
   });
 
   if (isLoading) return "Loading items...";

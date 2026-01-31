@@ -9,6 +9,7 @@ import AddItem from './pages/additem/Additem';
 import DescItem from './pages/descItem/DescItem';
 import Buyitem from './pages/buyitem/Buyitem';
 import Profile from "./pages/profile/Profile";
+import ProfileItems from "./pages/profile/ProfileItems";
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
@@ -18,7 +19,6 @@ import LeftBar from "./components/leftbar/leftbar";
 import LeftBarDL from "./components/leftbarDL/leftbarDL";
 import RightBar from "./components/rightbar/rightbar";
 import ProfileDetail from "./components/profileDetail/ProfileDetail";
-import Items from "./components/items/items"
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
@@ -131,7 +131,7 @@ function App() {
       ],
     },
     {
-      path: "/profile",
+      path: "/profile/:id",
       element: (
         <ProfileUser />
       ),
@@ -142,7 +142,7 @@ function App() {
         },
         {
           path: "items",
-          element: <Items />
+          element: <ProfileItems />
         },
         // {
         //   path: "projects",
