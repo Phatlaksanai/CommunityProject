@@ -92,6 +92,26 @@ router.get("/items/:id", (req, res) => {
     res.json(result[0]);
   });
 });
+router.get("/posts/user/:id", (req, res) => {
+  const { id } = req.params;
+  db.query("SELECT posts.*, users.username, users.profilePic FROM posts JOIN users ON posts.user_id = users.user_id WHERE posts.user_id = ? ORDER BY posts.createdAt DESC", [id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    if (result.length === 0){
+      return res.status(404).json({ error: "Post not found" });
+    }
+    res.json(result);
+  });
+});
+router.get("/items/user/:id", (req, res) => {
+  const { id } = req.params;
+  db.query("SELECT * FROM items WHERE user_id = ? ORDER BY items.createAt DESC", [id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    if (result.length === 0){
+      return res.status(404).json({ error: "Item not found" });
+    }
+    res.json(result);
+  });
+});
 
 router.post("/", verifyToken, (req, res) => {
   // NEw Verify Token
@@ -140,6 +160,7 @@ router.post("/login", (req, res) => {
         .status(200)
         .json({
           success: true,
+          user_id: user.user_id,
           username: user.username,
           name: user.name,
           profilePic: user.profilePic,

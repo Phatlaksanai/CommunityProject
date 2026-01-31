@@ -1,12 +1,12 @@
 import Posts from "../../components/posts/posts"
-import Items from "../../components/items/items"
-import Project from "../../components/PageItems/projects/projects"
+import { useParams } from "react-router-dom";
 import "./profile.scss"
 
 const Profile = () => {
+  const { id } = useParams();
   return (
     <div className="profile">
-      <Posts />
+      <Posts userId={id}/>
     </div>
   )
 }

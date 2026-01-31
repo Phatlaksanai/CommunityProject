@@ -1,10 +1,11 @@
 import "./profileDetail.scss";
 import { AuthContext } from "../../context/authContext";
 import { useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 
 const ProfileDetail = () => {
   const { currentUser } = useContext(AuthContext);
+  const { id } = useParams();
 
   const defaultPic =
     "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
@@ -37,9 +38,10 @@ const ProfileDetail = () => {
           </div>
         </div>
         <div className="tabs">
-          <NavLink to="/profile" end>Posts</NavLink>
-          <NavLink to="/profile/items">Items</NavLink>
-          <NavLink to="/profile/projects">Projects</NavLink>
+          <NavLink to={`/profile/${id}`} end>โพสต์</NavLink>
+          <NavLink to={`/profile/${id}/items`}>โมเดล</NavLink>
+          {/* <NavLink to={`/profile/${id}/projects`}>โปรเจกต์</NavLink> */}
+          <span>โปรเจกต์</span>
         </div>
         <hr />
       </div>
