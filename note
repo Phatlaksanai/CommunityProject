@@ -9,8 +9,8 @@ create table users(
 );
 
 ALTER TABLE users ADD UNIQUE(email); //email เดิมจะ insert ไม่ได้ซ้ำอีก
-TRUNCATE TABLE users; //ลบข้อมูลในตารางทั้งหมด
-SET FOREIGN_KEY_CHECKS = 0;
+
+SET FOREIGN_KEY_CHECKS = 0; //ลบข้อมูลในตารางทั้งหมด
 TRUNCATE TABLE users;
 SET FOREIGN_KEY_CHECKS = 1;
 

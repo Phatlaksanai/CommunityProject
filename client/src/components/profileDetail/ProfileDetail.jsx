@@ -40,8 +40,7 @@ const ProfileDetail = () => {
         <div className="tabs">
           <NavLink to={`/profile/${id}`} end>โพสต์</NavLink>
           <NavLink to={`/profile/${id}/items`}>โมเดล</NavLink>
-          {/* <NavLink to={`/profile/${id}/projects`}>โปรเจกต์</NavLink> */}
-          <span>โปรเจกต์</span>
+          <NavLink to={`/profile/${id}/projects`}>โปรเจกต์</NavLink>
         </div>
         <hr />
       </div>
