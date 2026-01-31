@@ -1,10 +1,13 @@
 import "./addproject.scss";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../context/authContext";
 import { Link, useNavigate } from "react-router-dom";//-------------------------------------
 
 const AddProject = () => {
   //----------------------------------------------------------
   const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext);
+
 
   // form data
   const [projectName, setProjectName] = useState("");
@@ -82,7 +85,7 @@ const AddProject = () => {
       }
 
       setSuccess("add project success");
-      navigate("/profile");
+      navigate(`/profile/${currentUser.user_id}/projects`);
     } catch (err) {
       console.error(err);
       setError("เชื่อมต่อ Server ไม่ได้");
