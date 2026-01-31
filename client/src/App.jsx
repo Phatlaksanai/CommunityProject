@@ -6,6 +6,7 @@ import Login from './pages/login/Login1'
 import Register from './pages/register/Register1'
 import Download from './pages/download/Download1';
 import AddItem from './pages/additem/Additem';
+import AddProject from './pages/addprojcet/addproject';
 import DescItem from './pages/descItem/DescItem';
 import Buyitem from './pages/buyitem/Buyitem';
 import Profile from "./pages/profile/Profile";
@@ -19,6 +20,7 @@ import LeftBarDL from "./components/leftbarDL/leftbarDL";
 import RightBar from "./components/rightbar/rightbar";
 import ProfileDetail from "./components/profileDetail/ProfileDetail";
 import Items from "./components/items/items"
+import Projects from "./components/PageItems/projects/projects"
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
@@ -144,10 +146,10 @@ function App() {
           path: "items",
           element: <Items />
         },
-        // {
-        //   path: "projects",
-        //   element: <Projects />
-        // }
+        {
+          path: "projects",
+          element: <Projects />
+        }
       ]
     },
     {
@@ -179,6 +181,18 @@ function App() {
         {
           path: "/additem",
           element: <AddItem />
+        },
+      ]
+    },
+    {
+      path: "/addproject",
+      element: (
+        <AddItemDL />
+      ),
+      children: [
+        {
+          path: "/addproject",
+          element: <AddProject />
         },
       ]
     },

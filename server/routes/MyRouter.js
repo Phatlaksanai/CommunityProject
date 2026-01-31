@@ -59,6 +59,17 @@ router.get("/posts", (req, res) => {
   });
 });
 
+router.get("/projects", (req, res) => {
+  // สั่ง JOIN เพื่อเอาชื่อคนโพสต์ (u.username) และรูป (u.profilePic) มาโชว์คู่กับโพสต์
+  const q = `SELECT *
+             FROM projects 
+             ORDER BY createAt DESC`;
+  db.query(q, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json(data);
+  });
+});
+
 router.get("/items", (req, res) => {
   // สั่ง JOIN เพื่อเอาชื่อคนโพสต์ (u.username) และรูป (u.profilePic) มาโชว์คู่กับโพสต์
   const q = `SELECT *
@@ -337,6 +348,22 @@ router.post("/additem", verifyToken, (req, res) => {
   });
 });
 
+router.post("/addproject", verifyToken, (req, res) => {
+  const q = `INSERT INTO projects (project_name, description, img, createAt)VALUES (?)`;
+
+  const values = [
+    req.body.projectName,
+    req.body.description,
+    req.body.img,
+    new Date(),
+  ];
+
+  db.query(q, [values], (err, data) => {
+    if (err) return res.status(500).json(err);
+    res.status(200).json({ success: true });
+  });
+});
+
 const storage_item = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
@@ -356,6 +383,28 @@ const storage_item = new CloudinaryStorage({
 const upload_item = multer({ storage: storage_item });
 
 router.post("/upload/item", upload_item.single("file"), (req, res) => {
+  try {
+    res.status(200).json(req.file.path); // cloudinaryส่ง URL นี้กลับไปให้ Frontend เพื่อ Save ลง DB
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+const storage_project = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    return {
+      folder: "Projects/Pictures", // ชื่อโฟลเดอร์ใน Cloudinary
+      resource_type: "image",
+      public_id: Date.now() + "-" + file.originalname.replace(/\.[^/.]+$/, ""), // รูป: ตัดนามสกุลออก
+      allowed_formats: ["jpg", "png", "jpeg", "gif"],
+    };
+  },
+});
+const upload_project = multer({ storage: storage_project });
+
+router.post("/upload/project", upload_project.single("file"), (req, res) => {
   try {
     res.status(200).json(req.file.path); // cloudinaryส่ง URL นี้กลับไปให้ Frontend เพื่อ Save ลง DB
   } catch (err) {

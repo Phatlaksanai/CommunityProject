@@ -37,9 +37,9 @@ const ProfileDetail = () => {
           </div>
         </div>
         <div className="tabs">
-          <NavLink to="/profile" end>โพสต์</NavLink>
-          <NavLink to="/profile/items">โมเดล</NavLink>
-          <span>โปรเจกต์</span>
+          <NavLink to="/profile" end>Posts</NavLink>
+          <NavLink to="/profile/items">Items</NavLink>
+          <NavLink to="/profile/projects">Projects</NavLink>
         </div>
         <hr />
       </div>
