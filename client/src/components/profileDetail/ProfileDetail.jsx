@@ -1,6 +1,7 @@
 import "./profileDetail.scss";
 import { AuthContext } from "../../context/authContext";
 import { useContext } from "react";
+import { NavLink } from "react-router-dom";
 
 const ProfileDetail = () => {
   const { currentUser } = useContext(AuthContext);
@@ -36,8 +37,8 @@ const ProfileDetail = () => {
           </div>
         </div>
         <div className="tabs">
-          <span className="active">โพสต์</span>
-          <span>โมเดล</span>
+          <NavLink to="/profile" end>โพสต์</NavLink>
+          <NavLink to="/profile/items">โมเดล</NavLink>
           <span>โปรเจกต์</span>
         </div>
         <hr />
