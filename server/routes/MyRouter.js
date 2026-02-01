@@ -133,26 +133,6 @@ router.get("/items/user/:id", (req, res) => {
   });
 });
 
-// ดึง post ของ user ที่ login (ใช้สำหรับเลือกผูกกับ project)
-router.get("/posts/user/:id/project", (req, res) => {
-  const { id } = req.params;
-
-  const q = `
-    SELECT 
-      post_id,
-      description AS title,
-      img
-    FROM posts
-    WHERE user_id = ?
-    ORDER BY createdAt DESC
-  `;
-
-  db.query(q, [id], (err, result) => {
-    if (err) return res.status(500).json(err);
-    return res.status(200).json(result);
-  });
-});
-
 
 router.post("/", verifyToken, (req, res) => {
   // NEw Verify Token
