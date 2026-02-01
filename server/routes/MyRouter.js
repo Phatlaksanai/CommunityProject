@@ -102,6 +102,14 @@ router.get("/posts/user/:id", (req, res) => {
     res.json(result);
   });
 });
+router.get("/posts/user/:id/available", (req, res) => {
+  const { id } = req.params;
+  const q = "SELECT posts.* FROM posts WHERE posts.user_id = ? AND posts.project_id IS NULL ORDER BY posts.createdAt DESC";
+  db.query(q, [id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json(result);
+  });
+});
 router.get("/items/user/:id", (req, res) => {
   const { id } = req.params;
   db.query("SELECT * FROM items WHERE user_id = ? ORDER BY items.createAt DESC", [id], (err, result) => {
@@ -370,18 +378,34 @@ router.post("/additem", verifyToken, (req, res) => {
 });
 
 router.post("/addproject", verifyToken, (req, res) => {
-  const q = `INSERT INTO projects (project_name, description, img, createAt)VALUES (?)`;
+  const { projectName, description, img, relatedPosts } = req.body;
+  const qProject = `INSERT INTO projects (project_name, description, img, createAt)VALUES (?)`;
 
   const values = [
-    req.body.projectName,
-    req.body.description,
-    req.body.img,
+    projectName,
+    description,
+    img,
     new Date(),
   ];
 
-  db.query(q, [values], (err, data) => {
+  db.query(qProject, [values], (err, data) => {
     if (err) return res.status(500).json(err);
-    res.status(200).json({ success: true });
+    const projectId = data.insertId; // project_id ใหม่
+
+    // ถ้าไม่มีโพสต์ที่เลือก
+    if (!relatedPosts || relatedPosts.length === 0) {
+      return res.status(200).json({
+        success: true,
+        projectId,
+      });
+    }
+    // Update posts ให้มี project_id
+    const qUpdate = "UPDATE posts SET project_id = ? WHERE post_id IN (?) AND project_id IS NULL";
+    db.query(qUpdate, [projectId, relatedPosts], (err2) => {
+      if (err2) return res.status(500).json(err2);
+
+      res.status(200).json({success: true, projectId});
+    });
   });
 });
 

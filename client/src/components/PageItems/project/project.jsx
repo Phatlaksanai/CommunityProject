@@ -6,10 +6,8 @@ import { useState } from "react";
 const Project = ({ project }) => {
   
   const navigate = useNavigate();
-  const [imgError, setImgError] = useState(false);
   return (
-    // <div className="project" onClick={() => navigate(`/descitem/${item.item_id}`)} style={{ cursor: "pointer" }}>
-    <div className="project">
+    <div className="project" onClick={() => navigate(`/descitem/${project.project_id}`)} style={{ cursor: "pointer" }}>
       <div className="container">
         <div className="content" >
            <img src={project.img} alt="" onError={(e) => {

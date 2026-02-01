@@ -1,35 +1,33 @@
 import "./addproject.scss";
 import { useState, useContext } from "react";
 import { AuthContext } from "../../context/authContext";
-import { Link, useNavigate } from "react-router-dom";//-------------------------------------
+import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { makeRequest } from "../../api/axios";
 
 const AddProject = () => {
-  //----------------------------------------------------------
+
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
 
-
-  // form data
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
   const [img, setImg] = useState(null);
 
-  // message
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  //-----------------------เลือก post ที่เกี่ยวข้อง------------------------
-                    const [search, setSearch] = useState("");
-                    const [selectedPosts, setSelectedPosts] = useState([]);
+  const [search, setSearch] = useState("");
+  const [selectedPosts, setSelectedPosts] = useState([]);
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ["userPosts", currentUser.user_id],
+    queryFn: () =>
+      makeRequest
+        .get(`/posts/user/${currentUser.user_id}/available`)
+        .then((res) => res.data),
+  });
 
-                    const posts = [
-                    { id: 1, title: "Mini Project Data Base" },
-                    { id: 2, title: "PlayWright #playwright700" },
-                    { id: 3, title: "ICMP #icmp700" },
-  ];
-  //-----------------------เลือก post ที่เกี่ยวข้อง------------------------
 
-  // ================= UPLOAD FILES TO CLOUDINARY =================
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -74,6 +72,7 @@ const AddProject = () => {
           projectName,
           description,
           img: imgURL,
+          relatedPosts: selectedPosts,
         }),
       });
 
@@ -133,44 +132,44 @@ const AddProject = () => {
             />
           </div>
 
-            {/* //-----------------------เลือก post ที่เกี่ยวข้อง------------------------ */}
           <div className="form-group">
             <label>Post ที่เกี่ยวข้อง</label>
-
-            {/* ช่องค้นหา */}
-            <input
-                type="text"
-                placeholder="ค้นหา Post"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+            <input 
+              type="text"
+              placeholder="ค้นหา Post"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
-
-            {/* List */}
+            {isLoading && <p>กำลังโหลดโพสต์...</p>} 
             <div className="post-list">
-                {posts
-                .filter(p =>
-                    p.title.toLowerCase().includes(search.toLowerCase())
+             {posts
+                .filter(post =>
+                  post.description.toLowerCase().includes(search.toLowerCase())
                 )
                 .map(post => (
-                    <label key={post.id} className="post-item">
+                  <label key={post.post_id} className="post-item">
                     <input
-                        type="checkbox"
-                        checked={selectedPosts.includes(post.id)}
-                        onChange={() => {
+                      type="checkbox"
+                      checked={selectedPosts.includes(post.post_id)}
+                      onChange={() => {
                         setSelectedPosts(prev =>
-                            prev.includes(post.id)
-                            ? prev.filter(id => id !== post.id)
-                            : [...prev, post.id]
+                          prev.includes(post.post_id)
+                            ? prev.filter(id => id !== post.post_id)
+                            : [...prev, post.post_id]
                         );
-                        }}
+                      }}
                     />
-                    {post.title}
-                    </label>
-                ))}
+                    <img
+                      src={post.img}
+                      alt=""
+                      onError={(e) => {
+                      e.currentTarget.src = "https://placehold.co/600x400/457EC3/FFFFFF?text=Project"}}
+                    />
+                    <span>{post.description}</span>
+                  </label>
+              ))}
             </div>
-            </div>
-                {/* //-----------------------เลือก post ที่เกี่ยวข้อง------------------------ */}
-
+          </div>
           <input type="submit" value="Submit" className="add-item__submit" />
         </form>
       </div>
