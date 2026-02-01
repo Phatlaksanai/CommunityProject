@@ -2,44 +2,33 @@ import "./addproject.scss";
 import { useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 
-
-
-
 const AddProject = () => {
-  //----------------------------------------------------------
+
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
 
-
-  // form data
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
   const [img, setImg] = useState(null);
 
-  // message
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  //-----------------------เลือก post ที่เกี่ยวข้อง------------------------
-  const { id: userId } = useParams();
   const [search, setSearch] = useState("");
   const [selectedPosts, setSelectedPosts] = useState([]);
-
-  const { data = [], isLoading } = useQuery({
-    queryKey: ["posts-for-project", userId],
-    enabled: !!userId,
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ["userPosts", currentUser.user_id],
     queryFn: () =>
       makeRequest
-        .get(`/posts/user/${userId}/project`)
-        .then(res => res.data),
+        .get(`/posts/user/${currentUser.user_id}/available`)
+        .then((res) => res.data),
   });
-  if (isLoading) return "Loading posts...";
-  //-----------------------เลือก post ที่เกี่ยวข้อง------------------------
 
-  // ================= UPLOAD FILES TO CLOUDINARY =================
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -84,6 +73,7 @@ const AddProject = () => {
           projectName,
           description,
           img: imgURL,
+          relatedPosts: selectedPosts,
         }),
       });
 
@@ -143,25 +133,19 @@ const AddProject = () => {
             />
           </div>
 
-            {/* //-----------------------เลือก post ที่เกี่ยวข้อง------------------------ */}
           <div className="form-group">
             <label>Post ที่เกี่ยวข้อง</label>
-
-            {/* ช่องค้นหา */}
-            <input
-                type="text"
-                placeholder="ค้นหา Post"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+            <input 
+              type="text"
+              placeholder="ค้นหา Post"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
-
-            {/* List */}
+            {isLoading && <p>กำลังโหลดโพสต์...</p>} 
             <div className="post-list">
-              {isLoading && <p>กำลังโหลด...</p>}
-
-              {data
+             {posts
                 .filter(post =>
-                  post.title.toLowerCase().includes(search.toLowerCase())
+                  post.description.toLowerCase().includes(search.toLowerCase())
                 )
                 .map(post => (
                   <label key={post.post_id} className="post-item">
@@ -176,24 +160,17 @@ const AddProject = () => {
                         );
                       }}
                     />
-
                     <img
                       src={post.img}
                       alt=""
                       onError={(e) => {
                       e.currentTarget.src = "https://placehold.co/600x400/457EC3/FFFFFF?text=Project"}}
-                      
                     />
-
-                    <span>{post.title}</span>
+                    <span>{post.description}</span>
                   </label>
               ))}
-
             </div>
-
-            </div>
-                {/* //-----------------------เลือก post ที่เกี่ยวข้อง------------------------ */}
-
+          </div>
           <input type="submit" value="Submit" className="add-item__submit" />
         </form>
       </div>
