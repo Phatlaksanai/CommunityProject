@@ -1,12 +1,15 @@
 import "./profileDetail.scss";
 import { AuthContext } from "../../context/authContext";
 import { useContext } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useParams, useNavigate } from "react-router-dom";
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+
+
 
 const ProfileDetail = () => {
   const { currentUser } = useContext(AuthContext);
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const defaultPic =
     "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
@@ -41,6 +44,7 @@ const ProfileDetail = () => {
           <NavLink to={`/profile/${id}`} end>โพสต์</NavLink>
           <NavLink to={`/profile/${id}/items`}>โมเดล</NavLink>
           <NavLink to={`/profile/${id}/projects`}>โปรเจกต์</NavLink>
+          <AddShoppingCartIcon onClick={() => navigate(`/profile/${id}/projects/addproject`)} style={{ cursor: "pointer" }}/>
         </div>
         <hr />
       </div>

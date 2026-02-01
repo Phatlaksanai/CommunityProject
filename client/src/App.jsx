@@ -150,7 +150,11 @@ function App() {
         {
           path: "projects",
           element: <ProfileProjects />
-        }
+        },
+        {
+          path: "projects/addproject",
+          element: <AddProject />
+        },
       ]
     },
     {
@@ -182,18 +186,6 @@ function App() {
         {
           path: "/additem",
           element: <AddItem />
-        },
-      ]
-    },
-    {
-      path: "/addproject",
-      element: (
-        <AddItemDL />
-      ),
-      children: [
-        {
-          path: "/addproject",
-          element: <AddProject />
         },
       ]
     },
