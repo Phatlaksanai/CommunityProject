@@ -120,6 +120,18 @@ router.get("/items/user/:id", (req, res) => {
     res.json(result);
   });
 });
+router.get("/projects/user/:id", (req, res) => {
+  const { id } = req.params;
+  db.query(`SELECT DISTINCT projects.*
+    FROM projects
+    JOIN posts ON posts.project_id = projects.project_id
+    WHERE posts.user_id = ?
+    ORDER BY projects.createAt DESC`, [id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json(result);
+  });
+});
+
 
 router.post("/", verifyToken, (req, res) => {
   // NEw Verify Token

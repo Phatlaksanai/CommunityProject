@@ -11,6 +11,7 @@ import DescItem from './pages/descItem/DescItem';
 import Buyitem from './pages/buyitem/Buyitem';
 import Profile from "./pages/profile/Profile";
 import ProfileItems from "./pages/profile/ProfileItems";
+import ProfileProjects from "./pages/profile/ProfileProjects";
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
@@ -148,7 +149,7 @@ function App() {
         },
         {
           path: "projects",
-          element: <Projects />
+          element: <ProfileProjects />
         }
       ]
     },
