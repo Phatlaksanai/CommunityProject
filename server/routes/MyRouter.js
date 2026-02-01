@@ -71,7 +71,6 @@ router.get("/projects", (req, res) => {
 });
 
 router.get("/items", (req, res) => {
-  // สั่ง JOIN เพื่อเอาชื่อคนโพสต์ (u.username) และรูป (u.profilePic) มาโชว์คู่กับโพสต์
   const q = `SELECT *
              FROM items 
              ORDER BY createAt DESC`;
@@ -92,6 +91,19 @@ router.get("/items/:id", (req, res) => {
     res.json(result[0]);
   });
 });
+
+router.get("/posts/:id/project", (req, res) => {
+  const { id } = req.params;
+
+  db.query("SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?", [id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    if (result.length === 0)
+      return res.status(404).json({ error: "Item not found" });
+
+    res.json(result[0]);
+  });
+});
+
 router.get("/posts/user/:id", (req, res) => {
   const { id } = req.params;
   db.query("SELECT posts.*, users.username, users.profilePic FROM posts JOIN users ON posts.user_id = users.user_id WHERE posts.user_id = ? ORDER BY posts.createdAt DESC", [id], (err, result) => {
@@ -112,6 +124,27 @@ router.get("/items/user/:id", (req, res) => {
     res.json(result);
   });
 });
+
+// ดึง post ของ user ที่ login (ใช้สำหรับเลือกผูกกับ project)
+router.get("/posts/user/:id/project", (req, res) => {
+  const { id } = req.params;
+
+  const q = `
+    SELECT 
+      post_id,
+      description AS title,
+      img
+    FROM posts
+    WHERE user_id = ?
+    ORDER BY createdAt DESC
+  `;
+
+  db.query(q, [id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json(result);
+  });
+});
+
 
 router.post("/", verifyToken, (req, res) => {
   // NEw Verify Token

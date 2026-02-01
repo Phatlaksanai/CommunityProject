@@ -1,7 +1,12 @@
 import "./addproject.scss";
 import { useState, useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
-import { Link, useNavigate } from "react-router-dom";//-------------------------------------
+import { useQuery } from "@tanstack/react-query";
+import { makeRequest } from "../../api/axios";
+
+
+
 
 const AddProject = () => {
   //----------------------------------------------------------
@@ -19,14 +24,19 @@ const AddProject = () => {
   const [success, setSuccess] = useState("");
 
   //-----------------------เลือก post ที่เกี่ยวข้อง------------------------
-                    const [search, setSearch] = useState("");
-                    const [selectedPosts, setSelectedPosts] = useState([]);
+  const { id: userId } = useParams();
+  const [search, setSearch] = useState("");
+  const [selectedPosts, setSelectedPosts] = useState([]);
 
-                    const posts = [
-                    { id: 1, title: "Mini Project Data Base" },
-                    { id: 2, title: "PlayWright #playwright700" },
-                    { id: 3, title: "ICMP #icmp700" },
-  ];
+  const { data = [], isLoading } = useQuery({
+    queryKey: ["posts-for-project", userId],
+    enabled: !!userId,
+    queryFn: () =>
+      makeRequest
+        .get(`/posts/user/${userId}/project`)
+        .then(res => res.data),
+  });
+  if (isLoading) return "Loading posts...";
   //-----------------------เลือก post ที่เกี่ยวข้อง------------------------
 
   // ================= UPLOAD FILES TO CLOUDINARY =================
@@ -147,27 +157,40 @@ const AddProject = () => {
 
             {/* List */}
             <div className="post-list">
-                {posts
-                .filter(p =>
-                    p.title.toLowerCase().includes(search.toLowerCase())
+              {isLoading && <p>กำลังโหลด...</p>}
+
+              {data
+                .filter(post =>
+                  post.title.toLowerCase().includes(search.toLowerCase())
                 )
                 .map(post => (
-                    <label key={post.id} className="post-item">
+                  <label key={post.post_id} className="post-item">
                     <input
-                        type="checkbox"
-                        checked={selectedPosts.includes(post.id)}
-                        onChange={() => {
+                      type="checkbox"
+                      checked={selectedPosts.includes(post.post_id)}
+                      onChange={() => {
                         setSelectedPosts(prev =>
-                            prev.includes(post.id)
-                            ? prev.filter(id => id !== post.id)
-                            : [...prev, post.id]
+                          prev.includes(post.post_id)
+                            ? prev.filter(id => id !== post.post_id)
+                            : [...prev, post.post_id]
                         );
-                        }}
+                      }}
                     />
-                    {post.title}
-                    </label>
-                ))}
+
+                    <img
+                      src={post.img}
+                      alt=""
+                      onError={(e) => {
+                      e.currentTarget.src = "https://placehold.co/600x400/457EC3/FFFFFF?text=Project"}}
+                      
+                    />
+
+                    <span>{post.title}</span>
+                  </label>
+              ))}
+
             </div>
+
             </div>
                 {/* //-----------------------เลือก post ที่เกี่ยวข้อง------------------------ */}
 
