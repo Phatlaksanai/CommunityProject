@@ -116,21 +116,21 @@ router.get("/projects/:id", (req, res) => {
   );
 });
 
-router.get("/posts/:id/project", (req, res) => {
-  const { id } = req.params;
+// router.get("/posts/:id/project", (req, res) => {
+//   const { id } = req.params;
 
-  db.query(
-    "SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?",
-    [id],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      if (result.length === 0)
-        return res.status(404).json({ error: "Item not found" });
+//   db.query(
+//     "SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?",
+//     [id],
+//     (err, result) => {
+//       if (err) return res.status(500).json(err);
+//       if (result.length === 0)
+//         return res.status(404).json({ error: "Item not found" });
 
-      res.json(result[0]);
-    },
-  );
-});
+//       res.json(result[0]);
+//     },
+//   );
+// });
 
 router.get("/posts/user/:id", (req, res) => {
   const { id } = req.params;
