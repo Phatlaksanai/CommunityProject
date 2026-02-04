@@ -2,6 +2,7 @@ import './descProject.scss';
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import LeftDP from "../../components/leftDP/leftDP"
+import Posts from "../../components/posts/posts"
 
 const DescProject = () => {
     const { id } = useParams();
@@ -24,6 +25,9 @@ const DescProject = () => {
         <div className="descProject">
             <div className="descProjectleft">
                 <LeftDP project={Project}/>
+            </div>
+            <div className="descProjectRight">
+                <Posts project={Project}/>
             </div>
         </div>
     );

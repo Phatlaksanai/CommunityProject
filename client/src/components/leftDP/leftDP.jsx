@@ -1,13 +1,19 @@
-import './leftDP.scss';
+import "./leftDP.scss";
 
-const LeftDP = ({ project }) => {
+const LeftDP = () => {
   return (
     <div className="leftDP">
-        <div className="container">
-            <h2>รายละเอียดโครงการ</h2>
+      <div className="container">
+        <div className="item">
+          <h2>ของขาย</h2>
         </div>
+
+        <div className="item">
+          <h2>สถิติ</h2>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default LeftDP;

@@ -2,8 +2,9 @@
 
 .descProject{
   display: flex;
+  gap: 10px;
   @include themify($themes) {
-    padding: 20px 20px;
+    padding: 0px 15%;
     background-color: themed("bgSoft");
     min-height: 100vh;
 
@@ -15,4 +16,12 @@
       padding: 20px;
     }
   }
- }
+
+   .descProjectleft {
+      flex: 1;
+    }
+
+    .descProjectRight {
+      flex: 1;
+    }
+}
