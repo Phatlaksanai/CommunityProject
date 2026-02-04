@@ -19,11 +19,19 @@ const AddProject = () => {
 
   const [search, setSearch] = useState("");
   const [selectedPosts, setSelectedPosts] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["userPosts", currentUser.user_id],
     queryFn: () =>
       makeRequest
         .get(`/posts/user/${currentUser.user_id}/available`)
+        .then((res) => res.data),
+  });
+  const { data: items = [] } = useQuery({
+    queryKey: ["userItems", currentUser.user_id],
+    queryFn: () =>
+      makeRequest
+        .get(`/items/user/${currentUser.user_id}/available`)
         .then((res) => res.data),
   });
 
@@ -73,6 +81,7 @@ const AddProject = () => {
           description,
           img: imgURL,
           relatedPosts: selectedPosts,
+          relatedItem: selectedItem,
         }),
       });
 
@@ -134,15 +143,15 @@ const AddProject = () => {
 
           <div className="form-group">
             <label>Post ที่เกี่ยวข้อง</label>
-            <input 
+            <input
               type="text"
               placeholder="ค้นหา Post"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            {isLoading && <p>กำลังโหลดโพสต์...</p>} 
+            {isLoading && <p>กำลังโหลดโพสต์...</p>}
             <div className="post-list">
-             {posts
+              {posts
                 .filter(post =>
                   post.description.toLowerCase().includes(search.toLowerCase())
                 )
@@ -163,13 +172,49 @@ const AddProject = () => {
                       src={post.img}
                       alt=""
                       onError={(e) => {
-                      e.currentTarget.src = "https://placehold.co/600x400/457EC3/FFFFFF?text=Project"}}
+                        e.currentTarget.src = "https://placehold.co/600x400/457EC3/FFFFFF?text=Project"
+                      }}
                     />
                     <span>{post.description}</span>
                   </label>
-              ))}
+                ))}
             </div>
           </div>
+          <div className="form-group">
+            <label>Item ที่เกี่ยวข้อง</label>
+            <input
+              type="text"
+              placeholder="ค้นหา Item"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <div className="post-list">
+              {items
+                .filter((item) =>
+                  item.modelName.toLowerCase().includes(search.toLowerCase())
+                )
+                .map((item) => (
+                  <label key={item.item_id} className="post-item">
+                    <input
+                      type="radio"
+                      name="selectedItem"
+                      checked={selectedItem === item.item_id}
+                      onChange={() => setSelectedItem(item.item_id)}
+                    />
+                    <img
+                      src={item.img}
+                      alt=""
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "https://placehold.co/600x400/457EC3/FFFFFF?text=Item";
+                      }}
+                    />
+                    <span>{item.modelName}</span>
+                  </label>
+                ))}
+            </div>
+          </div>
+
           <input type="submit" value="Submit" className="add-item__submit" />
         </form>
       </div>

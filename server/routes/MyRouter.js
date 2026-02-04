@@ -83,56 +83,82 @@ router.get("/items", (req, res) => {
 router.get("/items/:id", (req, res) => {
   const { id } = req.params;
 
-  db.query("SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?", [id], (err, result) => {
-    if (err) return res.status(500).json(err);
-    if (result.length === 0)
-      return res.status(404).json({ error: "Item not found" });
+  db.query(
+    "SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?",
+    [id],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      if (result.length === 0)
+        return res.status(404).json({ error: "Item not found" });
 
-    res.json(result[0]);
-  });
+      res.json(result[0]);
+    },
+  );
 });
 
 router.get("/projects/:id", (req, res) => {
   const { id } = req.params;
 
-  db.query(`SELECT DISTINCT projects.*
+  db.query(
+    `SELECT DISTINCT projects.*
     FROM projects
     JOIN posts ON posts.project_id = projects.project_id
     WHERE posts.user_id = ?
-    ORDER BY projects.createAt DESC`, [id], (err, result) => {
-    if (err) return res.status(500).json(err);
-    if (result.length === 0)
-      return res.status(404).json({ error: "Item not found" });
+    ORDER BY projects.createAt DESC`,
+    [id],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      if (result.length === 0)
+        return res.status(404).json({ error: "Item not found" });
 
-    res.json(result[0]);
-  });
+      res.json(result[0]);
+    },
+  );
 });
 
 router.get("/posts/:id/project", (req, res) => {
   const { id } = req.params;
 
-  db.query("SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?", [id], (err, result) => {
-    if (err) return res.status(500).json(err);
-    if (result.length === 0)
-      return res.status(404).json({ error: "Item not found" });
+  db.query(
+    "SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?",
+    [id],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      if (result.length === 0)
+        return res.status(404).json({ error: "Item not found" });
 
-    res.json(result[0]);
-  });
+      res.json(result[0]);
+    },
+  );
 });
 
 router.get("/posts/user/:id", (req, res) => {
   const { id } = req.params;
-  db.query("SELECT posts.*, users.username, users.profilePic FROM posts JOIN users ON posts.user_id = users.user_id WHERE posts.user_id = ? ORDER BY posts.createdAt DESC", [id], (err, result) => {
-    if (err) return res.status(500).json(err);
-    if (result.length === 0){
-      return res.status(404).json({ error: "Post not found" });
-    }
-    res.json(result);
-  });
+  db.query(
+    "SELECT posts.*, users.username, users.profilePic FROM posts JOIN users ON posts.user_id = users.user_id WHERE posts.user_id = ? ORDER BY posts.createdAt DESC",
+    [id],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      if (result.length === 0) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+      res.json(result);
+    },
+  );
 });
 router.get("/posts/user/:id/available", (req, res) => {
   const { id } = req.params;
-  const q = "SELECT posts.* FROM posts WHERE posts.user_id = ? AND posts.project_id IS NULL ORDER BY posts.createdAt DESC";
+  const q =
+    "SELECT posts.* FROM posts WHERE posts.user_id = ? AND posts.project_id IS NULL ORDER BY posts.createdAt DESC";
+  db.query(q, [id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json(result);
+  });
+});
+router.get("/items/user/:id/available", (req, res) => {
+  const { id } = req.params;
+  const q =
+    "SELECT items.* FROM items WHERE items.user_id = ? AND items.project_id IS NULL ORDER BY items.createAt DESC";
   db.query(q, [id], (err, result) => {
     if (err) return res.status(500).json(err);
     res.json(result);
@@ -140,27 +166,34 @@ router.get("/posts/user/:id/available", (req, res) => {
 });
 router.get("/items/user/:id", (req, res) => {
   const { id } = req.params;
-  db.query("SELECT * FROM items WHERE user_id = ? ORDER BY items.createAt DESC", [id], (err, result) => {
-    if (err) return res.status(500).json(err);
-    if (result.length === 0){
-      return res.status(404).json({ error: "Item not found" });
-    }
-    res.json(result);
-  });
+  db.query(
+    "SELECT * FROM items WHERE user_id = ? ORDER BY items.createAt DESC",
+    [id],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      if (result.length === 0) {
+        return res.status(404).json({ error: "Item not found" });
+      }
+      res.json(result);
+    },
+  );
 });
 router.get("/projects/user/:id", (req, res) => {
   const { id } = req.params;
-  db.query(`SELECT DISTINCT projects.*
-    FROM projects
-    JOIN posts ON posts.project_id = projects.project_id
-    WHERE posts.user_id = ?
-    ORDER BY projects.createAt DESC`, [id], (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json(result);
-  });
+  db.query(
+    `SELECT DISTINCT projects.*
+     FROM projects
+     LEFT JOIN posts ON posts.project_id = projects.project_id
+     LEFT JOIN items ON items.project_id = projects.project_id
+     WHERE posts.user_id = ? OR items.user_id = ?
+     ORDER BY projects.createAt DESC`,
+    [id, id],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      res.json(result);
+    }
+  );
 });
-
-
 
 router.post("/", verifyToken, (req, res) => {
   // NEw Verify Token
@@ -419,34 +452,37 @@ router.post("/additem", verifyToken, (req, res) => {
 });
 
 router.post("/addproject", verifyToken, (req, res) => {
-  const { projectName, description, img, relatedPosts } = req.body;
+  const { projectName, description, img, relatedPosts, relatedItem } = req.body;
   const qProject = `INSERT INTO projects (project_name, description, img, createAt)VALUES (?)`;
 
-  const values = [
-    projectName,
-    description,
-    img,
-    new Date(),
-  ];
+  const values = [projectName, description, img, new Date()];
 
   db.query(qProject, [values], (err, data) => {
     if (err) return res.status(500).json(err);
     const projectId = data.insertId; // project_id ใหม่
 
     // ถ้าไม่มีโพสต์ที่เลือก
-    if (!relatedPosts || relatedPosts.length === 0) {
+    if (relatedPosts && relatedPosts.length > 0) {
+      const qUpdatePost = "UPDATE posts SET project_id = ? WHERE post_id IN (?) AND project_id IS NULL";
+      db.query(qUpdatePost, [projectId, relatedPosts], (err2) => {
+        if (err2) return res.status(500).json(err2);
+      });
+    }
+    if (relatedItem) {
+      const qUpdateItem = `UPDATE items SET project_id = ?  WHERE item_id = ? AND project_id IS NULL`;
+      db.query(qUpdateItem, [projectId, relatedItem], (err3) => {
+        if (err3) return res.status(500).json(err3);
+        return res.status(200).json({
+          success: true,
+          projectId,
+        });
+      });
+    } else {
       return res.status(200).json({
         success: true,
         projectId,
       });
     }
-    // Update posts ให้มี project_id
-    const qUpdate = "UPDATE posts SET project_id = ? WHERE post_id IN (?) AND project_id IS NULL";
-    db.query(qUpdate, [projectId, relatedPosts], (err2) => {
-      if (err2) return res.status(500).json(err2);
-
-      res.status(200).json({success: true, projectId});
-    });
   });
 });
 
