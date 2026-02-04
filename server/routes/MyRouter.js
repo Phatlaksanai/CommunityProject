@@ -84,7 +84,10 @@ router.get("/items/:id", (req, res) => {
   const { id } = req.params;
 
   db.query(
-    "SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?",
+    `SELECT items.*, users.username, users.profilePic 
+    FROM items 
+    JOIN users ON items.user_id = users.user_id 
+    WHERE item_id = ?`,
     [id],
     (err, result) => {
       if (err) return res.status(500).json(err);
@@ -100,37 +103,35 @@ router.get("/projects/:id", (req, res) => {
   const { id } = req.params;
 
   db.query(
-    `SELECT DISTINCT projects.*
-    FROM projects
-    JOIN posts ON posts.project_id = projects.project_id
-    WHERE posts.user_id = ?
-    ORDER BY projects.createAt DESC`,
+    `SELECT *
+     FROM projects
+     WHERE project_id = ?`,
     [id],
     (err, result) => {
       if (err) return res.status(500).json(err);
       if (result.length === 0)
-        return res.status(404).json({ error: "Item not found" });
+        return res.status(404).json({ error: "Project not found" });
 
       res.json(result[0]);
     },
   );
 });
 
-router.get("/posts/:id/project", (req, res) => {
-  const { id } = req.params;
+// router.get("/posts/:id/project", (req, res) => {
+//   const { id } = req.params;
 
-  db.query(
-    "SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?",
-    [id],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      if (result.length === 0)
-        return res.status(404).json({ error: "Item not found" });
+//   db.query(
+//     "SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?",
+//     [id],
+//     (err, result) => {
+//       if (err) return res.status(500).json(err);
+//       if (result.length === 0)
+//         return res.status(404).json({ error: "Item not found" });
 
-      res.json(result[0]);
-    },
-  );
-});
+//       res.json(result[0]);
+//     },
+//   );
+// });
 
 router.get("/posts/user/:id", (req, res) => {
   const { id } = req.params;
@@ -146,6 +147,26 @@ router.get("/posts/user/:id", (req, res) => {
     },
   );
 });
+
+router.get("/posts/project/:id", (req, res) => {
+  const { id } = req.params;
+  db.query(
+    `SELECT posts.*, users.username, users.profilePic
+    FROM posts
+    LEFT JOIN users ON posts.user_id = users.user_id
+    WHERE posts.project_id = ?
+    ORDER BY posts.createdAt DESC`,
+    [id],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      if (result.length === 0) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+      res.json(result);
+    },
+  );
+});
+
 router.get("/posts/user/:id/available", (req, res) => {
   const { id } = req.params;
   const q =

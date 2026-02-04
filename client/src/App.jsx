@@ -8,7 +8,7 @@ import Download from './pages/download/Download1';
 import AddItem from './pages/additem/Additem';
 import AddProject from './pages/addproject/addproject';
 import DescItem from './pages/descItem/DescItem';
-import DescProject from './pages/descProject/descProject';
+import DescProject from './pages/descProject/DescProject';
 import Buyitem from './pages/buyitem/Buyitem';
 import Profile from "./pages/profile/Profile";
 import ProfileItems from "./pages/profile/ProfileItems";

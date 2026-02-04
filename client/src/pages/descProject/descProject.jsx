@@ -27,7 +27,7 @@ const DescProject = () => {
                 <LeftDP project={Project}/>
             </div>
             <div className="descProjectRight">
-                <Posts project={Project}/>
+                {Project && <Posts project={Project.project_id} />}
             </div>
         </div>
     );
