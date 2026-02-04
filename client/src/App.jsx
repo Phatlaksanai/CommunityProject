@@ -6,7 +6,7 @@ import Login from './pages/login/Login1'
 import Register from './pages/register/Register1'
 import Download from './pages/download/Download1';
 import AddItem from './pages/additem/Additem';
-import AddProject from './pages/addprojcet/addproject';
+import AddProject from './pages/addproject/addproject';
 import DescItem from './pages/descItem/DescItem';
 import DescProject from './pages/descProject/descProject';
 import Buyitem from './pages/buyitem/Buyitem';
