@@ -1,4 +1,5 @@
 import "./project.scss";
+import dayjs from "dayjs";
 import "dayjs/locale/th";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -19,7 +20,7 @@ const Project = ({ project }) => {
             <h2>{project.project_name}</h2>{/* 2026-01-30T17:00:00.000Z */}
         </div>
         <div className="price">
-            <p>{project.createAt}</p>
+            <p>{dayjs(project.createAt).locale("th").format("D MMM YYYY")}</p>
             
         </div>
       </div>
