@@ -7,7 +7,7 @@ const Project = ({ project }) => {
   
   const navigate = useNavigate();
   return (
-    <div className="project" onClick={() => navigate(`/descitem/${project.project_id}`)} style={{ cursor: "pointer" }}>
+    <div className="project" onClick={() => navigate(`/descproject/${project.project_id}`)} style={{ cursor: "pointer" }}>
       <div className="container">
         <div className="content" >
            <img src={project.img} alt="" onError={(e) => {

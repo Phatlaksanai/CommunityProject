@@ -92,6 +92,22 @@ router.get("/items/:id", (req, res) => {
   });
 });
 
+router.get("/projects/:id", (req, res) => {
+  const { id } = req.params;
+
+  db.query(`SELECT DISTINCT projects.*
+    FROM projects
+    JOIN posts ON posts.project_id = projects.project_id
+    WHERE posts.user_id = ?
+    ORDER BY projects.createAt DESC`, [id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    if (result.length === 0)
+      return res.status(404).json({ error: "Item not found" });
+
+    res.json(result[0]);
+  });
+});
+
 router.get("/posts/:id/project", (req, res) => {
   const { id } = req.params;
 

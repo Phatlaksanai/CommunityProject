@@ -8,6 +8,7 @@ import Download from './pages/download/Download1';
 import AddItem from './pages/additem/Additem';
 import AddProject from './pages/addprojcet/addproject';
 import DescItem from './pages/descItem/DescItem';
+import DescProject from './pages/descProject/descProject';
 import Buyitem from './pages/buyitem/Buyitem';
 import Profile from "./pages/profile/Profile";
 import ProfileItems from "./pages/profile/ProfileItems";
@@ -20,7 +21,8 @@ import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/leftbar/leftbar";
 import LeftBarDL from "./components/leftbarDL/leftbarDL";
 import RightBar from "./components/rightbar/rightbar";
-import ProfileDetail from "./components/profileDetail/ProfileDetail";
+import ProfileDetail from "./components/TopDetail/ProfileDetail/ProfileDetail";
+import ProjectDetail from "./components/TopDetail/ProjectDetail/ProjectDetail";
 import Projects from "./components/PageItems/projects/projects"
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
@@ -91,6 +93,19 @@ function App() {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 6 }}>
+            <Outlet />
+          </div>
+        </div>
+      </div>
+    )
+  }
+  const DescriptionProject = () => {
+    return (
+      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        <Navbar />
+        <ProjectDetail />
         <div style={{ display: "flex" }}>
           <div style={{ flex: 6 }}>
             <Outlet />
@@ -198,6 +213,18 @@ function App() {
         {
           path: ":id",
           element: <DescItem />
+        },
+      ]
+    },
+    {
+      path: "/descproject",
+      element: (
+        <DescriptionProject />
+      ),
+      children: [
+        {
+          path: ":id",
+          element: <DescProject />
         },
       ]
     },

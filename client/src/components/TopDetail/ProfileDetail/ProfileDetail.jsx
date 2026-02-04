@@ -1,5 +1,5 @@
 import "./profileDetail.scss";
-import { AuthContext } from "../../context/authContext";
+import { AuthContext } from "../../../context/authContext";
 import { useContext } from "react";
 import { NavLink, useParams, useNavigate } from "react-router-dom";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
@@ -10,8 +10,7 @@ const ProfileDetail = () => {
   const { currentUser } = useContext(AuthContext);
   const { id } = useParams();
   const navigate = useNavigate();
-  const defaultPic =
-    "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
+  const defaultPic ="https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   return (
     <div className="profileDetail">
