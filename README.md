@@ -17,8 +17,8 @@ npm install multer-storage-cloudinary multer --legacy-peer-deps // server ======
 npm install three // client ================new
 
 สิ่งที่ต้องเพิ่ม
-0.สถิติ หน้า descproject
-1.แจ้งเตือนมีเมลแล้วก่อนส่ง otp
+0.สถิติ หน้า descproject ✅
+1.แจ้งเตือนมีเมลแล้วก่อนส่ง otp ✅
 2.เปลี่ยนตาราง OTP ใน DB แยกออกจาก User ให้เป็นส่งแล้ว กอรกแล้ว ลบทิ้งเอง ประมาณนั้น
 3.เปลี่ยน DB ไปใช้ On-Cloud
 4.ทำโพสต์ฉบับสมบูรณ์ มี like, comment เป็นต้น

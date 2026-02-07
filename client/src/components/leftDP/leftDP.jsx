@@ -5,52 +5,90 @@ import dayjs from "dayjs";
 import "dayjs/locale/th";
 
 const LeftDP = ({ project }) => {
-  const { isLoading, error , data} = useQuery({
-    queryKey: ["items", project],
-    enabled: !!project, 
-    queryFn: () => {
-      if (project) {
-        return makeRequest.get(`/items/project/${project}`).then(res => res.data);
-      }
-    }
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["project-data", project],
+    enabled: !!project,
+    queryFn: () =>
+      Promise.all([
+        makeRequest.get(`/items/project/${project}`).then(res => res.data),
+        makeRequest.get(`/posts/project/${project}`).then(res => res.data),
+      ]).then(([items, posts]) => ({ items, posts })),
   });
 
   if (isLoading) return "Loading...";
-
   if (error) return "Something went wrong!";
+
+  const items = data?.items ?? [];
+  const posts = data?.posts ?? [];
+
+  const hasItems = items.length > 0;
+  const firstPost = posts[posts.length - 1];
+  const lastPost = posts[0];
 
   return (
     <div className="leftDP">
       <div className="container">
-        {data && data.map((item) => (
-          <div className="item" key={item.item_id}>
-            <div className="top">
-              <div className="L">
-                <h2>{item.modelName}</h2>
-                <img src={item.img} alt=""/>
-              </div>
-              <div className="R">
-                <p>Discription : {item.description}</p>
-                <p>Price : {item.price}</p>
-                <span>Created At : {dayjs(item?.createAt).locale("th").format("D MMM YYYY")}</span>
+
+        {/* ===== ITEMS ===== */}
+        {hasItems &&
+          items.map(item => (
+            <div className="item" key={item.item_id}>
+              <div className="top">
+                <div className="L">
+                  <h2>{item.modelName}</h2>
+                  <img src={item.img} alt="" />
+                </div>
+                <div className="R">
+                  <p>Description : {item.description}</p>
+                  <p>Price : {item.price}</p>
+                  <span>
+                    Created At :{" "}
+                    {dayjs(item.createAt)
+                      .locale("th")
+                      .format("D MMM YYYY")}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-        {data && data.map((post) => (
+          ))}
+
+        {/* ===== STATS (แสดงเสมอ แม้ไม่มี item) ===== */}
         <div className="item">
           <h2>สถิติ</h2>
           <p>ระยะเวลาการพัฒนา</p>
-          <p>first post : {dayjs(post?.start_date).locale("th").format("D MMM YYYY")}</p>
-          <p>last post : {dayjs(post?.end_date).locale("th").format("D MMM YYYY")}</p>
-          <p>duration : {dayjs(post?.end_date).diff(dayjs(post?.start_date), "day")} วัน</p>
-          <p>all posts : {data.length} ชิ้น</p>
-          <p>last updated : {dayjs(post?.updated_at).locale("th").format("D MMM YYYY")}</p>
+
+          <p>
+            first post :{" "}
+            {firstPost
+              ? dayjs(firstPost.createdAt).locale("th").format("D MMM YYYY")
+              : "-"}
+          </p>
+
+          <p>
+            last post :{" "}
+            {lastPost
+              ? dayjs(lastPost.createdAt).locale("th").format("D MMM YYYY")
+              : "-"}
+          </p>
+
+          <p>
+            duration :{" "}
+            {firstPost && lastPost
+              ? dayjs(lastPost.createdAt).diff(
+                  dayjs(firstPost.createdAt),
+                  "day"
+                ) + " วัน"
+              : "-"}
+          </p>
+
+          <p>all posts : {posts.length} ชิ้น</p>
+
         </div>
-        ))}
+
       </div>
     </div>
   );
 };
+
 
 export default LeftDP;
