@@ -1,22 +1,33 @@
 import "./projectDetail.scss";
-import { AuthContext } from "../../../context/authContext";
-import { useContext } from "react";
-import { NavLink, useParams, useNavigate } from "react-router-dom";
-import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-
-
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import dayjs from "dayjs";
+import "dayjs/locale/th";
 
 const ProjectDetail = () => {
-  const { currentUser } = useContext(AuthContext);
   const { id } = useParams();
-  const navigate = useNavigate();
+  const defaultPic = "https://placehold.co/600x400/457EC3/FFFFFF?text=Project";
+  const [Project, setProject] = useState(null);
+      useEffect(() => {
+          if (!id) return;
+          const fetchProject = async () => {
+              try {
+                  const res = await fetch(`/api/projects/${id}`);
+                  const data = await res.json();
+                  setProject(data);
+              } catch (err) {
+                  console.error("Error fetching project:", err);
+              }
+          };
+          fetchProject();
+      }, [id]);
 
   return (
     <div className="projectDetail">
       <div className="container">
         <div className="cover">
           <img
-            src={currentUser?.coverPic || defaultPic}
+            src={Project?.img || defaultPic}
             alt="cover"
             className="coverImg"
           />
@@ -24,10 +35,10 @@ const ProjectDetail = () => {
         <div className="projectHeader">
           <div className="projectInfo">
             <div className="nameRow">
-              <h1>ProjectName</h1>
+              <h1>{Project?.project_name || "Project Name"}</h1>
             </div>
-            <span className="handle">Description of the project</span>
-            <p>3/2/2026</p>
+            <span className="handle">{Project?.description}</span>
+            <p>{dayjs(Project?.createAt).locale("th").format("D MMM YYYY")}</p>
           </div>
         </div>
       </div>
