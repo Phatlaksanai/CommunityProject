@@ -23,24 +23,24 @@ npm install three // client ================new
 3.เปลี่ยน DB ไปใช้ On-Cloud
 4.ทำโพสต์ฉบับสมบูรณ์ มี like, comment เป็นต้น
 5.หน้ากรองรายละเอียดด้านซ้ายในด้าน download 
-6.หน้า buyitem ที่ถูกลืม
+6.หน้า descitem ฝั่งขวา / buyitem ที่ถูกลืม
 7.หน้าจัดการโปรไฟล์ เปลี่ยนชื่อ, รูป, ปก เป็นต้น
 8.หน้า home ฝั่ง leftbar, rightbar 
 9.ทำให้ลบ post, ลบ item, ลบ project จากนั้นเก็บ log หรือ something ไว้ แล้วลบใน DB กับ cloud ด้วย 
-
-Optional
-1.ระบบแอดเพื่อน
+10.ระบบแอดเพื่อน
+11.แยก backend / รวมไฟล์ให้ดูสะอาดตา frontend
 
 Feature
 1.run 3D ขึ้นโชว์ ✅
 2.upload object/mod ✅
 3.AI chat bot
-4.จ้างงาน
+4.จ้างงาน (คน post จ้างงาน)✅
 5.พูดคุยทั่วไป
-6.ข่าวสาร/กิจกรรม
+6.ข่าวสาร/กิจกรรม (คน post กิจกรรม)✅
 7.รายงาน
 
 ทดสอบระบบ
+
 ```
 CommunityProject
 ├─ client

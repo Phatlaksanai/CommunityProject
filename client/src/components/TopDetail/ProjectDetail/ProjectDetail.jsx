@@ -6,7 +6,7 @@ import "dayjs/locale/th";
 
 const ProjectDetail = () => {
   const { id } = useParams();
-  const defaultPic = "https://placehold.co/600x400/457EC3/FFFFFF?text=Project";
+  const defaultPic = "https://cdn-img.thethao247.vn/origin_1366x0/storage/files/haibui/2024/06/27/667cd23292cc6-094716.jpg";
   const [Project, setProject] = useState(null);
       useEffect(() => {
           if (!id) return;

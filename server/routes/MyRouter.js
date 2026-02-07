@@ -167,6 +167,25 @@ router.get("/posts/project/:id", (req, res) => {
   );
 });
 
+router.get("/items/project/:id", (req, res) => {
+  const { id } = req.params;
+  db.query(
+    `SELECT items.*,users.username,users.profilePic
+    FROM items
+    LEFT JOIN users ON items.user_id = users.user_id
+    WHERE items.project_id = ?
+    ORDER BY items.createAt DESC`,
+    [id],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      if (result.length === 0) {
+        return res.status(404).json({ error: "Item not found" });
+      }
+      res.json(result);
+    },
+  );
+});
+
 router.get("/posts/user/:id/available", (req, res) => {
   const { id } = req.params;
   const q =
