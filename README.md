@@ -19,8 +19,6 @@ npm install three // client ================new
 สิ่งที่ต้องเพิ่ม
 แจ้งเตือนมีเมลแล้วก่อนส่ง otp
 
-เพิ่มหน้า download
-กับแก้ใน App
 ```
 CommunityProject
 ├─ client
