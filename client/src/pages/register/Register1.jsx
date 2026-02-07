@@ -33,7 +33,7 @@
 // };
 
 // export default Register;
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./register.scss";
 
@@ -54,6 +54,19 @@ const Register = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [otpCooldown, setOtpCooldown] = useState(0);
+  const [otpLoading, setOtpLoading] = useState(false);
+
+  useEffect(() => { // นับถอยหลัง cooldown OTP
+    if (otpCooldown <= 0) return;
+
+    const timer = setInterval(() => {
+      setOtpCooldown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [otpCooldown]);
+
   // ================= STEP CONTROL =================
   const nextStep = () => {
     if (password !== password2) {
@@ -70,8 +83,10 @@ const Register = () => {
 
   // ================= SEND OTP =================
   const sendOTP = async () => {
+    if (otpCooldown > 0) return;
     setError("");
     setSuccess("");
+    setOtpLoading(true);
 
     if (!email.trim()) {
       setError("กรุณากรอกอีเมลก่อนกด OTP");
@@ -89,12 +104,16 @@ const Register = () => {
 
       if (!res.ok) {
         setError(data.error || "ส่ง OTP ไม่สำเร็จ");
+        setOtpLoading(false);
         return;
       }
 
       setSuccess("ส่งรหัส OTP แล้ว!");
+      setOtpCooldown(8);
     } catch (err) {
       setError("เชื่อมต่อ Server ไม่ได้");
+    } finally {
+      setOtpLoading(false);
     }
   };
 
@@ -203,9 +222,14 @@ const Register = () => {
                 />
 
                 <div style={{ display: "flex", gap: "10px" }}>
-                  <button type="button" onClick={sendOTP}>
-                    OTP
+                  <button
+                    type="button"
+                    onClick={sendOTP}
+                    disabled={otpCooldown > 0 || otpLoading}
+                  >
+                    {otpCooldown > 0 ? `รอ ${otpCooldown} วิ` : "OTP"}
                   </button>
+
                   <button type="button" onClick={prevStep}>
                     Back
                   </button>
