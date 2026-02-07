@@ -231,7 +231,7 @@ router.get("/projects/user/:id", (req, res) => {
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json(result);
-    }
+    },
   );
 });
 
@@ -358,47 +358,70 @@ router.post("/logout", (req, res) => {
 router.post("/send-otp", async (req, res) => {
   const { email } = req.body;
 
-  const otp = Math.floor(100000 + Math.random() * 900000);
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // หมดอายุใน 5 นาที
+  db.query("SELECT username FROM users WHERE email = ?",[email],async (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ error: "Server error" });
+      }
+      if (result.length > 0 && result[0].username !== null) { // ถ้ามี user และมี username = สมัครแล้ว
+        return res.status(400).json({ error: "อีเมลนี้ถูกใช้แล้ว" });
+      }
+      
+      if (result.length > 0 && result[0].otp_expire) { // ตรวจสอบการส่ง OTP ซ้ำภายใน 8 วินาที
+        const lastSentAt = new Date(result[0].otp_expire.getTime() - 5 * 60 * 1000,);
+        const now = new Date();
+        const diffSeconds = (now - lastSentAt) / 1000;
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: process.env.NODEMAIL_USER,
-      pass: process.env.NODEMAIL_PASS,
-    },
-  });
-  const mailOptions = {
-    from: process.env.NODEMAIL_USER,
-    to: email,
-    subject: "Your OTP Code",
-    text: `รหัส OTP ของคุณคือ: ${otp}`, // ใช้ตัวแปร otp
-    html: `<h2>รหัส OTP ของคุณคือ</h2><h1>${otp}</h1>`, // ใช้ otp
-  };
-  transporter.sendMail(mailOptions, (err, info) => {
-    if (err) {
-      console.log(err);
-      return res.json({ success: false, error: "ส่ง OTP ไม่สำเร็จ" });
-    }
-    // console.log("Message sent:", info.messageId);
-
-    // บันทึก OTP ลง DB
-    db.query(
-      `INSERT INTO users (email, otp, otp_expire) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE otp = VALUES(otp), otp_expire = VALUES(otp_expire)`,
-      [email, otp, expiresAt],
-
-      (error) => {
-        if (error) {
-          console.log(error);
-          return res.json({ success: false, error: "บันทึก OTP ไม่สำเร็จ" });
+        if (diffSeconds < 8) {
+          return res.status(429).json({
+            error: `กรุณารอ ${Math.ceil(8 - diffSeconds)} วินาทีก่อนขอ OTP อีกครั้ง`,
+          });
         }
-        return res.json({ success: true });
-      },
-    );
-  });
-  console.log("Send OTP to email:", email, "OTP =", otp);
+      }
+
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // หมดอายุใน 5 นาที
+
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: process.env.NODEMAIL_USER,
+          pass: process.env.NODEMAIL_PASS,
+        },
+      });
+      const mailOptions = {
+        from: process.env.NODEMAIL_USER,
+        to: email,
+        subject: "Your OTP Code",
+        text: `รหัส OTP ของคุณคือ: ${otp}`, // ใช้ตัวแปร otp
+        html: `<h2>รหัส OTP ของคุณคือ</h2><h1>${otp}</h1>`, // ใช้ otp
+      };
+      transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+          console.log(err);
+          return res.json({ success: false, error: "ส่ง OTP ไม่สำเร็จ" });
+        }
+        // บันทึก OTP ลง DB
+        db.query(
+          `INSERT INTO users (email, otp, otp_expire) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE otp = VALUES(otp), otp_expire = VALUES(otp_expire)`,
+          [email, otp, expiresAt],
+
+          (error) => {
+            if (error) {
+              console.log(error);
+              return res.json({
+                success: false,
+                error: "บันทึก OTP ไม่สำเร็จ",
+              });
+            }
+            return res.json({ success: true });
+          },
+        );
+      });
+    },
+  );
 });
 
 router.post("/register", (req, res) => {
@@ -503,7 +526,8 @@ router.post("/addproject", verifyToken, (req, res) => {
 
     // ถ้าไม่มีโพสต์ที่เลือก
     if (relatedPosts && relatedPosts.length > 0) {
-      const qUpdatePost = "UPDATE posts SET project_id = ? WHERE post_id IN (?) AND project_id IS NULL";
+      const qUpdatePost =
+        "UPDATE posts SET project_id = ? WHERE post_id IN (?) AND project_id IS NULL";
       db.query(qUpdatePost, [projectId, relatedPosts], (err2) => {
         if (err2) return res.status(500).json(err2);
       });
