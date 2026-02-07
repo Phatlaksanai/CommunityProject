@@ -160,7 +160,7 @@ router.get("/posts/project/:id", (req, res) => {
     (err, result) => {
       if (err) return res.status(500).json(err);
       if (result.length === 0) {
-        return res.status(404).json({ error: "Post not found" });
+        return res.json([]); // ✅ สำคัญ
       }
       res.json(result);
     },
@@ -179,7 +179,7 @@ router.get("/items/project/:id", (req, res) => {
     (err, result) => {
       if (err) return res.status(500).json(err);
       if (result.length === 0) {
-        return res.status(404).json({ error: "Item not found" });
+        return res.json([]); // ✅ สำคัญ
       }
       res.json(result);
     },
