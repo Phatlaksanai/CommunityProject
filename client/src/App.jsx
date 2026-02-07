@@ -223,7 +223,7 @@ function App() {
       ),
       children: [
         {
-          path: true,
+          index: true,
           element: <DescProject />
         },
       ]
