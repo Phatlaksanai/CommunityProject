@@ -217,13 +217,13 @@ function App() {
       ]
     },
     {
-      path: "/descproject",
+      path: "/descproject/:id",
       element: (
         <DescriptionProject />
       ),
       children: [
         {
-          path: ":id",
+          path: true,
           element: <DescProject />
         },
       ]
