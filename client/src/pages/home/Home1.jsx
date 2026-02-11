@@ -1,4 +1,4 @@
-import Posts from "../../components/posts/posts"
+import Posts from "../../components/PageItems/posts/posts"
 import Share from "../../components/share/share"
 import "./home1.scss"
 

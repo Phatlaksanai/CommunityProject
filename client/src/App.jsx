@@ -18,9 +18,9 @@ import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-rou
 
 //ระบบใหม่++++++++++++++++++++++
 import Navbar from "./components/navbar/navbar";
-import LeftBar from "./components/leftbar/leftbar";
-import LeftBarDL from "./components/leftbarDL/leftbarDL";
-import RightBar from "./components/rightbar/rightbar";
+import LeftBar from "./components/Left/leftbar/leftbar";
+import LeftBarDL from "./components/Left/leftbarDL/leftbarDL";
+import RightBar from "./components/Right/rightbar/rightbar";
 import ProfileDetail from "./components/TopDetail/ProfileDetail/ProfileDetail";
 import ProjectDetail from "./components/TopDetail/ProjectDetail/ProjectDetail";
 import Projects from "./components/PageItems/projects/projects"

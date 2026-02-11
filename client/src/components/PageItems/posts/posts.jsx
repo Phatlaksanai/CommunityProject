@@ -1,7 +1,7 @@
 import Post from "../post/post";
 import "./posts.scss";
 import { useQuery } from "@tanstack/react-query";
-import { makeRequest } from "../../api/axios";
+import { makeRequest } from "../../../api/axios";
 
 const Posts = ({ userId , project}) => {
   

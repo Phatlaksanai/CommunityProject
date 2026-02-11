@@ -1,7 +1,7 @@
 import Item from "../item/item";
 import "./items.scss";
 import { useQuery } from "@tanstack/react-query";
-import { makeRequest } from "../../api/axios";
+import { makeRequest } from "../../../api/axios";
 
 const Items = ({ userId }) => {
   const { isLoading, error, data } = useQuery({

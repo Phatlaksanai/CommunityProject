@@ -1,8 +1,8 @@
 import './descProject.scss';
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import LeftDP from "../../components/leftDP/leftDP"
-import Posts from "../../components/posts/posts"
+import LeftDP from "../../components/Left/leftDP/leftDP"
+import Posts from "../../components/PageItems/posts/posts"
 
 const DescProject = () => {
     const { id } = useParams();

@@ -1,6 +1,6 @@
 import "./descItem.scss";
-import LeftDI from "../../components/leftDI/leftDI"
-import RightDI from "../../components/rightDI/rightDI"
+import LeftDI from "../../components/Left/leftDI/leftDI"
+import RightDI from "../../components/Right/rightDI/rightDI"
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 

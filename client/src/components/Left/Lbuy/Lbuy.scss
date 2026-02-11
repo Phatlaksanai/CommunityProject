@@ -1,6 +1,6 @@
-@use "../../style.scss" as *;
+@use "../../../style.scss" as *;
 
-.leftDP {
+.Lbuy {
   @include themify($themes) {
     flex: 3;
     position: sticky;
@@ -24,6 +24,9 @@
       padding: 20px;
 
       .item {
+        display: flex;
+        align-items: center;   // ทำให้อยู่ระนาบเดียวกัน
+        gap: 10px; 
         -webkit-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
         -moz-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
         box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
@@ -32,24 +35,6 @@
         background-color: themed("bg");
         border-radius: 10px;
 
-        .top {
-          h2{
-            margin: 10px 0px;
-          }
-          display: flex;
-          align-items: center;
-          gap: 20px;
-
-          img {
-            width: 150px;
-            height: 150px;
-            max-height: none;
-            object-fit: initial;
-            border-radius: 10px;
-          }
-
-        }
-
         img {
         width: 100%;
         height: auto;
@@ -57,9 +42,9 @@
         object-fit: initial;
         border-radius: 10px;
         }
-
-        
-
+        h2 {
+            margin: 0; 
+        }
         .user {
           display: flex;
           align-items: center;

@@ -1,6 +1,6 @@
 import "./buyitem.scss";
-import Lbuy from "../../components/Lbuy/Lbuy"
-import Rbuy from "../../components/Rbuy/Rbuy"
+import Lbuy from "../../components/Left/Lbuy/Lbuy"
+import Rbuy from "../../components/Right/Rbuy/Rbuy"
 
 const Buyitem = () => {
     return (

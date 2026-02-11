@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import Items from "../../components/items/items";
+import Items from "../../components/PageItems/items/items";
 
 const ProfileItems = () => {
   const { id } = useParams(); 

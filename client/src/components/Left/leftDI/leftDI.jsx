@@ -1,5 +1,5 @@
 import "./leftDI.scss";
-import ModelViewer from "../modelViewer/model_viewer";
+import ModelViewer from "../../modelViewer/model_viewer";
 
 const LeftDI = ({ item }) => {
   if (!item) return null;

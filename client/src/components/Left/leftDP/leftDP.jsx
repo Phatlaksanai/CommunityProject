@@ -1,6 +1,6 @@
 import "./leftDP.scss";
 import { useQuery } from "@tanstack/react-query";
-import { makeRequest } from "../../api/axios";
+import { makeRequest } from "../../../api/axios";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 

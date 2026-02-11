@@ -1,6 +1,6 @@
-@use "../../style.scss" as *;
+@use "../../../style.scss" as *;
 
-.rightBar {
+.leftDI {
   @include themify($themes) {
     flex: 3;
     position: sticky;
@@ -30,10 +30,17 @@
         padding: 20px;
         margin-bottom: 20px;
         background-color: themed("bg");
+        border-radius: 10px;
 
-        span {
-          color: gray;
+        img {
+        width: 100%;
+        height: auto;
+        max-height: none;
+        object-fit: initial;
+        border-radius: 10px;
         }
+
+        
 
         .user {
           display: flex;
@@ -44,7 +51,7 @@
           .userInfo {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 10px;
             position: relative;
 
             img {
@@ -52,16 +59,7 @@
               height: 40px;
               border-radius: 50%;
               object-fit: cover;
-            }
-
-            .online {
-              width: 12px;
-              height: 12px;
-              border-radius: 50%;
-              background-color: limegreen;
-              position: absolute;
-              top: 0;
-              left: 30px;
+              
             }
 
             p {
@@ -84,14 +82,7 @@
               padding: 5px;
               color: white;
               cursor: pointer;
-
-              &:first-child {
-                background-color: #5271ff;
-              }
-
-              &:last-child {
-                background-color: #f0544f;
-              }
+              background-color: #5271ff;
             }
           }
         }

@@ -1,5 +1,5 @@
 
-import Items from "../../components/items/items"
+import Items from "../../components/PageItems/items/items"
 import "./download.scss"
 
 const download = () => {

@@ -1,22 +1,22 @@
-import "./Rbuy.scss";
-import Friends from "../../assets/1.png";
-import Groups from "../../assets/1.png";
-import Market from "../../assets/1.png";
-import Watch from "../../assets/1.png";
-import Memories from "../../assets/1.png";
-import Events from "../../assets/1.png";
-import Gaming from "../../assets/1.png";
-import Gallery from "../../assets/1.png";
-import Videos from "../../assets/1.png";
-import Messages from "../../assets/1.png";
-import Tutorials from "../../assets/1.png";
-import Courses from "../../assets/1.png";
-import Fund from "../../assets/1.png";
-import { AuthContext } from "../../context/authContext";
+import "./leftbar.scss";
+import Friends from "../../../assets/1.png";
+import Groups from "../../../assets/1.png";
+import Market from "../../../assets/1.png";
+import Watch from "../../../assets/1.png";
+import Memories from "../../../assets/1.png";
+import Events from "../../../assets/1.png";
+import Gaming from "../../../assets/1.png";
+import Gallery from "../../../assets/1.png";
+import Videos from "../../../assets/1.png";
+import Messages from "../../../assets/1.png";
+import Tutorials from "../../../assets/1.png";
+import Courses from "../../../assets/1.png";
+import Fund from "../../../assets/1.png";
+import { AuthContext } from "../../../context/authContext";
 import { useContext } from "react";
-import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 
-const Rbuy = () => {
+const LeftBar = () => {
+
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
@@ -26,7 +26,7 @@ const Rbuy = () => {
         <div className="menu">
           <div className="user">
             <img src={currentUser?.profilePic || defaultPic} alt="" />
-            <span>{currentUser?.name || "Guest"}</span>
+            <span>{currentUser?.username || "Guest"}</span>
           </div>
           <div className="item">
             <img src={Friends} alt="" />
@@ -48,7 +48,6 @@ const Rbuy = () => {
             <img src={Memories} alt="" />
             <span>Memories</span>
           </div>
-          < ShoppingBasketIcon />
         </div>
 
         <hr />{/* ส่วน 2 */}
@@ -97,4 +96,4 @@ const Rbuy = () => {
   );
 };
 
-export default Rbuy;
+export default LeftBar;

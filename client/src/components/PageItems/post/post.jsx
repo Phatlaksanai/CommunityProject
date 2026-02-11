@@ -5,15 +5,15 @@ import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Link } from "react-router-dom";
-import Comments from "../comments/comments";
+import Comments from "../../comments/comments";
 import { useState, useContext } from "react";
 import dayjs from "dayjs"; // moment to dayjs
 import relativeTime from "dayjs/plugin/relativeTime"; // โหลด Plugin "เมื่อสักครู่"
 import "dayjs/locale/th"; // โหลดภาษาไทย (ถ้าอยากได้อังกฤษไม่ต้องใส่)
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { makeRequest } from "../../api/axios";
-import { AuthContext } from "../../context/authContext";
-import ModelViewer from "../modelViewer/model_viewer";
+import { makeRequest } from "../../../api/axios";
+import { AuthContext } from "../../../context/authContext";
+import ModelViewer from "../../modelViewer/model_viewer";
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);

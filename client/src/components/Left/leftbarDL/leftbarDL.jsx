@@ -1,6 +1,6 @@
 import "./leftbarDL.scss";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import { AuthContext } from "../../context/authContext";
+import { AuthContext } from "../../../context/authContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 
