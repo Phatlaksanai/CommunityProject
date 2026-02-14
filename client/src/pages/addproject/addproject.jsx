@@ -70,7 +70,7 @@ const AddProject = () => {
     try {
       const imgURL = await uploadFile(img);
 
-      const res = await fetch("/api/addproject", {
+      const res = await fetch("/api/projects/addproject", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -79,7 +79,7 @@ const AddProject = () => {
         body: JSON.stringify({
           projectName,
           description,
-          img: imgURL,
+          img: imgURL.url,
           relatedPosts: selectedPosts,
           relatedItem: selectedItem,
         }),

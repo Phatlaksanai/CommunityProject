@@ -8,12 +8,18 @@ const cors = require("cors");
 
 dotenv.config({path: '../.env'})
 
+if (!process.env.JWT_SECRETKEY) {
+  console.error("❌ JWT_SECRETKEY is not defined in .env");
+  process.exit(1); // หยุดการทำงานทันที
+}
+
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE
 });
+
 db.connect((err) => {
     if (err) {
         console.error('not conect:', err);
@@ -22,15 +28,18 @@ db.connect((err) => {
     console.log('connecting!');
 });
 
-// app.set('views', path.join(__dirname, 'views'))
-// app.set('view engine', 'ejs')
 app.use(express.json());//new+++++
 app.use(express.urlencoded({extended:false}))
 
 app.use(cookieParser());
 app.use(cors({origin: ["http://localhost:5173","http://10.40.148.108:5173",],credentials: true, }));//new+++++
 
-app.use('/api', require('./routes/MyRouter')) // API        new++++++++++++++
+// app.use('/api', require('./routes/MyRouter'))  
+app.use("/api", require("./routes/authRoutes"));
+app.use("/api/posts", require("./routes/postRoutes"));
+app.use("/api/projects", require("./routes/projectRoutes"));
+app.use("/api/items", require("./routes/itemRoutes"));
+app.use("/api/upload", require("./routes/uploadRoutes"));
 app.use(express.static(path.join(__dirname, 'public')))
 
 // ===== SERVE REACT =====

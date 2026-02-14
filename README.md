@@ -41,6 +41,36 @@ Feature
 
 ทดสอบระบบ
 
+https://chatgpt.com/share/698c3597-9998-8002-b10e-aff5e93e8369
+
+server
+│
+├── config
+│   ├── db.js
+│   └── cloudinary.js
+│
+├── middleware
+│   └── verifyToken.js
+│
+├── controllers
+│   ├── authController.js
+│   ├── postController.js
+│   ├── projectController.js
+│   ├── itemController.js
+│   └── uploadController.js
+│
+├── routes
+│   ├── authRoutes.js
+│   ├── postRoutes.js
+│   ├── projectRoutes.js
+│   ├── itemRoutes.js
+│   └── uploadRoutes.js
+│
+├── services
+│   └── mailService.js
+│
+├── server.js
+
 ```
 CommunityProject
 ├─ client
@@ -63,36 +93,67 @@ CommunityProject
 │  │  │  ├─ comments
 │  │  │  │  ├─ comments.jsx
 │  │  │  │  └─ comments.scss
-│  │  │  ├─ item
-│  │  │  │  ├─ item.jsx
-│  │  │  │  └─ item.scss
-│  │  │  ├─ items
-│  │  │  │  ├─ items.jsx
-│  │  │  │  └─ items.scss
-│  │  │  ├─ leftbar
-│  │  │  │  ├─ leftbar.jsx
-│  │  │  │  └─ leftbar.scss
-│  │  │  ├─ leftbarDL
-│  │  │  │  ├─ leftbarDL.jsx
-│  │  │  │  └─ leftbarDL.scss
+│  │  │  ├─ Left
+│  │  │  │  ├─ Lbuy
+│  │  │  │  │  ├─ Lbuy.jsx
+│  │  │  │  │  └─ Lbuy.scss
+│  │  │  │  ├─ leftbar
+│  │  │  │  │  ├─ leftbar.jsx
+│  │  │  │  │  └─ leftbar.scss
+│  │  │  │  ├─ leftbarDL
+│  │  │  │  │  ├─ leftbarDL.jsx
+│  │  │  │  │  └─ leftbarDL.scss
+│  │  │  │  ├─ leftDI
+│  │  │  │  │  ├─ leftDI.jsx
+│  │  │  │  │  └─ leftDI.scss
+│  │  │  │  └─ leftDP
+│  │  │  │     ├─ leftDP.jsx
+│  │  │  │     └─ leftDP.scss
 │  │  │  ├─ modelViewer
 │  │  │  │  ├─ model_viewer.jsx
 │  │  │  │  └─ model_viewer.scss
 │  │  │  ├─ navbar
 │  │  │  │  ├─ navbar.jsx
 │  │  │  │  └─ navbar.scss
-│  │  │  ├─ post
-│  │  │  │  ├─ post.jsx
-│  │  │  │  └─ post.scss
-│  │  │  ├─ posts
-│  │  │  │  ├─ posts.jsx
-│  │  │  │  └─ posts.scss
-│  │  │  ├─ rightbar
-│  │  │  │  ├─ rightbar.jsx
-│  │  │  │  └─ rightbar.scss
-│  │  │  └─ share
-│  │  │     ├─ share.jsx
-│  │  │     └─ share.scss
+│  │  │  ├─ PageItems
+│  │  │  │  ├─ item
+│  │  │  │  │  ├─ item.jsx
+│  │  │  │  │  └─ item.scss
+│  │  │  │  ├─ items
+│  │  │  │  │  ├─ items.jsx
+│  │  │  │  │  └─ items.scss
+│  │  │  │  ├─ post
+│  │  │  │  │  ├─ post.jsx
+│  │  │  │  │  └─ post.scss
+│  │  │  │  ├─ posts
+│  │  │  │  │  ├─ posts.jsx
+│  │  │  │  │  └─ posts.scss
+│  │  │  │  ├─ project
+│  │  │  │  │  ├─ project.jsx
+│  │  │  │  │  └─ project.scss
+│  │  │  │  └─ projects
+│  │  │  │     ├─ projects.jsx
+│  │  │  │     └─ projects.scss
+│  │  │  ├─ Right
+│  │  │  │  ├─ Rbuy
+│  │  │  │  │  ├─ Rbuy.jsx
+│  │  │  │  │  └─ Rbuy.scss
+│  │  │  │  ├─ rightbar
+│  │  │  │  │  ├─ rightbar.jsx
+│  │  │  │  │  └─ rightbar.scss
+│  │  │  │  └─ rightDI
+│  │  │  │     ├─ rightDI.jsx
+│  │  │  │     └─ rightDI.scss
+│  │  │  ├─ share
+│  │  │  │  ├─ share.jsx
+│  │  │  │  └─ share.scss
+│  │  │  └─ TopDetail
+│  │  │     ├─ ProfileDetail
+│  │  │     │  ├─ ProfileDetail.jsx
+│  │  │     │  └─ profileDetail.scss
+│  │  │     └─ ProjectDetail
+│  │  │        ├─ ProjectDetail.jsx
+│  │  │        └─ ProjectDetail.scss
 │  │  ├─ context
 │  │  │  ├─ authContext.jsx
 │  │  │  └─ darkModeContext.jsx
@@ -102,27 +163,35 @@ CommunityProject
 │  │  │  ├─ additem
 │  │  │  │  ├─ Additem.jsx
 │  │  │  │  └─ additem.scss
+│  │  │  ├─ addproject
+│  │  │  │  ├─ addproject.jsx
+│  │  │  │  └─ addproject.scss
+│  │  │  ├─ buyitem
+│  │  │  │  ├─ Buyitem.jsx
+│  │  │  │  └─ buyitem.scss
+│  │  │  ├─ descItem
+│  │  │  │  ├─ DescItem.jsx
+│  │  │  │  └─ descItem.scss
+│  │  │  ├─ descProject
+│  │  │  │  ├─ descProject.jsx
+│  │  │  │  └─ descProject.scss
 │  │  │  ├─ download
 │  │  │  │  ├─ download.scss
 │  │  │  │  └─ Download1.jsx
 │  │  │  ├─ home
-│  │  │  │  ├─ Home.jsx
-│  │  │  │  ├─ home.scss
 │  │  │  │  ├─ Home1.jsx
 │  │  │  │  └─ home1.scss
 │  │  │  ├─ login
 │  │  │  │  ├─ login.scss
 │  │  │  │  └─ Login1.jsx
-│  │  │  ├─ Login.css
-│  │  │  ├─ login.jsx
 │  │  │  ├─ profile
 │  │  │  │  ├─ Profile.jsx
-│  │  │  │  └─ profile.scss
-│  │  │  ├─ register
-│  │  │  │  ├─ register.scss
-│  │  │  │  └─ Register1.jsx
-│  │  │  ├─ register.css
-│  │  │  └─ register.jsx
+│  │  │  │  ├─ profile.scss
+│  │  │  │  ├─ ProfileItems.jsx
+│  │  │  │  └─ ProfileProjects.jsx
+│  │  │  └─ register
+│  │  │     ├─ register.scss
+│  │  │     └─ Register1.jsx
 │  │  └─ style.scss
 │  └─ vite.config.js
 ├─ note
@@ -131,14 +200,31 @@ CommunityProject
 ├─ README.md
 ├─ report.html
 ├─ server
+│  ├─ config
+│  │  ├─ cloudinary.js
+│  │  ├─ db.js
+│  │  └─ multerCloudinary.js
+│  ├─ controllers
+│  │  ├─ authController.js
+│  │  ├─ itemController.js
+│  │  ├─ postController.js
+│  │  ├─ projectController.js
+│  │  └─ uploadController.js
 │  ├─ middleware
 │  │  └─ verifyToken.js
 │  ├─ package-lock.json
 │  ├─ package.json
 │  ├─ README.md
 │  ├─ routes
-│  │  └─ MyRouter.js
-│  └─ server.js
+│  │  ├─ authRoutes.js
+│  │  ├─ itemRoutes.js
+│  │  ├─ MyRouter.js
+│  │  ├─ postRoutes.js
+│  │  ├─ projectRoutes.js
+│  │  └─ uploadRoutes.js
+│  ├─ server.js
+│  └─ services
+│     └─ mailService.js
 └─ upload.html
 
 ```

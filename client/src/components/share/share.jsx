@@ -29,7 +29,7 @@ const Share = () => {
 
   const mutation = useMutation({
     mutationFn: (newPost) => {
-      return makeRequest.post("/posts", newPost);
+      return makeRequest.post("/posts/addpost", newPost);
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["posts"]);
@@ -47,21 +47,21 @@ const Share = () => {
     let modelUrls = [];
 
     for (const file of files) {
-      const url = await upload(file); // ได้ URL จาก Cloudinary มา
-      if (url) {
+      const result = await upload(file); // ได้ URL จาก Cloudinary มา
+      if (result?.url) {
         const isModel = /\.(glb|gltf)$/i.test(file.name); // เช็คว่าเป็นไฟล์ 3D ไหม
         if (isModel) {
-          modelUrls.push(url);
+          modelUrls.push(result.url);
         } else {
-          imgUrls.push(url);
+          imgUrls.push(result.url);
         }
       }
     }
 
     mutation.mutate({
       desc,
-      img: imgUrls.length ? imgUrls : null,
-      model: modelUrls.length ? modelUrls : null,
+      img: imgUrls.length ? imgUrls[0] : null,
+      model: modelUrls.length ? modelUrls[0] : null,
     }); // ส่งข้อมูลเข้า Database
   };
 

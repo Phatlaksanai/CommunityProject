@@ -72,7 +72,12 @@ const AddItem = () => {
       const imgURL = await uploadFile(img);
       const modelURL = await uploadFile(model);
 
-      const res = await fetch("/api/additem", {
+      if (!imgURL || !modelURL) {
+        setError("อัพโหลดไฟล์ไม่สำเร็จ");
+        return;
+      }
+
+      const res = await fetch("/api/items/additem", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -83,8 +88,8 @@ const AddItem = () => {
           description,
           price,
           category,
-          img: imgURL,
-          model: modelURL,
+          img: imgURL.url,
+          model: modelURL.url,
         }),
       });
 

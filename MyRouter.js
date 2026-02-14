@@ -4,7 +4,7 @@ const mysql = require("mysql2");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
-const verifyToken = require("../middleware/verifyToken");
+const verifyToken = require("./server/middleware/verifyToken");
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer"); //new--------------------
 const { CloudinaryStorage } = require("multer-storage-cloudinary"); //new--------------------
@@ -45,9 +45,9 @@ router.post("/upload/post", upload.single("file"), (req, res) => {
     console.log(err);
     res.status(500).json(err);
   }
-});
+});// ✅ upConttroller
 
-router.get("/posts", (req, res) => {
+router.get("/posts", (req, res) => { 
   // สั่ง JOIN เพื่อเอาชื่อคนโพสต์ (u.username) และรูป (u.profilePic) มาโชว์คู่กับโพสต์
   const q = `SELECT p.*, p.description AS \`desc\`, u.user_id AS userId, u.username, u.profilePic 
              FROM posts AS p 
@@ -57,7 +57,7 @@ router.get("/posts", (req, res) => {
     if (err) return res.status(500).json(err);
     return res.status(200).json(data);
   });
-});
+});// ✅
 
 router.get("/projects", (req, res) => {
   // สั่ง JOIN เพื่อเอาชื่อคนโพสต์ (u.username) และรูป (u.profilePic) มาโชว์คู่กับโพสต์
@@ -68,7 +68,7 @@ router.get("/projects", (req, res) => {
     if (err) return res.status(500).json(err);
     return res.status(200).json(data);
   });
-});
+});// ✅
 
 router.get("/items", (req, res) => {
   const q = `SELECT *
@@ -78,7 +78,7 @@ router.get("/items", (req, res) => {
     if (err) return res.status(500).json(err);
     return res.status(200).json(data);
   });
-});
+});// ✅
 
 router.get("/items/:id", (req, res) => {
   const { id } = req.params;
@@ -97,7 +97,7 @@ router.get("/items/:id", (req, res) => {
       res.json(result[0]);
     },
   );
-});
+});// ✅
 
 router.get("/projects/:id", (req, res) => {
   const { id } = req.params;
@@ -115,23 +115,7 @@ router.get("/projects/:id", (req, res) => {
       res.json(result[0]);
     },
   );
-});
-
-// router.get("/posts/:id/project", (req, res) => {
-//   const { id } = req.params;
-
-//   db.query(
-//     "SELECT items.*, users.username, users.profilePic FROM items JOIN users ON items.user_id = users.user_id WHERE item_id = ?",
-//     [id],
-//     (err, result) => {
-//       if (err) return res.status(500).json(err);
-//       if (result.length === 0)
-//         return res.status(404).json({ error: "Item not found" });
-
-//       res.json(result[0]);
-//     },
-//   );
-// });
+});// ✅
 
 router.get("/posts/user/:id", (req, res) => {
   const { id } = req.params;
@@ -146,7 +130,7 @@ router.get("/posts/user/:id", (req, res) => {
       res.json(result);
     },
   );
-});
+});// ✅
 
 router.get("/posts/project/:id", (req, res) => {
   const { id } = req.params;
@@ -165,7 +149,7 @@ router.get("/posts/project/:id", (req, res) => {
       res.json(result);
     },
   );
-});
+});// ✅
 
 router.get("/items/project/:id", (req, res) => {
   const { id } = req.params;
@@ -184,7 +168,7 @@ router.get("/items/project/:id", (req, res) => {
       res.json(result);
     },
   );
-});
+});// ✅
 
 router.get("/posts/user/:id/available", (req, res) => {
   const { id } = req.params;
@@ -194,7 +178,7 @@ router.get("/posts/user/:id/available", (req, res) => {
     if (err) return res.status(500).json(err);
     res.json(result);
   });
-});
+});//✅
 router.get("/items/user/:id/available", (req, res) => {
   const { id } = req.params;
   const q =
@@ -203,7 +187,7 @@ router.get("/items/user/:id/available", (req, res) => {
     if (err) return res.status(500).json(err);
     res.json(result);
   });
-});
+});//✅
 router.get("/items/user/:id", (req, res) => {
   const { id } = req.params;
   db.query(
@@ -217,7 +201,7 @@ router.get("/items/user/:id", (req, res) => {
       res.json(result);
     },
   );
-});
+});//✅
 router.get("/projects/user/:id", (req, res) => {
   const { id } = req.params;
   db.query(
@@ -233,13 +217,13 @@ router.get("/projects/user/:id", (req, res) => {
       res.json(result);
     },
   );
-});
+});//✅
 
-router.post("/", verifyToken, (req, res) => {
-  // NEw Verify Token
-  res.json("Create post by user " + req.user.user_id);
-  console.log("cookies:", req.cookies); //chack log
-});
+// router.post("/", verifyToken, (req, res) => {
+//   // NEw Verify Token
+//   res.json("Create post by user " + req.user.user_id);
+//   console.log("cookies:", req.cookies); //chack log
+// });
 
 router.post("/login", (req, res) => {
   const { username, password } = req.body;
@@ -290,28 +274,9 @@ router.post("/login", (req, res) => {
         });
     },
   );
-});
+});//✅
 
-// router.post("/", verifyToken, (req, res) => {
-//   const q = "INSERT INTO posts (`description`, `img`, `createdAt`, `user_id`) VALUES (?)";
-
-//   const values = [
-//     req.body.desc, // รับมาจากหน้าบ้าน (หน้าบ้านส่งมาชื่อ desc ได้ครับ ไม่ต้องแก้หน้าบ้าน)
-//     req.body.img,
-//     new Date(),    // ส่งเวลาปัจจุบันไป
-//     req.user_id    // ไอดีคนโพสต์ (จาก Token)
-//   ];
-
-//   db.query(q, [values], (err, data) => {
-//     if (err) {
-//         console.error(err);
-//         return res.status(500).json(err);
-//     }
-//     return res.status(200).json("Post created!");
-//   });
-// });
-// แก้ไขจาก router.post("/") เดิมทั้งหมด
-router.post("/posts", verifyToken, (req, res) => {
+router.post("/posts/addpost", verifyToken, (req, res) => {
   // 1. ตรวจสอบชื่อ Column ใน Database ของคุณ
   // จากโค้ด SELECT คุณใช้ `description` และ `user_id`
   // แต่ใน INSERT เดิมคุณเขียน `desc` และ `userId` ซึ่งอาจจะไม่ตรงกับตารางจริง
@@ -341,7 +306,7 @@ router.post("/posts", verifyToken, (req, res) => {
       username: req.body.username, // ส่งชื่อกลับไปโชว์ด้วยถ้าต้องการ
     });
   });
-});
+});// ✅
 
 // LOGOUT
 router.post("/logout", (req, res) => {
@@ -353,7 +318,7 @@ router.post("/logout", (req, res) => {
     })
     .status(200)
     .json({ success: true });
-});
+});//✅
 
 router.post("/send-otp", async (req, res) => {
   const { email } = req.body;
@@ -422,7 +387,7 @@ router.post("/send-otp", async (req, res) => {
       });
     },
   );
-});
+});//✅
 
 router.post("/register", (req, res) => {
   const { username, password, password2, email, otp } = req.body;
@@ -492,9 +457,9 @@ router.post("/register", (req, res) => {
   );
   console.log("Register email: ", email);
   console.log("Register otp: ", otp);
-});
+});//✅
 
-router.post("/additem", verifyToken, (req, res) => {
+router.post("/items/additem", verifyToken, (req, res) => {
   const q = `INSERT INTO items (modelName, description, price, img, model, createAt, category, user_id)VALUES (?)`;
 
   const values = [
@@ -512,9 +477,9 @@ router.post("/additem", verifyToken, (req, res) => {
     if (err) return res.status(500).json(err);
     res.status(200).json({ success: true });
   });
-});
+});//✅
 
-router.post("/addproject", verifyToken, (req, res) => {
+router.post("/projects/addproject", verifyToken, (req, res) => {
   const { projectName, description, img, relatedPosts, relatedItem } = req.body;
   const qProject = `INSERT INTO projects (project_name, description, img, createAt)VALUES (?)`;
 
@@ -548,7 +513,7 @@ router.post("/addproject", verifyToken, (req, res) => {
       });
     }
   });
-});
+});//✅
 
 const storage_item = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -566,7 +531,7 @@ const storage_item = new CloudinaryStorage({
     };
   },
 });
-const upload_item = multer({ storage: storage_item });
+const upload_item = multer({ storage: storage_item });//✅
 
 router.post("/upload/item", upload_item.single("file"), (req, res) => {
   try {
@@ -575,7 +540,7 @@ router.post("/upload/item", upload_item.single("file"), (req, res) => {
     console.log(err);
     res.status(500).json(err);
   }
-});
+});//✅ upConttroller
 
 const storage_project = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -588,7 +553,7 @@ const storage_project = new CloudinaryStorage({
     };
   },
 });
-const upload_project = multer({ storage: storage_project });
+const upload_project = multer({ storage: storage_project });//✅
 
 router.post("/upload/project", upload_project.single("file"), (req, res) => {
   try {
@@ -597,6 +562,6 @@ router.post("/upload/project", upload_project.single("file"), (req, res) => {
     console.log(err);
     res.status(500).json(err);
   }
-});
+});//✅ upConttroller
 
 module.exports = router;
