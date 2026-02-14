@@ -34,7 +34,7 @@ const createStorage = (baseFolder, allowModel = true) => // สร้าง Clou
 const createUploader = (folder, allowModel = true) => // สร้าง multer uploader
   multer({
     storage: createStorage(folder, allowModel),
-    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+    limits: { fileSize: 10 * 1024 * 1024 }, 
   }).single("file");
 
 const uploadHandler = (folder, allowModel = true) => [ 
