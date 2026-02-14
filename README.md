@@ -13,8 +13,9 @@ npm install dayjs //server + client
 npm install @mui/icons-material @mui/material @emotion/styled @emotion/react // client 
 npm install -D sass-embedded // client 
 npm install @tanstack/react-query // client 
-npm install multer-storage-cloudinary multer --legacy-peer-deps // server =============new
+npm install cloudinary multer // server =============new
 npm install three // client ================new
+npm install @supabase/supabase-js // server
 
 สิ่งที่ต้องเพิ่ม
 0.สถิติ หน้า descproject ✅
@@ -29,6 +30,9 @@ npm install three // client ================new
 9.ทำให้ลบ post, ลบ item, ลบ project จากนั้นเก็บ log หรือ something ไว้ แล้วลบใน DB กับ cloud ด้วย 
 10.ระบบแอดเพื่อน
 11.แยก backend / รวมไฟล์ให้ดูสะอาดตา frontend
+12.แก้แสดงผล 3D nigga
+13.แสดงผล % ขณะโหลด
+14.เลือก project ตอน post
 
 Feature
 1.run 3D ขึ้นโชว์ ✅
@@ -70,6 +74,7 @@ server
 │   └── mailService.js
 │
 ├── server.js
+
 
 ```
 CommunityProject
@@ -194,6 +199,7 @@ CommunityProject
 │  │  │     └─ Register1.jsx
 │  │  └─ style.scss
 │  └─ vite.config.js
+├─ MyRouter.js
 ├─ note
 ├─ package-lock.json
 ├─ package.json
@@ -202,8 +208,7 @@ CommunityProject
 ├─ server
 │  ├─ config
 │  │  ├─ cloudinary.js
-│  │  ├─ db.js
-│  │  └─ multerCloudinary.js
+│  │  └─ db.js
 │  ├─ controllers
 │  │  ├─ authController.js
 │  │  ├─ itemController.js
@@ -218,13 +223,10 @@ CommunityProject
 │  ├─ routes
 │  │  ├─ authRoutes.js
 │  │  ├─ itemRoutes.js
-│  │  ├─ MyRouter.js
 │  │  ├─ postRoutes.js
 │  │  ├─ projectRoutes.js
 │  │  └─ uploadRoutes.js
-│  ├─ server.js
-│  └─ services
-│     └─ mailService.js
+│  └─ server.js
 └─ upload.html
 
 ```

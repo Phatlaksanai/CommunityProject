@@ -36,3 +36,14 @@ CREATE TABLE comment (
     user_id INT NOT NULL,
     post_id INT NOT NULL
 );
+
+Supabase
+ใน SQL Editor
+CREATE TYPE category_type AS ENUM (
+  'Vehicles',
+  'Electronics',
+  'Characters',
+  'Furniture',
+  'Sports',
+  'Food&Drink'
+);
