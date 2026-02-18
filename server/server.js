@@ -1,10 +1,11 @@
 const express = require('express')
 const path = require('path')
 const app = express()
-const mysql = require('mysql2');
+// const mysql = require('mysql2');
 const dotenv = require('dotenv');
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+// const connectDB = require('./config/db');
 
 dotenv.config({path: '../.env'})
 
@@ -13,20 +14,20 @@ if (!process.env.JWT_SECRETKEY) {
   process.exit(1); // หยุดการทำงานทันที
 }
 
-const db = mysql.createConnection({
-    host: process.env.DATABASE_HOST,
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE
-});
+// const db = mysql.createConnection({
+//     host: process.env.DATABASE_HOST,
+//     user: process.env.DATABASE_USER,
+//     password: process.env.DATABASE_PASSWORD,
+//     database: process.env.DATABASE
+// });
 
-db.connect((err) => {
-    if (err) {
-        console.error('not conect:', err);
-        return;
-    }
-    console.log('connecting!');
-});
+// db.connect((err) => {
+//     if (err) {
+//         console.error('not conect:', err);
+//         return;
+//     }
+//     console.log('connecting!');
+// });
 
 app.use(express.json());//new+++++
 app.use(express.urlencoded({extended:false}))
@@ -54,6 +55,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use((req, res) => {
     res.status(404).json({ error: "API route not found" });
 });
+// connectDB();
 
 app.listen(8080, () => {
     console.log("http://localhost:8080")

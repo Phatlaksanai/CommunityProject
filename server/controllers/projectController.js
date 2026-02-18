@@ -1,82 +1,134 @@
 const db = require("../config/db")
 
-exports.getProjects = (req, res) => {
-  const q = `SELECT *
-             FROM projects 
-             ORDER BY createAt DESC`;
-  db.query(q, (err, data) => {
-    if (err) return res.status(500).json(err);
-    return res.status(200).json(data);
-  });
+exports.getProjects = async (req, res) => {
+  const { data, error } = await db
+    .from("projects")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) return res.status(500).json(error);
+
+  return res.status(200).json(data || []);
 };
 
-exports.getProjectById = (req, res) => {
+exports.getProjectById = async (req, res) => {
   const { id } = req.params;
 
-  db.query(
-    `SELECT *
-     FROM projects
-     WHERE project_id = ?`,
-    [id],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      if (result.length === 0)
-        return res.status(404).json({ error: "Project not found" });
+  const { data, error } = await db
+    .from("projects")
+    .select("*")
+    .eq("project_id", id)
+    .single();
 
-      res.json(result[0]);
-    },
-  );
+  if (error) {
+    return res.status(404).json({ error: "Project not found" });
+  }
+
+  return res.json(data);
 };
 
-exports.getProjectsByUserId = (req, res) => {
+exports.getProjectsByUserId = async (req, res) => {
   const { id } = req.params;
-  db.query(
-    `SELECT DISTINCT projects.*
-     FROM projects
-     LEFT JOIN posts ON posts.project_id = projects.project_id
-     LEFT JOIN items ON items.project_id = projects.project_id
-     WHERE posts.user_id = ? OR items.user_id = ?
-     ORDER BY projects.createAt DESC`,
-    [id, id],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      res.json(result);
-    },
-  );
+
+  // ดึง project_id จาก posts
+  const { data: postProjects, error: postError } = await db
+    .from("posts")
+    .select("project_id")
+    .eq("user_id", id)
+    .not("project_id", "is", null);
+
+  if (postError) return res.status(500).json(postError);
+
+  // ดึง project_id จาก items
+  const { data: itemProjects, error: itemError } = await db
+    .from("items")
+    .select("project_id")
+    .eq("user_id", id)
+    .not("project_id", "is", null);
+
+  if (itemError) return res.status(500).json(itemError);
+
+  // รวม id ทั้งหมด
+  const projectIds = [
+    ...new Set([
+      ...postProjects.map(p => p.project_id),
+      ...itemProjects.map(i => i.project_id),
+    ]),
+  ];
+
+  if (projectIds.length === 0) {
+    return res.json([]);
+  }
+
+  // ดึง project จริง
+  const { data: projects, error: projectError } = await db
+    .from("projects")
+    .select("*")
+    .in("project_id", projectIds)
+    .order("created_at", { ascending: false });
+
+  if (projectError) return res.status(500).json(projectError);
+  
+  return res.json(projects);
 };
 
-exports.addProject = (req, res) => {
+exports.addProject = async (req, res) => {
   const { projectName, description, img, relatedPosts, relatedItem } = req.body;
-  const qProject = `INSERT INTO projects (project_name, description, img, createAt)VALUES (?)`;
 
-  const values = [projectName, description, img, new Date()];
+  if (!projectName) {
+    return res.status(400).json({ error: "Project name required" });
+  }
+  
+  // สร้าง project
+  const { data: project, error: projectError } = await db 
+    .from("projects")
+    .insert([
+      {
+        project_name: projectName,
+        description: description || null,
+        img: img || null,
+      },
+    ])
+    .select()
+    .single();
 
-  db.query(qProject, [values], (err, data) => {
-    if (err) return res.status(500).json(err);
-    const projectId = data.insertId; // project_id ใหม่
+  if (projectError) {
+    console.log("PROJECT ERROR:", projectError);
+    return res.status(500).json(projectError);
+  }
 
-    // ถ้าไม่มีโพสต์ที่เลือก
-    if (relatedPosts && relatedPosts.length > 0) {
-      const qUpdatePost =
-        "UPDATE posts SET project_id = ? WHERE post_id IN (?) AND project_id IS NULL";
-      db.query(qUpdatePost, [projectId, relatedPosts], (err2) => {
-        if (err2) return res.status(500).json(err2);
-      });
+  const projectId = project.project_id;
+
+  // update posts
+  if (relatedPosts && relatedPosts.length > 0) { 
+    const { error: postError } = await db
+      .from("posts")
+      .update({ project_id: projectId })
+      .in("post_id", relatedPosts)
+      .is("project_id", null);
+
+    if (postError) {
+      console.log("POST UPDATE ERROR:", postError);
+      return res.status(500).json(postError);
     }
-    if (relatedItem) {
-      const qUpdateItem = `UPDATE items SET project_id = ?  WHERE item_id = ? AND project_id IS NULL`;
-      db.query(qUpdateItem, [projectId, relatedItem], (err3) => {
-        if (err3) return res.status(500).json(err3);
-        return res.status(200).json({
-          success: true,
-          projectId,
-        });
-      });
-    } else {
-      return res.status(200).json({
-        success: true,
-        projectId,
-      });
+  }
+
+  // update item
+  if (relatedItem) { 
+    const { error: itemError } = await db
+      .from("items")
+      .update({ project_id: projectId })
+      .eq("item_id", relatedItem)
+      .is("project_id", null);
+
+    if (itemError) {
+      console.log("ITEM UPDATE ERROR:", itemError);
+      return res.status(500).json(itemError);
     }
+  }
+
+  return res.status(201).json({
+    success: true,
+    project,
   });
 };

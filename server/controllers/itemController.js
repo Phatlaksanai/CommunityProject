@@ -1,79 +1,92 @@
 const db = require("../config/db");
 
-exports.getItems = (req, res) => {
-  const q = `SELECT *
-             FROM items 
-             ORDER BY items.createAt DESC`;
-  db.query(q, (err, data) => {
-    if (err) return res.status(500).json(err);
-    return res.status(200).json(data);
-  });
+exports.getItems = async (req, res) => {
+  const { data, error } = await db
+    .from("items")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) return res.status(500).json(error);
+
+  return res.status(200).json(data || []);
 };
 
-exports.getItemsById = (req, res) => {
+exports.getItemsById = async (req, res) => {
   const { id } = req.params;
 
-  db.query(
-    `SELECT items.*, users.username, users.profilePic 
-    FROM items 
-    JOIN users ON items.user_id = users.user_id 
-    WHERE item_id = ?`,
-    [id],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      if (result.length === 0)
-        return res.status(404).json({ error: "Item not found" });
+  const { data, error } = await db
+    .from("items")
+    .select(`
+      *,
+      users (
+        username,
+        profilePic
+      )
+    `)
+    .eq("item_id", id)
+    .single();
 
-      res.json(result[0]);
-    },
-  );
+  if (error) return res.status(404).json({ error: "Item not found" });
+
+  const formatted = {
+    ...data,
+    username: data.users?.username || null,
+    profilePic: data.users?.profilePic || null,
+  };
+
+  return res.json(formatted);
 };
 
-exports.getItemsByProjectId = (req, res) => {
+exports.getItemsByProjectId = async (req, res) => {
   const { id } = req.params;
-  db.query(
-    `SELECT items.*,users.username,users.profilePic
-    FROM items
-    LEFT JOIN users ON items.user_id = users.user_id
-    WHERE items.project_id = ?
-    ORDER BY items.createAt DESC`,
-    [id],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      if (result.length === 0) {
-        return res.json([]); // ✅ สำคัญ
-      }
-      res.json(result);
-    },
-  );
+
+  const { data, error } = await db
+    .from("items")
+    .select(`
+      *,
+      users (
+        username,
+        profilePic
+      )
+    `)
+    .eq("project_id", id)
+    .order("created_at", { ascending: false });
+
+  if (error) return res.status(500).json(error);
+
+  return res.json(data || []);
 };
 
-exports.getItemsByUserIdAvailable = (req, res) => {
+exports.getItemsByUserIdAvailable = async (req, res) => {
   const { id } = req.params;
-  const q =
-    "SELECT items.* FROM items WHERE items.user_id = ? AND items.project_id IS NULL ORDER BY items.createAt DESC";
-  db.query(q, [id], (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json(result);
-  });
+
+  const { data, error } = await db
+    .from("items")
+    .select("*")
+    .eq("user_id", id)
+    .is("project_id", null)
+    .order("created_at", { ascending: false });
+
+  if (error) return res.status(500).json(error);
+
+  return res.json(data || []);
 };
 
-exports.getItemsByUserId = (req, res) => {
+exports.getItemsByUserId = async (req, res) => {
   const { id } = req.params;
-  db.query(
-    "SELECT * FROM items WHERE user_id = ? ORDER BY items.createAt DESC",
-    [id],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      if (result.length === 0) {
-        res.json(result);
-      }
-      res.json(result);
-    },
-  );
+
+  const { data, error } = await db
+    .from("items")
+    .select("*")
+    .eq("user_id", id)
+    .order("created_at", { ascending: false });
+
+  if (error) return res.status(500).json(error);
+
+  return res.json(data || []);
 };
 
-exports.addItem = (req, res) => {
+exports.addItem = async (req, res) => {
   const { modelName, description, price, img, model, category } = req.body;
 
   if (!modelName || !price) {
@@ -84,21 +97,23 @@ exports.addItem = (req, res) => {
     return res.status(400).json({ error: "Price must be number" });
   }
 
-  const q = `INSERT INTO items (modelName, description, price, img, model, createAt, category, user_id)VALUES (?)`;
+  const { data, error } = await db
+    .from("items")
+    .insert([
+      {
+        modelName,
+        description: description || null,
+        price: Number(price),
+        img: img || null,
+        model: model || null,
+        category: category || null,
+        user_id: req.user.user_id,
+      },
+    ])
+    .select()
+    .single();
 
-  const values = [
-    modelName,
-    description,
-    Number(price),
-    img,
-    model,
-    new Date(),
-    category,
-    req.user.user_id,
-  ];
+  if (error) return res.status(500).json(error);
 
-  db.query(q, [values], (err, data) => {
-    if (err) return res.status(500).json(err);
-    res.status(201).json({ success: true });
-  });
+  return res.status(201).json(data);
 };
