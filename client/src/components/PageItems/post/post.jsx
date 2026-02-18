@@ -101,7 +101,7 @@ const Post = ({ post }) => {
               >
                 <span className="name">{post.username}</span>
               </Link>
-              <span className="date">{dayjs(post.createdAt).fromNow()}</span>
+              <span className="date">{dayjs(post.created_at).fromNow()}</span>
             </div>
           </div>
           <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} />

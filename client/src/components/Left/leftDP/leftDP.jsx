@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
+import ModelViewer from "../../modelViewer/model_viewer";
 
 const LeftDP = ({ project }) => {
   const { isLoading, error, data } = useQuery({
@@ -34,20 +35,17 @@ const LeftDP = ({ project }) => {
           items.map(item => (
             <div className="item" key={item.item_id}>
               <div className="top">
-                <div className="L">
-                  <h2>{item.modelName}</h2>
-                  <img src={item.img} alt="" />
-                </div>
-                <div className="R">
+                  {item.model && <ModelViewer modelUrl={item.model} />}
+                  {/* <img src={item.img} alt="" /> */}
+                  <p>Neme : {item.modelName}</p>
                   <p>Description : {item.description}</p>
                   <p>Price : {item.price}</p>
                   <span>
                     Created At :{" "}
-                    {dayjs(item.createAt)
+                    {dayjs(item.created_at)
                       .locale("th")
                       .format("D MMM YYYY")}
                   </span>
-                </div>
               </div>
             </div>
           ))}
@@ -60,22 +58,22 @@ const LeftDP = ({ project }) => {
           <p>
             first post :{" "}
             {firstPost
-              ? dayjs(firstPost.createdAt).locale("th").format("D MMM YYYY")
+              ? dayjs(firstPost.created_at).locale("th").format("D MMM YYYY")
               : "-"}
           </p>
 
           <p>
             last post :{" "}
             {lastPost
-              ? dayjs(lastPost.createdAt).locale("th").format("D MMM YYYY")
+              ? dayjs(lastPost.created_at).locale("th").format("D MMM YYYY")
               : "-"}
           </p>
 
           <p>
             duration :{" "}
             {firstPost && lastPost
-              ? dayjs(lastPost.createdAt).diff(
-                  dayjs(firstPost.createdAt),
+              ? dayjs(lastPost.created_at).diff(
+                  dayjs(firstPost.created_at),
                   "day"
                 ) + " วัน"
               : "-"}

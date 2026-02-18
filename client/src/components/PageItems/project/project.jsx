@@ -20,7 +20,7 @@ const Project = ({ project }) => {
             <h2>{project.project_name}</h2>{/* 2026-01-30T17:00:00.000Z */}
         </div>
         <div className="price">
-            <p>{dayjs(project.createAt).locale("th").format("D MMM YYYY")}</p>
+            <p>{dayjs(project.created_at).locale("th").format("D MMM YYYY")}</p>
             
         </div>
       </div>
