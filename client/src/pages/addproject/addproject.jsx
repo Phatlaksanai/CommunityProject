@@ -65,6 +65,21 @@ const AddProject = () => {
     setError("");
     setSuccess("");
 
+    // ใช้ .trim() เพื่อตัดช่องว่างหน้า-หลัง และเช็คว่าชื่อว่างหรือไม่
+    const trimmedProjectName = projectName.trim();
+
+    // 1. เช็คชื่อโปรเจคที่ตัดช่องว่างออกแล้ว
+    if (!trimmedProjectName) {
+      setError("กรุณากรอกชื่อ Project (ห้ามเว้นว่าง)");
+      return;
+    }
+
+    // 2. เพิ่มการเช็คว่าเลือก Post อย่างน้อย 1 อันหรือยัง
+    if (selectedPosts.length === 0) {
+      setError("กรุณาเลือกอย่างน้อย 1 โพสต์เพื่อรวมในโปรเจค");
+      return;
+    }
+
     try {
       const imgURL = await uploadFile(img);
 
@@ -99,6 +114,7 @@ const AddProject = () => {
     }
   };
 
+  
 
   return (
     <div className="add-project">
