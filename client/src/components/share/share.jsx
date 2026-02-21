@@ -5,23 +5,36 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
+import { useQuery } from "@tanstack/react-query"; // เพิ่ม useQuery
 
 const Share = () => {
-  const [desc, setDesc] = useState(""); // เก็บข้อความ
-  const [files, setFiles] = useState([]); // เก็บหลายไฟล์
+  const [desc, setDesc] = useState("");
+  const [files, setFiles] = useState([]);
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
   const defaultPic =
     "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
-  const [filePreviews, setFilePreviews] = useState([]); // โชว์รูปตัวอย่างหลายไฟล์
+  const [filePreviews, setFilePreviews] = useState([]);
+  const [search, setSearch] = useState("");
+  const [openProjectModal, setOpenProjectModal] = useState(false); // เพิ่ม State สำหรับเปิด-ปิด Modal
+  const [selectedItem, setSelectedItem] = useState(null); // State สำหรับเก็บ ID โปรเจคที่เลือก
+
+  // ดึงข้อมูลโปรเจคของผู้ใช้ (ตัวอย่าง API path: /projects)
+  const { isLoading, data: items } = useQuery({
+    queryKey: ["userProjects"],
+    queryFn: () =>
+      makeRequest.get("/projects").then((res) => {
+        return res.data;
+      }),
+  });
 
   const upload = async (file) => {
     try {
       const formData = new FormData();
       formData.append("file", file);
       const res = await makeRequest.post("/upload/post", formData);
-      return res.data; // เอา data ข้างในเป็น URL ที่หลังบ้านส่งมา
+      return res.data;
     } catch (err) {
       console.log(err);
     }
@@ -41,15 +54,15 @@ const Share = () => {
 
   const handleClick = async (e) => {
     e.preventDefault();
-    if (desc.trim() === "" && files.length === 0) return; // ถ้าไม่มีข้อความและไม่มีรูป ก็ไม่ต้องทำอะไร
+    if (desc.trim() === "" && files.length === 0) return;
 
     let imgUrls = [];
     let modelUrls = [];
 
     for (const file of files) {
-      const result = await upload(file); // ได้ URL จาก Cloudinary มา
+      const result = await upload(file);
       if (result?.url) {
-        const isModel = /\.(glb|gltf)$/i.test(file.name); // เช็คว่าเป็นไฟล์ 3D ไหม
+        const isModel = /\.(glb|gltf)$/i.test(file.name);
         if (isModel) {
           modelUrls.push(result.url);
         } else {
@@ -62,17 +75,16 @@ const Share = () => {
       desc,
       img: imgUrls.length ? imgUrls[0] : null,
       model: modelUrls.length ? modelUrls[0] : null,
-    }); // ส่งข้อมูลเข้า Database
+    });
   };
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-
     const validFiles = selectedFiles.filter((file) =>
       /\.(jpg|jpeg|png|gif|glb|gltf)$/i.test(file.name)
     );
-    setFiles((prev) => prev.concat(validFiles));e.target.value = "";
-
+    setFiles((prev) => prev.concat(validFiles));
+    e.target.value = "";
     const previews = validFiles.map((file) =>
       /\.(jpg|jpeg|png|gif)$/i.test(file.name)
         ? URL.createObjectURL(file)
@@ -135,7 +147,7 @@ const Share = () => {
             <input
               type="file"
               id="file"
-              multiple  
+              multiple
               style={{ display: "none" }}
               accept=".jpg,.png,.jpeg,.gif,.glb,.gltf"
               onChange={handleFileChange}
@@ -143,12 +155,13 @@ const Share = () => {
             <label htmlFor="file">
               <div className="item">
                 <img src={Image} alt="Add" />
-                <span>Add Image</span>
+                <span>Image/Model</span>
               </div>
             </label>
-            <div className="item">
+            {/* เพิ่ม onClick เพื่อเปิด Modal */}
+            <div className="item" onClick={() => setOpenProjectModal(true)}>
               <img src={Friend} alt="Friend" />
-              <span>Tag Friends</span>
+              <span>Project</span>
             </div>
           </div>
           <div className="right">
@@ -156,6 +169,56 @@ const Share = () => {
           </div>
         </div>
       </div>
+
+      {/* ส่วนของ Popup (Modal) */}
+      {openProjectModal && (
+        <div className="projectModal">
+          <div className="modalContainer">
+            <h3>Select Project</h3>
+
+            <div className="form-group">
+              <label>All project</label>
+              <input
+                type="text"
+                placeholder="ค้นหา Project"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+
+              <div className="post-list">
+                {isLoading ? (
+                  "Loading..."
+                ) : items && items.length > 0 ? (
+                  items
+                    .filter((project) =>
+                      project.project_name.toLowerCase().includes(search.toLowerCase())
+                    )
+                    .map((project) => (
+                      <label key={project.project_id} className="post-item">
+                        <input
+                          type="radio"
+                          name="selectedItem"
+                          checked={selectedItem === project.project_id}
+                          onChange={() => setSelectedItem(project.project_id)}
+                        />
+                        <span>{project.project_name}</span>
+                      </label>
+                    ))
+                ) : (
+                  "No projects found"
+                )}
+              </div>
+
+              {/* ปุ่มควบคุมด้านล่าง */}
+              <div className="modalButtons">
+                <button onClick={() => setOpenProjectModal(false)}>Cancel</button>
+                <button onClick={() => setOpenProjectModal(false)}>Confirm</button>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
