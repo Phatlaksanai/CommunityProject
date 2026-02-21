@@ -25,7 +25,10 @@ const ProjectDetail = () => {
   return (
     <div className="projectDetail">
       <div className="container">
-        <div className="cover">
+        <div 
+          className="cover" 
+          style={{ "--cover-image": `url(${Project?.img || defaultPic})` }}
+        >
           <img
             src={Project?.img || defaultPic}
             alt="cover"
