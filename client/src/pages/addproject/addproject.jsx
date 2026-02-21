@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 
 const AddProject = () => {
-
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
 
@@ -34,7 +33,6 @@ const AddProject = () => {
         .get(`/items/user/${currentUser.user_id}/available`)
         .then((res) => res.data),
   });
-
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -82,6 +80,7 @@ const AddProject = () => {
           img: imgURL.url,
           relatedPosts: selectedPosts,
           relatedItem: selectedItem,
+          userId: currentUser.user_id,
         }),
       });
 

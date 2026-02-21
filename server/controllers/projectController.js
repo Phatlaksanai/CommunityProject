@@ -73,7 +73,7 @@ exports.getProjectsByUserId = async (req, res) => {
 };
 
 exports.addProject = async (req, res) => {
-  const { projectName, description, img, relatedPosts, relatedItem } = req.body;
+  const { projectName, description, img, relatedPosts, relatedItem, userId } = req.body;
 
   if (!projectName) {
     return res.status(400).json({ error: "Project name required" });
@@ -87,6 +87,7 @@ exports.addProject = async (req, res) => {
         project_name: projectName,
         description: description || null,
         img: img || null,
+        user_id: userId,
       },
     ])
     .select()
