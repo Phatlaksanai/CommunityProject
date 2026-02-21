@@ -2,7 +2,7 @@
 
 .projectDetail {
   @include themify($themes) {
-    padding: 0px 15%;
+    padding: 0px;
     overflow: scroll;
     background-color: themed("bg");
     color: themed("textColor");
@@ -16,24 +16,51 @@
 
       /* ===== COVER ===== */
       .cover {
-        width: 100%;
-        height: 250px;
-        background-color: rgb(82, 135, 200);
-        border-radius: 20px 20px 0px 0px;
-        overflow: hidden;
-        img {
-          width: 100%;
-          height: 250px;
-          object-fit: cover;
-        }
-      }
+  padding: 0px 15%;
+  width: auto;
+  height: 250px;
+  background-color: themed("bg");
+  position: relative; // เพิ่ม: เพื่อให้ ::before อ้างอิงตำแหน่งได้
+  overflow: hidden;
+  display: flex; // เพิ่ม: เพื่อจัดรูปให้อยู่กลาง
+  justify-content: center;
+
+  // เพิ่ม: ส่วนทำพื้นหลังเบลอแบบ Facebook
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: var(--cover-image); // ดึงค่าจากตัวแปรที่ส่งมาจาก JSX
+    background-size: cover;
+    background-position: center;
+    filter: blur(50px) brightness(0.8); // ทำเบลอและลดความสว่างลงเล็กน้อย
+    transform: scale(1.1); // ขยายภาพเล็กน้อยเพื่อปิดขอบขาวจากการเบลอ
+    z-index: 0;
+  }
+
+  img {
+    /* --- แก้ไขส่วนนี้เพื่อฟิกขนาด --- */
+    width: 100%;       // กำหนดความกว้างที่คุณต้องการ (เช่น 450px หรือ 300px)
+    height: 100%;      // ให้ความสูงเต็มพื้นที่ 250px ของ .cover
+    object-fit: cover; // หรือใช้ contain ถ้าไม่อยากให้รูปโดน Crop
+    /* -------------------------- */
+    
+    position: relative;
+    z-index: 1;
+    // เพิ่มเงาให้รูปตรงกลางดูเด่นขึ้น (ถ้าชอบ)
+    box-shadow: 0px 0px 20px rgba(0,0,0,0.5); 
+  }
+}
 
       /* ===== PROFILE HEADER ===== */
       .projectHeader {
         display: flex;
         align-items: flex-start;
         gap: 20px;
-        padding: 10px;
+        padding: 10px 15%;
 
         .projectImg {
           margin-top: -60px;
