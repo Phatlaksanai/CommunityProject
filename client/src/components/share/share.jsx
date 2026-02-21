@@ -21,14 +21,13 @@ const Share = () => {
   const [selectedItem, setSelectedItem] = useState(null); // State สำหรับเก็บ ID โปรเจคที่เลือก
 
   // ดึงข้อมูลโปรเจคของผู้ใช้ (ตัวอย่าง API path: /projects)
-  const { isLoading, data: items } = useQuery({
-    queryKey: ["userProjects"],
+  const { isLoading, data: projects } = useQuery({
+    queryKey: ["userProjects", currentUser?.user_id],
     queryFn: () =>
-      makeRequest.get("/projects").then((res) => {
+      makeRequest.get(`/projects/addbypost/${currentUser.user_id}`).then((res) => {
         return res.data;
       }),
   });
-
   const upload = async (file) => {
     try {
       const formData = new FormData();
@@ -188,8 +187,8 @@ const Share = () => {
               <div className="post-list">
                 {isLoading ? (
                   "Loading..."
-                ) : items && items.length > 0 ? (
-                  items
+                ) : projects && projects.length > 0 ? (
+                  projects
                     .filter((project) =>
                       project.project_name.toLowerCase().includes(search.toLowerCase())
                     )
