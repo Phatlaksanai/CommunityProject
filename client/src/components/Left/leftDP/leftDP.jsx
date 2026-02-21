@@ -1,11 +1,13 @@
 import "./leftDP.scss";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import ModelViewer from "../../modelViewer/model_viewer";
 
 const LeftDP = ({ project }) => {
+  const navigate = useNavigate();
   const { isLoading, error, data } = useQuery({
     queryKey: ["project-data", project],
     enabled: !!project,
@@ -47,6 +49,7 @@ const LeftDP = ({ project }) => {
                       .format("D MMM YYYY")}
                   </span>
               </div>
+              <button onClick={() => navigate(`/descitem/${item.item_id}`)}>Buy</button>
             </div>
           ))}
 

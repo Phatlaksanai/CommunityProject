@@ -31,6 +31,20 @@
         margin-bottom: 20px;
         background-color: themed("bg");
         border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+
+        button {
+    margin-top: 15px;         // ดันไปล่าง
+    align-self: flex-end;     // ชิดขวา
+    padding: 10px 50px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #5271ff, #3558e0);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+  }
 
         .top {
           h2{
