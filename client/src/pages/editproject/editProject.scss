@@ -1,0 +1,155 @@
+@use "../../style.scss" as *;
+
+.editProject {
+  @include themify($themes) {
+    min-height: calc(100vh - 70px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: themed("bg");
+    color: themed("textColor");
+
+    &__form {
+      width: 100%;
+      max-width: 520px;
+      padding: 30px;
+      border-radius: 12px;
+      background-color: themed("cardBg");
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    &__title {
+      text-align: center;
+      font-size: 26px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      .post-list {
+  margin-top: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.post-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  cursor: pointer;
+  img{
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    background-color: rgb(82, 135, 200);
+  }
+  span {
+      flex: 1;
+    min-width: 0;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    word-break: break-all;
+    overflow-wrap: anywhere;
+  }
+}
+
+.post-item:hover {
+  background: #222;
+}
+
+
+      label {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      input[type="text"],
+      input[type="file"] {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid themed("border");
+        background-color: transparent;
+        color: themed("textColor");
+        font-size: 14px;
+
+        &:focus {
+          outline: none;
+          border-color: themed("button");
+        }
+      }
+    }
+
+    .file-input {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid themed("border");
+      background-color: transparent;
+      color: themed("textColor");
+      font-size: 14px;
+      cursor: pointer;
+
+      &:hover {
+        border-color: themed("button");
+      }
+    }
+
+
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  &__select {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid themed("border");
+    background-color: themed("bg");
+    color: themed("textColor");
+    font-size: 14px;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: themed("button");
+    }
+  }
+}
+
+    &__submit {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      background-color: themed("button");
+      color: themed("buttonText");
+      transition: transform 0.15s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+      }
+    }
+  }
+}

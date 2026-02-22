@@ -13,6 +13,7 @@ import Buyitem from './pages/buyitem/Buyitem';
 import Profile from "./pages/profile/Profile";
 import ProfileItems from "./pages/profile/ProfileItems";
 import ProfileProjects from "./pages/profile/ProfileProjects";
+import EditProject from "./pages/editproject/editProject";
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
@@ -77,19 +78,7 @@ function App() {
     )
   }
 
-  const AddItemDL = () => {
-    return (
-      <div className={`theme-${darkMode ? "dark" : "light"}`}>
-        <Navbar />
-        <div style={{ display: "flex" }}>
-          <div style={{ flex: 6 }}>
-            <Outlet />
-          </div>
-        </div>
-      </div>
-    )
-  }
-  const DescriptionItem = () => {
+  const LayoutNavbar = () => {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
@@ -106,18 +95,6 @@ function App() {
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
         <ProjectDetail />
-        <div style={{ display: "flex" }}>
-          <div style={{ flex: 6 }}>
-            <Outlet />
-          </div>
-        </div>
-      </div>
-    )
-  }
-  const BuyItem = () => {
-    return (
-      <div className={`theme-${darkMode ? "dark" : "light"}`}>
-        <Navbar />
         <div style={{ display: "flex" }}>
           <div style={{ flex: 6 }}>
             <Outlet />
@@ -195,7 +172,7 @@ function App() {
     {
       path: "/additem",
       element: (
-        <AddItemDL />
+        <LayoutNavbar />
       ),
       children: [
         {
@@ -207,7 +184,7 @@ function App() {
     {
       path: "/descitem",
       element: (
-        <DescriptionItem />
+        <LayoutNavbar />
       ),
       children: [
         {
@@ -229,9 +206,21 @@ function App() {
       ]
     },
     {
+      path: "/editproject/:id",
+      element: (
+        <LayoutNavbar />
+      ),
+      children: [
+        {
+          index: true,
+          element: <EditProject />
+        },
+      ]
+    },
+    {
       path: "/buyitem",
       element: (
-        <BuyItem />
+        <LayoutNavbar />
       ),
       children: [
         {

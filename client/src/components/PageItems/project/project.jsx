@@ -9,8 +9,8 @@ const Project = ({ project }) => {
   
   const navigate = useNavigate();
   return (
-    <div className="project" onClick={() => navigate(`/descproject/${project.project_id}`)} style={{ cursor: "pointer" }}>
-      <div className="container">
+    <div className="project">
+      <div className="container" onClick={() => navigate(`/descproject/${project.project_id}`)} style={{ cursor: "pointer" }}>
         <div className="content" >
            <img src={project.img} alt="" onError={(e) => {
                 e.currentTarget.src = "https://placehold.co/600x400/457EC3/FFFFFF?text=Project";
@@ -22,7 +22,7 @@ const Project = ({ project }) => {
         </div>
         <div className="price">
             <p>{dayjs(project.created_at).locale("th").format("D MMM YYYY")}</p>
-              <SettingsIcon style={{cursor: "pointer" }} />
+              <SettingsIcon onClick={() => navigate(`/editproject/${project.project_id}`)} style={{cursor: "pointer" }} />
         </div>
       </div>
   );
