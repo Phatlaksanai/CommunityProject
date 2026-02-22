@@ -117,3 +117,17 @@ exports.addItem = async (req, res) => {
 
   return res.status(201).json(data);
 };
+
+// itemController.js (ทำเหมือนกัน)
+exports.getItemsForEditProject = async (req, res) => {
+  const { projectId } = req.params;
+  const userId = req.user.user_id;
+
+  const { data, error } = await db
+    .from("items")
+    .select("*")
+    .or(`project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`);
+
+  if (error) return res.status(500).json(error);
+  return res.status(200).json(data || []);
+};

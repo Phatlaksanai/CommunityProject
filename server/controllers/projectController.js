@@ -134,3 +134,32 @@ exports.addProject = async (req, res) => {
     project,
   });
 };
+
+exports.updateProject = async (req, res) => {
+  const { projectId, projectName, description, img, relatedPosts, relatedItem } = req.body;
+
+  try {
+    // 1. อัปเดตข้อมูล Project หลัก
+    await db.from("projects").update({ project_name: projectName, description, img}).eq("project_id", projectId);
+
+    // 2. จัดการ Posts: ล้างค่า FK เดิมที่เป็นของโปรเจกต์นี้ให้เป็น null ทั้งหมดก่อน
+    await db.from("posts").update({ project_id: null }).eq("project_id", projectId);
+
+    // แล้วค่อยเอาลิสต์ใหม่ที่ติ๊กเลือก มาใส่ projectId
+    if (relatedPosts && relatedPosts.length > 0) {
+      await db.from("posts").update({ project_id: projectId }).in("post_id", relatedPosts);
+    }
+
+    // 3. จัดการ Items: ล้างค่า FK เดิม
+    await db.from("items").update({ project_id: null }).eq("project_id", projectId);
+
+    // ใส่ค่าใหม่ (ถ้ามีเลือก)
+    if (relatedItem) {
+      await db.from("items").update({ project_id: projectId }).eq("item_id", relatedItem);
+    }
+
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};

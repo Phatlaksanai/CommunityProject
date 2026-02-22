@@ -13,4 +13,6 @@ router.get("/:id", itemController.getItemsById);
 
 router.post("/additem", verifyToken, itemController.addItem);
 
+router.get("/project-edit/:projectId", verifyToken, itemController.getItemsForEditProject);
+
 module.exports = router;

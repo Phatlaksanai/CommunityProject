@@ -17,6 +17,8 @@ npm install cloudinary multer // server =============new
 npm install three // client ================new
 npm install @supabase/supabase-js // server
 
+    public_id ใส่ supa หน้า edit
+
 สิ่งที่ต้องเพิ่ม
 0.สถิติ หน้า descproject ✅
 1.แจ้งเตือนมีเมลแล้วก่อนส่ง otp ✅

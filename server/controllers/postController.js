@@ -118,3 +118,18 @@ exports.addPost = async (req, res) => {
 
   return res.status(200).json(data);
 };
+
+// postController.js
+exports.getPostsForEditProject = async (req, res) => {
+  const { projectId } = req.params;
+  const userId = req.user.user_id;
+
+  const { data, error } = await db
+    .from("posts")
+    .select("*")
+    // ดึงอันที่เป็นของโปรเจกต์นี้ OR (เป็นของเรา AND ยังไม่มีโปรเจกต์)
+    .or(`project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`);
+
+  if (error) return res.status(500).json(error);
+  return res.status(200).json(data || []);
+};
