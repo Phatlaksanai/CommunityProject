@@ -46,15 +46,6 @@
         display: flex;
         justify-content: space-between;
         p{margin: 5px 0px;}
-
-        button{
-          padding: 0px 15px;
-          border: none;
-          background-color: #c35645;
-          color: themed("textColor");
-          border-radius: 5px;
-          cursor: pointer;
-        }
       }
   }
 }

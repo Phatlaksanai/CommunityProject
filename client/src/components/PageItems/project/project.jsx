@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/th";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const Project = ({ project }) => {
   
@@ -21,7 +22,7 @@ const Project = ({ project }) => {
         </div>
         <div className="price">
             <p>{dayjs(project.created_at).locale("th").format("D MMM YYYY")}</p>
-            <button>fix</button>
+              <SettingsIcon style={{cursor: "pointer" }} />
         </div>
       </div>
   );
