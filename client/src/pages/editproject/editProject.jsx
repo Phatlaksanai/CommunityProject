@@ -68,6 +68,24 @@ const EditProject = () => {
   // ✅ 2. รวมฟังก์ชัน Submit สำหรับการ Update
   const handleUpdateProject = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    // ใช้ .trim() เพื่อตัดช่องว่างหน้า-หลัง และเช็คว่าชื่อว่างหรือไม่
+    const trimmedProjectName = projectName.trim();
+
+    // เช็คชื่อโปรเจคที่ตัดช่องว่างออกแล้ว
+    if (!trimmedProjectName) {
+      setError("กรุณากรอกชื่อ Project (ห้ามเว้นว่าง)");
+      return;
+    }
+
+    // เพิ่มการเช็คว่าเลือก Post อย่างน้อย 1 อันหรือยัง
+    if (selectedPosts.length === 0) {
+      setError("กรุณาเลือกอย่างน้อย 1 โพสต์เพื่อรวมในโปรเจค");
+      return;
+    }
+
   try {
     let imgUrl = img; // ค่าเดิม
 
