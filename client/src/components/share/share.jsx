@@ -18,7 +18,7 @@ const Share = () => {
   const [filePreviews, setFilePreviews] = useState([]);
   const [search, setSearch] = useState("");
   const [openProjectModal, setOpenProjectModal] = useState(false); // เพิ่ม State สำหรับเปิด-ปิด Modal
-  const [selectedItem, setSelectedItem] = useState(null); // State สำหรับเก็บ ID โปรเจคที่เลือก
+  const [selectedProject, setSelectedProject] = useState(null); // State สำหรับเก็บ ID โปรเจคที่เลือก
 
   // ดึงข้อมูลโปรเจคของผู้ใช้ (ตัวอย่าง API path: /projects)
   const { isLoading, data: projects } = useQuery({
@@ -48,12 +48,14 @@ const Share = () => {
       setDesc("");
       setFiles([]);
       setFilePreviews([]);
+      setSelectedProject(null); // <--- ล้างค่า ID โปรเจกต์ที่เลือกไว้
+      setSearch("");         // (Option) ล้างค่าการค้นหาใน Modal ด้วยก็ได้
     },
   });
 
   const handleClick = async (e) => {
     e.preventDefault();
-    if (desc.trim() === "" && files.length === 0) return;
+    if (desc.trim() === "" && files.length === 0 && !selectedProject) return;
 
     let imgUrls = [];
     let modelUrls = [];
@@ -74,6 +76,7 @@ const Share = () => {
       desc,
       img: imgUrls.length ? imgUrls[0] : null,
       model: modelUrls.length ? modelUrls[0] : null,
+      project_id: selectedProject,
     });
   };
 
@@ -108,6 +111,7 @@ const Share = () => {
             onChange={(e) => setDesc(e.target.value)}
             value={desc}
           />
+          
         </div>
 
         <div className="right">
@@ -139,6 +143,23 @@ const Share = () => {
               </button>
             </div>
           ))}
+          {selectedProject && (
+            <div className="selectedProjectBadge" style={{ fontSize: "12px", color: "#ffffff", margin: "5px 0" }}>
+              Project : {selectedProject}
+              <button
+                onClick={() => setSelectedProject(null)}
+                style={{
+                  marginLeft: "10px",
+                  color: "red",
+                  border: "none",
+                  background: "none",
+                  cursor: "pointer",
+                }}
+              >
+                X
+              </button>
+            </div>
+          )}
         </div>
         <hr />
         <div className="bottom">
@@ -196,9 +217,9 @@ const Share = () => {
                       <label key={project.project_id} className="post-item">
                         <input
                           type="radio"
-                          name="selectedItem"
-                          checked={selectedItem === project.project_id}
-                          onChange={() => setSelectedItem(project.project_id)}
+                          name="selectedProject"
+                          checked={selectedProject === project.project_id}
+                          onChange={() => setSelectedProject(project.project_id)}
                         />
                         <span>{project.project_name}</span>
                       </label>
@@ -213,7 +234,7 @@ const Share = () => {
                 <button onClick={() => setOpenProjectModal(false)}>Cancel</button>
                 <button onClick={() => setOpenProjectModal(false)}>Confirm</button>
               </div>
-              
+
             </div>
           </div>
         </div>

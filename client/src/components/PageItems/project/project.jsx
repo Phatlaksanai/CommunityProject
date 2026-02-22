@@ -21,7 +21,7 @@ const Project = ({ project }) => {
         </div>
         <div className="price">
             <p>{dayjs(project.created_at).locale("th").format("D MMM YYYY")}</p>
-            
+            <button>fix</button>
         </div>
       </div>
   );

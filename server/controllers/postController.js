@@ -105,6 +105,7 @@ exports.addPost = async (req, res) => {
         img: img || null,
         model: model || null,
         user_id: req.user.user_id,
+        project_id: req.body.project_id || null,
       },
     ])
     .select()

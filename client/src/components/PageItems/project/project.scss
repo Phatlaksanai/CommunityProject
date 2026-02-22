@@ -23,8 +23,10 @@
         }
       }
 
-      .desc {
-        padding: 10px;
+      
+    }
+    .desc {
+        padding: 0px 15px;
         h2{
           margin: 0px;
         }
@@ -40,10 +42,19 @@
         }
       }
       .price{
-        padding: 0px 10px;
+        padding: 0px 15px 10px 15px;
         display: flex;
+        justify-content: space-between;
         p{margin: 5px 0px;}
+
+        button{
+          padding: 0px 15px;
+          border: none;
+          background-color: #c35645;
+          color: themed("textColor");
+          border-radius: 5px;
+          cursor: pointer;
+        }
       }
-    }
   }
 }

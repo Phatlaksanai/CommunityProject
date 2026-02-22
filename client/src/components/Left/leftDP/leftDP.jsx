@@ -49,7 +49,7 @@ const LeftDP = ({ project }) => {
                       .format("D MMM YYYY")}
                   </span>
               </div>
-              <button onClick={() => navigate(`/descitem/${item.item_id}`)}>Buy</button>
+              <button className="buy-button" onClick={() => navigate(`/descitem/${item.item_id}`)}>Buy</button>
             </div>
           ))}
 
