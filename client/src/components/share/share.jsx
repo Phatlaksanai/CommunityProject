@@ -219,7 +219,7 @@ const Share = () => {
                           type="radio"
                           name="selectedProject"
                           checked={selectedProject === project.project_id}
-                          onChange={() => setSelectedProject(project.project_id)}
+                          onChange={() => setSelectedProject(project.project_name)}
                         />
                         <span>{project.project_name}</span>
                       </label>
