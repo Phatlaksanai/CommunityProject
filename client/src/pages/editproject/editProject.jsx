@@ -18,6 +18,7 @@ const EditProject = () => {
   const [search, setSearch] = useState("");
   const [selectedPosts, setSelectedPosts] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [imgPublicId, setImgPublicId] = useState(null);
 
   // ดึงข้อมูล Posts
   const { data: posts = [], isLoading: isPostsLoading } = useQuery({
@@ -29,6 +30,12 @@ const EditProject = () => {
   const { data: items = [], isLoading: isItemsLoading } = useQuery({
     queryKey: ["editProjectItems", project_id],
     queryFn: () => makeRequest.get(`/items/project-edit/${project_id}`).then(res => res.data),
+  });
+
+  const { data: projects } = useQuery({
+  queryKey: ["project", project_id],
+  queryFn: () =>
+    makeRequest.get(`/projects/${project_id}`).then(res => res.data),
   });
 
   // ✅ 1. ย้าย useEffect มาไว้ข้างนอก (Top Level)
@@ -43,7 +50,13 @@ const EditProject = () => {
       const initialItem = items.find(item => item.project_id === Number(project_id));
       if (initialItem) setSelectedItem(initialItem.item_id);
     }
-  }, [posts, items, project_id]);
+    if (projects) {
+    setProjectName(projects.project_name);
+    setDescription(projects.description);
+    setImg(projects.img);
+    setImgPublicId(projects.img_public_id); 
+  }
+  }, [posts, items, projects]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -88,6 +101,7 @@ const EditProject = () => {
 
   try {
     let imgUrl = img; // ค่าเดิม
+    let newimgPublicId = imgPublicId;  // สำหรับเก็บ public_id ของรูปที่อัปโหลดใหม่ (ถ้ามี)
 
     // ถ้ามีการเลือกไฟล์ใหม่ (เป็น Object File)
     if (img && typeof img !== 'string') {
@@ -96,23 +110,27 @@ const EditProject = () => {
       
       // ตรวจสอบ Path นี้ที่ Backend ดีๆ ว่าเป็น /upload หรือ /upload/project
       const res = await makeRequest.post("/upload/project", formData); 
-      imgUrl = res.data; 
+      imgUrl = res.data.url; 
+      newimgPublicId = res.data.public_id;
     }
 
     await makeRequest.put("/projects/update", {
       projectId: project_id,
       projectName,
       description,
-      img: imgUrl.url,
+      img: imgUrl,
       relatedPosts: selectedPosts,
       relatedItem: selectedItem,
+      imgPublicId: newimgPublicId, 
     });
     
     setSuccess("Update successful!");
     navigate(`/profile/${currentUser.user_id}/projects`);
   } catch (err) {
     console.error(err);
-    setError("Update failed: API route or Path not found");
+    console.log(err.response?.status);
+  console.log(err.response?.data);
+    setError("Update failed");
   }
   };
 

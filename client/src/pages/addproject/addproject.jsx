@@ -81,7 +81,14 @@ const AddProject = () => {
     }
 
     try {
-      const imgURL = await uploadFile(img);
+      let imgUrl = null;
+      let imgPublicId = null;
+
+      if (img) {
+        const uploadRes = await uploadFile(img);
+        imgUrl = uploadRes.url;
+        imgPublicId = uploadRes.public_id;
+      }
 
       const res = await fetch("/api/projects/addproject", {
         method: "POST",
@@ -92,7 +99,8 @@ const AddProject = () => {
         body: JSON.stringify({
           projectName,
           description,
-          img: imgURL.url,
+          imgUrl,
+          imgPublicId,
           relatedPosts: selectedPosts,
           relatedItem: selectedItem,
           userId: currentUser.user_id,
@@ -114,7 +122,7 @@ const AddProject = () => {
     }
   };
 
-  
+
 
   return (
     <div className="add-project">

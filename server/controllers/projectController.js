@@ -1,4 +1,5 @@
 const db = require("../config/db")
+const cloudinary = require("../config/cloudinary");
 
 exports.getProjectsAddByPostUser = async (req, res) => {
   const { id } = req.params;
@@ -74,7 +75,7 @@ exports.getProjectsByUserId = async (req, res) => {
 };
 
 exports.addProject = async (req, res) => {
-  const { projectName, description, img, relatedPosts, relatedItem, userId } = req.body;
+  const { projectName, description, imgUrl, imgPublicId, relatedPosts, relatedItem, userId } = req.body;
 
   if (!projectName) {
     return res.status(400).json({ error: "Project name required" });
@@ -87,7 +88,8 @@ exports.addProject = async (req, res) => {
       {
         project_name: projectName,
         description: description || null,
-        img: img || null,
+        img: imgUrl || null,
+        img_public_id: imgPublicId || null,
         user_id: userId,
       },
     ])
@@ -136,11 +138,30 @@ exports.addProject = async (req, res) => {
 };
 
 exports.updateProject = async (req, res) => {
-  const { projectId, projectName, description, img, relatedPosts, relatedItem } = req.body;
+  const { projectId, projectName, description, img, relatedPosts, relatedItem, imgPublicId } = req.body;
 
   try {
+    // 0. ดึง public_id เดิมก่อน
+    const { data: oldProject, error } = await db
+      .from("projects")
+      .select("img_public_id")
+      .eq("project_id", projectId)
+      .maybeSingle();
+      if (error) {
+        return res.status(500).json(error);
+      }
+
+      // ถ้ามีการอัปโหลดรูปใหม่ และ public_id เปลี่ยน
+    if (imgPublicId && oldProject?.img_public_id && oldProject.img_public_id !== imgPublicId) {
+  try {
+    await cloudinary.uploader.destroy(oldProject.img_public_id);
+  } catch (cloudErr) {
+    console.log("CLOUD DELETE ERROR:", cloudErr);
+  }
+}
+    
     // 1. อัปเดตข้อมูล Project หลัก
-    await db.from("projects").update({ project_name: projectName, description, img}).eq("project_id", projectId);
+    await db.from("projects").update({ project_name: projectName, description, img, img_public_id: imgPublicId }).eq("project_id", projectId);
 
     // 2. จัดการ Posts: ล้างค่า FK เดิมที่เป็นของโปรเจกต์นี้ให้เป็น null ทั้งหมดก่อน
     await db.from("posts").update({ project_id: null }).eq("project_id", projectId);
