@@ -100,6 +100,10 @@ const Share = () => {
     setFilePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const selectedProjectData = projects?.find( // หาก้อน object ที่ตรงกับ id ที่เลือกไว้
+  (p) => p.project_id === selectedProject
+  );
+
   return (
     <div className="share">
       <div className="container">
@@ -145,7 +149,7 @@ const Share = () => {
           ))}
           {selectedProject && (
             <div className="selectedProjectBadge" style={{ fontSize: "12px", color: "#ffffff", margin: "5px 0" }}>
-              Project : {selectedProject}
+              Project : {selectedProjectData?.project_name}
               <button
                 onClick={() => setSelectedProject(null)}
                 style={{
@@ -219,7 +223,7 @@ const Share = () => {
                           type="radio"
                           name="selectedProject"
                           checked={selectedProject === project.project_id}
-                          onChange={() => setSelectedProject(project.project_name)}
+                          onChange={() => setSelectedProject(project.project_id)}
                         />
                         <span>{project.project_name}</span>
                       </label>

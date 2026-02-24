@@ -17,7 +17,7 @@ npm install cloudinary multer // server =============new
 npm install three // client ================new
 npm install @supabase/supabase-js // server
 
-    public_id ใส่ supa หน้า edit
+    เพิ่มลบ project ได้ และก็ลบรูปออกจาก cloud ด้วย
 
 สิ่งที่ต้องเพิ่ม
 0.สถิติ หน้า descproject ✅

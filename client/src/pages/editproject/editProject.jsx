@@ -128,8 +128,6 @@ const EditProject = () => {
     navigate(`/profile/${currentUser.user_id}/projects`);
   } catch (err) {
     console.error(err);
-    console.log(err.response?.status);
-  console.log(err.response?.data);
     setError("Update failed");
   }
   };
