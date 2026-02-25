@@ -62,10 +62,24 @@ exports.logout = (req, res) => {
 
 exports.register = async (req, res) => {
     try {
-        const { username, password, password2, email, otp } = req.body;
+        let { username, password, password2, email, otp } = req.body;
 
         if (!email || !username || !password) {
             return res.status(400).json({ error: "Please enter all required fields" });
+        }
+        username = username.trim();
+        if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9_ ]+$/.test(username)) {
+            return res.status(400).json({ error: "Username can only contain letters, numbers, and underscores" });
+        }
+        if (username.length < 3 || username.length > 35) {
+            return res.status(400).json({ error: "Username must be between 3 and 35 characters" });
+        }
+        if (password.length < 10 || password.length > 20) {
+            return res.status(400).json({ error: "Password must be between 10 and 20 characters" });
+        }
+
+        if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$/.test(password)) {
+            return res.status(400).json({ error: "Password must contain at least one uppercase letter, one lowercase letter, and one special character" });
         }
         if (password !== password2) {
             return res.status(400).json({ error: "Passwords don't match" });
