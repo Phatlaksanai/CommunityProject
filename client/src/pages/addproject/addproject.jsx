@@ -16,7 +16,8 @@ const AddProject = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const [search, setSearch] = useState("");
+  const [searchPost, setSearchPost] = useState("");
+  const [searchItem, setSearchItem] = useState("");
   const [selectedPosts, setSelectedPosts] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const { data: posts = [], isLoading } = useQuery({
@@ -169,14 +170,14 @@ const AddProject = () => {
             <input
               type="text"
               placeholder="ค้นหา Post"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchPost}
+              onChange={(e) => setSearchPost(e.target.value)}
             />
             {isLoading && <p>กำลังโหลดโพสต์...</p>}
             <div className="post-list">
               {posts
                 .filter(post =>
-                  post.description.toLowerCase().includes(search.toLowerCase())
+                  post.description.toLowerCase().includes(searchPost.toLowerCase())
                 )
                 .map(post => (
                   <label key={post.post_id} className="post-item">
@@ -208,13 +209,13 @@ const AddProject = () => {
             <input
               type="text"
               placeholder="ค้นหา Item"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchItem}
+              onChange={(e) => setSearchItem(e.target.value)}
             />
             <div className="post-list">
               {items
                 .filter((item) =>
-                  item.modelName.toLowerCase().includes(search.toLowerCase())
+                  item.modelName.toLowerCase().includes(searchItem.toLowerCase())
                 )
                 .map((item) => (
                   <label key={item.item_id} className="post-item">
