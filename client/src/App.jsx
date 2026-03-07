@@ -28,7 +28,9 @@ import Projects from "./components/PageItems/projects/projects"
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
+// import "./index.css";
 import "./style.scss";
+
 
 
 function App() {
