@@ -117,37 +117,37 @@ const AddItem = () => {
       {success && <p style={{ color: "green" }}>{success}</p>}
 
       <div className="add-item__form">
-        <h1 className="add-item__title">เพิ่มสินค้า</h1>
+        <h1 className="add-item__title">Add Item</h1>
         <form onSubmit={handleAdditem}>
           <div className="form-group">
-            <label htmlFor="itemName">ชื่อสินค้า</label>
-            <input type="text" id="itemName" placeholder="ชื่อสินค้า"
+            <label htmlFor="itemName">Item Name</label>
+            <input type="text" id="itemName" placeholder="Item Name"
               value={modelName}
               onChange={(e) => setModelName(e.target.value)}
               required />
           </div>
 
           <div className="form-group">
-            <label htmlFor="itemDetail">รายละเอียดสินค้า</label>
-            <input type="text" id="itemDetail" placeholder="รายละเอียดสินค้า"
+            <label htmlFor="itemDetail">Item Detail</label>
+            <input type="text" id="itemDetail" placeholder="Item Detail"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required />
           </div>
 
           <div className="form-group">
-            <label htmlFor="price">ราคา</label>
-            <input type="text" id="price" placeholder="ราคา"
+            <label htmlFor="price">Price</label>
+            <input type="text" id="price" placeholder="Price"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               required />
           </div>
 
           <div className="form-group">
-            <label>รูปภาพ</label>
+            <label>Image</label>
 
             <label htmlFor="image" className="file-input">
-              {img ? img.name : "ไม่มีไฟล์ที่เลือก"}
+              {img ? img.name : "No file selected"}
             </label>
 
             <input
@@ -160,10 +160,10 @@ const AddItem = () => {
           </div>
 
           <div className="form-group">
-            <label>ไฟล์โมเดล</label>
+            <label>Model</label>
 
             <label htmlFor="model" className="file-input">
-              {model ? model.name : "ไม่มีไฟล์ที่เลือก"}
+              {model ? model.name : "No file selected"}
             </label>
 
             <input
@@ -177,7 +177,7 @@ const AddItem = () => {
 
           <div className="category">
             <label htmlFor="category" className="category__title">
-              หมวดหมู่
+              Category
             </label>
 
             <select
@@ -187,7 +187,7 @@ const AddItem = () => {
               onChange={(e) => setCategory(e.target.value)}
             >
               <option value="" disabled>
-                เลือกหมวดหมู่
+                Select Category
               </option>
               <option value="Vehicles">Vehicles</option>
               <option value="Electronics">Electronics</option>

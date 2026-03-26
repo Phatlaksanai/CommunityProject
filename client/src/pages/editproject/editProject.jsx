@@ -142,33 +142,33 @@ const EditProject = () => {
       {success && <p style={{ color: "green" }}>{success}</p>}
 
       <div className="add-item__form">
-        <h1 className="add-item__title">แก้ไขโปรเจกต์</h1>
+        <h1 className="add-item__title">Edit Project</h1>
         {/* ✅ เรียกใช้ handleUpdateProject */}
         <form onSubmit={handleUpdateProject}>
           <div className="form-group">
-            <label htmlFor="itemName">ชื่อโปรเจกต์</label>
+            <label htmlFor="itemName">Project Name</label>
             <input type="text" id="itemName" value={projectName}
               onChange={(e) => setProjectName(e.target.value)} required />
           </div>
 
           <div className="form-group">
-            <label htmlFor="itemDetail">รายละเอียด</label>
+            <label htmlFor="itemDetail">Project Description</label>
             <input type="text" id="itemDetail" value={description}
               onChange={(e) => setDescription(e.target.value)} required />
           </div>
 
           <div className="form-group">
-            <label>รูปภาพ</label>
+            <label>Image</label>
             <label htmlFor="image" className="file-input">
-              {img instanceof File ? img.name : "คลิกเพื่อเปลี่ยนรูป"}
+              {img instanceof File ? img.name : "Click to change image"}
             </label>
             <input type="file" id="image" accept=".png,.jpg,.jpeg" onChange={handleImageChange} hidden />
           </div>
 
           {/* ส่วนของ Posts */}
           <div className="form-group">
-            <label>Post ที่เกี่ยวข้อง</label>
-            <input type="text" placeholder="ค้นหา Post" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <label>Related Posts</label>
+            <input type="text" placeholder="Search Posts" value={search} onChange={(e) => setSearch(e.target.value)} />
             <div className="post-list">
               {posts
                 .filter(post => post.description.toLowerCase().includes(search.toLowerCase()))
@@ -194,7 +194,7 @@ const EditProject = () => {
 
           {/* ส่วนของ Items */}
           <div className="form-group">
-            <label>Item ที่เกี่ยวข้อง</label>
+            <label>Related Items</label>
             <div className="post-list">
               {items
                 .filter(item => item.modelName.toLowerCase().includes(search.toLowerCase()))

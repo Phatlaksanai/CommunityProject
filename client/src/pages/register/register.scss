@@ -1,6 +1,6 @@
 .register {
   height: 100vh;
-  background-color: #a8c0d9;
+  background-color: #868686;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,8 +16,8 @@
 
     .left {
       flex: 1;
-      background: linear-gradient(#2b3a4b, rgb(43, 58, 75, 0.5)),
-        url("https://tse3.mm.bing.net/th/id/OIP.hCeGi_MnvlKE_tfG8PVCKwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3")
+      background: linear-gradient(#333, rgb(43, 58, 75, 0.5)),
+        url("https://i.pinimg.com/1200x/b0/9b/f8/b09bf8a76a902712c28568ed56433d9f.jpg")
           center;
       background-size: cover;
       padding: 50px;
@@ -73,7 +73,7 @@
           width: 50%;
           padding: 10px;
           border: none;
-          background-color: #a8c0d9;
+          background-color: #333;
           color: white;
           font-weight: bold;
           cursor: pointer;

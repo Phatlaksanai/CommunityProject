@@ -131,29 +131,29 @@ const AddProject = () => {
       {success && <p style={{ color: "green" }}>{success}</p>}
 
       <div className="add-item__form">
-        <h1 className="add-item__title">เพิ่มโปรเจกต์</h1>
+        <h1 className="add-item__title">Add Project</h1>
         <form onSubmit={handleAddproject}>
           <div className="form-group">
-            <label htmlFor="itemName">ชื่อโปรเจกต์</label>
-            <input type="text" id="itemName" placeholder="ชื่อโปรเจกต์"
+            <label htmlFor="itemName">Project Name</label>
+            <input type="text" id="itemName" placeholder="Project Name"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               required />
           </div>
 
           <div className="form-group">
-            <label htmlFor="itemDetail">รายละเอียดโปรเจกต์</label>
-            <input type="text" id="itemDetail" placeholder="รายละเอียดโปรเจกต์"
+            <label htmlFor="itemDetail">Project Description</label>
+            <input type="text" id="itemDetail" placeholder="Project Description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required />
           </div>
 
           <div className="form-group">
-            <label>รูปภาพ</label>
+            <label>Image</label>
 
             <label htmlFor="image" className="file-input">
-              {img ? img.name : "ไม่มีไฟล์ที่เลือก"}
+              {img ? img.name : "No file selected"}
             </label>
 
             <input
@@ -166,14 +166,14 @@ const AddProject = () => {
           </div>
 
           <div className="form-group">
-            <label>Post ที่เกี่ยวข้อง</label>
+            <label>Related Posts</label>
             <input
               type="text"
-              placeholder="ค้นหา Post"
+              placeholder="Search Posts"
               value={searchPost}
               onChange={(e) => setSearchPost(e.target.value)}
             />
-            {isLoading && <p>กำลังโหลดโพสต์...</p>}
+            {isLoading && <p>loading Posts...</p>}
             <div className="post-list">
               {posts
                 .filter(post =>
@@ -205,10 +205,10 @@ const AddProject = () => {
             </div>
           </div>
           <div className="form-group">
-            <label>Item ที่เกี่ยวข้อง</label>
+            <label>Related Items</label>
             <input
               type="text"
-              placeholder="ค้นหา Item"
+              placeholder="Search Items"
               value={searchItem}
               onChange={(e) => setSearchItem(e.target.value)}
             />
