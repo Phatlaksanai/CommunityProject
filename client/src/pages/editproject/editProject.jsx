@@ -213,7 +213,7 @@ const EditProject = () => {
             </div>
           </div>
 
-          <input type="submit" value="บันทึกการแก้ไข" className="add-item__submit" />
+          <input type="submit" value="Save Changes" className="add-item__submit" />
         </form>
       </div>
     </div>

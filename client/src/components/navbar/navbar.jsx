@@ -2,8 +2,7 @@ import "./navbar.scss";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
-import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
@@ -67,7 +66,7 @@ const Navbar = () => {
         ) : (
           <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }}/>
         )}
-        <GridViewOutlinedIcon />
+        <AddShoppingCartIcon />
         <DownloadIcon onClick={() => navigate("/download")} style={{ cursor: "pointer" }}/>
         <div className="search">
           <SearchOutlinedIcon />
@@ -84,7 +83,6 @@ const Navbar = () => {
         {user && (<button className="button" onClick={handleLogout}>Logout</button>)} */}
         <PersonOutlinedIcon />
         <EmailOutlinedIcon />
-        <NotificationsOutlinedIcon />
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}/>
           <span>{currentUser?.username || "Guest"}</span>
