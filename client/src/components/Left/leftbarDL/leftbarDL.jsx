@@ -62,7 +62,7 @@ const LeftBarDownload = () => {
       </div>
       
       
-      <h3>ค้นหาแบบละเอียด</h3>
+      <h3>Detailed search</h3>
       <hr />
       <form onSubmit={handleSubmit}>
         <p>Category</p>

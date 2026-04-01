@@ -40,9 +40,9 @@ const ProfileDetail = () => {
           </div>
         </div>
         <div className="tabs">
-          <NavLink to={`/profile/${id}`} end>โพสต์</NavLink>
-          <NavLink to={`/profile/${id}/items`}>โมเดล</NavLink>
-          <NavLink to={`/profile/${id}/projects`}>โปรเจกต์</NavLink>
+          <NavLink to={`/profile/${id}`} end>Posts</NavLink>
+          <NavLink to={`/profile/${id}/items`}>Models</NavLink>
+          <NavLink to={`/profile/${id}/projects`}>Projects</NavLink>
           <AddShoppingCartIcon onClick={() => navigate(`/profile/${id}/projects/addproject`)} style={{ cursor: "pointer" }}/>
         </div>
         <hr />
