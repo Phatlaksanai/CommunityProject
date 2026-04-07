@@ -22,20 +22,22 @@ const EditProfile = () => {
   const [profilePublicId, setProfilePublicId] = useState(null);
   const [coverPublicId, setCoverPublicId] = useState(null);
 
-  const { data: user } = useQuery({
-    queryKey: ["user", id],
-    queryFn: () => makeRequest.get(`/users/${id}`).then(res => res.data),
-  });
+  // const { data: user } = useQuery({
+  //   queryKey: ["user", id],
+  //   queryFn: () => makeRequest.get(`/${currentUser}`).then(res => res.data),
+  // });
   useEffect(() => {
-    if (user) {
-      setDisplayName(user.name);
-      setDescription(user.description);
-      setCity(user.city);
-      setWebsite(user.website);
-      setProfileImg(user.profilePic);
-      setCoverImg(user.coverPic);
+    if (currentUser) {
+      setDisplayName(currentUser.name || "");
+      setDescription(currentUser.description || "");
+      setCity(currentUser.city || "");
+      setWebsite(currentUser.website || "");
+      setProfileImg(currentUser.profilePic || null);
+      setProfilePublicId(currentUser.profile_public_id || null);
+      setCoverImg(currentUser.coverPic || null);
+      setCoverPublicId(currentUser.cover_public_id || null);
     }
-  }, [user]);
+  }, [currentUser]);
   // ================= UPLOAD FILES TO CLOUDINARY =================
   const handleImageChange = (e, type) => {
     const file = e.target.files[0];
@@ -54,64 +56,65 @@ const EditProfile = () => {
     e.target.value = "";
     setError("");
   };
-  const uploadFile = async (file) => {
+ const uploadFile = async (file) => {
+    if (!file || !(file instanceof File)) return null; // ถ้าไม่ใช่ไฟล์ ไม่ต้องอัปโหลด
     const formData = new FormData();
     formData.append("file", file);
-
-    const res = await fetch("/api/upload/profile", {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    });
-
-    return await res.json();
+    
+    // ใช้ makeRequest แทน fetch เพื่อความสม่ำเสมอ
+    const res = await makeRequest.post("/upload/profile", formData); 
+    return res.data; // คาดหวัง { url: "...", public_id: "..." }
   };
 
 
   const handleUpdateProfile = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+  e.preventDefault();
+  setError("");
+  setSuccess("");
 
-    try {
-      const imgURL = profileimg ? await uploadFile(profileimg) : null;
-      const coverURL = coverimg ? await uploadFile(coverimg) : null;
+  try {
+    // 1. ตั้งค่าเริ่มต้นจาก State ปัจจุบัน (ซึ่งอาจเป็น URL เดิม)
+    let finalProfileImg = profileimg;
+    let finalProfilePublicId = profilePublicId;
+    let finalCoverImg = coverimg;
+    let finalCoverPublicId = coverPublicId;
 
-      if (!imgURL || !coverURL) {
-        setError("อัพโหลดไฟล์ไม่สำเร็จ");
-        return;
-      }
-
-      const res = await fetch("/api/update-profile", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          displayName,
-          description,
-          city,
-          website,
-          profileimg: imgURL?.url || currentUser.profileimg,
-          coverimg: coverURL?.url || currentUser.coverimg,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "update profile failed");
-        return;
-      }
-      setSuccess("update profile success");
-      navigate("/download");
-    } catch (err) {
-      console.error(err);
-      setError("เชื่อมต่อ Server ไม่ได้");
+    // 2. อัปโหลดเฉพาะเมื่อเป็นไฟล์ใหม่เท่านั้น (instanceof File)
+    if (profileimg instanceof File) {
+      const res = await uploadFile(profileimg);
+      finalProfileImg = res.url;
+      finalProfilePublicId = res.public_id;
     }
 
-  };
+    if (coverimg instanceof File) {
+      const res = await uploadFile(coverimg);
+      finalCoverImg = res.url;
+      finalCoverPublicId = res.public_id;
+    }
+
+    // 3. ส่งไปที่ API
+    await makeRequest.put("/update-profile", {
+      userId: currentUser?.user_id,
+      displayName,
+      description,
+      city,
+      website,
+      profileimg: finalProfileImg, // ส่ง string URL ไปตรงๆ
+      coverimg: finalCoverImg,
+      profilePublicId: finalProfilePublicId,
+      coverPublicId: finalCoverPublicId,
+    });
+
+    setSuccess("Update profile success");
+    setTimeout(() => navigate(`/profile/${currentUser?.user_id}`), 1000);
+  } catch (err) {
+    console.error(err);
+    // ถ้าหลังบ้าน Error 500 เราจะดึงข้อความ error มาโชว์
+    setError(err.response?.data?.message || "Internal Server Error: ตรวจสอบ Backend");
+  }
+};
+  
+
 
 
   return (
@@ -127,7 +130,7 @@ const EditProfile = () => {
             <input type="text" id="displayName" placeholder="Display Name"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              required />
+            />
           </div>
 
           <div className="form-group">
@@ -135,7 +138,7 @@ const EditProfile = () => {
             <input type="text" id="profileDetail" placeholder="Description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              required />
+            />
           </div>
 
           <div className="form-group">
@@ -143,7 +146,7 @@ const EditProfile = () => {
             <input type="text" id="city" placeholder="City"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              required />
+            />
           </div>
 
           <div className="form-group">
@@ -151,7 +154,7 @@ const EditProfile = () => {
             <input type="text" id="website" placeholder="Website"
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
-              required />
+            />
           </div>
 
           <div className="form-group">

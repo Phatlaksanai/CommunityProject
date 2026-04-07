@@ -85,7 +85,7 @@ const Navbar = () => {
         <EmailOutlinedIcon />
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}/>
-          <span>{currentUser?.username || "Guest"}</span>
+          <span>{currentUser?.name || currentUser?.username || "Guest"}</span>
           {!currentUser && (
             <button onClick={handleLogin} style={{ marginLeft: "10px", cursor: "pointer" }}>
               Login
