@@ -33,7 +33,7 @@ const ProfileDetail = () => {
             <div className="nameRow">
               <h1>{currentUser?.name || currentUser?.username}</h1>
               <div className="actions">
-                <button className="followBtn">จัดการโปรไฟล์</button>
+                <button className="followBtn" onClick={() => navigate(`/editprofile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>Edit Profile</button>
               </div>
             </div>
             <span className="handle">@{currentUser?.username}</span>

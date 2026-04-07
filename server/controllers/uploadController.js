@@ -68,3 +68,4 @@ const uploadHandler = (baseFolder, allowModel = true) => [
 exports.uploadPost = uploadHandler("Posts", true);
 exports.uploadItem = uploadHandler("Items", true);
 exports.uploadProject = uploadHandler("Projects", false);
+exports.uploadProfile = uploadHandler("Profiles", false);

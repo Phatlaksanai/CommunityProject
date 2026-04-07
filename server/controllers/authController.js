@@ -199,3 +199,34 @@ exports.sendOtp = async (req, res) => {
         return res.status(500).json({ success: false, error: "Failed to send OTP" });
     }
 };
+
+exports.updateProfile = async (req, res) => {
+    const { displayName, description, city, website, profileimg, coverimg } = req.body;
+
+    try {
+    // 0. ดึง public_id เดิมก่อน
+    const { data: oldProject, error } = await db
+      .from("users")
+      .select("img_public_id")
+      .eq("user_id", userId)
+      .maybeSingle();
+      if (error) {
+        return res.status(500).json(error);
+      }
+
+      // ถ้ามีการอัปโหลดรูปใหม่ และ public_id เปลี่ยน
+    if (imgPublicId && oldProject?.img_public_id && oldProject.img_public_id !== imgPublicId) {
+  try {
+    await cloudinary.uploader.destroy(oldProject.img_public_id);
+  } catch (cloudErr) {
+    console.log("CLOUD DELETE ERROR:", cloudErr);
+  }
+}
+    //  อัปเดตข้อมูล Project หลัก
+    await db.from("users").update({ project_name: projectName, description, img, img_public_id: imgPublicId }).eq("project_id", projectId);
+
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};

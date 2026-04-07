@@ -47,3 +47,11 @@ CREATE TYPE category_type AS ENUM (
   'Sports',
   'Food&Drink'
 );
+
+CREATE TYPE status_friendships AS ENUM (
+  'pending', 'accepted', 'declined' 
+);
+
+CREATE TYPE status_messages AS ENUM (
+  'read', 'sending', 'sent', 'failed'  
+);
