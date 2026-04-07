@@ -2,6 +2,7 @@ const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const cloudinary = require("../config/cloudinary");
 
 exports.login = async (req, res) => {
     try {
@@ -201,29 +202,59 @@ exports.sendOtp = async (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-    const { displayName, description, city, website, profileimg, coverimg } = req.body;
-
+    const { userId, displayName, description, city, website, profileimg, coverimg, profilePublicId, coverPublicId } = req.body;
+    
     try {
-    // 0. ดึง public_id เดิมก่อน
-    const { data: oldProject, error } = await db
+    const { data: user, error } = await db
       .from("users")
-      .select("img_public_id")
+      .select("profile_public_id, cover_public_id")
       .eq("user_id", userId)
       .maybeSingle();
       if (error) {
         return res.status(500).json(error);
       }
 
-      // ถ้ามีการอัปโหลดรูปใหม่ และ public_id เปลี่ยน
-    if (imgPublicId && oldProject?.img_public_id && oldProject.img_public_id !== imgPublicId) {
-  try {
-    await cloudinary.uploader.destroy(oldProject.img_public_id);
-  } catch (cloudErr) {
-    console.log("CLOUD DELETE ERROR:", cloudErr);
-  }
+      // 2. สร้าง Object สำหรับ Update (เช็คเฉพาะที่มีค่าจริงๆ)
+    const updateData = {};
+
+    // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
+    if (displayName && displayName.trim() !== "") updateData.name = displayName;
+    if (description && description.trim() !== "") updateData.description = description;
+    if (city && city.trim() !== "") updateData.city = city;
+    if (website && website.trim() !== "") updateData.website = website;
+
+    // ส่วนของรูปภาพ (ใช้ logic เดิมของคุณ)
+    if (profileimg) updateData.profilePic = profileimg;
+    if (coverimg) updateData.coverPic = coverimg;
+    if (profilePublicId) updateData.profile_public_id = profilePublicId;
+    if (coverPublicId) updateData.cover_public_id = coverPublicId;
+
+    // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
+    if (Object.keys(updateData).length === 0) {
+        return res.status(200).json({ success: true, message: "Nothing to update" });
+    }
+
+    // 3. Update ลง DB
+    const { error: updateError } = await db
+      .from("users")
+      .update(updateData) // ส่งเฉพาะ field ที่มีค่าไป
+      .eq("user_id", userId);
+
+    if (updateError) return res.status(500).json(updateError);
+
+    // เก็บ id เก่าไว้ก่อน
+const oldProfileId = user?.profile_public_id;
+const oldCoverId = user?.cover_public_id;
+
+// แล้วค่อยลบ
+if (profilePublicId && oldProfileId && oldProfileId !== profilePublicId) {
+  await cloudinary.uploader.destroy(oldProfileId);
 }
-    //  อัปเดตข้อมูล Project หลัก
-    await db.from("users").update({ project_name: projectName, description, img, img_public_id: imgPublicId }).eq("project_id", projectId);
+
+if (coverPublicId && oldCoverId && oldCoverId !== coverPublicId) {
+  await cloudinary.uploader.destroy(oldCoverId);
+}
+    
 
     return res.status(200).json({ success: true });
   } catch (err) {
