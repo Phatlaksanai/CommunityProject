@@ -88,6 +88,7 @@
       /* ===== TABS ===== */
       .tabs {
         display: flex;
+        align-items: center;
         gap: 25px;
         padding: 15px 20px;
         border-bottom: 1px solid themed("border");
@@ -102,8 +103,19 @@
           font-weight: bold;
           border-bottom: 2px solid themed("textColor");
         }
+      button {
+        padding: 10px 18px;
+        border-radius: 6px;
+        margin-left: auto;
+        background-color: #555;
+        color: white;
+        border: none;
+      }         
       }
-
+      .tabs a {
+        text-decoration: none; // ❌ เอาเส้นใต้ออก
+        color: inherit;        // ❌ เอาสีม่วงออก (ใช้สีปกติแทน)
+      }
       /* ===== CONTENT ===== */
       .content {
         padding: 20px;

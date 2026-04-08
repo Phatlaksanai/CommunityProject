@@ -77,7 +77,7 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <a href="#" className="forgot">
+            <a href="" className="forgot" onClick={() => navigate("/resetpassword")} style={{ cursor: "pointer" }}>
               forgot password
             </a>
             <button type="submit" className="login-btn">login</button>

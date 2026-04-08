@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/home/Home1";
 import Login from './pages/login/Login1'
 import Register from './pages/register/Register1'
+import ResetPassword from "./pages/resetpassword/ResetPassword";
 import Download from './pages/download/Download1';
 import AddItem from './pages/additem/Additem';
 import AddProject from './pages/addproject/addproject';
@@ -159,6 +160,10 @@ function App() {
     {
       path: "/login",
       element: <Login />,
+    },
+    {
+      path: "/resetpassword",
+      element: <ResetPassword />,
     },
     {
       path: "/download",

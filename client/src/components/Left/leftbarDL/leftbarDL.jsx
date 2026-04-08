@@ -1,5 +1,4 @@
 import "./leftbarDL.scss";
-import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { AuthContext } from "../../../context/authContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
@@ -58,7 +57,7 @@ const LeftBarDownload = () => {
       <div className="leftBarDownloadItem">
         <img src={currentUser?.profilePic || defaultPic} alt="profile" />
         <span>{currentUser?.name || currentUser?.username || "Guest"}</span>
-        <AddShoppingCartIcon onClick={() => navigate("/additem")} style={{ cursor: "pointer" }}/>
+        <button onClick={() => navigate("/additem")} style={{ cursor: "pointer" }}>Add Item</button>
       </div>
       
       

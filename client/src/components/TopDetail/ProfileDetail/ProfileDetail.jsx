@@ -2,7 +2,6 @@ import "./profileDetail.scss";
 import { AuthContext } from "../../../context/authContext";
 import { useContext } from "react";
 import { NavLink, useParams, useNavigate } from "react-router-dom";
-import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 
 
@@ -44,7 +43,7 @@ const ProfileDetail = () => {
           <NavLink to={`/profile/${id}`} end>Posts</NavLink>
           <NavLink to={`/profile/${id}/items`}>Models</NavLink>
           <NavLink to={`/profile/${id}/projects`}>Projects</NavLink>
-          <AddShoppingCartIcon onClick={() => navigate(`/profile/${id}/projects/addproject`)} style={{ cursor: "pointer" }}/>
+          <button onClick={() => navigate(`/profile/${id}/projects/addproject`)} style={{ cursor: "pointer" }}>Create Project</button>
         </div>
         <hr />
       </div>
