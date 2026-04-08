@@ -8,7 +8,7 @@ import { makeRequest } from "../../api/axios";
 const EditProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, setUser  } = useContext(AuthContext);
 
   const [displayName, setDisplayName] = useState("");
   const [description, setDescription] = useState("");
@@ -104,6 +104,18 @@ const EditProfile = () => {
       profilePublicId: finalProfilePublicId,
       coverPublicId: finalCoverPublicId,
     });
+
+    setUser({
+  ...currentUser,
+  name: displayName,
+  description,
+  city,
+  website,
+  profilePic: finalProfileImg,
+  coverPic: finalCoverImg,
+  profile_public_id: finalProfilePublicId,
+  cover_public_id: finalCoverPublicId,
+});
 
     setSuccess("Update profile success");
     setTimeout(() => navigate(`/profile/${currentUser?.user_id}`), 1000);
