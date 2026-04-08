@@ -10,6 +10,7 @@ exports.getPosts = async (req, res) => {
       users (
         user_id,
         username,
+        name,
         profilePic
       )
     `)
@@ -19,6 +20,7 @@ exports.getPosts = async (req, res) => {
   const formatted = data.map(post => ({
     ...post,
     username: post.users?.username || null,
+    name: post.users?.name || null,
     profilePic: post.users?.profilePic || null,
   }));
 
@@ -34,6 +36,7 @@ exports.getPostsByUserId = async (req, res) => {
       *,
       users (
         username,
+        name,
         profilePic
       )
     `)
@@ -45,6 +48,7 @@ exports.getPostsByUserId = async (req, res) => {
   const formatted = data.map(post => ({
     ...post,
     username: post.users?.username || null,
+    name: post.users?.name || null,
     profilePic: post.users?.profilePic || null,
   }));
 

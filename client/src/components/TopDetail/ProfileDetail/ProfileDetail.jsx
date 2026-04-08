@@ -37,6 +37,7 @@ const ProfileDetail = () => {
               </div>
             </div>
             <span className="handle">@{currentUser?.username}</span>
+            <span className="handle">{currentUser?.description}...more</span>
           </div>
         </div>
         <div className="tabs">

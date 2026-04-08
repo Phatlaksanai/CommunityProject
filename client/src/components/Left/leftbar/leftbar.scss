@@ -31,8 +31,22 @@
       .menu {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 5px;
 
+        .menu-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          button {
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: #5271ff;
+            color: white;
+            border: none;
+          }
+        }
         span {
           font-size: 12px;
         }
@@ -56,9 +70,13 @@
 
         .item {
           display: flex;
+          padding: 5px 10px;
           align-items: center;
           gap: 10px;
-
+          box-shadow: none;
+        &:hover {
+          background-color: #959292;
+        }
           img {
             width: 30px;
           }

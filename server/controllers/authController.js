@@ -47,6 +47,9 @@ exports.login = async (req, res) => {
             name: user.name,
             profilePic: user.profilePic,
             coverPic: user.coverPic,
+            description: user.description,
+            city: user.city,
+            website: user.website
         });
 
     } catch (err) {

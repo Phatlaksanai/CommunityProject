@@ -20,6 +20,7 @@ exports.getItemsById = async (req, res) => {
       *,
       users (
         username,
+        name,
         profilePic
       )
     `)
@@ -31,6 +32,7 @@ exports.getItemsById = async (req, res) => {
   const formatted = {
     ...data,
     username: data.users?.username || null,
+    name: data.users?.name || null,
     profilePic: data.users?.profilePic || null,
   };
 

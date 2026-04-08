@@ -66,8 +66,8 @@ const Navbar = () => {
         ) : (
           <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }}/>
         )}
-        <AddShoppingCartIcon />
-        <DownloadIcon onClick={() => navigate("/download")} style={{ cursor: "pointer" }}/>
+        <AddShoppingCartIcon onClick={() => navigate("/download")} style={{ cursor: "pointer" }}/>
+        <DownloadIcon/>
         <div className="search">
           <SearchOutlinedIcon />
           <input type="text" placeholder="Search..." />
