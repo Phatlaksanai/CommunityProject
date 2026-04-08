@@ -111,7 +111,14 @@ const Post = ({ post }) => {
         </div>
         <div className="content">
           <p>{post.description}</p>
-          {post.model && <ModelViewer modelUrl={post.model} />}
+          {post.imgs?.map((item, index) => (
+            <div className="postImage" key={index}>
+              <img src={item.img} alt="" />
+            </div>
+          ))}
+          {post.models?.map((item, index) => (
+            <ModelViewer key={index} modelUrl={item.model} />
+          ))}
           {/* {models.length > 0 && models.map((modelUrl, index) => (
             <div key={index} className="model-wrapper" style={{ marginTop: "20px" }}>
               <div style={{ textAlign: "right", marginTop: "5px" }}>
@@ -121,11 +128,6 @@ const Post = ({ post }) => {
               </div>
             </div>
           ))} */}
-          {post.img && (
-            <div className="postImage">
-              <img src={post.img} alt="" />
-            </div>
-          )}
         </div>
         <div className="info">
           <div className="item">

@@ -5,6 +5,8 @@ exports.getPosts = async (req, res) => {
     .from("posts")
     .select(`
       *,
+      imgs(img),
+      models(model),
       users (
         user_id,
         username,
@@ -95,32 +97,66 @@ exports.getPostsByUserIdAvailable = async (req, res) => {
 };
 
 exports.addPost = async (req, res) => {
-  const { desc, img, model } = req.body;
+  const { desc, img, model, project_id } = req.body;
 
-  if (!desc?.trim()) {
+  if (!desc?.trim()) { // เช็คว่า description มีค่าและไม่ใช่แค่เว้นวรรค
     return res.status(400).json({ error: "Description is required" });
   }
 
-  const { data, error } = await db
-    .from("posts")
-    .insert([
-      {
-        description: desc.trim(),
-        // img: img || null,
-        // model: model || null,
-        user_id: req.user.user_id,
-        project_id: req.body.project_id || null,
-      },
-    ])
-    .select()
-    .single();
+try {
+    // 2. เพิ่มข้อมูลลงในตารางหลัก (posts)
+    const { data: postData, error: postError } = await db
+      .from("posts")
+      .insert([
+        {
+          description: desc.trim(),
+          user_id: req.user.user_id,
+          project_id: project_id || null,
+        },
+      ])
+      .select()
+      .single();
 
-  if (error) {
-    console.error(error);
+    if (postError) throw postError;
+
+    const postId = postData.post_id; // ดึง ID ของโพสต์ที่เพิ่งสร้าง
+
+    // 2. จัดการรูปภาพ (รองรับทั้งรูปเดียว และ หลายรูปเป็น Array)
+    if (img) {
+      // ทำให้เป็น Array เสมอเพื่อความง่ายในการจัดการ
+      const imageList = Array.isArray(img) ? img : [img];
+      
+      // เตรียมข้อมูลสำหรับ Bulk Insert
+      const imagesToInsert = imageList.map(url => ({
+        post_id: postId,
+        img: url,
+        message_id: null // ใส่ไว้กัน Error ตามที่คุณเจอตอนแรก
+      }));
+
+      const { error: imgError } = await db.from("imgs").insert(imagesToInsert);
+      if (imgError) console.error("Image upload error:", imgError);
+    }
+
+    // 3. จัดการโมเดล (รองรับทั้งโมเดลเดียว และ หลายโมเดล)
+    if (model) {
+      const modelList = Array.isArray(model) ? model : [model];
+      
+      const modelsToInsert = modelList.map(m => ({
+        post_id: postId,
+        model: m
+      }));
+
+      const { error: modelError } = await db.from("models").insert(modelsToInsert);
+      if (modelError) console.error("Model upload error:", modelError);
+    }
+
+    // 5. ส่งข้อมูลโพสต์ที่สร้างเสร็จแล้วกลับไป
+    return res.status(200).json({ ...postData, img, model });
+
+  } catch (error) {
+    console.error("Server Error:", error.message);
     return res.status(500).json({ error: "Internal server error" });
   }
-
-  return res.status(200).json(data);
 };
 
 // postController.js

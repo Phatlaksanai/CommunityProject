@@ -74,8 +74,8 @@ const Share = () => {
 
     mutation.mutate({
       desc,
-      img: imgUrls.length ? imgUrls[0] : null,
-      model: modelUrls.length ? modelUrls[0] : null,
+      img: imgUrls.length ? imgUrls : null,
+      model: modelUrls.length ? modelUrls : null,
       project_id: selectedProject,
     });
   };
