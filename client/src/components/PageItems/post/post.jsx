@@ -15,6 +15,12 @@ import { makeRequest } from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
 import ModelViewer from "../../modelViewer/model_viewer";
 
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -111,14 +117,40 @@ const Post = ({ post }) => {
         </div>
         <div className="content">
           <p>{post.description}</p>
-          {post.imgs?.map((item, index) => (
-            <div className="postImage" key={index}>
-              <img src={item.img} alt="" />
+
+          {(post.imgs?.length > 0) && (
+            <div className="postMediaSlider">
+              <Swiper
+                modules={[Navigation, Pagination]}
+                spaceBetween={0}
+                slidesPerView={1}
+                navigation
+                pagination={{ clickable: true }}
+                className="mySwiper"
+              >
+                {/* ส่วนของรูปภาพ */}
+                {post.imgs?.map((item, index) => (
+                  <SwiperSlide key={`img-${index}`}>
+                    <div className="postImage">
+                      <img src={item.img} alt="" />
+                    </div>
+                  </SwiperSlide>
+                ))}
+
+                {/* ส่วนของโมเดล 3D */}
+                {post.models?.map((item, index) => (
+                  <SwiperSlide key={`model-${index}`}>
+                    <div className="postModel">
+                      <ModelViewer modelUrl={item.model} />
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
-          ))}
-          {post.models?.map((item, index) => (
+          )}
+          {/* {post.models?.map((item, index) => (
             <ModelViewer key={index} modelUrl={item.model} />
-          ))}
+          ))} */}
           {/* {models.length > 0 && models.map((modelUrl, index) => (
             <div key={index} className="model-wrapper" style={{ marginTop: "20px" }}>
               <div style={{ textAlign: "right", marginTop: "5px" }}>

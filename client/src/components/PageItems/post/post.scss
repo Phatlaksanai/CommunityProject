@@ -56,6 +56,8 @@
 
       .content {
         margin: 20px 0px;
+        // width: 100%; // บังคับความกว้าง content
+        // overflow: hidden; // ตัดส่วนที่แผ่ออกไปทิ้ง
 
         p {
           word-wrap: break-word;   // legacy
@@ -64,23 +66,68 @@
           white-space: pre-wrap;  // เคารพ \n และตัดบรรทัด
         }
 
-        .postImage {
+        .postMediaSlider {
+        width: 100%;
+        // max-width: 100%; // ห้ามกว้างกว่าแม่
+        border-radius: 10px;
+        overflow: hidden;
+        // position: relative;
+        background-color: themed("bgSoft"); // ใช้สีพื้นหลังที่เหมาะสมจากธีม
+        
+        .postImage, .postModel {
           width: 100%;
-          height: 500px;
-          background: rgb(218, 218, 218);
+          height: 500px; // คุมความสูงให้เท่ากันหมดทุก Slide
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-top: 20px;
+          background: #b5b5b5; // พื้นหลังดำเวลาภาพไม่เต็ม
         }
 
         .postImage img {
           max-width: 100%;
           max-height: 100%;
-          width: auto;
-          height: auto;
           object-fit: contain;
         }
+
+        .swiper {
+          // width: 100%;
+          // height: 500px;
+          // เพิ่มบรรทัดนี้เพื่อความชัวร์
+          // display: block; 
+        }
+
+        .swiper-slide {
+          // บังคับให้ slide กว้างเท่ากับตัว swiper เป๊ะๆ
+          width: 100% !important; 
+          // height: 100%;
+        }
+
+        // ตกแต่งปุ่ม Navigation (ลูกศร)
+        .swiper-button-next, .swiper-button-prev {
+          color: white;
+          background-color: rgba(0, 0, 0, 0.3);
+          width: 35px;
+          height: 35px;
+          border-radius: 50%;
+          &::after {
+            font-size: 16px;
+            font-weight: bold;
+          }
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+          }
+        }
+
+        // ตกแต่ง Pagination (จุดไข่ปลา)
+        .swiper-pagination-bullet {
+          background: white;
+          opacity: 0.5;
+        }
+        .swiper-pagination-bullet-active {
+          opacity: 1;
+          background: #5271ff; // หรือสีหลักของเว็บคุณ
+        }
+      }
 
       }
 
