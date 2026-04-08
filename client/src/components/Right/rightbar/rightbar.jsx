@@ -4,19 +4,18 @@ const RightBar = () => {
   return (
     <div className="rightBar">
       <div className="container">
-        <div className="item">
-          <span>Suggestions For You</span>
+        <div className="item new-releases">
+          <span>New Releases</span>
           <div className="user">
             <div className="userInfo">
               <img
                 src="https://cdn.vcgamers.com/news/wp-content/uploads/2023/02/PODUSZKA-ROBLOX-MAN-FACE-PREZENT.jpg"
                 alt=""
               />
-              <span>Nino</span>
             </div>
             <div className="buttons">
-              <button>follow</button>
-              <button>dismiss</button>
+              <p>welcomeeee</p>
+              <span>Helloooooooo</span>
             </div>
           </div>
           <div className="user">
@@ -25,16 +24,16 @@ const RightBar = () => {
                 src="https://cdn.vcgamers.com/news/wp-content/uploads/2023/02/PODUSZKA-ROBLOX-MAN-FACE-PREZENT.jpg"
                 alt=""
               />
-              <span>Nino</span>
             </div>
             <div className="buttons">
-              <button>follow</button>
-              <button>dismiss</button>
+              <p>welcomeeee</p>
+              <span>Helloooooooo</span>
             </div>
           </div>
         </div>
+        
         <div className="item">
-          <span>Latest Activities</span>
+          <span>Friend Requests</span>
           <div className="user">
             <div className="userInfo">
               <img
@@ -42,10 +41,13 @@ const RightBar = () => {
                 alt=""
               />
               <p>
-                <span>Nino</span> changed their cover picture
+                <span>Nino</span>
               </p>
             </div>
-            <span>1 min ago</span>
+              <div className="buttons">
+                <button>Accept</button>
+                <button>Decline</button>
+              </div>
           </div>
           <div className="user">
             <div className="userInfo">
@@ -54,38 +56,17 @@ const RightBar = () => {
                 alt=""
               />
               <p>
-                <span>Nino</span> changed their cover picture
+                <span>Nino</span>
               </p>
             </div>
-            <span>1 min ago</span>
-          </div>
-          <div className="user">
-            <div className="userInfo">
-              <img
-                src="https://cdn.vcgamers.com/news/wp-content/uploads/2023/02/PODUSZKA-ROBLOX-MAN-FACE-PREZENT.jpg"
-                alt=""
-              />
-              <p>
-                <span>Nino</span> changed their cover picture
-              </p>
-            </div>
-            <span>1 min ago</span>
-          </div>
-          <div className="user">
-            <div className="userInfo">
-              <img
-                src="https://cdn.vcgamers.com/news/wp-content/uploads/2023/02/PODUSZKA-ROBLOX-MAN-FACE-PREZENT.jpg"
-                alt=""
-              />
-              <p>
-                <span>Nino</span> changed their cover picture
-              </p>
-            </div>
-            <span>1 min ago</span>
+              <div className="buttons">
+                <button>Accept</button>
+                <button>Decline</button>
+              </div>
           </div>
         </div>
         <div className="item">
-          <span>Online Friends</span>
+          <span>Contacts</span>
           <div className="user">
             <div className="userInfo">
               <img

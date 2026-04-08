@@ -57,7 +57,7 @@ const LeftBarDownload = () => {
     <div className="leftBarDownload">
       <div className="leftBarDownloadItem">
         <img src={currentUser?.profilePic || defaultPic} alt="profile" />
-        <span>{currentUser?.username}</span>
+        <span>{currentUser?.name || currentUser?.username || "Guest"}</span>
         <AddShoppingCartIcon onClick={() => navigate("/additem")} style={{ cursor: "pointer" }}/>
       </div>
       

@@ -27,10 +27,10 @@ const LeftDI = ({ item }) => {
                 alt=""
               />
               <div className="online" />
-              <span>{item.username}</span>
+              <span>{item.name || item.username}</span>
             </div>
             <div className="buttons">
-              <button>follow</button>
+              <button>Add+</button>
             </div>
           </div>
         </div>

@@ -50,7 +50,7 @@
             img {
               width: 40px;
               height: 40px;
-              border-radius: 50%;
+              border-radius: 10px;
               object-fit: cover;
             }
 
@@ -76,7 +76,7 @@
 
           .buttons {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
 
             button {
@@ -84,6 +84,8 @@
               padding: 5px;
               color: white;
               cursor: pointer;
+              border-radius: 6px;
+              padding: 4px 12px;
 
               &:first-child {
                 background-color: #5271ff;
@@ -96,6 +98,28 @@
           }
         }
       }
+      .new-releases {
+        .user {
+          align-items: flex-start;
+
+        .userInfo {
+          img {
+            width: 100px; 
+            height: 100px;
+          }
+        }
+        .buttons {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 2px;
+
+        span {
+          font-size: 14px;
+          font-weight: 500;
+        }
+      }
+    }
+  }
     }
   }
 }
