@@ -23,7 +23,7 @@ const Posts = ({ userId , project}) => {
 
   return <div className="posts">
     {data.map((post) => (  // วนลูปแสดงข้อมูลจริงจาก Database
-      <Post post={post} key={post.post_id || post.id} />
+      <Post post={post} key={post.post_id} />
     ))}
   </div>
 

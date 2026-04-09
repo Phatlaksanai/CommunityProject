@@ -16,6 +16,7 @@ npm install @tanstack/react-query // client
 npm install cloudinary multer // server =============new
 npm install three // client ================new
 npm install @supabase/supabase-js // server
+npm install swiper // client
 
     เพิ่มลบ project ได้ และก็ลบรูปออกจาก cloud ด้วย
 

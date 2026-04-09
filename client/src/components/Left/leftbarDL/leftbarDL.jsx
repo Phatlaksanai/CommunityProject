@@ -93,17 +93,6 @@ const LeftBarDownload = () => {
             <label htmlFor={item}>{dateLabels[item]}</label>
           </div>
         ))}
-        <hr />
-        <p>Others</p>
-        <div>
-          <input
-            type="checkbox"
-            id="Downloadable"
-            checked={filters.others.Downloadable}
-            onChange={() => handleChange("others", "Downloadable")}
-          />
-          <label htmlFor="Downloadable"> Downloadable</label>
-        </div>
       </form>
     </div>
   );
