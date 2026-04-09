@@ -10,4 +10,13 @@ router.get("/user/:id/available", postController.getPostsByUserIdAvailable);
 router.post("/addpost", verifyToken, postController.addPost);
 router.get("/project-edit/:projectId", verifyToken, postController.getPostsForEditProject);
 
+// 1. ดึงข้อมูล Like (GET /api/posts/likes/post/:post_id)
+router.get("/likes/post/:post_id", postController.getLikes);
+
+// 2. เพิ่ม Like (POST /api/posts/likes)
+router.post("/likes", verifyToken, postController.addLike);
+
+// 3. ลบ Like (DELETE /api/posts/likes/post/:post_id)
+router.delete("/likes/post/:post_id", verifyToken, postController.deleteLike);
+
 module.exports = router;

@@ -28,67 +28,50 @@ const Post = ({ post }) => {
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
-  // const { isLoading, error, data } = useQuery(["likes", post.id], () =>
-  //   makeRequest.get("/likes?postId=" + post.id).then((res) => {
-  //     return res.data;
-  //   })
-  // );
   const { isLoading, error, data } = useQuery({
-    queryKey: ["likes", post.id],
-    queryFn: () => makeRequest.get("/likes?postId=" + post.id).then((res) => {
-      return res.data;
-    })
+    queryKey: ["likes", post.post_id],
+    queryFn: () => makeRequest.get(`/posts/likes/post/${post.post_id}`).then((res) => res.data), // ข้อที่ 1
   });
   const queryClient = useQueryClient();
 
-  // const mutation = useMutation(
-  //   (liked) => {
-  //     if (liked) return makeRequest.delete("/likes?postId=" + post.id);
-  //     return makeRequest.post("/likes", { postId: post.id });
-  //   },
-  //   {
-  //     onSuccess: () => {
-  //       // Invalidate and refetch
-  //       queryClient.invalidateQueries(["likes"]);
-  //     },
-  //   }
-  // );
-  // const deleteMutation = useMutation(
-  //   (postId) => {
-  //     return makeRequest.delete("/posts/" + postId);
-  //   },
-  //   {
-  //     onSuccess: () => {
-  //       // Invalidate and refetch
-  //       queryClient.invalidateQueries(["posts"]);
-  //     },
-  //   }
-  // );
   const mutation = useMutation({
-    mutationFn: (liked) => {
-      if (liked) return makeRequest.delete("/likes?postId=" + post.id);
-      return makeRequest.post("/likes", { postId: post.id });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["likes"] });
-    },
-  });
+  mutationFn: async (liked) => {
+      if (liked) {
+        // ถ้าเคย Like แล้ว -> ส่งคำสั่ง DELETE ไปถอน Like
+        return await makeRequest.delete(`/posts/likes/post/${post.post_id}`);
+      } else {
+        // ถ้ายังไม่เคย Like -> ส่งคำสั่ง POST ไปเพิ่ม Like
+        return await makeRequest.post("/posts/likes", { post_id: post.post_id });
+      }
+  },
+  onSuccess: () => {
+    // เมื่อทำงานสำเร็จ (ถอนหรือเพิ่มสำเร็จ)
+    // สั่งให้ "ป้ายชื่อ" ที่ชื่อ "likes" ของโพสต์นี้ หมดอายุ (Invalidate)
+    // เพื่อให้ useQuery (ในข้อ 1) ไปดึงข้อมูลใหม่มาอัปเดตหน้าจอทันที
+    queryClient.invalidateQueries(["likes", post.post_id]);
+  },
+});
 
   const deleteMutation = useMutation({
-    mutationFn: (postId) => {
-      return makeRequest.delete("/posts/" + postId);
+    mutationFn: (post_id) => {
+      return makeRequest.delete(`/posts/${post_id}`);
     },
     onSuccess: () => {
+      // เมื่อลบสำเร็จ สั่งให้รายการโพสต์ทั้งหมด (posts) รีเฟรชใหม่
+      // เพื่อให้โพสต์ที่ถูกลบหายไปจากหน้า Feed
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
 
   const handleLike = () => {
-    mutation.mutate(data.includes(currentUser.id));
+    // ตรวจสอบว่าใน Array 'data' มี ID ของเรา (currentUser?.user_id) อยู่ไหม
+    // !! แปลงค่าให้เป็น true/false เสมอ ป้องกัน error ถ้า data เป็น null
+    const isAlreadyLiked = !!data?.includes(currentUser?.user_id);
+    mutation.mutate(isAlreadyLiked); // ส่งสถานะปัจจุบัน (ไลก์แล้ว/ยังไม่ไลก์) เข้าไปใน mutation
   };
 
   const handleDelete = () => {
-    deleteMutation.mutate(post.id);
+    deleteMutation.mutate(post.post_id);
   };
 
   dayjs.extend(relativeTime);
@@ -111,7 +94,7 @@ const Post = ({ post }) => {
             </div>
           </div>
           <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} />
-          {menuOpen && post.userId === currentUser.id && (
+          {menuOpen && post.user_id === currentUser?.user_id && (
             <button onClick={handleDelete}>delete</button>
           )}
         </div>
@@ -165,7 +148,7 @@ const Post = ({ post }) => {
           <div className="item">
             {isLoading ? (
               "loading"
-            ) : data?.includes(currentUser.id) ? (
+            ) : data?.includes(currentUser?.user_id) ? (
               <FavoriteOutlinedIcon
                 style={{ color: "red" }}
                 onClick={handleLike}
@@ -179,12 +162,12 @@ const Post = ({ post }) => {
             <TextsmsOutlinedIcon />
             See Comments
           </div>
-          <div className="item">
+          {/* <div className="item">
             <ShareOutlinedIcon />
             Share
-          </div>
+          </div> */}
         </div>
-        {commentOpen && <Comments postId={post.id} />}
+        {commentOpen && <Comments post_id={post.id} />}
       </div>
     </div>
   );

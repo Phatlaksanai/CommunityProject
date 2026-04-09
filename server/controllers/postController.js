@@ -173,3 +173,53 @@ exports.getPostsForEditProject = async (req, res) => {
   if (error) return res.status(500).json(error);
   return res.status(200).json(data || []);
 };
+
+exports.getLikes = async (req, res) => {
+  const { data, error } = await db
+    .from("likes")
+    .select("user_id")
+    .eq("post_id", req.params.post_id);
+
+  if (error) return res.status(500).json(error);
+  
+  // แปลงจาก [{userId: 1}, {userId: 2}] เป็น [1, 2]
+  return res.status(200).json(data ? data.map((like) => like.user_id) : []);
+};
+
+// POST: เพิ่ม Like
+exports.addLike = async (req, res) => {
+  const userId = req.user.user_id; 
+  // ดึงค่าได้ทั้งสองแบบกันพลาด
+  const postId = req.body.post_id; 
+
+  if (!postId) {
+    return res.status(400).json("post_id is required");
+  }
+
+  const { error } = await db
+    .from("likes")
+    .insert([{ 
+      user_id: userId,        
+      post_id: postId 
+    }]);
+
+  if (error) {
+    console.error("Like Error:", error);
+    return res.status(500).json(error);
+  }
+  return res.status(200).json("Post has been liked.");
+};
+
+// DELETE: ลบ Like
+exports.deleteLike = async (req, res) => {
+  const userId = req.user.user_id;
+
+  const { error } = await db
+    .from("likes")
+    .delete()
+    .eq("user_id", userId)
+    .eq("post_id", req.params.post_id);
+
+  if (error) return res.status(500).json(error);
+  return res.status(200).json("Like has been removed.");
+};
