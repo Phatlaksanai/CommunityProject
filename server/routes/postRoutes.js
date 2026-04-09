@@ -9,5 +9,7 @@ router.get("/project/:id", postController.getPostsByProjectId);
 router.get("/user/:id/available", postController.getPostsByUserIdAvailable);
 router.post("/addpost", verifyToken, postController.addPost);
 router.get("/project-edit/:projectId", verifyToken, postController.getPostsForEditProject);
+router.post("/addcomment", verifyToken, postController.addComment);
+router.get("/comments/:id", postController.getCommentsByPostId);
 
 module.exports = router;

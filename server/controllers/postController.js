@@ -3,7 +3,8 @@ const db = require("../config/db");
 exports.getPosts = async (req, res) => {
   const { data, error } = await db
     .from("posts")
-    .select(`
+    .select(
+      `
       *,
       imgs(img),
       models(model),
@@ -13,11 +14,12 @@ exports.getPosts = async (req, res) => {
         name,
         profilePic
       )
-    `)
+    `,
+    )
     .order("created_at", { ascending: false });
   if (error) return res.status(500).json(error);
 
-  const formatted = data.map(post => ({
+  const formatted = data.map((post) => ({
     ...post,
     username: post.users?.username || null,
     name: post.users?.name || null,
@@ -32,20 +34,22 @@ exports.getPostsByUserId = async (req, res) => {
 
   const { data, error } = await db
     .from("posts")
-    .select(`
+    .select(
+      `
       *,
       users (
         username,
         name,
         profilePic
       )
-    `)
+    `,
+    )
     .eq("user_id", id)
     .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
 
-  const formatted = data.map(post => ({
+  const formatted = data.map((post) => ({
     ...post,
     username: post.users?.username || null,
     name: post.users?.name || null,
@@ -60,19 +64,21 @@ exports.getPostsByProjectId = async (req, res) => {
 
   const { data, error } = await db
     .from("posts")
-    .select(`
+    .select(
+      `
       *,
       users (
         username,
         profilePic
       )
-    `)
+    `,
+    )
     .eq("project_id", id)
     .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
 
-  const formatted = data.map(post => ({
+  const formatted = data.map((post) => ({
     ...post,
     username: post.users?.username || null,
     profilePic: post.users?.profilePic || null,
@@ -99,11 +105,12 @@ exports.getPostsByUserIdAvailable = async (req, res) => {
 exports.addPost = async (req, res) => {
   const { desc, img, model, project_id } = req.body;
 
-  if (!desc?.trim()) { // เช็คว่า description มีค่าและไม่ใช่แค่เว้นวรรค
+  if (!desc?.trim()) {
+    // เช็คว่า description มีค่าและไม่ใช่แค่เว้นวรรค
     return res.status(400).json({ error: "Description is required" });
   }
 
-try {
+  try {
     // 2. เพิ่มข้อมูลลงในตารางหลัก (posts)
     const { data: postData, error: postError } = await db
       .from("posts")
@@ -125,12 +132,12 @@ try {
     if (img) {
       // ทำให้เป็น Array เสมอเพื่อความง่ายในการจัดการ
       const imageList = Array.isArray(img) ? img : [img];
-      
+
       // เตรียมข้อมูลสำหรับ Bulk Insert
-      const imagesToInsert = imageList.map(url => ({
+      const imagesToInsert = imageList.map((url) => ({
         post_id: postId,
         img: url,
-        message_id: null // ใส่ไว้กัน Error ตามที่คุณเจอตอนแรก
+        message_id: null, // ใส่ไว้กัน Error ตามที่คุณเจอตอนแรก
       }));
 
       const { error: imgError } = await db.from("imgs").insert(imagesToInsert);
@@ -140,19 +147,20 @@ try {
     // 3. จัดการโมเดล (รองรับทั้งโมเดลเดียว และ หลายโมเดล)
     if (model) {
       const modelList = Array.isArray(model) ? model : [model];
-      
-      const modelsToInsert = modelList.map(m => ({
+
+      const modelsToInsert = modelList.map((m) => ({
         post_id: postId,
-        model: m
+        model: m,
       }));
 
-      const { error: modelError } = await db.from("models").insert(modelsToInsert);
+      const { error: modelError } = await db
+        .from("models")
+        .insert(modelsToInsert);
       if (modelError) console.error("Model upload error:", modelError);
     }
 
     // 5. ส่งข้อมูลโพสต์ที่สร้างเสร็จแล้วกลับไป
     return res.status(200).json({ ...postData, img, model });
-
   } catch (error) {
     console.error("Server Error:", error.message);
     return res.status(500).json({ error: "Internal server error" });
@@ -168,8 +176,83 @@ exports.getPostsForEditProject = async (req, res) => {
     .from("posts")
     .select("*")
     // ดึงอันที่เป็นของโปรเจกต์นี้ OR (เป็นของเรา AND ยังไม่มีโปรเจกต์)
-    .or(`project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`);
+    .or(
+      `project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`,
+    );
 
   if (error) return res.status(500).json(error);
   return res.status(200).json(data || []);
+};
+
+exports.addComment = async (req, res) => {
+  const { desc, img, postId, userId } = req.body;
+
+  if ((!desc || desc.trim() === "") && (!img || img.length === 0)) {
+    return res.status(400).json({ error: "Empty comment" });
+  }
+  if (!userId) {
+  return res.status(400).json({ error: "Missing userId" });
+}
+
+  try {
+    const { data, error } = await db
+      .from("comments")
+      .insert([
+        {
+          description: desc,
+          img: img || null,
+          post_id: postId,
+          user_id: userId,
+        },
+      ])
+      .select();
+    if (error) throw error;
+
+    res.status(200).json(data[0]);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+};
+
+exports.getCommentsByPostId = async (req, res) => {
+  const {id} = req.params;
+
+  try {
+    const { data, error } = await db
+      .from("comments")
+      .select(
+        `
+        comment_id,
+        description,
+        img,
+        created_at,
+        users (
+          user_id,
+          username,
+          name,
+          profilePic
+        )
+      `,
+      )
+      .eq("post_id", id)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    const formatted = data.map((c) => ({
+      comment_id: c.comment_id,
+      description: c.description,
+      img: c.img,
+      created_at: c.created_at,
+      user_id: c.users?.user_id,
+      username: c.users?.username,
+      name: c.users?.name,
+      profilePic: c.users?.profilePic,
+    }));
+
+    res.status(200).json(formatted);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
 };
