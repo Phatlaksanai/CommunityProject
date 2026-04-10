@@ -16,6 +16,7 @@ exports.getPosts = async (req, res) => {
       )
     `,
     )
+    .eq("status", "show") // ดึงเฉพาะโพสต์ที่มีสถานะ "show"
     .order("created_at", { ascending: false });
   if (error) return res.status(500).json(error);
 
@@ -119,6 +120,7 @@ exports.addPost = async (req, res) => {
           description: desc.trim(),
           user_id: req.user.user_id,
           project_id: project_id || null,
+          status: "show", 
         },
       ])
       .select()
@@ -304,4 +306,17 @@ exports.deleteLike = async (req, res) => {
 
   if (error) return res.status(500).json(error);
   return res.status(200).json("Like has been removed.");
+};
+
+exports.deletePost = async (req, res) => {
+  const userId = req.user.user_id;
+
+  const { error } = await db
+    .from("posts")
+    .update([{ status: "hide" },]) // เปลี่ยนสถานะเป็น "hide"
+    .eq("user_id", userId)
+    .eq("post_id", req.params.post_id);
+
+  if (error) return res.status(500).json(error);
+  return res.status(200).json("Post has been deleted.");
 };

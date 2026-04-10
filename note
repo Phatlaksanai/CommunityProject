@@ -55,3 +55,8 @@ CREATE TYPE status_friendships AS ENUM (
 CREATE TYPE status_messages AS ENUM (
   'read', 'sending', 'sent', 'failed'  
 );
+
+create type status_post as enum (
+  'show',
+  'hide'
+);

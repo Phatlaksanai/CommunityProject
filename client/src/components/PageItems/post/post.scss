@@ -56,8 +56,8 @@
 
       .content {
         margin: 20px 0px;
-        // width: 100%; // บังคับความกว้าง content
-        // overflow: hidden; // ตัดส่วนที่แผ่ออกไปทิ้ง
+        width: 100%; // บังคับความกว้าง content
+        overflow: hidden; // ตัดส่วนที่แผ่ออกไปทิ้ง
 
         p {
           word-wrap: break-word;   // legacy
@@ -68,13 +68,13 @@
 
         .postMediaSlider {
         width: 100%;
-        // max-width: 100%; // ห้ามกว้างกว่าแม่
+        max-width: 100%; // ห้ามกว้างกว่าแม่
         border-radius: 10px;
         overflow: hidden;
-        // position: relative;
+        position: relative;
         background-color: themed("bgSoft"); // ใช้สีพื้นหลังที่เหมาะสมจากธีม
         
-        .postImage, .postModel {
+        .postImage{
           width: 100%;
           height: 500px; // คุมความสูงให้เท่ากันหมดทุก Slide
           display: flex;
@@ -90,16 +90,39 @@
         }
 
         .swiper {
-          // width: 100%;
-          // height: 500px;
+          width: 100%;
+          max-width: 100%;
+          height: 500px;
           // เพิ่มบรรทัดนี้เพื่อความชัวร์
-          // display: block; 
+          display: block; 
+          overflow: hidden;
         }
 
         .swiper-slide {
           // บังคับให้ slide กว้างเท่ากับตัว swiper เป๊ะๆ
           width: 100% !important; 
-          // height: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        .postModel {
+          width: 100%;
+          height: 100%; // ให้สูงเต็ม Swiper (500px)
+          display: block; // เปลี่ยนจาก flex เป็น block เพื่อความชัวร์ในการคุมขนาด
+          position: relative;
+
+          .model-viewer {
+            width: 100%;
+            height: 100%;
+            position: absolute; // ใช้ absolute เพื่อให้มันเกาะตามกรอบ postModel เป๊ะๆ
+            top: 0;
+            left: 0;
+
+            .viewer-canvas {
+              width: 100% !important;
+              height: 100% !important;
+            }
+          }
         }
 
         // ตกแต่งปุ่ม Navigation (ลูกศร)

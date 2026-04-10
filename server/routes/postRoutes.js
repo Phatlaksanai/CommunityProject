@@ -21,4 +21,6 @@ router.post("/likes", verifyToken, postController.addLike);
 // 3. ลบ Like (DELETE /api/posts/likes/post/:post_id)
 router.delete("/likes/post/:post_id", verifyToken, postController.deleteLike);
 
+router.post("/delete/post/:post_id", verifyToken, postController.deletePost);
+
 module.exports = router;

@@ -51,9 +51,16 @@ const Post = ({ post }) => {
   },
 });
 
+  const handleLike = () => {
+      // ตรวจสอบว่าใน Array 'data' มี ID ของเรา (currentUser?.user_id) อยู่ไหม
+      // !! แปลงค่าให้เป็น true/false เสมอ ป้องกัน error ถ้า data เป็น null
+      const isAlreadyLiked = !!data?.includes(currentUser?.user_id);
+      mutation.mutate(isAlreadyLiked); // ส่งสถานะปัจจุบัน (ไลก์แล้ว/ยังไม่ไลก์) เข้าไปใน mutation
+    };
+
   const deleteMutation = useMutation({
     mutationFn: (post_id) => {
-      return makeRequest.delete(`/posts/${post_id}`);
+      return makeRequest.post(`/posts/delete/post/${post.post_id}`);
     },
     onSuccess: () => {
       // เมื่อลบสำเร็จ สั่งให้รายการโพสต์ทั้งหมด (posts) รีเฟรชใหม่
@@ -61,13 +68,6 @@ const Post = ({ post }) => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
-
-  const handleLike = () => {
-    // ตรวจสอบว่าใน Array 'data' มี ID ของเรา (currentUser?.user_id) อยู่ไหม
-    // !! แปลงค่าให้เป็น true/false เสมอ ป้องกัน error ถ้า data เป็น null
-    const isAlreadyLiked = !!data?.includes(currentUser?.user_id);
-    mutation.mutate(isAlreadyLiked); // ส่งสถานะปัจจุบัน (ไลก์แล้ว/ยังไม่ไลก์) เข้าไปใน mutation
-  };
 
   const handleDelete = () => {
     deleteMutation.mutate(post.post_id);
@@ -100,7 +100,7 @@ const Post = ({ post }) => {
         <div className="content">
           <p>{post.description}</p>
 
-          {(post.imgs?.length > 0) && (
+          {( (post.imgs?.length > 0) || (post.models?.length > 0) ) && (
             <div className="postMediaSlider">
               <Swiper
                 modules={[Navigation, Pagination]}
