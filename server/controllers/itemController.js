@@ -1,10 +1,34 @@
 const db = require("../config/db");
 
 exports.getItems = async (req, res) => {
-  const { data, error } = await db
-    .from("items")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const { category, date } = req.query;
+
+  let query = db.from("items").select("*");
+
+  // ✅ filter category
+  if (category) {
+    // ถ้าเลือกหลาย category → เป็น array
+    const categories = Array.isArray(category) ? category : [category];
+    query = query.in("category", categories);
+  }
+
+  // ✅ filter date
+  if (date && date !== "AllTime") {
+    const now = new Date();
+    let pastDate = new Date();
+
+    if (date === "ThisMonth") {
+      pastDate.setMonth(now.getMonth() - 1);
+    } else if (date === "ThisWeek") {
+      pastDate.setDate(now.getDate() - 7);
+    } else if (date === "ThisDay") {
+      pastDate.setDate(now.getDate() - 1);
+    }
+
+    query = query.gte("created_at", pastDate.toISOString());
+  }
+
+  const { data, error } = await query.order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
 

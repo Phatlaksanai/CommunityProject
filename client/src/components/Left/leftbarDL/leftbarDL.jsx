@@ -1,29 +1,12 @@
 import "./leftbarDL.scss";
 import { AuthContext } from "../../../context/authContext";
 import { Link, useNavigate } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 
-const LeftBarDownload = () => {
+const LeftBarDownload = ({ filters = {}, setFilters }) => {
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
-
-
-  const [filters, setFilters] = useState({
-    category: {
-      Vehicles: false,
-      Characters: false,
-      Furniture: false,
-      Sports: false,
-      FoodDrink: false,
-      Electronics: false,
-    },
-    date: "AllTime",
-    others: {
-      Downloadable: false,
-    },
-  });
-
   const dateLabels = {
     AllTime: "All time",
     ThisMonth: "This month",
@@ -47,11 +30,6 @@ const LeftBarDownload = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Filters:", filters);
-  };
-
   return (
     <div className="leftBarDownload">
       <div className="leftBarDownloadItem">
@@ -59,13 +37,12 @@ const LeftBarDownload = () => {
         <span>{currentUser?.name || currentUser?.username || "Guest"}</span>
         <button onClick={() => navigate("/additem")} style={{ cursor: "pointer" }}>Add Item</button>
       </div>
-      
-      
+
       <h3>Detailed search</h3>
       <hr />
-      <form onSubmit={handleSubmit}>
+      <form>
         <p>Category</p>
-        {Object.keys(filters.category).map((item) => (
+        {Object.keys(filters.category || {}).map((item) => (
           <div key={item}>
             <input
               type="checkbox"
@@ -73,10 +50,7 @@ const LeftBarDownload = () => {
               checked={filters.category[item]}
               onChange={() => handleChange("category", item)}
             />
-            <label htmlFor={item}>
-              {" "}
-              {item === "FoodDrink" ? "Food & Drink" : item}
-            </label>
+            <label htmlFor={item}>{item}</label>
           </div>
         ))}
         <hr />

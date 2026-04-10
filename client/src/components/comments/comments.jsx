@@ -127,24 +127,18 @@ const Comments = ({ postId }) => {
       {commentsData?.map((comment) => (
         <div className="comment" key={comment.comment_id}>
           <img src={comment?.profilePic || defaultPic} alt="" />
-          <div className="info">
-            <span>{comment.name || comment.username}</span>
-            <p>{comment.description}</p>
-            {comment.img && (
-              <img
-                src={comment.img}
-                alt=""
-                style={{
-                  width: "100px",
-                  marginTop: "5px",
-                  borderRadius: "8px"
-                }}
-              />
-            )}
+          <div className="content">
+            <div className="info">
+              <div classname="top"> 
+              <span>{comment.name || comment.username}</span>
+              <span className="date">{dayjs(comment.created_at).fromNow()}</span>
+              </div>
+              <p>{comment.description}</p>
+              {comment.img && (
+                <img src={comment.img} alt="" />
+              )}
+            </div>
           </div>
-          <span className="date">
-            {dayjs(comment.created_at).fromNow()}
-          </span>
         </div>
       ))}
     </div>

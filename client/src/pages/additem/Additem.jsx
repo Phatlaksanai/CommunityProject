@@ -63,6 +63,11 @@ const AddItem = () => {
     setError("");
     setSuccess("");
 
+    if (!category) {
+      setError("กรุณาเลือกหมวดหมู่");
+      return;
+    }
+
     if (!img || !model) {
       setError("กรุณาเลือกรูปและไฟล์โมเดล");
       return;

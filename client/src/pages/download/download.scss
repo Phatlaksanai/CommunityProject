@@ -1,8 +1,10 @@
 @use "../../style.scss" as *;
 
 .download{
+  display: flex;
+  gap: 20px;
   @include themify($themes) {
-    padding: 20px 70px;
+    padding: 0px 15px 0px 0px;
     background-color: themed("bgSoft");
     min-height: 100vh;
 
@@ -14,4 +16,9 @@
       padding: 20px;
     }
   }
+
+/* content ฝั่งขวา */
+.content {
+  flex: 1;
+}
  }

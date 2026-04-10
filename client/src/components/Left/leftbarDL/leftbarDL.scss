@@ -2,14 +2,19 @@
 
 .leftBarDownload {
   @include themify($themes) {
-    flex: 1.5;
     position: sticky;
     top: 70px;
     height: calc(100vh - 70px);
     overflow: scroll;
     background-color: themed("bg");
     color: themed("textColor");
-
+    width: 250px; 
+    flex: none;
+    .error {
+      color: red;
+      margin-top: 10px;
+      font-size: 14px;
+    }
     @include mobile {
       display: none;
     }

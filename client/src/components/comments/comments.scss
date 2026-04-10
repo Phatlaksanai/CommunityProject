@@ -8,7 +8,12 @@
       border-radius: 50%;
       object-fit: cover;
     }
-
+    .preview img {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;   // 🔥 ทำให้ไม่เหลี่ยม
+  object-fit: cover;     // 🔥 ไม่ยืดภาพ
+} 
     .write{
       display: flex;
       align-items: center;
@@ -33,35 +38,69 @@
         border-radius: 3px;
       }
     }
-
     .comment {
-      margin: 30px 0px;
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 20px 0;
+}
 
-      .info {
-        flex:5;
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        align-items: flex-start;
+/* รูปโปรไฟล์ */
+.comment > img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
 
-        span {
-          font-weight: 500;
-        }
+/* กล่องกลาง */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.top {
+  display: flex;
+  justify-content: space-between; // 🔥 ซ้าย-ขวา
+  align-items: center;
+}
+.name {
+  font-weight: 500;
+}
 
-        p{
-          color:themed("textColorSoft")
-        }
-      }
+/* ชื่อ + เวลา อยู่บรรทัดเดียว */
+.info span {
+  font-weight: 500;
+}
 
-      .date{
-        flex:1;
-        align-self: center;
-        color: gray;
-        font-size: 12px;
-      }
-    }
+/* ข้อความ */
+.info p {
+  margin: 3px 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  color: themed("textColorSoft");
+}
+
+/* รูปใน comment */
+.info img {
+  width: 250px;
+  max-width: 100%;
+  border-radius: 10px;
+  margin-top: 5px;
+}
+
+/* เวลา */
+.date {
+  font-size: 12px;
+  color: gray;
+  white-space: nowrap;
+}
   }
 }

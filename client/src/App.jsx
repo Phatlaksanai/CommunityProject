@@ -68,19 +68,19 @@ function App() {
     )
   }
 
-  const TopTab = () => {
-    return (
-      <div className={`theme-${darkMode ? "dark" : "light"}`}>
-        <Navbar />
-        <div style={{ display: "flex" }}>
-          <LeftBarDL />
-          <div style={{ flex: 6 }}>
-            <Outlet />
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // const TopTab = () => {
+  //   return (
+  //     <div className={`theme-${darkMode ? "dark" : "light"}`}>
+  //       <Navbar />
+  //       <div style={{ display: "flex" }}>
+  //         {/* <LeftBarDL /> */}
+  //         <div style={{ flex: 6 }}>
+  //           <Outlet />
+  //         </div>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   const LayoutNavbar = () => {
     return (
@@ -168,7 +168,7 @@ function App() {
     {
       path: "/download",
       element: (
-        <TopTab />
+        <LayoutNavbar />
       ),
       children: [
         {
