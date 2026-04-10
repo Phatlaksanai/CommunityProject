@@ -1,6 +1,8 @@
 import "./share.scss";
 import Image from "../../assets/1.png";
 import Friend from "../../assets/1.png";
+import AttachmentIcon from '@mui/icons-material/Attachment';
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -126,7 +128,7 @@ const Share = () => {
                   className="file"
                   alt=""
                   src={filePreviews[i]}
-                  style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                  style={{ width: "50px", height: "50px", objectFit: "cover" , borderRadius: "10px"}}
                 />
               ) : (
                 <span style={{ fontSize: "12px", color: "gray" }}>
@@ -178,13 +180,13 @@ const Share = () => {
             />
             <label htmlFor="file">
               <div className="item">
-                <img src={Image} alt="Add" />
+                <AttachmentIcon />
                 <span>Image/Model</span>
               </div>
             </label>
             {/* เพิ่ม onClick เพื่อเปิด Modal */}
             <div className="item" onClick={() => setOpenProjectModal(true)}>
-              <img src={Friend} alt="Friend" />
+              <CreateNewFolderIcon />
               <span>Project</span>
             </div>
           </div>
