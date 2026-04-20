@@ -17,6 +17,7 @@ npm install cloudinary multer // server =============new
 npm install three // client ================new
 npm install @supabase/supabase-js // server
 npm install swiper // client
+npm i react-intersection-observer // client
 
     เพิ่มลบ project ได้ และก็ลบรูปออกจาก cloud ด้วย
 
