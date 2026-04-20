@@ -124,26 +124,29 @@ const Comments = ({ postId }) => {
         />
         <button onClick={handleClick}>Send</button>
       </div>
-      {commentsData?.map((comment) => (
-        <div className="comment" key={comment.comment_id}>
-          <img src={comment?.profilePic || defaultPic} alt="" />
-          <div className="content">
-            <div className="info">
-              <div classname="top"> 
-              <span>{comment.name || comment.username}</span>
-              <span className="date">{dayjs(comment.created_at).fromNow()}</span>
+      <div className="box-comment">
+        {commentsData?.length > 0 ? (
+          commentsData.map((comment) => (
+            <div className="comment" key={comment.comment_id}>
+              <img src={comment?.profilePic || defaultPic} alt="" />
+              <div className="content">
+                <div className="info">
+                  <div className="top">
+                    <span>{comment.name || comment.username}</span>
+                    <span className="date">
+                      {dayjs(comment.created_at).fromNow()}
+                    </span>
+                  </div>
+                  <p>{comment.description}</p>
+                  {comment.img && <img src={comment.img} alt="" />}
+                </div>
               </div>
-              <p>{comment.description}</p>
-              {comment.img && (
-                <img src={comment.img} alt="" />
-              )}
             </div>
-          </div>
-        </div>
-      ))}
-      {commentsData?.length === 0 && (
-  <p className="noComment">No Comment</p>
-)}
+          ))
+        ) : (
+          <p className="noComment">No Comment</p>
+        )}
+      </div>
     </div>
   );
 };

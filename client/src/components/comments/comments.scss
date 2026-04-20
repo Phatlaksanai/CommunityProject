@@ -47,6 +47,32 @@
   color: gray;
   font-size: 20px;
 }
+.box-comment {
+  height: 200px;
+  overflow-y: auto;
+
+  /* Chrome / Edge / Safari */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent; // 🔥 เอากล่องขาวออก
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #bbb; // ตัวเลื่อนสีเทา
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
+
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #bbb transparent; // 🔥 ไม่มีพื้นหลัง
+}
     .comment {
   display: flex;
   align-items: flex-start;
