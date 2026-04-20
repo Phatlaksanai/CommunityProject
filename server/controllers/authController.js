@@ -146,10 +146,9 @@ exports.register = async (req, res) => {
     }
 };
 
-exports.sendOtp = async (req, res) => {
+exports.sendOtpRegister = async (req, res) => {
     try {
         const { email } = req.body;
-
         // --- 1. จัดการตาราง 'users' ---
         // ใช้ upsert เพื่อสร้าง user เปล่าๆ ถ้ายังไม่มี หรือดึงข้อมูลถ้ามีอยู่แล้ว
         const { data: user, error: userError } = await db
@@ -164,7 +163,6 @@ exports.sendOtp = async (req, res) => {
         if (user.username) {
             return res.status(400).json({ error: "Email has been used" });
         }
-
         // --- 2. สร้าง OTP ---
         const otp = Math.floor(100000 + Math.random() * 900000);
         const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
@@ -202,6 +200,101 @@ exports.sendOtp = async (req, res) => {
         console.error("Detailed Error:", err);
         return res.status(500).json({ success: false, error: "Failed to send OTP" });
     }
+};
+
+exports.sendOtpResetPassword = async (req, res) => {
+    try {
+    const { email } = req.body;
+
+    // เช็คว่ามี user นี้จริงไหม
+    const { data: user, error: userError } = await db
+      .from("users")
+      .select("user_id")
+      .eq("email", email)
+      .single();
+
+    if (userError || !user) {
+      return res.status(400).json({ error: "Email not found" });
+    }
+
+    // สร้าง OTP
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+    // บันทึก OTP
+    const { error: otpError } = await db
+      .from("otps")
+      .upsert(
+        {
+          user_id: user.user_id,
+          otp: String(otp),
+          otp_expire: expiresAt,
+        },
+        { onConflict: "user_id" }
+      );
+
+    if (otpError) throw otpError;
+
+    // ส่ง email
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.NODEMAIL_USER,
+        pass: process.env.NODEMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.NODEMAIL_USER,
+      to: email,
+      subject: "Reset Password OTP",
+      html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
+    });
+
+    return res.json({ success: true });
+
+  } catch (err) {
+    console.error("RESET OTP ERROR:", err);
+    return res.status(500).json({ error: "Failed to send OTP" });
+  }
+};
+
+exports.verifyOtpResetPassword = async (req, res) => {
+    const { email, otp } = req.body;
+
+  // หา user
+  const { data: user } = await db
+    .from("users")
+    .select("user_id")
+    .eq("email", email)
+    .single();
+
+  if (!user) {
+    return res.status(400).json({ error: "Email not found" });
+  }
+
+  // หา OTP
+  const { data: otpData } = await db
+    .from("otps")
+    .select("*")
+    .eq("user_id", user.user_id)
+    .single();
+
+  if (!otpData) {
+    return res.status(400).json({ error: "OTP not found" });
+  }
+
+  if (otpData.otp !== otp) {
+    return res.status(400).json({ error: "OTP incorrect" });
+  }
+
+  if (new Date(otpData.otp_expire) < new Date()) {
+    return res.status(400).json({ error: "OTP expired" });
+  }
+
+  return res.json({ success: true });
 };
 
 exports.updateProfile = async (req, res) => {
@@ -263,4 +356,31 @@ if (coverPublicId && oldCoverId && oldCoverId !== coverPublicId) {
   } catch (err) {
     return res.status(500).json(err);
   }
+};
+
+exports.resetPassword = async (req, res) => {
+    const { email, password, confirmpassword } = req.body;
+    if (password !== confirmpassword) {
+        return res.status(400).json({ error: "Passwords don't match" });
+    }
+    if (password.length < 10 || password.length > 20) {
+        return res.status(400).json({ error: "Password must be between 10 and 20 characters" });
+    }
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$/.test(password)) {
+        return res.status(400).json({ error: "Password must contain at least one uppercase letter, one lowercase letter, and one special character" });
+    }
+    
+    try {
+    let hashedPassword = await bcrypt.hash(password, 8);
+        const { error: updateError } = await db
+            .from('users')
+            .update({ password: hashedPassword })
+            .eq('email', email);
+
+    if (updateError) throw updateError;
+    return res.json({ success: true });
+    } catch (err) {
+        console.error("Reset Password Error:", err);
+        return res.status(500).json({ error: "Failed to reset password" });
+    }
 };

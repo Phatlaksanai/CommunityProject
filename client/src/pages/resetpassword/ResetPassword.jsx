@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { makeRequest } from "../../api/axios";
@@ -13,21 +13,57 @@ const ResetPassword = () => {
   const [Email, setEmail] = useState("");
   const [OTP, setOTP] = useState("");
   const [password, setPassword] = useState("");
-  const [comfirmpassword, setConfirmPassword] = useState("");
+  const [confirmpassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const nextStep = () => {
-    if (password !== comfirmpassword) {
-      setError("Passwords are not same.");
-      return;
-    }
+  const [otpCooldown, setOtpCooldown] = useState(0);
+  const [otpLoading, setOtpLoading] = useState(false);
+
+  useEffect(() => { // นับถอยหลัง cooldown OTP
+      if (otpCooldown <= 0) return;
+  
+      const timer = setInterval(() => {
+        setOtpCooldown((prev) => prev - 1);
+      }, 1000);
+  
+      return () => clearInterval(timer);
+  }, [otpCooldown]);
+  
+  const nextStep = async () => {
     setError("");
-    setStep(2);
+    setSuccess("");
+  try {
+    const res = await makeRequest.post("/verify-otp-resetpassword", {
+      email: Email,
+      otp: OTP
+    });
+
+    if (res.data.success) {
+      setStep(2);
+    } else {
+      setError("OTP is incorrect");
+    }
+  } catch (err) {
+    setError(err.response?.data?.error || "OTP is incorrect");
+  }
   };
 
   const prevStep = () => {
     setStep(1);
+  };
+
+  const handleSendOTP = async () => {
+    if (otpCooldown > 0) return;
+    setError("");
+    setSuccess("");
+    try {
+    await makeRequest.post("/send-otp-resetpassword", { email: Email });
+    setSuccess("Sent OTP Successfully");
+    setOtpCooldown(8);
+  } catch (err) {
+    setError("OTP sending failed");
+  }
   };
 
   const handleResetPassword = async (e) => {
@@ -36,21 +72,19 @@ const ResetPassword = () => {
     setSuccess("");
     try {
       const res = await makeRequest.post("/reset-password", {
-        username,
+        email: Email,
         password,
+        confirmpassword,
       });
 
-      // Backend ส่งของ user data มาให้
       if (res.data.success) {
-        setUser(res.data);
-        localStorage.setItem("user", JSON.stringify(res.data));
-        navigate("/");
-      }
+      setSuccess("Reset password success");
+      navigate("/login");
+    }
     } catch (err) {
-      setError(err.response?.data?.error || "Login Failed");
+      setError(err.response?.data?.error || "Reset password failed");
     }
   };
-
   return (
     <div className="login">
       <div className="card">
@@ -94,7 +128,9 @@ const ResetPassword = () => {
               required
             />
             <div className="button-group">
-                <button type="button">OTP</button>
+                <button type="button" onClick={handleSendOTP} disabled={otpCooldown > 0 || otpLoading}>
+                    {otpCooldown > 0 ? `Resend OTP (${otpCooldown} s)` : "OTP"}
+                </button>
                 <button type="button" onClick={nextStep}>Confirm</button>
             </div>           
             </>
@@ -112,14 +148,13 @@ const ResetPassword = () => {
             />
             <input
               type="password"
-              value={comfirmpassword}
+              value={confirmpassword}
               placeholder="Confirm Password"
-              name="comfirmpassword"
+              name="confirmpassword"
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
             <div className="button-group">
-                <button type="button" onClick={prevStep}>Back</button>
                 <button type="submit" className="login-btn">Confirm</button>
             </div>
             </>

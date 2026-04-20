@@ -94,7 +94,7 @@ const Register = () => {
     }
 
     try {
-      const res = await fetch("/api/send-otp", {
+      const res = await fetch("/api/send-otp-register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -227,7 +227,7 @@ const Register = () => {
                     onClick={sendOTP}
                     disabled={otpCooldown > 0 || otpLoading}
                   >
-                    {otpCooldown > 0 ? `รอ ${otpCooldown} วิ` : "OTP"}
+                    {otpCooldown > 0 ? `Resend OTP (${otpCooldown} s)` : "OTP"}
                   </button>
 
                   <button type="button" onClick={prevStep}>
