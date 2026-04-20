@@ -38,6 +38,15 @@
         border-radius: 3px;
       }
     }
+    .noComment {
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: gray;
+  font-size: 20px;
+}
     .comment {
   display: flex;
   align-items: flex-start;

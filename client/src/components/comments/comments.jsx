@@ -141,6 +141,9 @@ const Comments = ({ postId }) => {
           </div>
         </div>
       ))}
+      {commentsData?.length === 0 && (
+  <p className="noComment">No Comment</p>
+)}
     </div>
   );
 };
