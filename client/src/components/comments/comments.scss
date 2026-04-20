@@ -48,7 +48,8 @@
   font-size: 20px;
 }
 .box-comment {
-  height: 200px;
+  height: auto;
+  max-height: 400px;
   overflow-y: auto;
 
   /* Chrome / Edge / Safari */
@@ -125,8 +126,10 @@
 
 /* รูปใน comment */
 .info img {
-  width: 250px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 300px;
+  height: 100%;
+  max-height: 300px;
   border-radius: 10px;
   margin-top: 5px;
 }
@@ -136,6 +139,7 @@
   font-size: 12px;
   color: gray;
   white-space: nowrap;
+  padding: 0px 10px;
 }
   }
 }

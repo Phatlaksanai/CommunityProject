@@ -249,13 +249,17 @@ exports.addComment = async (req, res) => {
 };
 
 exports.getCommentsByPostId = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
+  // 1. รับค่า page จาก Query String (เช่น /comments/123?page=0)
+  const page = parseInt(req.query.page) || 0;
+  const limit = 5; // โหลดทีละ 5 คอมเมนต์ (หรือ 10 ก็ได้ตามเหมาะสม)
+  const from = page * limit;
+  const to = from + limit - 1;
 
   try {
     const { data, error } = await db
       .from("comments")
-      .select(
-        `
+      .select(`
         comment_id,
         description,
         img,
@@ -266,12 +270,13 @@ exports.getCommentsByPostId = async (req, res) => {
           name,
           profilePic
         )
-      `,
-      )
+      `)
       .eq("post_id", id)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false }) // เอาคอมเมนต์ใหม่ขึ้นก่อน
+      .range(from, to); // 2. ดึงข้อมูลตามช่วง
 
     if (error) throw error;
+
     const formatted = data.map((c) => ({
       comment_id: c.comment_id,
       description: c.description,
@@ -289,6 +294,7 @@ exports.getCommentsByPostId = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
 exports.getLikes = async (req, res) => {
   const { data, error } = await db
     .from("likes")
@@ -337,6 +343,21 @@ exports.deleteLike = async (req, res) => {
 
   if (error) return res.status(500).json(error);
   return res.status(200).json("Like has been removed.");
+};
+
+// postController.js
+
+exports.getCommentsCount = async (req, res) => {
+  const { post_id } = req.params;
+
+  const { count, error } = await db
+    .from("comments")
+    .select("*", { count: 'exact', head: true }) // head: true คือเอาเฉพาะ count ไม่เอาเนื้อหา
+    .eq("post_id", post_id);
+
+  if (error) return res.status(500).json(error);
+  
+  return res.status(200).json(count || 0);
 };
 
 exports.deletePost = async (req, res) => {

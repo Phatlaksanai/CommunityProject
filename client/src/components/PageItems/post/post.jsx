@@ -27,6 +27,12 @@ const Post = ({ post }) => {
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
+  const { isLoading: commentLoading, data: commentCount } = useQuery({
+    queryKey: ["commentCount", post.post_id], // เปลี่ยน Key ให้ต่างจากตัวดึงคอมเมนต์จริง
+    queryFn: () =>
+      makeRequest.get(`/posts/comments/count/${post.post_id}`).then((res) => res.data),
+  });
+
   const { isLoading, error, data } = useQuery({
     queryKey: ["likes", post.post_id],
     queryFn: () => makeRequest.get(`/posts/likes/post/${post.post_id}`).then((res) => res.data), // ข้อที่ 1
@@ -34,7 +40,7 @@ const Post = ({ post }) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-  mutationFn: async (liked) => {
+    mutationFn: async (liked) => {
       if (liked) {
         // ถ้าเคย Like แล้ว -> ส่งคำสั่ง DELETE ไปถอน Like
         return await makeRequest.delete(`/posts/likes/post/${post.post_id}`);
@@ -42,21 +48,21 @@ const Post = ({ post }) => {
         // ถ้ายังไม่เคย Like -> ส่งคำสั่ง POST ไปเพิ่ม Like
         return await makeRequest.post("/posts/likes", { post_id: post.post_id });
       }
-  },
-  onSuccess: () => {
-    // เมื่อทำงานสำเร็จ (ถอนหรือเพิ่มสำเร็จ)
-    // สั่งให้ "ป้ายชื่อ" ที่ชื่อ "likes" ของโพสต์นี้ หมดอายุ (Invalidate)
-    // เพื่อให้ useQuery (ในข้อ 1) ไปดึงข้อมูลใหม่มาอัปเดตหน้าจอทันที
-    queryClient.invalidateQueries(["likes", post.post_id]);
-  },
-});
+    },
+    onSuccess: () => {
+      // เมื่อทำงานสำเร็จ (ถอนหรือเพิ่มสำเร็จ)
+      // สั่งให้ "ป้ายชื่อ" ที่ชื่อ "likes" ของโพสต์นี้ หมดอายุ (Invalidate)
+      // เพื่อให้ useQuery (ในข้อ 1) ไปดึงข้อมูลใหม่มาอัปเดตหน้าจอทันที
+      queryClient.invalidateQueries(["likes", post.post_id]);
+    },
+  });
 
   const handleLike = () => {
-      // ตรวจสอบว่าใน Array 'data' มี ID ของเรา (currentUser?.user_id) อยู่ไหม
-      // !! แปลงค่าให้เป็น true/false เสมอ ป้องกัน error ถ้า data เป็น null
-      const isAlreadyLiked = !!data?.includes(currentUser?.user_id);
-      mutation.mutate(isAlreadyLiked); // ส่งสถานะปัจจุบัน (ไลก์แล้ว/ยังไม่ไลก์) เข้าไปใน mutation
-    };
+    // ตรวจสอบว่าใน Array 'data' มี ID ของเรา (currentUser?.user_id) อยู่ไหม
+    // !! แปลงค่าให้เป็น true/false เสมอ ป้องกัน error ถ้า data เป็น null
+    const isAlreadyLiked = !!data?.includes(currentUser?.user_id);
+    mutation.mutate(isAlreadyLiked); // ส่งสถานะปัจจุบัน (ไลก์แล้ว/ยังไม่ไลก์) เข้าไปใน mutation
+  };
 
   const deleteMutation = useMutation({
     mutationFn: (post_id) => {
@@ -100,7 +106,7 @@ const Post = ({ post }) => {
         <div className="content">
           <p>{post.description}</p>
 
-          {( (post.imgs?.length > 0) || (post.models?.length > 0) ) && (
+          {((post.imgs?.length > 0) || (post.models?.length > 0)) && (
             <div className="postMediaSlider">
               <Swiper
                 modules={[Navigation, Pagination]}
@@ -159,7 +165,7 @@ const Post = ({ post }) => {
           </div>
           <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
             <TextsmsOutlinedIcon />
-            See Comments
+            {commentLoading ? "..." : commentCount} Comments
           </div>
         </div>
         {commentOpen && <Comments postId={post.post_id} />}

@@ -1,12 +1,167 @@
+// import "./comments.scss";
+// import PhotoIcon from '@mui/icons-material/Photo';
+// import { useContext, useState } from "react";
+// import { AuthContext } from "../../context/authContext";
+// import { useMutation, useQueryClient } from "@tanstack/react-query";
+// import { makeRequest } from "../../api/axios";
+// import { useQuery } from "@tanstack/react-query"; // เพิ่ม useQuery
+// import dayjs from "dayjs"; // moment to dayjs
+// import relativeTime from "dayjs/plugin/relativeTime"; // โหลด Plugin "เมื่อสักครู่"
+
+// const Comments = ({ postId }) => {
+//   const { currentUser } = useContext(AuthContext);
+//   const [desc, setDesc] = useState("");
+//   const [files, setFiles] = useState([]);
+//   const [filePreviews, setFilePreviews] = useState([]);
+//   const queryClient = useQueryClient();
+
+//   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
+
+//   const { data: commentsData } = useQuery({
+//     queryKey: ["comments", postId],
+//     queryFn: () =>
+//       makeRequest.get(`/posts/comments/${postId}`).then(res => res.data)
+//   });
+//   const upload = async (file) => {
+//     try {
+//       const formData = new FormData();
+//       formData.append("file", file);
+//       const res = await makeRequest.post("/upload/comment", formData);
+//       return res.data;
+//     } catch (err) {
+//       console.log(err);
+//     }
+//   };
+//   const mutation = useMutation({
+//     mutationFn: (newPost) => {
+//       return makeRequest.post("/posts/addcomment", newPost);
+//     },
+//     onSuccess: () => {
+//       queryClient.invalidateQueries(["comments", postId]);
+//       setDesc("");
+//       setFiles([]);
+//       setFilePreviews([]);
+//     },
+//   });
+//   const handleClick = async (e) => {
+//     e.preventDefault();
+//     if (desc.trim() === "" && files.length === 0) return;
+
+//     let imgUrl = null;
+
+//     if (files[0]) {
+//       const result = await upload(files[0]);
+//       if (result?.url) imgUrl = result.url;
+//     }
+
+//     mutation.mutate({
+//       desc,
+//       img: imgUrl,
+//       postId: postId,
+//       userId: currentUser.user_id
+//     });
+//   };
+//   const handleFileChange = (e) => {
+//     const file = e.target.files[0];
+//     if (!file) return;
+//     if (!/\.(jpg|jpeg|png|gif)$/i.test(file.name)) return;
+//     setFiles([file]); // overwrite เลย
+//     const preview = URL.createObjectURL(file);
+//     setFilePreviews([preview]); // เหลือ 1 อัน
+//     e.target.value = null; // ล้างค่า input หลังเลือกไฟล์
+//   };
+
+//   const removeFile = () => {
+//     setFiles([]);
+//     setFilePreviews([]);
+//   };
+
+//   dayjs.extend(relativeTime);
+
+//   return (
+//     <div className="comments">
+//       <div className="write">
+//         <img src={currentUser.profilePic} alt="" />
+
+//         <input
+//           type="file"
+//           id={`file-${postId}`}
+//           style={{ display: "none" }}
+//           accept=".jpg,.png,.jpeg,.gif"
+//           onChange={handleFileChange}
+//         />
+
+//         <label htmlFor={`file-${postId}`} className="item">
+//           <PhotoIcon />
+//         </label>
+
+//         <div className="preview-container">
+//           {filePreviews[0] && (
+//             <div className="preview">
+//               {filePreviews[0] && (
+//                 <img src={filePreviews[0]} alt="" />
+//               )}
+//               <button
+//                 onClick={removeFile}
+//                 style={{
+//                   marginLeft: "10px",
+//                   color: "red",
+//                   border: "none",
+//                   background: "none",
+//                   cursor: "pointer"
+//                 }}
+//               >
+//                 X
+//               </button>
+//             </div>
+//           )}
+//         </div>
+//         <input
+//           type="text"
+//           placeholder="write a comment"
+//           value={desc}
+//           onChange={(e) => setDesc(e.target.value)}
+//         />
+//         <button onClick={handleClick}>Send</button>
+//       </div>
+//       <div className="box-comment">
+//         {commentsData?.length > 0 ? (
+//           commentsData.map((comment) => (
+//             <div className="comment" key={comment.comment_id}>
+//               <img src={comment?.profilePic || defaultPic} alt="" />
+//               <div className="content">
+//                 <div className="info">
+//                   <div className="top">
+//                     <span>{comment.name || comment.username}</span>
+//                     <span className="date">
+//                       {dayjs(comment.created_at).fromNow()}
+//                     </span>
+//                   </div>
+//                   <p>{comment.description}</p>
+//                   {comment.img && <img src={comment.img} alt="" />}
+//                 </div>
+//               </div>
+//             </div>
+//           ))
+//         ) : (
+//           <p className="noComment">No Comment</p>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Comments;
+
+
 import "./comments.scss";
 import PhotoIcon from '@mui/icons-material/Photo';
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query"; // เปลี่ยน useQuery เป็น useInfiniteQuery
 import { makeRequest } from "../../api/axios";
-import { useQuery } from "@tanstack/react-query"; // เพิ่ม useQuery
-import dayjs from "dayjs"; // moment to dayjs
-import relativeTime from "dayjs/plugin/relativeTime"; // โหลด Plugin "เมื่อสักครู่"
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 const Comments = ({ postId }) => {
   const { currentUser } = useContext(AuthContext);
@@ -17,11 +172,26 @@ const Comments = ({ postId }) => {
 
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
-  const { data: commentsData } = useQuery({
+  /* ===== 1. ปรับเปลี่ยนการดึงข้อมูลเป็น useInfiniteQuery ===== */
+  const {
+    data: infiniteComments,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status
+  } = useInfiniteQuery({
     queryKey: ["comments", postId],
-    queryFn: () =>
-      makeRequest.get(`/posts/comments/${postId}`).then(res => res.data)
+    queryFn: ({ pageParam = 0 }) =>
+      makeRequest.get(`/posts/comments/${postId}?page=${pageParam}`).then(res => res.data),
+    getNextPageParam: (lastPage, allPages) => {
+      // เพิ่มการตรวจสอบ lastPage ว่ามีค่าหรือไม่ก่อนเช็ค length
+      if (!lastPage || lastPage.length < 5) {
+        return undefined;
+      }
+      return allPages.length;
+    },
   });
+
   const upload = async (file) => {
     try {
       const formData = new FormData();
@@ -32,23 +202,25 @@ const Comments = ({ postId }) => {
       console.log(err);
     }
   };
+
   const mutation = useMutation({
     mutationFn: (newPost) => {
       return makeRequest.post("/posts/addcomment", newPost);
     },
     onSuccess: () => {
+      // เมื่อคอมเมนต์สำเร็จ ให้ล้าง Cache เพื่อโหลดหน้าแรกใหม่
       queryClient.invalidateQueries(["comments", postId]);
       setDesc("");
       setFiles([]);
       setFilePreviews([]);
     },
   });
+
   const handleClick = async (e) => {
     e.preventDefault();
     if (desc.trim() === "" && files.length === 0) return;
 
     let imgUrl = null;
-
     if (files[0]) {
       const result = await upload(files[0]);
       if (result?.url) imgUrl = result.url;
@@ -61,14 +233,15 @@ const Comments = ({ postId }) => {
       userId: currentUser.user_id
     });
   };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!/\.(jpg|jpeg|png|gif)$/i.test(file.name)) return;
-    setFiles([file]); // overwrite เลย
+    setFiles([file]);
     const preview = URL.createObjectURL(file);
-    setFilePreviews([preview]); // เหลือ 1 อัน
-    e.target.value = null; // ล้างค่า input หลังเลือกไฟล์
+    setFilePreviews([preview]);
+    e.target.value = null;
   };
 
   const removeFile = () => {
@@ -81,7 +254,7 @@ const Comments = ({ postId }) => {
   return (
     <div className="comments">
       <div className="write">
-        <img src={currentUser.profilePic} alt="" />
+        <img src={currentUser.profilePic || defaultPic} alt="" />
 
         <input
           type="file"
@@ -98,19 +271,8 @@ const Comments = ({ postId }) => {
         <div className="preview-container">
           {filePreviews[0] && (
             <div className="preview">
-              {filePreviews[0] && (
-                <img src={filePreviews[0]} alt="" />
-              )}
-              <button
-                onClick={removeFile}
-                style={{
-                  marginLeft: "10px",
-                  color: "red",
-                  border: "none",
-                  background: "none",
-                  cursor: "pointer"
-                }}
-              >
+              <img src={filePreviews[0]} alt="" />
+              <button onClick={removeFile} style={{ marginLeft: "10px", color: "red", border: "none", background: "none", cursor: "pointer" }}>
                 X
               </button>
             </div>
@@ -124,25 +286,57 @@ const Comments = ({ postId }) => {
         />
         <button onClick={handleClick}>Send</button>
       </div>
+
       <div className="box-comment">
-        {commentsData?.length > 0 ? (
-          commentsData.map((comment) => (
-            <div className="comment" key={comment.comment_id}>
-              <img src={comment?.profilePic || defaultPic} alt="" />
-              <div className="content">
-                <div className="info">
-                  <div className="top">
-                    <span>{comment.name || comment.username}</span>
-                    <span className="date">
-                      {dayjs(comment.created_at).fromNow()}
-                    </span>
+        {status === "loading" ? (
+          <p>Loading comments...</p>
+        ) : infiniteComments?.pages[0]?.length > 0 ? (
+          <>
+            {/* วนลูปตามหน้า (Pages) */}
+            {infiniteComments.pages.map((page, i) => (
+              <div key={i}>
+                {/* วนลูปตามรายการคอมเมนต์ในหน้านั้นๆ */}
+                {page.map((comment) => (
+                  <div className="comment" key={comment.comment_id}>
+                    <img src={comment?.profilePic || defaultPic} alt="" />
+                    <div className="content">
+                      <div className="info">
+                        <div className="top">
+                          <span>{comment.name || comment.username}</span>
+                          <span className="date">
+                            {dayjs(comment.created_at).fromNow()}
+                          </span>
+                        </div>
+                        <p>{comment.description}</p>
+                        {comment.img && <img src={comment.img} alt="" className="commentImg" />}
+                      </div>
+                    </div>
                   </div>
-                  <p>{comment.description}</p>
-                  {comment.img && <img src={comment.img} alt="" />}
-                </div>
+                ))}
               </div>
-            </div>
-          ))
+            ))}
+
+            {/* ปุ่มโหลดข้อมูลหน้าถัดไป */}
+            {hasNextPage && (
+              <button
+                className="loadMoreBtn"
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "10px",
+                  border: "none",
+                  background: "none",
+                  color: "#5271ff",
+                  cursor: "pointer",
+                  fontWeight: "bold"
+                }}
+              >
+                {isFetchingNextPage ? "Loading more..." : "See more comments"}
+              </button>
+            )}
+          </>
         ) : (
           <p className="noComment">No Comment</p>
         )}

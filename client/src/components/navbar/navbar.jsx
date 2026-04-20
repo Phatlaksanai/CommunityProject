@@ -87,12 +87,12 @@ const Navbar = () => {
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}/>
           <span>{currentUser?.name || currentUser?.username || "Guest"}</span>
           {!currentUser && (
-            <button onClick={handleLogin} style={{ marginLeft: "10px", cursor: "pointer" }}>
+            <button onClick={handleLogin}>
               Login
             </button>
           )}
           {currentUser && (
-            <button onClick={handleLogout} style={{ marginLeft: "10px", cursor: "pointer" }}>
+            <button onClick={handleLogout}>
               Logout
             </button>
           )}

@@ -84,7 +84,13 @@
           object-fit: cover;
         }
 
-        
+        button{
+          border-radius: 6px;
+          background-color: themed("textColor");
+          padding: 5px 10px;
+          cursor: pointer;
+          color:themed("bg");
+        }
       }
     }
   }
