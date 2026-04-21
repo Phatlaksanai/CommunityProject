@@ -3,7 +3,7 @@ import Image from "../../assets/1.png";
 import Friend from "../../assets/1.png";
 import AttachmentIcon from '@mui/icons-material/Attachment';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
@@ -21,6 +21,8 @@ const Share = () => {
   const [search, setSearch] = useState("");
   const [openProjectModal, setOpenProjectModal] = useState(false); // เพิ่ม State สำหรับเปิด-ปิด Modal
   const [selectedProject, setSelectedProject] = useState(null); // State สำหรับเก็บ ID โปรเจคที่เลือก
+
+  const [error, setError] = useState("");
 
   // ดึงข้อมูลโปรเจคของผู้ใช้ (ตัวอย่าง API path: /projects)
   const { isLoading, data: projects } = useQuery({
@@ -82,11 +84,25 @@ const Share = () => {
     });
   };
 
+  const MAX_MODEL_SIZE = 10 * 1024 * 1024; // 10MB
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    const validFiles = selectedFiles.filter((file) =>
-      /\.(jpg|jpeg|png|gif|glb|gltf)$/i.test(file.name)
-    );
+
+    const validFiles = selectedFiles.filter((file) => {
+      const isValidType = /\.(jpg|jpeg|png|gif|glb|gltf)$/i.test(file.name);
+      if (!isValidType) return false;
+
+      const isModel = /\.(glb|gltf)$/i.test(file.name);
+
+      // 👉 ถ้าเป็น model ต้องไม่เกิน 10MB
+      if (isModel && file.size > MAX_MODEL_SIZE) {
+        setError(`File ${file.name} Over 10MB`);
+        return false;
+      }
+      setError(""); // ล้าง error ถ้าไฟล์นี้ผ่านการตรวจสอบ
+      return true;
+    });
     setFiles((prev) => prev.concat(validFiles));
     e.target.value = "";
     const previews = validFiles.map((file) =>
@@ -105,6 +121,15 @@ const Share = () => {
   const selectedProjectData = projects?.find( // หาก้อน object ที่ตรงกับ id ที่เลือกไว้
   (p) => p.project_id === selectedProject
   );
+
+  useEffect(() => {
+  if (openProjectModal) {
+    document.body.style.overflow = "hidden";
+  } 
+  return () => {
+    document.body.style.overflow = "auto";
+  };
+}, [openProjectModal]);
 
   return (
     <div className="share">
@@ -190,6 +215,7 @@ const Share = () => {
               <span>Project</span>
             </div>
           </div>
+          {error && <p style={{ color: "red" , fontSize: "14px" }}>{error}</p>}
           <div className="right">
             <button onClick={handleClick}>Share</button>
           </div>

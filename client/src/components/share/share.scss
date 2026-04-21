@@ -81,25 +81,30 @@
         }
       }
     }
-
-    // ...โค้ดเดิมของคุณด้านบน...
-
-    .projectModal {
+  }
+}
+.projectModal {
       position: fixed;
-      padding: 20px;
-      border-radius: 20px;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: auto;
-      height: auto;
-      background-color: rgba(120, 120, 120,);
+      // padding: 20px;
+      // border-radius: 20px;
+      // top: 50%;
+      // left: 50%;
+      // transform: translate(-50%, -50%);
+      // width: auto;
+      // height: auto;
+      top: 0;
+  left: 0;
+  width: 100vw; 
+  height: 100vh;
+      background: rgba(0, 0, 0, 0.3);
+      // background-color: themed("bg");
+
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 999;
-
-      .modalContainer {
+    }
+      .projectModal .modalContainer {
         @include themify($themes) {
           background-color: themed("bg");
           color: themed("textColor");
@@ -221,6 +226,3 @@
           }
         }
       }
-    }
-  }
-}

@@ -79,6 +79,7 @@ exports.getPostsByUserId = async (req, res) => {
     `,
     )
     .eq("user_id", id)
+    .eq("status", "show")
     .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);

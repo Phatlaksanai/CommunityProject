@@ -32,6 +32,8 @@ const AddItem = () => {
     setError("");
   };
 
+  const MAX_MODEL_SIZE = 10 * 1024 * 1024;
+
   const handleModelChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -40,8 +42,14 @@ const AddItem = () => {
       setError("กรุณาเลือกไฟล์ .glb หรือ .gltf");
       return;
     }
-
-    setModel(file); e.target.value = "";
+    if (file.size > MAX_MODEL_SIZE) {
+      setError("File size must be under 10MB");
+      setModel(null); // เคลียร์ของเก่า
+      e.target.value = "";
+      return;
+    }
+    setModel(file); 
+    e.target.value = "";
     setError("");
   };
   const uploadFile = async (file) => {

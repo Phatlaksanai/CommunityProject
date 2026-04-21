@@ -12,7 +12,52 @@
     &::-webkit-scrollbar {
       display: none;
     }
+    .profileModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalContainer {
+  background: themed("bg");
+  width: 350px;
+  max-width: 90%;
+  padding: 20px;
+  border-radius: 12px;
+
+  p {
+    margin: 8px 0;
+    font-size: 14px;
+  }
+}
+
+.modalContainer a {
+  color: inherit;    
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+
+  h2 {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  svg {
+    cursor: pointer;
+    font-size: 22px;
+  }
+}
     .container {
       padding: 0;
 
