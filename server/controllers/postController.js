@@ -69,6 +69,8 @@ exports.getPostsByUserId = async (req, res) => {
     .select(
       `
       *,
+      imgs(img),
+      models(model),
       users (
         username,
         name,
@@ -99,6 +101,8 @@ exports.getPostsByProjectId = async (req, res) => {
     .select(
       `
       *,
+      imgs(img),
+      models(model),
       users (
         username,
         profilePic
@@ -126,6 +130,7 @@ exports.getPostsByUserIdAvailable = async (req, res) => {
     .from("posts")
     .select("*")
     .eq("user_id", id)
+    .eq("status", "show")
     .is("project_id", null)
     .order("created_at", { ascending: false });
 
@@ -208,6 +213,7 @@ exports.getPostsForEditProject = async (req, res) => {
   const { data, error } = await db
     .from("posts")
     .select("*")
+    .eq("status", "show")
     // ดึงอันที่เป็นของโปรเจกต์นี้ OR (เป็นของเรา AND ยังไม่มีโปรเจกต์)
     .or(
       `project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`,

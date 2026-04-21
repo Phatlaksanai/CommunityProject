@@ -212,9 +212,9 @@ const ModelViewer = ({ modelUrl }) => {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
-    
+
     // ปรับปรุงการตั้งค่าสีให้ทันสมัย (Three.js เวอร์ชั่นใหม่ๆ แนะนำแบบนี้)
-    renderer.outputColorSpace = THREE.SRGBColorSpace; 
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -274,7 +274,10 @@ const ModelViewer = ({ modelUrl }) => {
 
         model.traverse((child) => {
           if (child.isMesh) {
-            child.material.side = THREE.DoubleSide;
+            // บังคับให้ทุกอย่างเรนเดอร์เฉพาะด้านหน้า ถ้าอันไหนเป็น Outline มันจะหายไป 
+            // ถ้าอันไหนเป็นตัวละคร มันจะสว่างขึ้น ถ้าทำแบบนี้แล้วตัวละครมา แสดงว่าเป็นที่ Outline จริงๆ
+            child.material.side = THREE.FrontSide;
+            // child.material.side = THREE.DoubleSide;
             child.castShadow = true;
             child.receiveShadow = true;
           }
@@ -282,7 +285,7 @@ const ModelViewer = ({ modelUrl }) => {
 
         scene.add(model);
         fitCameraToObject(model);
-        
+
         // บังคับ Resize อีกครั้งเผื่อ Swiper เพิ่งกางเสร็จ
         setTimeout(handleResize, 100);
       });
@@ -303,12 +306,12 @@ const ModelViewer = ({ modelUrl }) => {
       resizeObserver.disconnect();
       controls.dispose();
       renderer.dispose();
-      
+
       // ลบ Canvas ออกจาก DOM เพื่อไม่ให้เกิดขยะ
       if (renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
-      
+
       // เคลียร์ memory ของ geometries/materials ถ้าทำได้จะดีมาก
       scene.traverse((object) => {
         if (!object.isMesh) return;
@@ -330,7 +333,7 @@ const ModelViewer = ({ modelUrl }) => {
     }
   }, [modelUrl, isVisible]);
 
- 
+
 
   return (
     // ใส่ Ref ที่ div นอกสุดเพื่อใช้ดักจับระยะจอ
