@@ -48,7 +48,7 @@ const LeftBar = () => {
         <div className="menu">
           <div className="menu-header">
             <span>My Communities</span>
-            <button>Create</button>
+            <button onClick={() => navigate("/addcommu")} style={{ cursor: "pointer" }}>Create</button>
           </div>
           <div className="item">
             <img src={Events} alt="" />

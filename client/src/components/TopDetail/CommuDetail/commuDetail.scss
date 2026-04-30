@@ -1,6 +1,6 @@
 @use "../../../style.scss" as *;
 
-.profileDetail {
+.commudetail {
   @include themify($themes) {
     flex: 2;
     top: 70px;

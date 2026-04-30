@@ -40,6 +40,7 @@ app.use("/api", require("./routes/authRoutes"));
 app.use("/api/posts", require("./routes/postRoutes"));
 app.use("/api/projects", require("./routes/projectRoutes"));
 app.use("/api/items", require("./routes/itemRoutes"));
+app.use("/api/communities", require("./routes/commuRoutes"));
 app.use("/api/upload", require("./routes/uploadRoutes"));
 app.use(express.static(path.join(__dirname, 'public')))
 

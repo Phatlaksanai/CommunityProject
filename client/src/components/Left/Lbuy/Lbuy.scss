@@ -1,5 +1,7 @@
 @use "../../../style.scss" as *;
 
+@use "../../../style.scss" as *;
+
 .Lbuy {
   @include themify($themes) {
     flex: 3;
@@ -24,72 +26,62 @@
       padding: 20px;
 
       .item {
-        display: flex;
-        align-items: center;   // ทำให้อยู่ระนาบเดียวกัน
-        gap: 10px; 
         -webkit-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
         -moz-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
         box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
         padding: 20px;
         margin-bottom: 20px;
         background-color: themed("bg");
-        border-radius: 10px;
 
-        img {
-        width: 100%;
-        height: auto;
-        max-height: none;
-        object-fit: initial;
-        border-radius: 10px;
-        }
-        h2 {
-            margin: 0; 
-        }
-        .user {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin: 20px 0px;
-
-          .userInfo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-
-            img {
-              width: 40px;
-              height: 40px;
-              border-radius: 50%;
-              object-fit: cover;
-              
-            }
-
-            p {
-              color: themed("textColorSoft");
-            }
-
-            span {
-              font-weight: 500;
-              color: themed("textColor");
-            }
-          }
-
-          .buttons {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-
-            button {
-              border: none;
-              padding: 5px;
-              color: white;
-              cursor: pointer;
-              background-color: #5271ff;
-            }
-          }
+        span {
+          color: gray;
         }
       }
+      .new-releases {
+        .payment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;   // 🔥 กลางแนวนอน
+  justify-content: center; // 🔥 กลางแนวตั้ง
+  text-align: center;
+  height: 100%;
+
+  .qr {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    margin-bottom: 20px;
+  }
+
+  .expire {
+    font-size: 20px;
+    margin: 10px 0;
+  }
+
+  .desc {
+    font-size: 14px;
+    color: gray;
+    margin-bottom: 20px;
+  }
+
+  .confirmBox {
+  display: flex;
+  align-items: center;
+
+  button {
+    border: none;
+    flex: 1;
+    padding: 20px 100px;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    background-color: #5271ff;
+    border-radius: 10px;
+  }
+}
+}
+  }
     }
   }
 }
+

@@ -1,8 +1,10 @@
 import "./rightDI.scss";
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import { useNavigate } from "react-router-dom";
 
 const RightDI = ({ item }) => {
   if (!item) return null;
+  const navigate = useNavigate();
 
   return (
     <div className="rightDI">
@@ -37,7 +39,7 @@ const RightDI = ({ item }) => {
         </div>
         <div className="menu">
           <div className="buttons">
-              <button>Check Out</button>
+              <button onClick={() => navigate("/buyitem")} style={{ cursor: "pointer" }}>Check Out</button>
           </div>
         </div>
         
