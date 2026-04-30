@@ -1,6 +1,7 @@
 import "./addItem.scss";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";//-------------------------------------
+import { makeRequest } from "../../api/axios";
 
 const AddItem = () => {
   //----------------------------------------------------------
@@ -17,6 +18,8 @@ const AddItem = () => {
   // message
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [imgPublicId, setImgPublicId] = useState(null);
+  const [modelPublicId, setModelPublicId] = useState(null);
 
   // ================= UPLOAD FILES TO CLOUDINARY =================
   const handleImageChange = (e) => {
@@ -48,21 +51,18 @@ const AddItem = () => {
       e.target.value = "";
       return;
     }
-    setModel(file); 
+    setModel(file);
     e.target.value = "";
     setError("");
   };
   const uploadFile = async (file) => {
+    if (!file || !(file instanceof File)) return null; // ถ้าไม่ใช่ไฟล์ ไม่ต้องอัปโหลด
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("/api/upload/item", {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    });
-
-    return await res.json();
+    // ใช้ makeRequest แทน fetch เพื่อความสม่ำเสมอ
+    const res = await makeRequest.post("/upload/item", formData);
+    return res.data; // คาดหวัง { url: "...", public_id: "..." }
   };
 
 
@@ -90,28 +90,23 @@ const AddItem = () => {
         return;
       }
 
-      const res = await fetch("/api/items/additem", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          modelName,
-          description,
-          price,
-          category,
-          img: imgURL.url,
-          model: modelURL.url,
-        }),
+      const res = await makeRequest.post("/items/additem", {
+        modelName,
+        description,
+        price,
+        category,
+        img: imgURL.url,
+        model: modelURL.url,
+        imgPublicId: imgURL.public_id,
+        modelPublicId: modelURL.public_id,
       });
 
-      const data = await res.json();
+      // const data = await res.json();
 
-      if (!res.ok) {
-        setError(data.error || "add item failed");
-        return;
-      }
+      // if (!res.ok) {
+      //   setError(data.error || "add item failed");
+      //   return;
+      // }
 
 
 

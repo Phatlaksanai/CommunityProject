@@ -21,7 +21,7 @@ const Item = ({ item, isProfile }) => {
         </div>
         <div className="price">
             <p>$ {item.price}</p>
-            {isProfile && item.user_id === currentUser.user_id && (<SettingsIcon onClick={() => navigate(`/download`)} style={{ cursor: "pointer" }}/>)}
+            {isProfile && item.user_id === currentUser.user_id && (<SettingsIcon onClick={() => navigate(`/edititem/${item?.item_id}`)} style={{ cursor: "pointer" }}/>)}
         </div>
       </div>
     </div>
