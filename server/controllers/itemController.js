@@ -113,7 +113,7 @@ exports.getItemsByUserId = async (req, res) => {
 };
 
 exports.addItem = async (req, res) => {
-  const { modelName, description, price, img, model, category } = req.body;
+  const { modelName, description, price, img, model, category, imgPublicId, modelPublicId } = req.body;
 
   if (!modelName || !price) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -134,6 +134,8 @@ exports.addItem = async (req, res) => {
         model: model || null,
         category: category || null,
         user_id: req.user.user_id,
+        img_public_id: imgPublicId || null,
+        model_public_id: modelPublicId || null,
       },
     ])
     .select()

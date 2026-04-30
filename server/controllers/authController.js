@@ -34,23 +34,23 @@ exports.login = async (req, res) => {
             { expiresIn: "1d" }
         );
 
-        res.cookie("accessToken", token, { 
-            httpOnly: true, 
-            sameSite: "lax", 
+        res.cookie("accessToken", token, {
+            httpOnly: true,
+            sameSite: "lax",
             secure: process.env.NODE_ENV === "production"
         })
-        .status(200)
-        .json({
-            success: true,
-            user_id: user.user_id,
-            username: user.username,
-            name: user.name,
-            profilePic: user.profilePic,
-            coverPic: user.coverPic,
-            description: user.description,
-            city: user.city,
-            website: user.website
-        });
+            .status(200)
+            .json({
+                success: true,
+                user_id: user.user_id,
+                username: user.username,
+                name: user.name,
+                profilePic: user.profilePic,
+                coverPic: user.coverPic,
+                description: user.description,
+                city: user.city,
+                website: user.website
+            });
 
     } catch (err) {
         console.error(err);
@@ -60,8 +60,8 @@ exports.login = async (req, res) => {
 
 exports.logout = (req, res) => {
     res.clearCookie("accessToken", { httpOnly: true, sameSite: "lax" })
-       .status(200)
-       .json({ success: true });
+        .status(200)
+        .json({ success: true });
 };
 
 exports.register = async (req, res) => {
@@ -171,10 +171,10 @@ exports.sendOtpRegister = async (req, res) => {
         // ตอนนี้เรามี user.user_id แล้ว เอามาใช้เชื่อมตารางได้เลย
         const { error: otpError } = await db
             .from('otps')
-            .upsert({ 
+            .upsert({
                 user_id: user.user_id, // ใช้ ID จากตาราง users
-                otp: String(otp), 
-                otp_expire: expiresAt 
+                otp: String(otp),
+                otp_expire: expiresAt
             }, { onConflict: 'user_id' }); // ป้องกันการสร้าง OTP ซ้ำซ้อนให้ user คนเดิม
 
         if (otpError) throw otpError;
@@ -204,158 +204,219 @@ exports.sendOtpRegister = async (req, res) => {
 
 exports.sendOtpResetPassword = async (req, res) => {
     try {
-    const { email } = req.body;
+        const { email } = req.body;
 
-    // เช็คว่ามี user นี้จริงไหม
-    const { data: user, error: userError } = await db
-      .from("users")
-      .select("user_id")
-      .eq("email", email)
-      .single();
+        // เช็คว่ามี user นี้จริงไหม
+        const { data: user, error: userError } = await db
+            .from("users")
+            .select("user_id")
+            .eq("email", email)
+            .single();
 
-    if (userError || !user) {
-      return res.status(400).json({ error: "Email not found" });
+        if (userError || !user) {
+            return res.status(400).json({ error: "Email not found" });
+        }
+
+        // สร้าง OTP
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+        // บันทึก OTP
+        const { error: otpError } = await db
+            .from("otps")
+            .upsert(
+                {
+                    user_id: user.user_id,
+                    otp: String(otp),
+                    otp_expire: expiresAt,
+                },
+                { onConflict: "user_id" }
+            );
+
+        if (otpError) throw otpError;
+
+        // ส่ง email
+        const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
+            auth: {
+                user: process.env.NODEMAIL_USER,
+                pass: process.env.NODEMAIL_PASS,
+            },
+        });
+
+        await transporter.sendMail({
+            from: process.env.NODEMAIL_USER,
+            to: email,
+            subject: "Reset Password OTP",
+            html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
+        });
+
+        return res.json({ success: true });
+
+    } catch (err) {
+        console.error("RESET OTP ERROR:", err);
+        return res.status(500).json({ error: "Failed to send OTP" });
     }
-
-    // สร้าง OTP
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-
-    // บันทึก OTP
-    const { error: otpError } = await db
-      .from("otps")
-      .upsert(
-        {
-          user_id: user.user_id,
-          otp: String(otp),
-          otp_expire: expiresAt,
-        },
-        { onConflict: "user_id" }
-      );
-
-    if (otpError) throw otpError;
-
-    // ส่ง email
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.NODEMAIL_USER,
-        pass: process.env.NODEMAIL_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: process.env.NODEMAIL_USER,
-      to: email,
-      subject: "Reset Password OTP",
-      html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
-    });
-
-    return res.json({ success: true });
-
-  } catch (err) {
-    console.error("RESET OTP ERROR:", err);
-    return res.status(500).json({ error: "Failed to send OTP" });
-  }
 };
 
 exports.verifyOtpResetPassword = async (req, res) => {
     const { email, otp } = req.body;
 
-  // หา user
-  const { data: user } = await db
-    .from("users")
-    .select("user_id")
-    .eq("email", email)
-    .single();
+    // หา user
+    const { data: user } = await db
+        .from("users")
+        .select("user_id")
+        .eq("email", email)
+        .single();
 
-  if (!user) {
-    return res.status(400).json({ error: "Email not found" });
-  }
+    if (!user) {
+        return res.status(400).json({ error: "Email not found" });
+    }
 
-  // หา OTP
-  const { data: otpData } = await db
-    .from("otps")
-    .select("*")
-    .eq("user_id", user.user_id)
-    .single();
+    // หา OTP
+    const { data: otpData } = await db
+        .from("otps")
+        .select("*")
+        .eq("user_id", user.user_id)
+        .single();
 
-  if (!otpData) {
-    return res.status(400).json({ error: "OTP not found" });
-  }
+    if (!otpData) {
+        return res.status(400).json({ error: "OTP not found" });
+    }
 
-  if (otpData.otp !== otp) {
-    return res.status(400).json({ error: "OTP incorrect" });
-  }
+    if (otpData.otp !== otp) {
+        return res.status(400).json({ error: "OTP incorrect" });
+    }
 
-  if (new Date(otpData.otp_expire) < new Date()) {
-    return res.status(400).json({ error: "OTP expired" });
-  }
+    if (new Date(otpData.otp_expire) < new Date()) {
+        return res.status(400).json({ error: "OTP expired" });
+    }
 
-  return res.json({ success: true });
+    return res.json({ success: true });
 };
 
 exports.updateProfile = async (req, res) => {
     const { userId, displayName, description, city, website, profileimg, coverimg, profilePublicId, coverPublicId } = req.body;
-    
+
     try {
-    const { data: user, error } = await db
-      .from("users")
-      .select("profile_public_id, cover_public_id")
-      .eq("user_id", userId)
-      .maybeSingle();
-      if (error) {
-        return res.status(500).json(error);
-      }
+        const { data: user, error } = await db
+            .from("users")
+            .select("profile_public_id, cover_public_id")
+            .eq("user_id", userId)
+            .maybeSingle();
+        if (error) {
+            return res.status(500).json(error);
+        }
 
-      // 2. สร้าง Object สำหรับ Update (เช็คเฉพาะที่มีค่าจริงๆ)
-    const updateData = {};
+        // 2. สร้าง Object สำหรับ Update (เช็คเฉพาะที่มีค่าจริงๆ)
+        const updateData = {};
 
-    // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
-    if (displayName && displayName.trim() !== "") updateData.name = displayName;
-    if (description && description.trim() !== "") updateData.description = description;
-    if (city && city.trim() !== "") updateData.city = city;
-    if (website && website.trim() !== "") updateData.website = website;
+        // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
+        if (displayName && displayName.trim() !== "") updateData.name = displayName;
+        if (description && description.trim() !== "") updateData.description = description;
+        if (city && city.trim() !== "") updateData.city = city;
+        if (website && website.trim() !== "") updateData.website = website;
 
-    // ส่วนของรูปภาพ (ใช้ logic เดิมของคุณ)
-    if (profileimg) updateData.profilePic = profileimg;
-    if (coverimg) updateData.coverPic = coverimg;
-    if (profilePublicId) updateData.profile_public_id = profilePublicId;
-    if (coverPublicId) updateData.cover_public_id = coverPublicId;
+        // ส่วนของรูปภาพ (ใช้ logic เดิมของคุณ)
+        if (profileimg) updateData.profilePic = profileimg;
+        if (coverimg) updateData.coverPic = coverimg;
+        if (profilePublicId) updateData.profile_public_id = profilePublicId;
+        if (coverPublicId) updateData.cover_public_id = coverPublicId;
 
-    // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
-    if (Object.keys(updateData).length === 0) {
-        return res.status(200).json({ success: true, message: "Nothing to update" });
+        // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
+        if (Object.keys(updateData).length === 0) {
+            return res.status(200).json({ success: true, message: "Nothing to update" });
+        }
+
+        // 3. Update ลง DB
+        const { error: updateError } = await db
+            .from("users")
+            .update(updateData) // ส่งเฉพาะ field ที่มีค่าไป
+            .eq("user_id", userId);
+
+        if (updateError) return res.status(500).json(updateError);
+
+        // เก็บ id เก่าไว้ก่อน
+        const oldProfileId = user?.profile_public_id;
+        const oldCoverId = user?.cover_public_id;
+
+        // แล้วค่อยลบ
+        if (profilePublicId && oldProfileId && oldProfileId !== profilePublicId) {
+            await cloudinary.uploader.destroy(oldProfileId);
+        }
+
+        if (coverPublicId && oldCoverId && oldCoverId !== coverPublicId) {
+            await cloudinary.uploader.destroy(oldCoverId);
+        }
+
+
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        return res.status(500).json(err);
     }
+};
 
-    // 3. Update ลง DB
-    const { error: updateError } = await db
-      .from("users")
-      .update(updateData) // ส่งเฉพาะ field ที่มีค่าไป
-      .eq("user_id", userId);
+exports.updateItem = async (req, res) => {
+    const { itemId, modelName, description, price, category, img, model, imgPublicId, modelPublicId } = req.body;
 
-    if (updateError) return res.status(500).json(updateError);
+    try {
+        const { data: items, error } = await db
+            .from("items")
+            .select("img_public_id, model_public_id")
+            .eq("item_id", itemId)
+            .maybeSingle();
+        if (error) {
+            return res.status(500).json(error);
+        }
 
-    // เก็บ id เก่าไว้ก่อน
-const oldProfileId = user?.profile_public_id;
-const oldCoverId = user?.cover_public_id;
+        // 2. สร้าง Object สำหรับ Update (เช็คเฉพาะที่มีค่าจริงๆ)
+        const updateData = {};
 
-// แล้วค่อยลบ
-if (profilePublicId && oldProfileId && oldProfileId !== profilePublicId) {
-  await cloudinary.uploader.destroy(oldProfileId);
-}
+        // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
+        if (modelName && modelName.trim() !== "") updateData.modelName = modelName;
+        if (description && description.trim() !== "") updateData.description = description;
+        if (price && !isNaN(price)) updateData.price = parseFloat(price);
+        if (category && category.trim() !== "") updateData.category = category;
 
-if (coverPublicId && oldCoverId && oldCoverId !== coverPublicId) {
-  await cloudinary.uploader.destroy(oldCoverId);
-}
-    
+        // ส่วนของรูปภาพ (ใช้ logic เดิมของคุณ)
+        if (img) updateData.img = img;
+        if (model) updateData.model = model;
+        if (imgPublicId) updateData.img_public_id = imgPublicId;
+        if (modelPublicId) updateData.model_public_id = modelPublicId;
 
-    return res.status(200).json({ success: true });
-  } catch (err) {
-    return res.status(500).json(err);
-  }
+        // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
+        if (Object.keys(updateData).length === 0) {
+            return res.status(200).json({ success: true, message: "Nothing to update" });
+        }
+
+        // 3. Update ลง DB
+        const { error: updateError } = await db
+            .from("items")
+            .update(updateData) // ส่งเฉพาะ field ที่มีค่าไป
+            .eq("item_id", itemId);
+
+        if (updateError) return res.status(500).json(updateError);
+
+        // เก็บ id เก่าไว้ก่อน
+        const oldImgId = items?.img_public_id;
+        const oldModelId = items?.model_public_id;
+
+        // แล้วค่อยลบ
+        if (imgPublicId && oldImgId && oldImgId !== imgPublicId) {
+            await cloudinary.uploader.destroy(oldImgId);
+        }
+
+        if (modelPublicId && oldModelId && oldModelId !== modelPublicId) {
+            await cloudinary.uploader.destroy(oldModelId);
+        }
+
+
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        return res.status(500).json(err);
+    }
 };
 
 exports.resetPassword = async (req, res) => {
@@ -369,16 +430,16 @@ exports.resetPassword = async (req, res) => {
     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$/.test(password)) {
         return res.status(400).json({ error: "Password must contain at least one uppercase letter, one lowercase letter, and one special character" });
     }
-    
+
     try {
-    let hashedPassword = await bcrypt.hash(password, 8);
+        let hashedPassword = await bcrypt.hash(password, 8);
         const { error: updateError } = await db
             .from('users')
             .update({ password: hashedPassword })
             .eq('email', email);
 
-    if (updateError) throw updateError;
-    return res.json({ success: true });
+        if (updateError) throw updateError;
+        return res.json({ success: true });
     } catch (err) {
         console.error("Reset Password Error:", err);
         return res.status(500).json({ error: "Failed to reset password" });

@@ -18,6 +18,7 @@ import ProfileItems from "./pages/profile/ProfileItems";
 import ProfileProjects from "./pages/profile/ProfileProjects";
 import EditProject from "./pages/editproject/editProject";
 import EditProfile from "./pages/editprofile/editProfile";
+import EditItem from "./pages/edititem/editItem";
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
@@ -274,6 +275,18 @@ function App() {
         {
           index: true,
           element: <EditProfile />
+        },
+      ]
+    },
+    {
+      path: "/edititem/:id",
+      element: (
+        <LayoutNavbar />
+      ),
+      children: [
+        {
+          index: true,
+          element: <EditItem />
         },
       ]
     },
