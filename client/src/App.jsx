@@ -8,8 +8,10 @@ import ResetPassword from "./pages/resetpassword/ResetPassword";
 import Download from './pages/download/Download1';
 import AddItem from './pages/additem/Additem';
 import AddProject from './pages/addproject/addproject';
+import AddCommu from './pages/addcommu/Addcommu';
 import DescItem from './pages/descItem/DescItem';
 import DescProject from './pages/descProject/DescProject';
+import DescCommu from './pages/descCommu/DescCommu';
 import Buyitem from './pages/buyitem/Buyitem';
 import Profile from "./pages/profile/Profile";
 import ProfileItems from "./pages/profile/ProfileItems";
@@ -26,6 +28,7 @@ import LeftBarDL from "./components/Left/leftbarDL/leftbarDL";
 import RightBar from "./components/Right/rightbar/rightbar";
 import ProfileDetail from "./components/TopDetail/ProfileDetail/ProfileDetail";
 import ProjectDetail from "./components/TopDetail/ProjectDetail/ProjectDetail";
+import CommuDetail from "./components/TopDetail/CommuDetail/CommuDetail";
 import Projects from "./components/PageItems/projects/projects"
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
@@ -99,6 +102,19 @@ function App() {
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
         <ProjectDetail />
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 6 }}>
+            <Outlet />
+          </div>
+        </div>
+      </div>
+    )
+  }
+  const DescriptionCommu = () => {
+    return (
+      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        <Navbar />
+        <CommuDetail />
         <div style={{ display: "flex" }}>
           <div style={{ flex: 6 }}>
             <Outlet />
@@ -190,6 +206,18 @@ function App() {
       ]
     },
     {
+      path: "/addcommu",
+      element: (
+        <LayoutNavbar />
+      ),
+      children: [
+        {
+          path: "/addcommu",
+          element: <AddCommu />
+        },
+      ]
+    },
+    {
       path: "/descitem",
       element: (
         <LayoutNavbar />
@@ -198,6 +226,18 @@ function App() {
         {
           path: ":id",
           element: <DescItem />
+        },
+      ]
+    },
+    {
+      path: "/desccommu",
+      element: (
+        <DescriptionCommu />
+      ),
+      children: [
+        { 
+          index: ":id",
+          element: <DescCommu />
         },
       ]
     },
