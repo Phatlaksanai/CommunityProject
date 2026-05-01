@@ -8,7 +8,6 @@ import Comments from "../../comments/comments";
 import { useState, useContext } from "react";
 import dayjs from "dayjs"; // moment to dayjs
 import relativeTime from "dayjs/plugin/relativeTime"; // โหลด Plugin "เมื่อสักครู่"
-import "dayjs/locale/th"; // โหลดภาษาไทย (ถ้าอยากได้อังกฤษไม่ต้องใส่)
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
@@ -80,7 +79,6 @@ const Post = ({ post }) => {
   };
 
   dayjs.extend(relativeTime);
-  dayjs.locale("th");
 
   return (
     <div className="post">

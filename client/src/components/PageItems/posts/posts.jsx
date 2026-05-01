@@ -85,10 +85,10 @@ const Posts = ({ userId, project }) => {
       {/* จุดล่างสุดที่ใช้ตรวจจับการเลื่อน */}
       <div ref={ref} style={{ padding: "20px", textAlign: "center" }}>
         {isFetchingNextPage 
-          ? "กำลังโหลดเพิ่ม..." 
+          ? "Loading..." 
           : hasNextPage 
-            ? "เลื่อนลงเพื่อดูโพสต์เพิ่มเติม" 
-            : "ไม่มีโพสต์เหลือแล้ว"}
+            ? "Scroll down to see more posts" 
+            : "No more posts to load"}
       </div>
     </div>
   );

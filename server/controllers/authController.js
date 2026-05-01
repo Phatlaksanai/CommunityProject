@@ -190,8 +190,8 @@ exports.sendOtpRegister = async (req, res) => {
         await transporter.sendMail({
             from: process.env.NODEMAIL_USER,
             to: email,
-            subject: "Your OTP Code",
-            html: `<h2>รหัส OTP ของคุณคือ</h2><h1>${otp}</h1>`,
+            subject: "PM Request OTP",
+            html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
         });
 
         return res.json({ success: true });

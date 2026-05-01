@@ -27,7 +27,7 @@ const AddItem = () => {
     if (!file) return;
 
     if (!/\.(jpg|jpeg|png)$/i.test(file.name)) {
-      setError("กรุณาเลือกไฟล์รูป jpg หรือ png");
+      setError("Please select a JPG or PNG file");
       return;
     }
 
@@ -42,7 +42,7 @@ const AddItem = () => {
     if (!file) return;
 
     if (!/\.(glb|gltf)$/i.test(file.name)) {
-      setError("กรุณาเลือกไฟล์ .glb หรือ .gltf");
+      setError("Please select a GLB or GLTF file");
       return;
     }
     if (file.size > MAX_MODEL_SIZE) {
@@ -60,7 +60,6 @@ const AddItem = () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    // ใช้ makeRequest แทน fetch เพื่อความสม่ำเสมอ
     const res = await makeRequest.post("/upload/item", formData);
     return res.data; // คาดหวัง { url: "...", public_id: "..." }
   };
@@ -72,12 +71,12 @@ const AddItem = () => {
     setSuccess("");
 
     if (!category) {
-      setError("กรุณาเลือกหมวดหมู่");
+      setError("Please select a category");
       return;
     }
 
     if (!img || !model) {
-      setError("กรุณาเลือกรูปและไฟล์โมเดล");
+      setError("Please upload your image and model files");
       return;
     }
 
@@ -86,7 +85,7 @@ const AddItem = () => {
       const modelURL = await uploadFile(model);
 
       if (!imgURL || !modelURL) {
-        setError("อัพโหลดไฟล์ไม่สำเร็จ");
+        setError("Failed to upload file");
         return;
       }
 
@@ -101,29 +100,17 @@ const AddItem = () => {
         modelPublicId: modelURL.public_id,
       });
 
-      // const data = await res.json();
-
-      // if (!res.ok) {
-      //   setError(data.error || "add item failed");
-      //   return;
-      // }
-
-
-
       setSuccess("add item success");
       navigate("/download");
     } catch (err) {
       console.error(err);
-      setError("เชื่อมต่อ Server ไม่ได้");
+      setError("Failed to connect to server");
     }
   };
 
 
   return (
     <div className="add-item">
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-
       <div className="add-item__form">
         <h1 className="add-item__title">Add Item</h1>
         <form onSubmit={handleAdditem}>
@@ -207,6 +194,8 @@ const AddItem = () => {
           </div>
 
           <input type="submit" value="Submit" className="add-item__submit" />
+          {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
+          {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
         </form>
       </div>
     </div>

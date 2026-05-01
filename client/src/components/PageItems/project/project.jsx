@@ -1,6 +1,5 @@
 import "./project.scss";
 import dayjs from "dayjs";
-import "dayjs/locale/th";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -21,7 +20,7 @@ const Project = ({ project }) => {
             <h2>{project.project_name}</h2>{/* 2026-01-30T17:00:00.000Z */}
         </div>
         <div className="price">
-            <p>{dayjs(project.created_at).locale("th").format("D MMM YYYY")}</p>
+            <p>{dayjs(project.created_at).format("D MMM YYYY")}</p>
               <SettingsIcon onClick={() => navigate(`/editproject/${project.project_id}`)} style={{cursor: "pointer" }} />
         </div>
       </div>

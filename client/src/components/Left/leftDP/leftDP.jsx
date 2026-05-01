@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import dayjs from "dayjs";
-import "dayjs/locale/th";
 import ModelViewer from "../../modelViewer/model_viewer";
 
 const LeftDP = ({ project }) => {
@@ -45,7 +44,6 @@ const LeftDP = ({ project }) => {
                   <span>
                     Created At :{" "}
                     {dayjs(item.created_at)
-                      .locale("th")
                       .format("D MMM YYYY")}
                   </span>
               </div>
@@ -55,20 +53,20 @@ const LeftDP = ({ project }) => {
 
         {/* ===== STATS (แสดงเสมอ แม้ไม่มี item) ===== */}
         <div className="item">
-          <h2>สถิติ</h2>
-          <p>ระยะเวลาการพัฒนา</p>
+          <h2>Project Stats</h2>
+          <p>Development Duration</p>
 
           <p>
             first post :{" "}
             {firstPost
-              ? dayjs(firstPost.created_at).locale("th").format("D MMM YYYY")
+              ? dayjs(firstPost.created_at).format("D MMM YYYY")
               : "-"}
           </p>
 
           <p>
             last post :{" "}
             {lastPost
-              ? dayjs(lastPost.created_at).locale("th").format("D MMM YYYY")
+              ? dayjs(lastPost.created_at).format("D MMM YYYY")
               : "-"}
           </p>
 
@@ -78,11 +76,11 @@ const LeftDP = ({ project }) => {
               ? dayjs(lastPost.created_at).diff(
                   dayjs(firstPost.created_at),
                   "day"
-                ) + " วัน"
+                ) + " days"
               : "-"}
           </p>
 
-          <p>all posts : {posts.length} ชิ้น</p>
+          <p>all posts : {posts.length}</p>
 
         </div>
 

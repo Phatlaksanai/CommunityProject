@@ -11,7 +11,7 @@ npm install axios //client
 npm install cors //server
 npm install dayjs //server + client
 npm install @mui/icons-material @mui/material @emotion/styled @emotion/react // client 
-npm install -D sass-embedded // client 💀💀💀💀
+
 npm install -D sass // client 🆕🆕
 npm install @tanstack/react-query // client 
 npm install cloudinary multer // server =============new
@@ -27,23 +27,23 @@ npm i react-intersection-observer // client
 1.แจ้งเตือนมีเมลแล้วก่อนส่ง otp ✅
 2.เปลี่ยนตาราง OTP ใน DB แยกออกจาก User ให้เป็นส่งแล้ว กอรกแล้ว ลบทิ้งเอง ประมาณนั้น ✅
 3.เปลี่ยน DB ไปใช้ On-Cloud ✅
-4.ทำโพสต์ฉบับสมบูรณ์ มี like, comment เป็นต้น
-5.หน้ากรองรายละเอียดด้านซ้ายในด้าน download 
+4.ทำโพสต์ฉบับสมบูรณ์ มี like, comment เป็นต้น ✅
+5.หน้ากรองรายละเอียดด้านซ้ายในด้าน download ✅
 6.หน้า descitem ฝั่งขวา / buyitem ที่ถูกลืม
-7.หน้าจัดการโปรไฟล์ เปลี่ยนชื่อ, รูป, ปก เป็นต้น
-8.หน้า home ฝั่ง leftbar, rightbar 
-9.ทำให้ลบ post, ลบ item, ลบ project จากนั้นเก็บ log หรือ something ไว้ แล้วลบใน DB กับ cloud ด้วย 
+7.หน้าจัดการโปรไฟล์ เปลี่ยนชื่อ, รูป, ปก เป็นต้น ✅
+8.หน้า home ฝั่ง leftbar, rightbar  
+9.ทำให้ลบ post ✅, ลบ item, ลบ project จากนั้นเก็บ log หรือ something ไว้ แล้วลบใน DB กับ cloud ด้วย 
 10.ระบบแอดเพื่อน
-11.แยก backend / รวมไฟล์ให้ดูสะอาดตา frontend
-12.แก้แสดงผล 3D nigga
+11.แยก backend / รวมไฟล์ให้ดูสะอาดตา frontend ✅
+12.แก้แสดงผล 3D nigga ✅/2
 13.แสดงผล % ขณะโหลด
-14.เลือก project ตอน post
-15.ทำให้หน้า home โหลด post มาแสดงทีละนิด แล้วค่อยโหลดเพิ่มเมื่อเลื่อนลงไป
+14.เลือก project ตอน post ✅
+15.ทำให้หน้า home โหลด post มาแสดงทีละนิด แล้วค่อยโหลดเพิ่มเมื่อเลื่อนลงไป ✅
 16.ทำให้โมเดลแต่ละตัวตอนโพสต์ เล็ก ใหญ่ ไม่เพี้ยน สีไม่ Nig
-17.ลบ row users กรณีที่ผู้ใช้ไม่สมัครสมาชิกเป็นเวลากี่วัน...
-18.หน้า edit item || ลบ item???? 
-19.เปลี่ยน Fetch ปกติเป็น Axios ให้หมด
-20.จัดหน้าตาพวก setError , setSuccess ให้เป็นระเบียบ
+17.ลบ row users กรณีที่ผู้ใช้ไม่สมัครสมาชิกเป็นเวลากี่วัน... 
+18.หน้า edit item ✅ || ลบ item???? 
+19.เปลี่ยน Fetch ปกติเป็น Axios ให้หมด ✅
+20.จัดหน้าตาพวก setError , setSuccess ให้เป็นระเบียบ ✅
 
 Feature
 1.run 3D ขึ้นโชว์ ✅

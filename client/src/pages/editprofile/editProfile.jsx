@@ -8,7 +8,7 @@ import { makeRequest } from "../../api/axios";
 const EditProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { currentUser, setUser  } = useContext(AuthContext);
+  const { currentUser, setUser } = useContext(AuthContext);
 
   const [displayName, setDisplayName] = useState("");
   const [description, setDescription] = useState("");
@@ -44,7 +44,7 @@ const EditProfile = () => {
     if (!file) return;
 
     if (!/\.(jpg|jpeg|png)$/i.test(file.name)) {
-      setError("กรุณาเลือกไฟล์รูป jpg หรือ png");
+      setError("Please select a JPG or PNG file");
       return;
     }
 
@@ -56,84 +56,81 @@ const EditProfile = () => {
     e.target.value = "";
     setError("");
   };
- const uploadFile = async (file) => {
+  const uploadFile = async (file) => {
     if (!file || !(file instanceof File)) return null; // ถ้าไม่ใช่ไฟล์ ไม่ต้องอัปโหลด
     const formData = new FormData();
     formData.append("file", file);
-    
+
     // ใช้ makeRequest แทน fetch เพื่อความสม่ำเสมอ
-    const res = await makeRequest.post("/upload/profile", formData); 
+    const res = await makeRequest.post("/upload/profile", formData);
     return res.data; // คาดหวัง { url: "...", public_id: "..." }
   };
 
 
   const handleUpdateProfile = async (e) => {
-  e.preventDefault();
-  setError("");
-  setSuccess("");
+    e.preventDefault();
+    setError("");
+    setSuccess("");
 
-  try {
-    // 1. ตั้งค่าเริ่มต้นจาก State ปัจจุบัน (ซึ่งอาจเป็น URL เดิม)
-    let finalProfileImg = profileimg;
-    let finalProfilePublicId = profilePublicId;
-    let finalCoverImg = coverimg;
-    let finalCoverPublicId = coverPublicId;
+    try {
+      // 1. ตั้งค่าเริ่มต้นจาก State ปัจจุบัน (ซึ่งอาจเป็น URL เดิม)
+      let finalProfileImg = profileimg;
+      let finalProfilePublicId = profilePublicId;
+      let finalCoverImg = coverimg;
+      let finalCoverPublicId = coverPublicId;
 
-    // 2. อัปโหลดเฉพาะเมื่อเป็นไฟล์ใหม่เท่านั้น (instanceof File)
-    if (profileimg instanceof File) {
-      const res = await uploadFile(profileimg);
-      finalProfileImg = res.url;
-      finalProfilePublicId = res.public_id;
+      // 2. อัปโหลดเฉพาะเมื่อเป็นไฟล์ใหม่เท่านั้น (instanceof File)
+      if (profileimg instanceof File) {
+        const res = await uploadFile(profileimg);
+        finalProfileImg = res.url;
+        finalProfilePublicId = res.public_id;
+      }
+
+      if (coverimg instanceof File) {
+        const res = await uploadFile(coverimg);
+        finalCoverImg = res.url;
+        finalCoverPublicId = res.public_id;
+      }
+
+      // 3. ส่งไปที่ API
+      await makeRequest.put("/update-profile", {
+        userId: currentUser?.user_id,
+        displayName,
+        description,
+        city,
+        website,
+        profileimg: finalProfileImg, // ส่ง string URL ไปตรงๆ
+        coverimg: finalCoverImg,
+        profilePublicId: finalProfilePublicId,
+        coverPublicId: finalCoverPublicId,
+      });
+
+      setUser({
+        ...currentUser,
+        name: displayName,
+        description,
+        city,
+        website,
+        profilePic: finalProfileImg,
+        coverPic: finalCoverImg,
+        profile_public_id: finalProfilePublicId,
+        cover_public_id: finalCoverPublicId,
+      });
+
+      setSuccess("Update profile success");
+      setTimeout(() => navigate(`/profile/${currentUser?.user_id}`), 1000);
+    } catch (err) {
+      console.error(err);
+      // ถ้าหลังบ้าน Error 500 เราจะดึงข้อความ error มาโชว์
+      setError(err.response?.data?.message || "Internal Server Error: ตรวจสอบ Backend");
     }
+  };
 
-    if (coverimg instanceof File) {
-      const res = await uploadFile(coverimg);
-      finalCoverImg = res.url;
-      finalCoverPublicId = res.public_id;
-    }
-
-    // 3. ส่งไปที่ API
-    await makeRequest.put("/update-profile", {
-      userId: currentUser?.user_id,
-      displayName,
-      description,
-      city,
-      website,
-      profileimg: finalProfileImg, // ส่ง string URL ไปตรงๆ
-      coverimg: finalCoverImg,
-      profilePublicId: finalProfilePublicId,
-      coverPublicId: finalCoverPublicId,
-    });
-
-    setUser({
-  ...currentUser,
-  name: displayName,
-  description,
-  city,
-  website,
-  profilePic: finalProfileImg,
-  coverPic: finalCoverImg,
-  profile_public_id: finalProfilePublicId,
-  cover_public_id: finalCoverPublicId,
-});
-
-    setSuccess("Update profile success");
-    setTimeout(() => navigate(`/profile/${currentUser?.user_id}`), 1000);
-  } catch (err) {
-    console.error(err);
-    // ถ้าหลังบ้าน Error 500 เราจะดึงข้อความ error มาโชว์
-    setError(err.response?.data?.message || "Internal Server Error: ตรวจสอบ Backend");
-  }
-};
-  
 
 
 
   return (
     <div className="edit-profile">
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-
       <div className="edit-profile__form">
         <h1 className="edit-profile__title">Edit Profile</h1>
         <form onSubmit={handleUpdateProfile}>
@@ -202,6 +199,8 @@ const EditProfile = () => {
           </div>
 
           <input type="submit" value="Save Changes" className="add-item__submit" />
+          {error && <span style={{ color: "red" , margin: "0px 10px" }}>{error}</span>}
+          {success && <span style={{ color: "green" , margin: "0px 10px" }}>{success}</span>}
         </form>
       </div>
     </div>

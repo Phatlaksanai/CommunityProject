@@ -21,7 +21,7 @@ const AddCommu = () => {
     if (!file) return;
 
     if (!/\.(jpg|jpeg|png)$/i.test(file.name)) {
-      setError("กรุณาเลือกไฟล์รูป jpg หรือ png");
+      setError("Please select a JPG or PNG file");
       return;
     }
 
@@ -36,7 +36,7 @@ const AddCommu = () => {
     if (!file) return;
 
     if (!/\.(glb|gltf)$/i.test(file.name)) {
-      setError("กรุณาเลือกไฟล์ .glb หรือ .gltf");
+      setError("Please select a GLB or GLTF file");
       return;
     }
     if (file.size > MAX_MODEL_SIZE) {
@@ -45,7 +45,7 @@ const AddCommu = () => {
       e.target.value = "";
       return;
     }
-    setModel(file); 
+    setModel(file);
     e.target.value = "";
     setError("");
   };
@@ -53,13 +53,8 @@ const AddCommu = () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("/api/upload/item", {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    });
-
-    return await res.json();
+    const res = await makeRequest.post("/upload/item", formData);
+    return res.data; // คาดหวัง { url: "...", public_id: "..." }
   };
 
   const handleAddcommu = async (e) => {
@@ -68,7 +63,7 @@ const AddCommu = () => {
     setSuccess("");
 
     if (!img) {
-      setError("กรุณาเลือกรูปและไฟล์โมเดล");
+      setError("Please upload your image and model files");
       return;
     }
 
@@ -76,43 +71,27 @@ const AddCommu = () => {
       const imgURL = await uploadFile(img);
 
       if (!imgURL) {
-        setError("อัพโหลดไฟล์ไม่สำเร็จ");
+        setError("Failed to upload file");
         return;
       }
 
-      const res = await fetch("/api/communities/addcommu", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          CommunityName,
-          description,
-          img: imgURL.url,
-        }),
+      const res = await makeRequest.post("/communities/addcommu", {
+        CommunityName,
+        description,
+        img: imgURL.url,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "add community failed");
-        return;
-      }
       setSuccess("add community success");
       navigate("/desccommu");
     } catch (err) {
       console.error(err);
-      setError("เชื่อมต่อ Server ไม่ได้");
+      setError("Failed to connect to server");
     }
   };
 
 
   return (
     <div className="addcommu">
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-
       <div className="add-item__form">
         <h1 className="add-item__title">Create your own Community</h1>
         <form onSubmit={handleAddcommu}>
@@ -149,6 +128,8 @@ const AddCommu = () => {
           </div>
 
           <input type="submit" value="Submit" className="add-item__submit" />
+          {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
+          {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
         </form>
       </div>
     </div>

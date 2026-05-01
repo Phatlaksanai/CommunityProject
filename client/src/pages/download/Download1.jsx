@@ -20,7 +20,7 @@ const download = () => {
     <div className="download">
       <LeftBarDownload filters={filters} setFilters={setFilters} />
       <div className="content">
-        <Items filters={filters} />
+        <Items filters={filters} isShop={true}/>
       </div>
     </div>
   )

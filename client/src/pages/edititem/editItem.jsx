@@ -50,7 +50,7 @@ const EditItem = () => {
         if (!file) return;
 
         if (!/\.(jpg|jpeg|png)$/i.test(file.name)) {
-            setError("กรุณาเลือกไฟล์รูป jpg หรือ png");
+            setError("Please select a JPG or PNG file");
             return;
         }
 
@@ -65,7 +65,7 @@ const EditItem = () => {
         if (!file) return;
 
         if (!/\.(glb|gltf)$/i.test(file.name)) {
-            setError("กรุณาเลือกไฟล์ .glb หรือ .gltf");
+            setError("Please select a GLB or GLTF file");
             return;
         }
         if (file.size > MAX_MODEL_SIZE) {
@@ -132,16 +132,13 @@ const EditItem = () => {
             navigate(`/profile/${currentUser.user_id}/items`);
         } catch (err) {
             console.error(err);
-            setError("เชื่อมต่อ Server ไม่ได้");
+            setError("Failed to connect to server");
         }
     };
 
 
     return (
         <div className="edit-item">
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            {success && <p style={{ color: "green" }}>{success}</p>}
-
             <div className="add-item__form">
                 <h1 className="add-item__title">Update Item</h1>
                 <form onSubmit={handleUpdateitem}>
@@ -225,6 +222,8 @@ const EditItem = () => {
                     </div>
 
                     <input type="submit" value="Submit" className="add-item__submit" />
+                    {error && <span style={{ color: "red" , margin: "0px 10px" }}>{error}</span>}
+                    {success && <span style={{ color: "green" , margin: "0px 10px" }}>{success}</span>}
                 </form>
             </div>
         </div>

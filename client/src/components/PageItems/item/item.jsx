@@ -3,9 +3,10 @@ import "dayjs/locale/th";
 import { useContext } from "react";
 import { AuthContext } from "../../../context/authContext";
 import SettingsIcon from '@mui/icons-material/Settings';
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { useNavigate } from "react-router-dom";
 
-const Item = ({ item, isProfile }) => {
+const Item = ({ item, isProfile, isShop }) => {
   
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
@@ -21,6 +22,7 @@ const Item = ({ item, isProfile }) => {
         </div>
         <div className="price">
             <p>$ {item.price}</p>
+            {isShop && (<ControlPointIcon style={{ cursor: "pointer" }}/>)}
             {isProfile && item.user_id === currentUser.user_id && (<SettingsIcon onClick={() => navigate(`/edititem/${item?.item_id}`)} style={{ cursor: "pointer" }}/>)}
         </div>
       </div>

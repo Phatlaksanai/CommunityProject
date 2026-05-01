@@ -7,6 +7,7 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import DownloadIcon from '@mui/icons-material/Download';
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { DarkModeContext } from "../../context/darkModeContext";
@@ -81,6 +82,7 @@ const Navbar = () => {
           </>
         )}
         {user && (<button className="button" onClick={handleLogout}>Logout</button>)} */}
+        <ShoppingBasketIcon />
         <PersonOutlinedIcon />
         <EmailOutlinedIcon />
         <div className="user">

@@ -1,35 +1,5 @@
 const db = require("../config/db");
 
-// exports.getPosts = async (req, res) => {
-//   const { data, error } = await db
-//     .from("posts")
-//     .select(
-//       `
-//       *,
-//       imgs(img),
-//       models(model),
-//       users (
-//         user_id,
-//         username,
-//         name,
-//         profilePic
-//       )
-//     `,
-//     )
-//     .eq("status", "show") // ดึงเฉพาะโพสต์ที่มีสถานะ "show"
-//     .order("created_at", { ascending: false });
-//   if (error) return res.status(500).json(error);
-
-//   const formatted = data.map((post) => ({
-//     ...post,
-//     username: post.users?.username || null,
-//     name: post.users?.name || null,
-//     profilePic: post.users?.profilePic || null,
-//   }));
-
-//   return res.status(200).json(formatted);
-// };
-
 exports.getPosts = async (req, res) => {
   // รับค่า page จาก query string (เริ่มต้นที่ 0)
   const page = parseInt(req.query.page) || 0;

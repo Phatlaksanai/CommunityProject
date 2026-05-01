@@ -33,9 +33,9 @@ const EditProject = () => {
   });
 
   const { data: projects } = useQuery({
-  queryKey: ["project", project_id],
-  queryFn: () =>
-    makeRequest.get(`/projects/${project_id}`).then(res => res.data),
+    queryKey: ["project", project_id],
+    queryFn: () =>
+      makeRequest.get(`/projects/${project_id}`).then(res => res.data),
   });
 
   // ✅ 1. ย้าย useEffect มาไว้ข้างนอก (Top Level)
@@ -51,18 +51,18 @@ const EditProject = () => {
       if (initialItem) setSelectedItem(initialItem.item_id);
     }
     if (projects) {
-    setProjectName(projects.project_name);
-    setDescription(projects.description);
-    setImg(projects.img);
-    setImgPublicId(projects.img_public_id); 
-  }
+      setProjectName(projects.project_name);
+      setDescription(projects.description);
+      setImg(projects.img);
+      setImgPublicId(projects.img_public_id);
+    }
   }, [posts, items, projects]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!/\.(jpg|jpeg|png)$/i.test(file.name)) {
-      setError("กรุณาเลือกไฟล์รูป jpg หรือ png");
+      setError("Please select a JPG or PNG file");
       return;
     }
     setImg(file);
@@ -89,47 +89,47 @@ const EditProject = () => {
 
     // เช็คชื่อโปรเจคที่ตัดช่องว่างออกแล้ว
     if (!trimmedProjectName) {
-      setError("กรุณากรอกชื่อ Project (ห้ามเว้นว่าง)");
+      setError("Please enter a Project Name (cannot be empty)");
       return;
     }
 
     // เพิ่มการเช็คว่าเลือก Post อย่างน้อย 1 อันหรือยัง
     if (selectedPosts.length === 0) {
-      setError("กรุณาเลือกอย่างน้อย 1 โพสต์เพื่อรวมในโปรเจค");
+      setError("Please select at least one related Post");
       return;
     }
 
-  try {
-    let imgUrl = img; // ค่าเดิม
-    let newimgPublicId = imgPublicId;  // สำหรับเก็บ public_id ของรูปที่อัปโหลดใหม่ (ถ้ามี)
+    try {
+      let imgUrl = img; // ค่าเดิม
+      let newimgPublicId = imgPublicId;  // สำหรับเก็บ public_id ของรูปที่อัปโหลดใหม่ (ถ้ามี)
 
-    // ถ้ามีการเลือกไฟล์ใหม่ (เป็น Object File)
-    if (img && typeof img !== 'string') {
-      const formData = new FormData();
-      formData.append("file", img);
-      
-      // ตรวจสอบ Path นี้ที่ Backend ดีๆ ว่าเป็น /upload หรือ /upload/project
-      const res = await makeRequest.post("/upload/project", formData); 
-      imgUrl = res.data.url; 
-      newimgPublicId = res.data.public_id;
+      // ถ้ามีการเลือกไฟล์ใหม่ (เป็น Object File)
+      if (img && typeof img !== 'string') {
+        const formData = new FormData();
+        formData.append("file", img);
+
+        // ตรวจสอบ Path นี้ที่ Backend ดีๆ ว่าเป็น /upload หรือ /upload/project
+        const res = await makeRequest.post("/upload/project", formData);
+        imgUrl = res.data.url;
+        newimgPublicId = res.data.public_id;
+      }
+
+      await makeRequest.put("/projects/update", {
+        projectId: project_id,
+        projectName,
+        description,
+        img: imgUrl,
+        relatedPosts: selectedPosts,
+        relatedItem: selectedItem,
+        imgPublicId: newimgPublicId,
+      });
+
+      setSuccess("Update successful!");
+      navigate(`/profile/${currentUser.user_id}/projects`);
+    } catch (err) {
+      console.error(err);
+      setError("Update failed");
     }
-
-    await makeRequest.put("/projects/update", {
-      projectId: project_id,
-      projectName,
-      description,
-      img: imgUrl,
-      relatedPosts: selectedPosts,
-      relatedItem: selectedItem,
-      imgPublicId: newimgPublicId, 
-    });
-    
-    setSuccess("Update successful!");
-    navigate(`/profile/${currentUser.user_id}/projects`);
-  } catch (err) {
-    console.error(err);
-    setError("Update failed");
-  }
   };
 
   if (isPostsLoading || isItemsLoading) {
@@ -138,9 +138,6 @@ const EditProject = () => {
 
   return (
     <div className="add-project">
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-
       <div className="add-item__form">
         <h1 className="add-item__title">Edit Project</h1>
         {/* ✅ เรียกใช้ handleUpdateProject */}
@@ -214,6 +211,8 @@ const EditProject = () => {
           </div>
 
           <input type="submit" value="Save Changes" className="add-item__submit" />
+          {error && <span style={{ color: "red" , margin: "0px 10px" }}>{error}</span>}
+          {success && <span style={{ color: "green" , margin: "0px 10px" }}>{success}</span>}
         </form>
       </div>
     </div>

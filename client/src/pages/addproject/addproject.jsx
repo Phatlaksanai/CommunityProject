@@ -40,7 +40,7 @@ const AddProject = () => {
     if (!file) return;
 
     if (!/\.(jpg|jpeg|png)$/i.test(file.name)) {
-      setError("กรุณาเลือกไฟล์รูป jpg หรือ png");
+      setError("Please select a JPG or PNG file");
       return;
     }
 
@@ -52,13 +52,8 @@ const AddProject = () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("/api/upload/project", {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    });
-
-    return await res.json();
+    const res = await makeRequest.post("/upload/project", formData);
+    return res.data;
   };
 
   const handleAddproject = async (e) => {
@@ -71,13 +66,13 @@ const AddProject = () => {
 
     // 1. เช็คชื่อโปรเจคที่ตัดช่องว่างออกแล้ว
     if (!trimmedProjectName) {
-      setError("กรุณากรอกชื่อ Project (ห้ามเว้นว่าง)");
+      setError("Please enter a Project Name (cannot be empty)");
       return;
     }
 
     // 2. เพิ่มการเช็คว่าเลือก Post อย่างน้อย 1 อันหรือยัง
     if (selectedPosts.length === 0) {
-      setError("กรุณาเลือกอย่างน้อย 1 โพสต์เพื่อรวมในโปรเจค");
+      setError("Please select at least one related Post");
       return;
     }
 
@@ -91,35 +86,21 @@ const AddProject = () => {
         imgPublicId = uploadRes.public_id;
       }
 
-      const res = await fetch("/api/projects/addproject", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          projectName,
-          description,
-          imgUrl,
-          imgPublicId,
-          relatedPosts: selectedPosts,
-          relatedItem: selectedItem,
-          userId: currentUser.user_id,
-        }),
+      const res = await makeRequest.post("/projects/addproject", {
+        projectName,
+        description,
+        imgUrl,
+        imgPublicId,
+        relatedPosts: selectedPosts,
+        relatedItem: selectedItem,
+        userId: currentUser.user_id,
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "add project failed");
-        return;
-      }
 
       setSuccess("add project success");
       navigate(`/profile/${currentUser.user_id}/projects`);
     } catch (err) {
       console.error(err);
-      setError("เชื่อมต่อ Server ไม่ได้");
+      setError("Failed to connect to server");
     }
   };
 
@@ -127,9 +108,6 @@ const AddProject = () => {
 
   return (
     <div className="add-project">
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-
       <div className="add-item__form">
         <h1 className="add-item__title">Add Project</h1>
         <form onSubmit={handleAddproject}>
@@ -240,6 +218,8 @@ const AddProject = () => {
           </div>
 
           <input type="submit" value="Submit" className="add-item__submit" />
+          {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
+          {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
         </form>
       </div>
     </div>

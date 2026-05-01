@@ -1,6 +1,7 @@
 import './descProject.scss';
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { makeRequest } from "../../api/axios";
 import LeftDP from "../../components/Left/leftDP/leftDP"
 import Posts from "../../components/PageItems/posts/posts"
 
@@ -11,11 +12,10 @@ const DescProject = () => {
         if (!id) return;
         const fetchProject = async () => {
             try {
-                const res = await fetch(`/api/projects/${id}`);
-                const data = await res.json();
-                setProject(data);
+                const res = await makeRequest.get(`/projects/${id}`);
+                setProject(res.data);
             } catch (err) {
-                setError("โหลดข้อมูลไม่สำเร็จ");
+                setError("Failed to load project data");
             }
         };
         fetchProject();
