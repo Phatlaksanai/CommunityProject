@@ -20,7 +20,7 @@ const ResetPassword = () => {
   const [otpCooldown, setOtpCooldown] = useState(0);
   const [otpLoading, setOtpLoading] = useState(false);
 
-  useEffect(() => { // นับถอยหลัง cooldown OTP
+  useEffect(() => { 
       if (otpCooldown <= 0) return;
   
       const timer = setInterval(() => {
@@ -38,8 +38,8 @@ const ResetPassword = () => {
       email: Email,
       otp: OTP
     });
-
-    if (res.data.success) {
+    const data = res.data;
+    if (data.success) {
       setStep(2);
     } else {
       setError("OTP is incorrect");
@@ -57,12 +57,20 @@ const ResetPassword = () => {
     if (otpCooldown > 0) return;
     setError("");
     setSuccess("");
+    setOtpLoading(true);
     try {
-    await makeRequest.post("/send-otp-resetpassword", { email: Email });
-    setSuccess("Sent OTP Successfully");
-    setOtpCooldown(8);
+    const res = await makeRequest.post("/send-otp-resetpassword", { email: Email });
+    const data = res.data;
+    if (data.success) {
+      setSuccess("Sent OTP Successfully");
+      setOtpCooldown(8);
+    } else {
+      setError(data.error || "OTP sending failed");
+    }
   } catch (err) {
     setError("OTP sending failed");
+  } finally {
+    setOtpLoading(false);
   }
   };
 
@@ -76,8 +84,8 @@ const ResetPassword = () => {
         password,
         confirmpassword,
       });
-
-      if (res.data.success) {
+      const data = res.data;
+      if (data.success) {
       setSuccess("Reset password success");
       navigate("/login");
     }

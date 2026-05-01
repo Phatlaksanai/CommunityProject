@@ -25,11 +25,11 @@ const Login = () => {
         username,
         password,
       });
-
+      const data = res.data;
       // Backend ส่งของ user data มาให้
-      if (res.data.success) {
-        setUser(res.data);
-        localStorage.setItem("user", JSON.stringify(res.data));
+      if (data.success) {
+        setUser(data);
+        localStorage.setItem("user", JSON.stringify(data));
         navigate("/");
       }
     } catch (err) {
@@ -77,9 +77,9 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <a href="" className="forgot" onClick={() => navigate("/resetpassword")} style={{ cursor: "pointer" }}>
+            <Link to="/resetpassword" className="forgot">
               forgot password
-            </a>
+            </Link>
             <button type="submit" className="login-btn">login</button>
           </form>
         </div>

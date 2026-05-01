@@ -1,40 +1,6 @@
-// import { Link } from "react-router-dom";
-
-// import "./register.scss";
-
-// const Register = () => {
-//   return (
-//     <div className="register">
-//       <div className="card">
-//         <div className="left">
-//           <h1>PM.</h1>
-//           <p>
-//             There is a lot of fun. Community game development platform. Join us
-//             now!
-//           </p>
-//           <span>Do you have an account?</span>
-//           <Link to="/login">
-//           <button>Login</button>
-//           </Link>
-//         </div>
-//         <div className="right">
-//           <h1>Register</h1>
-//           <form>
-//             <input type="text" placeholder="Username" />
-//             <input type="email" placeholder="Email" />
-//             <input type="password" placeholder="Password" />
-//             <input type="text" placeholder="Name" />
-//             <button>Register</button>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Register;
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { makeRequest } from "../../api/axios";
 import "./register.scss";
 
 const Register = () => {
@@ -70,7 +36,7 @@ const Register = () => {
   // ================= STEP CONTROL =================
   const nextStep = () => {
     if (password !== password2) {
-      setError("Passwords are not same.");
+      setError("Passwords are not same");
       return;
     }
     setError("");
@@ -89,29 +55,22 @@ const Register = () => {
     setOtpLoading(true);
 
     if (!email.trim()) {
-      setError("กรุณากรอกอีเมลก่อนกด OTP");
+      setError("Please enter your email before requesting OTP");
+      setOtpLoading(false);
       return;
     }
 
     try {
-      const res = await fetch("/api/send-otp-register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "ส่ง OTP ไม่สำเร็จ");
-        setOtpLoading(false);
-        return;
-      }
-
-      setSuccess("ส่งรหัส OTP แล้ว!");
+      const res = await makeRequest.post("/send-otp-register", { email });
+      const data = res.data;
+      if (data.success) {
+      setSuccess("Send OTP Successfully");
       setOtpCooldown(8);
+    } else {
+      setError(data.error || "OTP sending failed");
+    }
     } catch (err) {
-      setError("เชื่อมต่อ Server ไม่ได้");
+      setError("Connect to server failed");
     } finally {
       setOtpLoading(false);
     }
@@ -124,29 +83,23 @@ const Register = () => {
     setSuccess("");
 
     try {
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username,
-          password,
-          password2,
-          email,
-          otp,
-        }),
+      const res = await makeRequest.post("/register", {
+        username,
+        password,
+        password2,
+        email,
+        otp
       });
+      const data = res.data;
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "การลงทะเบียนล้มเหลว");
-        return;
-      }
-
+      if (data.success) {
       setSuccess("Register success");
       navigate("/login");
+    } else {
+      setError(data.error || "Registration failed");
+    }
     } catch (err) {
-      setError("เชื่อมต่อ Server ไม่ได้");
+      setError("Connect to server failed");
     }
   };
 

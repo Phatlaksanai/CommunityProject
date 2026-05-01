@@ -1,3 +1,4 @@
+$theme-map: null;
 @use "sass:map"; // =============new
 // =============new
 body {
@@ -30,7 +31,6 @@ $themes: (
     .theme-#{$theme} & {
       $theme-map: $map !global; 
       @content;
-      $theme-map: null !global;
     }
   }
 }
@@ -65,6 +65,9 @@ $themes: (
 
 
 @function themed($key) {
+  @if $theme-map == null {
+    @error "themed(#{$key}) must be used inside themify()";
+  }
   @return map.get($theme-map, $key);
 }
 

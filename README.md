@@ -11,7 +11,8 @@ npm install axios //client
 npm install cors //server
 npm install dayjs //server + client
 npm install @mui/icons-material @mui/material @emotion/styled @emotion/react // client 
-npm install -D sass-embedded // client 
+npm install -D sass-embedded // client 💀💀💀💀
+npm install -D sass // client 🆕🆕
 npm install @tanstack/react-query // client 
 npm install cloudinary multer // server =============new
 npm install three // client ================new
