@@ -1,6 +1,7 @@
 import "./addcommu.scss";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";//-------------------------------------
+import { Link, useNavigate } from "react-router-dom";//----------------
+import { makeRequest } from "../../api/axios";
 
 const AddCommu = () => {
   //----------------------------------------------------------
@@ -53,7 +54,7 @@ const AddCommu = () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await makeRequest.post("/upload/item", formData);
+    const res = await makeRequest.post("/upload/Communities", formData);
     return res.data; // คาดหวัง { url: "...", public_id: "..." }
   };
 
