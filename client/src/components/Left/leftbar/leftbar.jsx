@@ -6,17 +6,32 @@ import DownloadIcon from '@mui/icons-material/Download';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Events from "../../../assets/1.png";
 import Gaming from "../../../assets/1.png";
-import Gallery from "../../../assets/1.png";
-import Videos from "../../../assets/1.png";
-import Messages from "../../../assets/1.png"
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/authContext";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
+import { makeRequest } from "../../../api/axios";
 
 const LeftBar = () => {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
+
+  const [communities, setCommunities] = useState([]);
+
+  useEffect(() => {
+    const fetchCommunities = async () => {
+      try {
+        const res = await makeRequest.get(`communities/user/${currentUser.user_id}`);
+        setCommunities(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (currentUser?.user_id) {
+      fetchCommunities();
+    }
+  }, [currentUser]);
 
   return (
     <div className="leftBar">
@@ -27,19 +42,19 @@ const LeftBar = () => {
             <span>{currentUser?.name || currentUser?.username || "Guest"}</span>
           </div>
           <div className="item">
-            <PeopleIcon/>
+            <PeopleIcon />
             <span>Friends</span>
           </div>
           <div className="item">
-            <ForumIcon/>
+            <ForumIcon />
             <span>Messenger</span>
           </div>
           <div className="item" onClick={() => navigate("/download")} style={{ cursor: "pointer" }}>
-            <StorefrontIcon/>
+            <StorefrontIcon />
             <span>Market</span>
           </div>
           <div className="item">
-            <DownloadIcon/>
+            <DownloadIcon />
             <span>Download</span>
           </div>
         </div>
@@ -50,26 +65,22 @@ const LeftBar = () => {
             <span>My Communities</span>
             <button onClick={() => navigate("/addcommu")} style={{ cursor: "pointer" }}>Create</button>
           </div>
-          <div className="item">
-            <img src={Events} alt="" />
-            <span>Events</span>
-          </div>
-          <div className="item">
-            <img src={Gaming} alt="" />
-            <span>Gaming</span>
-          </div>
-          <div className="item">
-            <img src={Gallery} alt="" />
-            <span>Gallery</span>
-          </div>
-          <div className="item">
-            <img src={Videos} alt="" />
-            <span>Videos</span>
-          </div>
-          <div className="item">
-            <img src={Messages} alt="" />
-            <span>Messages</span>
-          </div>
+          {communities.length > 0 ? (
+            communities.map((commu) => (
+              // <div className="item" key={commu.communities_id}>
+              <div
+                className="item"
+                key={commu.communities_id}
+                onClick={() => navigate(`/desccommu/${commu.communities_id}`)}
+                style={{ cursor: "pointer" }}
+              >
+                <img src={commu.cover_img || Events} alt="" />
+                <span>{commu.name}</span>
+              </div>
+            ))
+          ) : (
+            <span>No communities yet</span>
+          )}
         </div>
 
         <hr />

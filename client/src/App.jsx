@@ -231,13 +231,13 @@ function App() {
       ]
     },
     {
-      path: "/desccommu",
+      path: "/desccommu/:id",
       element: (
         <DescriptionCommu />
       ),
       children: [
         { 
-          index: ":id",
+          index: true,
           element: <DescCommu />
         },
       ]
