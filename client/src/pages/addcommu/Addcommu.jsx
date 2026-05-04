@@ -1,6 +1,6 @@
 import "./addcommu.scss";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";//----------------
+import { Link, useNavigate } from "react-router-dom";//-------------------------------------
 import { makeRequest } from "../../api/axios";
 
 const AddCommu = () => {
@@ -16,7 +16,6 @@ const AddCommu = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // ================= UPLOAD FILES TO CLOUDINARY =================
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -30,31 +29,11 @@ const AddCommu = () => {
     setError("");
   };
 
-  const MAX_MODEL_SIZE = 10 * 1024 * 1024;
-
-  const handleModelChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (!/\.(glb|gltf)$/i.test(file.name)) {
-      setError("Please select a GLB or GLTF file");
-      return;
-    }
-    if (file.size > MAX_MODEL_SIZE) {
-      setError("File size must be under 10MB");
-      setModel(null); // เคลียร์ของเก่า
-      e.target.value = "";
-      return;
-    }
-    setModel(file);
-    e.target.value = "";
-    setError("");
-  };
   const uploadFile = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await makeRequest.post("/upload/Communities", formData);
+    const res = await makeRequest.post("/upload/community", formData);
     return res.data; // คาดหวัง { url: "...", public_id: "..." }
   };
 
@@ -83,7 +62,7 @@ const AddCommu = () => {
       });
 
       setSuccess("add community success");
-      navigate("/desccommu");
+      navigate("/");
     } catch (err) {
       console.error(err);
       setError("Failed to connect to server");
