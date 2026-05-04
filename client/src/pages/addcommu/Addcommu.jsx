@@ -33,7 +33,7 @@ const AddCommu = () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await makeRequest.post("/upload/community", formData);
+    const res = await makeRequest.post("/upload/communities", formData);
     return res.data; // คาดหวัง { url: "...", public_id: "..." }
   };
 
