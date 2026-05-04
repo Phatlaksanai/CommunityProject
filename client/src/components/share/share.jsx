@@ -9,7 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import { useQuery } from "@tanstack/react-query"; // เพิ่ม useQuery
 
-const Share = () => {
+const Share = ({ isDescCommu, commuId }) => {
   const [desc, setDesc] = useState("");
   const [files, setFiles] = useState([]);
   const { currentUser } = useContext(AuthContext);
@@ -32,6 +32,7 @@ const Share = () => {
         return res.data;
       }),
   });
+
   const upload = async (file) => {
     try {
       const formData = new FormData();
@@ -81,6 +82,7 @@ const Share = () => {
       img: imgUrls.length ? imgUrls : null,
       model: modelUrls.length ? modelUrls : null,
       project_id: selectedProject,
+      commu_id: commuId || null,
     });
   };
 
@@ -210,10 +212,12 @@ const Share = () => {
               </div>
             </label>
             {/* เพิ่ม onClick เพื่อเปิด Modal */}
-            <div className="item" onClick={() => setOpenProjectModal(true)}>
-              <CreateNewFolderIcon />
-              <span>Project</span>
-            </div>
+            {!isDescCommu && (
+              <div className="item" onClick={() => setOpenProjectModal(true)}>
+                <CreateNewFolderIcon />
+                <span>Project</span>
+              </div>
+            )}
           </div>
           {error && <p style={{ color: "red" , fontSize: "14px" }}>{error}</p>}
           <div className="right">

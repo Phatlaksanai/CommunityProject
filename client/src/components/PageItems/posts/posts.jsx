@@ -38,7 +38,7 @@ import { makeRequest } from "../../../api/axios";
 import { useInView } from "react-intersection-observer"; // เพิ่มเข้ามา
 import { useEffect } from "react";
 
-const Posts = ({ userId, project }) => {
+const Posts = ({ userId, project, commuId, isDescCommu }) => {
   const { ref, inView } = useInView(); // ref ตัวนี้จะเอาไปแปะไว้ล่างสุดของหน้าจอ
 
   const {
@@ -79,7 +79,7 @@ const Posts = ({ userId, project }) => {
     <div className="posts">
       {/* ข้อมูลจาก useInfiniteQuery จะซ้อนอยู่ใน data.pages */}
       {data.pages.map((page) =>
-        page.map((post) => <Post post={post} key={post.post_id} />)
+        page.map((post) => <Post post={post} key={post.post_id} commuId={commuId} isDescCommu={isDescCommu} />)
       )}
 
       {/* จุดล่างสุดที่ใช้ตรวจจับการเลื่อน */}

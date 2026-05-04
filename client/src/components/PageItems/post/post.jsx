@@ -3,7 +3,7 @@ import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlin
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Comments from "../../comments/comments";
 import { useState, useContext } from "react";
 import dayjs from "dayjs"; // moment to dayjs
@@ -19,9 +19,10 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-const Post = ({ post }) => {
+const Post = ({ post, isDescCommu }) => {
   const [commentOpen, setCommentOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
@@ -165,8 +166,15 @@ const Post = ({ post }) => {
             <TextsmsOutlinedIcon />
             {commentLoading ? "..." : commentCount} Comments
           </div>
+          {!isDescCommu && post.community_name && (
+            <div className="postCommunityInfo">
+              <img src={post.community_cover} alt="" onClick={() => navigate(`/desccommu/${post.community_id}`)} style={{ cursor: "pointer" }} />
+              <Link className="community-link" to={`/desccommu/${post.community_id}`}>Shared in {post.community_name}</Link>
+            </div>
+          )}
         </div>
         {commentOpen && <Comments postId={post.post_id} />}
+
       </div>
     </div>
   );

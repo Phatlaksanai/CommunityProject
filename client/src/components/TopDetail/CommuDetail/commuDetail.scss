@@ -4,6 +4,7 @@
   @include themify($themes) {
     flex: 2;
     top: 70px;
+
     // height: calc(100vh - 70px);
     overflow: scroll;
     background-color: themed("bg");
@@ -12,57 +13,59 @@
     &::-webkit-scrollbar {
       display: none;
     }
+
     .profileModal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-.modalContainer {
-  background: themed("bg");
-  width: 350px;
-  max-width: 90%;
-  padding: 20px;
-  border-radius: 12px;
+    .modalContainer {
+      background: themed("bg");
+      width: 350px;
+      max-width: 90%;
+      padding: 20px;
+      border-radius: 12px;
 
-  p {
-    // margin: 8px 0;
-    // font-size: 14px;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    white-space: pre-wrap;
-  }
-}
+      p {
+        // margin: 8px 0;
+        // font-size: 14px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        white-space: pre-wrap;
+      }
+    }
 
-.modalContainer a {
-  color: inherit;    
-}
+    .modalContainer a {
+      color: inherit;
+    }
 
-.modalHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  
+    .modalHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
 
-  h2 {
-    font-size: 18px;
-    margin: 0;
-  }
 
-  svg {
-    cursor: pointer;
-    font-size: 22px;
-  }
-}
+      h2 {
+        font-size: 18px;
+        margin: 0;
+      }
+
+      svg {
+        cursor: pointer;
+        font-size: 22px;
+      }
+    }
+
     .container {
       padding: 0;
 
@@ -100,38 +103,38 @@
         }
 
         .profileInfo {
+          padding: 20px 10%;
+          .nameRow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
 
-  .nameRow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
+            h1 {
+              font-size: 26px;
+              font-weight: bold;
+              margin: 0;
+            }
 
-    h1 {
-      font-size: 26px;
-      font-weight: bold;
-      margin: 0;
-    }
+            .actions {
+              .followBtn {
+                padding: 8px 18px;
+                border: none;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+              }
+            }
+          }
 
-    .actions {
-      .followBtn {
-        padding: 8px 18px;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-      }
-    }
-  }
-
-  .handle {
-    display: block;
-    margin-top: 5px;
-    font-size: 14px;
-    opacity: 0.7;
-  }
-}
+          .handle {
+            display: block;
+            margin-top: 5px;
+            font-size: 14px;
+            opacity: 0.7;
+          }
+        }
 
       }
 
@@ -153,19 +156,22 @@
           font-weight: bold;
           border-bottom: 2px solid themed("textColor");
         }
-      button {
-        padding: 10px 18px;
-        border-radius: 6px;
-        margin-left: auto;
-        background-color: #555;
-        color: white;
-        border: none;
-      }         
+
+        button {
+          padding: 10px 18px;
+          border-radius: 6px;
+          margin-left: auto;
+          background-color: #555;
+          color: white;
+          border: none;
+        }
       }
+
       .tabs a {
         text-decoration: none; // ❌ เอาเส้นใต้ออก
-        color: inherit;        // ❌ เอาสีม่วงออก (ใช้สีปกติแทน)
+        color: inherit; // ❌ เอาสีม่วงออก (ใช้สีปกติแทน)
       }
+
       /* ===== CONTENT ===== */
       .content {
         padding: 20px;

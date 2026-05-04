@@ -13,7 +13,8 @@ exports.getPosts = async (req, res) => {
       *,
       imgs(img),
       models(model),
-      users (user_id, username, name, profilePic)
+      users (user_id, username, name, profilePic),
+      communities (communities_id, name, cover_img)
     `)
     .eq("status", "show")
     .order("created_at", { ascending: false })
@@ -26,6 +27,8 @@ exports.getPosts = async (req, res) => {
     username: post.users?.username || null,
     name: post.users?.name || null,
     profilePic: post.users?.profilePic || null,
+    community_name: post.communities?.name || null,
+    community_cover: post.communities?.cover_img || null,
   }));
 
   return res.status(200).json(formatted);
@@ -45,7 +48,8 @@ exports.getPostsByUserId = async (req, res) => {
         username,
         name,
         profilePic
-      )
+      ),
+      communities (communities_id, name, cover_img)
     `,
     )
     .eq("user_id", id)
@@ -59,6 +63,8 @@ exports.getPostsByUserId = async (req, res) => {
     username: post.users?.username || null,
     name: post.users?.name || null,
     profilePic: post.users?.profilePic || null,
+    community_name: post.communities?.name || null,
+    community_pic: post.communities?.cover_img || null,
   }));
 
   return res.status(200).json(formatted || []);
@@ -111,7 +117,7 @@ exports.getPostsByUserIdAvailable = async (req, res) => {
 };
 
 exports.addPost = async (req, res) => {
-  const { desc, img, model, project_id } = req.body;
+  const { desc, img, model, project_id, commu_id } = req.body;
 
   if (!desc?.trim()) {
     // เช็คว่า description มีค่าและไม่ใช่แค่เว้นวรรค
@@ -127,6 +133,7 @@ exports.addPost = async (req, res) => {
           description: desc.trim(),
           user_id: req.user.user_id,
           project_id: project_id || null,
+          community_id: commu_id || null,
           status: "show", 
         },
       ])
