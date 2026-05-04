@@ -170,7 +170,7 @@ const EditProfile = () => {
             <label>Profile Image</label>
 
             <label htmlFor="image" className="file-input">
-              {profileimg ? profileimg.name : "No file selected"}
+              {profileimg instanceof File ? profileimg.name : "Current image"}
             </label>
 
             <input
@@ -186,7 +186,7 @@ const EditProfile = () => {
             <label>Cover Image</label>
 
             <label htmlFor="cover" className="file-input">
-              {coverimg ? coverimg.name : "No file selected"}
+              {coverimg instanceof File ? coverimg.name : "Current image"}
             </label>
 
             <input

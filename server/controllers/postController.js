@@ -64,7 +64,7 @@ exports.getPostsByUserId = async (req, res) => {
     name: post.users?.name || null,
     profilePic: post.users?.profilePic || null,
     community_name: post.communities?.name || null,
-    community_pic: post.communities?.cover_img || null,
+    community_cover: post.communities?.cover_img || null,
   }));
 
   return res.status(200).json(formatted || []);

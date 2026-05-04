@@ -140,7 +140,7 @@ const EditItem = () => {
     return (
         <div className="edit-item">
             <div className="add-item__form">
-                <h1 className="add-item__title">Update Item</h1>
+                <h1 className="add-item__title">Edit Item</h1>
                 <form onSubmit={handleUpdateitem}>
                     <div className="form-group">
                         <label htmlFor="itemName">Item Name</label>
@@ -170,7 +170,7 @@ const EditItem = () => {
                         <label>Image</label>
 
                         <label htmlFor="image" className="file-input">
-                            {img ? img.name : "No file selected"}
+                            {img instanceof File ? img.name : "Current image"}
                         </label>
 
                         <input
@@ -186,7 +186,7 @@ const EditItem = () => {
                         <label>Model</label>
 
                         <label htmlFor="model" className="file-input">
-                            {model ? model.name : "No file selected"}
+                            {model instanceof File ? model.name : "Current model"}
                         </label>
 
                         <input
@@ -221,7 +221,7 @@ const EditItem = () => {
                         </select>
                     </div>
 
-                    <input type="submit" value="Submit" className="add-item__submit" />
+                    <input type="submit" value="Save Changes" className="add-item__submit" />
                     {error && <span style={{ color: "red" , margin: "0px 10px" }}>{error}</span>}
                     {success && <span style={{ color: "green" , margin: "0px 10px" }}>{success}</span>}
                 </form>

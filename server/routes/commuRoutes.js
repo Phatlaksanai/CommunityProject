@@ -4,7 +4,8 @@ const commuController = require("../controllers/commuController");
 const verifyToken = require("../middleware/verifyToken");
 
 router.post("/addcommu", verifyToken, commuController.addCommunity);
-router.get("/", commuController.getCommunities);
+router.get("/:id", commuController.getCommunityById);
 router.get("/user/:id", commuController.getCommunitiesByUserId);
+router.put("/update", verifyToken, commuController.updateCommunity);
 
 module.exports = router;

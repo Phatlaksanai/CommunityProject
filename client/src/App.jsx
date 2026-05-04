@@ -292,6 +292,18 @@ function App() {
       ]
     },
     {
+      path: "/editcommu/:id",
+      element: (
+        <LayoutNavbar />
+      ),
+      children: [
+        {
+          index: true,
+          element: <EditCommu />
+        },
+      ]
+    },
+    {
       path: "/buyitem",
       element: (
         <LayoutNavbar />

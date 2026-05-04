@@ -137,7 +137,7 @@ const EditProject = () => {
   }
 
   return (
-    <div className="add-project">
+    <div className="editProject">
       <div className="add-item__form">
         <h1 className="add-item__title">Edit Project</h1>
         {/* ✅ เรียกใช้ handleUpdateProject */}
