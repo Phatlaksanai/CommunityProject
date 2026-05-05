@@ -28,8 +28,13 @@ const LeftBar = () => {
       const createdCommu = createdRes.data || [];
       const joinedCommu = joinedRes.data || [];
 
-      // จับมารวมกันแล้วส่งคืนค่าได้เลย
-      return [...createdCommu, ...joinedCommu];
+      // เอาข้อมูลมารวมกัน กรองอันที่ซ้ำออก
+      const allCommu = [...createdCommu, ...joinedCommu];
+      const uniqueCommunities = Array.from(
+        new Map(allCommu.map((item) => [item.communities_id, item])).values()
+      );
+
+      return uniqueCommunities;
     },
     enabled: !!currentUser?.user_id, // ทำงานเมื่อมี user_id เท่านั้น
   });

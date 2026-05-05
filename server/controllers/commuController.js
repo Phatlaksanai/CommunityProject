@@ -3,6 +3,7 @@ const cloudinary = require("../config/cloudinary");
 
 exports.addCommunity = async (req, res) => {
   const { CommunityName, description, img } = req.body;
+  const userId = req.user.user_id;
 
   if (!CommunityName?.trim()) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -16,23 +17,43 @@ exports.addCommunity = async (req, res) => {
   if (!description.trim()) {
     return res.status(400).json({ error: "Description cannot be empty" });
   }
-
-  const { data, error } = await db
+try {
+  const { data: newCommunity, error: communityError } = await db
     .from("communities")
     .insert([
       {
         name: CommunityName,
         description: description || null,
         cover_img: img || null,
-        user_id: req.user.user_id,
+        user_id: userId,
+        totalUsers: 1,
       },
     ])
     .select()
     .single();
 
-  if (error) return res.status(500).json(error);
+  if (communityError) return res.status(500).json(communityError);
 
-  return res.status(201).json(data);
+  // เพิ่มผู้สร้างลงในตาราง community_members ทันที
+    // เพื่อให้ระบบนับว่าผู้สร้างเป็นสมาชิกคนแรกอย่างสมบูรณ์
+    const { error: memberError } = await db
+      .from("community_members")
+      .insert([
+        {
+          user_id: userId,
+          community_id: newCommunity.communities_id,
+          status: "active", // หรือ status ตามที่คุณตั้งไว้ใน Enum
+        },
+      ]);
+    if (memberError) {
+      console.error("Member Insert Error:", memberError);
+    }
+
+    return res.status(201).json(newCommunity);
+  } catch (err) {
+    console.error("Add Community Error:", err);
+    return res.status(500).json(err);
+  }
 };
 
 exports.getCommunityById = async (req, res) => {
@@ -48,7 +69,7 @@ exports.getCommunityById = async (req, res) => {
 exports.getCommunitiesByUserId = async (req, res) => {
   const { id } = req.params;
 
-  const { data, error } = await db.from("communities").select().eq("user_id", id);
+  const { data, error } = await db.from("communities").select().eq("user_id", id).order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
 
@@ -67,7 +88,8 @@ exports.getJoinedCommunities = async (req, res) => {
         communities (*)
       `)
       .eq("user_id", id)
-      .eq("status", "active"); // ดึงเฉพาะกลุ่มที่สถานะยัง active (ไม่ได้ถูกแบนหรือออก)
+      .eq("status", "active") // ดึงเฉพาะกลุ่มที่สถานะยัง active (ไม่ได้ถูกแบนหรือออก)
+      .order("created_at", { ascending: false });
 
     if (error) return res.status(500).json(error);
 
