@@ -6,6 +6,7 @@ const verifyToken = require("../middleware/verifyToken");
 router.get("/", postController.getPosts);
 router.get("/user/:id", postController.getPostsByUserId);
 router.get("/project/:id", postController.getPostsByProjectId);
+router.get("/community/:id", postController.getPostsByCommunityId);
 router.get("/user/:id/available", postController.getPostsByUserIdAvailable);
 router.post("/addpost", verifyToken, postController.addPost);
 router.get("/project-edit/:projectId", verifyToken, postController.getPostsForEditProject);

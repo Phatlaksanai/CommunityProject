@@ -87,3 +87,30 @@ exports.updateCommunity = async (req, res) => {
     return res.status(500).json(err);
   }
 };
+
+exports.getLatestCommunityImages = async (req, res) => {
+  const { id } = req.params; // id ของคอมมูนิตี้
+
+  try {
+    const { data, error } = await db
+      .from("imgs")
+      .select(`
+        img,
+        posts!inner(community_id, created_at, status)
+      `)
+      .eq("posts.community_id", id)
+      .eq("posts.status", "show")
+      .order("posts(created_at)", { ascending: false })
+      .range(0, 3); // ดึงแค่ 4 รูป (index 0 ถึง 3)
+
+    if (error) throw error;
+
+    // แปลงข้อมูลให้เหลือแค่ array ของ URL รูปภาพเพื่อให้ใช้ง่ายขึ้น
+    const images = data.map(item => item.img);
+
+    return res.status(200).json(images);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+};

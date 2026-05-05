@@ -72,11 +72,16 @@ exports.getPostsByUserId = async (req, res) => {
 
 exports.getPostsByProjectId = async (req, res) => {
   const { id } = req.params;
+  
+  // 1. เพิ่ม Logic การคำนวณ Page เหมือนใน getPosts
+  const page = parseInt(req.query.page) || 0;
+  const limit = 5; 
+  const from = page * limit;
+  const to = from + limit - 1;
 
   const { data, error } = await db
     .from("posts")
-    .select(
-      `
+    .select(`
       *,
       imgs(img),
       models(model),
@@ -84,10 +89,47 @@ exports.getPostsByProjectId = async (req, res) => {
         username,
         profilePic
       )
-    `,
-    )
-    .eq("project_id", id)
-    .order("created_at", { ascending: false });
+    `)
+    .eq("project_id", id) // ตรวจสอบชื่อ Column ใน DB ให้แม่นยำ (บางที่ใช้ community_id)
+    .eq("status", "show")     // ควรเช็ค status ด้วยเพื่อให้เหมือนหน้า Feed หลัก
+    .order("created_at", { ascending: false })
+    .range(from, to); // 2. เพิ่ม .range() เพื่อดึงข้อมูลตามหน้า
+
+  if (error) return res.status(500).json(error);
+
+  const formatted = data.map((post) => ({
+    ...post,
+    username: post.users?.username || null,
+    profilePic: post.users?.profilePic || null,
+  }));
+
+  return res.status(200).json(formatted || []);
+};
+
+exports.getPostsByCommunityId = async (req, res) => {
+  const { id } = req.params;
+  
+  // 1. เพิ่ม Logic การคำนวณ Page เหมือนใน getPosts
+  const page = parseInt(req.query.page) || 0;
+  const limit = 5; 
+  const from = page * limit;
+  const to = from + limit - 1;
+
+  const { data, error } = await db
+    .from("posts")
+    .select(`
+      *,
+      imgs(img),
+      models(model),
+      users (
+        username,
+        profilePic
+      )
+    `)
+    .eq("community_id", id) // ตรวจสอบชื่อ Column ใน DB ให้แม่นยำ (บางที่ใช้ community_id)
+    .eq("status", "show")     // ควรเช็ค status ด้วยเพื่อให้เหมือนหน้า Feed หลัก
+    .order("created_at", { ascending: false })
+    .range(from, to); // 2. เพิ่ม .range() เพื่อดึงข้อมูลตามหน้า
 
   if (error) return res.status(500).json(error);
 
@@ -109,6 +151,7 @@ exports.getPostsByUserIdAvailable = async (req, res) => {
     .eq("user_id", id)
     .eq("status", "show")
     .is("project_id", null)
+    .is("community_id", null)
     .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
@@ -195,7 +238,9 @@ exports.getPostsForEditProject = async (req, res) => {
     // ดึงอันที่เป็นของโปรเจกต์นี้ OR (เป็นของเรา AND ยังไม่มีโปรเจกต์)
     .or(
       `project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`,
-    );
+    )
+    .is("community_id", null) // เพิ่มเงื่อนไขว่าไม่เอาโพสต์ที่อยู่ในคอมมูนิตี้
+    .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
   return res.status(200).json(data || []);
