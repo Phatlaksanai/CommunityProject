@@ -65,7 +65,11 @@ const AddCommu = () => {
       navigate("/");
     } catch (err) {
       console.error(err);
-      setError("Failed to connect to server");
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Failed to connect to server");
+      }
     }
   };
 

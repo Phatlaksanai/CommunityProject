@@ -89,7 +89,11 @@ const EditCommu = () => {
             navigate(`/desccommu/${community_id}`);
         } catch (err) {
             console.error(err);
-            setError("Failed to connect to server");
+            if (err.response && err.response.data && err.response.data.error) {
+                setError(err.response.data.error); // จะแสดง error จาก backend
+            } else {
+                setError("Failed to connect to server");
+            }
         }
     };
 

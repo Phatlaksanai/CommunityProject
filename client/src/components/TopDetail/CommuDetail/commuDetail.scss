@@ -83,59 +83,78 @@
         }
       }
 
-      /* ===== PROFILE HEADER ===== */
       .profileHeader {
         display: flex;
-        align-items: flex-start;
-        gap: 20px;
-        padding: 20px;
+        justify-content: space-between; /* ดันซ้าย-ขวาออกจากกัน */
+        align-items: stretch;
+        padding: 20px 10%; /* จัด padding ซ้ายขวาให้สวยงาม */
 
-        .profileImg {
-          margin-top: -60px;
+        /* กลุ่มฝั่งซ้าย */
+        .leftSide {
+          display: flex;
+          flex-direction: column;
+          gap: 8px; /* ระยะห่างบรรทัด */
 
-          img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid themed("bg");
-            object-fit: cover;
-          }
-        }
-
-        .profileInfo {
-          padding: 20px 10%;
-          .nameRow {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-
-            h1 {
-              font-size: 26px;
-              font-weight: bold;
-              margin: 0;
-            }
-
-            .actions {
-              .followBtn {
-                padding: 8px 18px;
-                border: none;
-                border-radius: 20px;
-                cursor: pointer;
-                font-size: 14px;
-                font-weight: 500;
-              }
-            }
+          h1 {
+            font-size: 26px;
+            font-weight: bold;
+            margin: 0;
           }
 
           .handle {
-            display: block;
-            margin-top: 5px;
-            font-size: 14px;
+            font-size: 16px;
             opacity: 0.7;
+          }
+
+          .statsRow {
+            display: flex;
+            flex-direction: column; 
+            align-items: flex-start; 
+            gap: 8px; 
+            margin-top: auto; 
+            padding-top: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: gray;
+
+            p {
+              margin: 0;
+            }
           }
         }
 
+        /* กลุ่มฝั่งขวา */
+        .rightSide {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end; 
+          gap: 12px;
+          justify-content: space-between;
+
+          .iconBtn {
+            font-size: 28px; 
+            opacity: 0.7;
+            transition: 0.2s ease-in-out;
+          }
+
+          .blockBtn {
+            color: #ff4d4f; 
+            margin-bottom: 26px;
+          }
+          .followBtn {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: none;
+            background-color: #5271ff; // เปลี่ยนสีตามสถานะ
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+          
+          &.following {
+              background-color: #888; 
+          }
+        }
+        }
       }
 
       /* ===== TABS ===== */

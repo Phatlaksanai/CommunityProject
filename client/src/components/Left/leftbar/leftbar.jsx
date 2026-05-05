@@ -4,34 +4,35 @@ import ForumIcon from '@mui/icons-material/Forum';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import DownloadIcon from '@mui/icons-material/Download';
 import SettingsIcon from '@mui/icons-material/Settings';
-import Events from "../../../assets/1.png";
-import Gaming from "../../../assets/1.png";
+import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/authContext";
 import { useContext, useEffect, useState } from "react";
 import { makeRequest } from "../../../api/axios";
+import { useQuery } from "@tanstack/react-query";
 
 const LeftBar = () => {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
-  const [communities, setCommunities] = useState([]);
+  const { data: communities = [], isLoading } = useQuery({
+    queryKey: ["leftBarCommunities", currentUser?.user_id],
+    queryFn: async () => {
+      // ดึงข้อมูล 2 เส้นพร้อมกัน
+      const [createdRes, joinedRes] = await Promise.all([
+        makeRequest.get(`communities/user/${currentUser.user_id}`),
+        makeRequest.get(`communities/joined/${currentUser.user_id}`)
+      ]);
 
-  useEffect(() => {
-    const fetchCommunities = async () => {
-      try {
-        const res = await makeRequest.get(`communities/user/${currentUser.user_id}`);
-        setCommunities(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
+      const createdCommu = createdRes.data || [];
+      const joinedCommu = joinedRes.data || [];
 
-    if (currentUser?.user_id) {
-      fetchCommunities();
-    }
-  }, [currentUser]);
+      // จับมารวมกันแล้วส่งคืนค่าได้เลย
+      return [...createdCommu, ...joinedCommu];
+    },
+    enabled: !!currentUser?.user_id, // ทำงานเมื่อมี user_id เท่านั้น
+  });
 
   return (
     <div className="leftBar">
@@ -65,17 +66,22 @@ const LeftBar = () => {
             <span>My Communities</span>
             <button onClick={() => navigate("/addcommu")} style={{ cursor: "pointer" }}>Create</button>
           </div>
-          {communities.length > 0 ? (
+          {isLoading ? (
+            <span style={{ fontSize: "12px", color: "gray" }}>Loading communities...</span>
+          ) : communities.length > 0 ? (
             communities.map((commu) => (
-              // <div className="item" key={commu.communities_id}>
               <div
                 className="item"
                 key={commu.communities_id}
                 onClick={() => navigate(`/desccommu/${commu.communities_id}`)}
                 style={{ cursor: "pointer" }}
               >
-                <img src={commu.cover_img || Events} alt="" />
+                <img src={commu.cover_img} alt="" />
                 <span>{commu.name}</span>
+                
+                {commu.user_id === currentUser.user_id && (
+                  <MilitaryTechIcon style={{ marginLeft: "auto", color: "gray"}} />
+                )}
               </div>
             ))
           ) : (

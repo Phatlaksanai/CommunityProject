@@ -224,6 +224,10 @@ exports.getFollwersByCommunityId = async (req, res) => {
     return res.status(200).json(followerIds);
     
   } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+};
 exports.getLatestCommunityImages = async (req, res) => {
   const { id } = req.params; // id ของคอมมูนิตี้
 
