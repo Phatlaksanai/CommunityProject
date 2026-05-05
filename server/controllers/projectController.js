@@ -109,7 +109,9 @@ exports.addProject = async (req, res) => {
       .from("posts")
       .update({ project_id: projectId })
       .in("post_id", relatedPosts)
-      .is("project_id", null);
+      .is("project_id", null)
+      
+      
 
     if (postError) {
       console.log("POST UPDATE ERROR:", postError);

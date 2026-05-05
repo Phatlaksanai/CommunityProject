@@ -11,5 +11,6 @@ router.put("/update", verifyToken, commuController.updateCommunity);
 router.get("/followers/:id", commuController.getFollwersByCommunityId);
 router.post("/follow", verifyToken, commuController.addFollower);
 router.delete("/unfollow/:id", verifyToken, commuController.removeFollower);
+router.get("/:id/images", commuController.getLatestCommunityImages);
 
 module.exports = router;

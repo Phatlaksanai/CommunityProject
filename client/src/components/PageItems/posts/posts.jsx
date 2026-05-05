@@ -4,7 +4,7 @@
 // import { makeRequest } from "../../../api/axios";
 
 // const Posts = ({ userId , project}) => {
-  
+
 //   const { isLoading, error, data } = useQuery({
 //     queryKey: ["posts", userId, project],
 //     queryFn: () => {
@@ -49,13 +49,14 @@ const Posts = ({ userId, project, commuId, isDescCommu }) => {
     hasNextPage,      // เช็คว่ามีข้อมูลหน้าถัดไปให้ดึงอีกไหม
     isFetchingNextPage // เช็คว่ากำลังโหลดข้อมูลหน้าถัดไปอยู่หรือไม่
   } = useInfiniteQuery({
-    queryKey: ["posts", userId, project],
+    queryKey: ["posts", userId, project, commuId],
     queryFn: ({ pageParam = 0 }) => {
       // ส่งค่า page ไปใน API
       let url = "/posts";
       if (userId) url = `/posts/user/${userId}`;
       if (project) url = `/posts/project/${project}`;
-      
+      if (commuId) url = `/posts/community/${commuId}`;
+
       return makeRequest.get(`${url}?page=${pageParam}`).then(res => res.data);
     },
     // กำหนดว่าหน้าถัดไปคือเลขอะไร
@@ -84,10 +85,10 @@ const Posts = ({ userId, project, commuId, isDescCommu }) => {
 
       {/* จุดล่างสุดที่ใช้ตรวจจับการเลื่อน */}
       <div ref={ref} style={{ padding: "20px", textAlign: "center" }}>
-        {isFetchingNextPage 
-          ? "Loading..." 
-          : hasNextPage 
-            ? "Scroll down to see more posts" 
+        {isFetchingNextPage
+          ? "Loading..."
+          : hasNextPage
+            ? "Scroll down to see more posts"
             : "No more posts to load"}
       </div>
     </div>

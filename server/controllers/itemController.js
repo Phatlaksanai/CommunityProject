@@ -159,3 +159,18 @@ exports.getItemsForEditProject = async (req, res) => {
   if (error) return res.status(500).json(error);
   return res.status(200).json(data || []);
 };
+
+exports.getLatestItems = async (req, res) => {
+  try {
+    const { data, error } = await db
+      .from("items") // เปลี่ยนชื่อตารางตามที่คุณใช้
+      .select("*")
+      .order("created_at", { ascending: false }) // เรียงจากใหม่ไปเก่า
+      .range(0, 1); // ดึงลำดับที่ 0 และ 1 (รวมเป็น 2 อัน)
+
+    if (error) throw error;
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};

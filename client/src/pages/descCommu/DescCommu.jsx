@@ -34,7 +34,7 @@ const DescCommu = () => {
     return (
         <div className="descCommu">
             <div className="descCommuleft">
-                <LeftDC />
+                <LeftDC commuId={id}/>
             </div>
 
             <div className="descCommuright">
