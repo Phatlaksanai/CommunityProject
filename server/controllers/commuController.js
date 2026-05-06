@@ -158,7 +158,6 @@ exports.updateCommunity = async (req, res) => {
   }
 };
 
-
 exports.addFollower = async (req, res) => {
   const { commu_id } = req.body;
   const user_id = req.user.user_id;
@@ -250,6 +249,7 @@ exports.getFollwersByCommunityId = async (req, res) => {
     return res.status(500).json(err);
   }
 };
+
 exports.getLatestCommunityImages = async (req, res) => {
   const { id } = req.params; // id ของคอมมูนิตี้
 
@@ -273,6 +273,97 @@ exports.getLatestCommunityImages = async (req, res) => {
     return res.status(200).json(images);
   } catch (err) {
     console.error(err);
+    return res.status(500).json(err);
+  }
+};
+
+exports.getMembersByCommunityId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    // ดึงข้อมูล Community เพื่อเอาไปใช้กรองออก 
+    const { data: community, error: commuError } = await db
+      .from("communities")
+      .select("user_id")
+      .eq("communities_id", id)
+      .maybeSingle(); // ใช้ maybeSingle เพื่อป้องกัน error กรณีไม่พบข้อมูล
+
+    if (commuError) {
+      console.error("Get Community Error:", commuError);
+      return res.status(500).json(commuError);
+    }
+
+    const ownerId = community?.user_id;
+
+    // ดึงข้อมูลจากตาราง community_members และ Join เอาข้อมูลตาราง users
+    const { data, error } = await db
+      .from("community_members")
+      .select(`
+        user_id,
+        status,
+        users (
+          user_id,
+          username,
+          name,
+          profilePic
+        )
+      `)
+      .eq("community_id", id)
+      .neq("user_id", ownerId); // กรองเจ้าของกลุ่มออก
+
+    if (error) {
+      console.error("GET MEMBERS ERROR:", error);
+      return res.status(500).json(error);
+    }
+
+    // ข้อมูลที่ Supabase คืนมาจะซ้อนกันอยู่ (item.users) 
+    // เราจึง map กระจาย (spread) ข้อมูลออกมาให้เป็น Object ชั้นเดียว เพื่อให้หน้าบ้านใช้ง่ายๆ
+    const members = data.map(item => ({
+      user_id: item.user_id,
+      status: item.status,
+      ...(item.users || {}) // แตก properties ของ users ออกมา
+    }));
+
+    return res.status(200).json(members);
+  } catch (err) {
+    console.error("SERVER ERROR:", err);
+    return res.status(500).json(err);
+  }
+};
+
+exports.banMember = async (req, res) => {
+  const { communityId, userIds } = req.body;
+
+  try {
+    if (!communityId) {
+      return res.status(400).json({ error: "Community ID not found" });
+    }
+    const { error: resetError } = await db
+      .from("community_members")
+      .update({ status: "active" }) 
+      .eq("community_id", communityId)
+      .eq("status", "banned");
+
+    if (resetError) {
+      console.error("BAN MEMBER ERROR:", resetError);
+      return res.status(500).json(resetError);
+    }
+
+    if (userIds && userIds.length > 0) {
+      const { error: banError } = await db
+        .from("community_members")
+        .update({ status: "banned" })
+        .eq("community_id", communityId)
+        .in("user_id", userIds);
+
+      if (banError) {
+        console.error("BAN MEMBER ERROR:", banError);
+        return res.status(500).json(banError);
+      }
+    }
+
+    return res.status(200).json({ success: true, message: "Update Successful!" });
+  } catch (err) {
+    console.error("SERVER ERROR:", err);
     return res.status(500).json(err);
   }
 };
