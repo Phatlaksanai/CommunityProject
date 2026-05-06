@@ -121,8 +121,11 @@ const EditProfile = () => {
       setTimeout(() => navigate(`/profile/${currentUser?.user_id}`), 1000);
     } catch (err) {
       console.error(err);
-      // ถ้าหลังบ้าน Error 500 เราจะดึงข้อความ error มาโชว์
-      setError(err.response?.data?.message || "Internal Server Error: ตรวจสอบ Backend");
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error); // จะแสดง error จาก backend
+      } else {
+        setError("Internal Server Error");
+      }
     }
   };
 

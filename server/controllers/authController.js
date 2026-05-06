@@ -315,7 +315,13 @@ exports.updateProfile = async (req, res) => {
 
         // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
         if (displayName && displayName.trim() !== "") updateData.name = displayName;
+        if (displayName.length < 3 || displayName.length > 35) {
+            return res.status(400).json({ error: "Display name must be between 3 and 35 characters" });
+        }
         if (description && description.trim() !== "") updateData.description = description;
+        if (description.length < 3 || description.length > 500) {
+            return res.status(400).json({ error: "Description must be between 3 and 500 characters" });
+        }
         if (city && city.trim() !== "") updateData.city = city;
         if (website && website.trim() !== "") updateData.website = website;
 

@@ -17,7 +17,7 @@ const Project = ({ project }) => {
         </div>
         </div>
         <div className="desc">
-            <h2>{project.project_name}</h2>{/* 2026-01-30T17:00:00.000Z */}
+            <h3>{project.project_name.length > 20 ? `${project.project_name.substring(0, 10)}...` : project.project_name}</h3>{/* 2026-01-30T17:00:00.000Z */}
         </div>
         <div className="price">
             <p>{dayjs(project.created_at).format("D MMM YYYY")}</p>

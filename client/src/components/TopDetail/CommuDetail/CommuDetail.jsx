@@ -86,7 +86,7 @@ const CommuDetail = () => {
             ) : (
               <button 
                 className="followBtn" 
-                onClick={handleFollow}
+                onClick={handleFollow} style={{ backgroundColor: isFollowing ? "#bababa" : "#5271ff" }}
               >
                 {isFollowing ? "Following" : "Follow"}
               </button>

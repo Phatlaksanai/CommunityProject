@@ -10,10 +10,12 @@ import { AuthContext } from "../../../context/authContext";
 import { useContext, useEffect, useState } from "react";
 import { makeRequest } from "../../../api/axios";
 import { useQuery } from "@tanstack/react-query";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const LeftBar = () => {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
+  const [showAll, setShowAll] = useState(false);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   const { data: communities = [], isLoading } = useQuery({
@@ -24,7 +26,7 @@ const LeftBar = () => {
         makeRequest.get(`communities/user/${currentUser.user_id}`),
         makeRequest.get(`communities/joined/${currentUser.user_id}`)
       ]);
-
+      
       const createdCommu = createdRes.data || [];
       const joinedCommu = joinedRes.data || [];
 
@@ -38,6 +40,9 @@ const LeftBar = () => {
     },
     enabled: !!currentUser?.user_id, // ทำงานเมื่อมี user_id เท่านั้น
   });
+
+  // ถ้า showAll เป็น false ให้ตัดมาแค่ 5 ตัวแรก แต่ถ้า true ให้เอามาทั้งหมด
+  const displayedCommunities = showAll ? communities : communities.slice(0, 3);
 
   return (
     <div className="leftBar">
@@ -71,26 +76,33 @@ const LeftBar = () => {
             <span>My Communities</span>
             <button onClick={() => navigate("/addcommu")} style={{ cursor: "pointer" }}>Create</button>
           </div>
-          {isLoading ? (
-            <span style={{ fontSize: "12px", color: "gray" }}>Loading communities...</span>
-          ) : communities.length > 0 ? (
-            communities.map((commu) => (
-              <div
-                className="item"
-                key={commu.communities_id}
-                onClick={() => navigate(`/desccommu/${commu.communities_id}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <img src={commu.cover_img} alt="" />
-                <span>{commu.name}</span>
-                
-                {commu.user_id === currentUser.user_id && (
-                  <MilitaryTechIcon style={{ marginLeft: "auto", color: "gray"}} />
-                )}
-              </div>
-            ))
-          ) : (
-            <span>No communities yet</span>
+
+          <div className="community-list-wrapper">
+            {isLoading ? (
+              <span>Loading...</span>
+            ) : (
+              displayedCommunities.map((commu) => (
+                <div
+                  className="item community-item"
+                  key={commu.communities_id}
+                  onClick={() => navigate(`/desccommu/${commu.communities_id}`)}
+                >
+                  <img src={commu.cover_img || defaultPic} alt="" />
+                  <span className="community-name">{commu.name.length > 20 ? `${commu.name.substring(0, 17)}...` : commu.name}</span>
+                  
+                  {commu.user_id === currentUser.user_id && (
+                    <MilitaryTechIcon className="owner-badge" />
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* 4. ปุ่ม Load More */}
+          {!showAll && communities.length > 3 && (
+            <div className="load-more" onClick={() => setShowAll(true)}>
+               <span>See more</span>
+            </div>
           )}
         </div>
 
