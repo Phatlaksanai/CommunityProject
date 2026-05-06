@@ -331,34 +331,70 @@ exports.getMembersByCommunityId = async (req, res) => {
 };
 
 exports.banMember = async (req, res) => {
-  const { communityId, userIds } = req.body;
+  const { communityId, userIds = [] } = req.body;
 
   try {
     if (!communityId) {
       return res.status(400).json({ error: "Community ID not found" });
     }
-    const { error: resetError } = await db
+    // ดึงรายชื่อคนที่กำลังถูกแบนอยู่ปัจจุบัน
+    const { data: currentBanned, error: fetchError } = await db
       .from("community_members")
-      .update({ status: "active" }) 
+      .select("user_id")
       .eq("community_id", communityId)
       .eq("status", "banned");
 
-    if (resetError) {
-      console.error("BAN MEMBER ERROR:", resetError);
-      return res.status(500).json(resetError);
+    if (fetchError) {
+      console.error("FETCH BANNED USERS ERROR:", fetchError);
+      return res.status(500).json(fetchError);
     }
 
-    if (userIds && userIds.length > 0) {
+    const currentBannedIds = currentBanned.map(user => user.user_id);
+
+    // คัดแยกคนที่ต้อง "ปลดแบน" (คือคนที่เคยโดนแบน แต่ไม่มีชื่อใน userIds ล่าสุดที่ส่งมา)
+    const usersToUnban = currentBannedIds.filter(id => !userIds.includes(id));
+
+    // ดำเนินการ "ปลดแบน" และ "โชว์โพสต์"
+    if (usersToUnban.length > 0) {
+      // ปลดแบนสมาชิก
+      const { error: unbanError } = await db
+        .from("community_members")
+        .update({ status: "active" })
+        .eq("community_id", communityId)
+        .in("user_id", usersToUnban);
+
+      if (unbanError) return res.status(500).json(unbanError);
+
+      // โชว์โพสต์กลับมา (เปลี่ยนกลับเป็น 'show' หรือ 'active' ตามที่คุณใช้ใน Database)
+      const { error: showPostError } = await db
+        .from("posts")
+        .update({ status: "show" }) // ตรวจสอบว่า Status โพสต์ปกติของคุณคือคำว่าอะไร (เช่น 'show', 'active')
+        .eq("community_id", communityId)
+        .in("user_id", usersToUnban)
+        .eq("status", "hide"); // ป้องกันการไปโชว์โพสต์ที่อาจถูกลบไปแล้ว ให้เปลี่ยนเฉพาะโพสต์ที่ถูกซ่อนอยู่
+
+      if (showPostError) return res.status(500).json(showPostError);
+    }
+
+    // 4. ดำเนินการ "แบน" และ "ซ่อนโพสต์" (ตามรายชื่อ userIds ล่าสุด)
+    if (userIds.length > 0) {
+      // 4.1 แบนสมาชิก
       const { error: banError } = await db
         .from("community_members")
         .update({ status: "banned" })
         .eq("community_id", communityId)
         .in("user_id", userIds);
 
-      if (banError) {
-        console.error("BAN MEMBER ERROR:", banError);
-        return res.status(500).json(banError);
-      }
+      if (banError) return res.status(500).json(banError);
+
+      // 4.2 ซ่อนโพสต์
+      const { error: hidePostError } = await db
+        .from("posts")
+        .update({ status: "hide" })
+        .eq("community_id", communityId)
+        .in("user_id", userIds);
+
+      if (hidePostError) return res.status(500).json(hidePostError);
     }
 
     return res.status(200).json({ success: true, message: "Update Successful!" });
