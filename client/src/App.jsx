@@ -21,6 +21,9 @@ import EditProfile from "./pages/editprofile/editProfile";
 import EditItem from "./pages/edititem/editItem";
 import EditCommu from "./pages/editcommu/editCommu";
 import BanMember from "./pages/banMember/banMember";
+import Setting from "./pages/setting/Setting";
+import ChangePassword from "./pages/changepassword/ChangePassword";
+import DeleteAccount from "./pages/deleteaccount/DeleteAccount";
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
@@ -169,6 +172,26 @@ function App() {
         {
           path: "projects/addproject",
           element: <AddProject />
+        },
+      ]
+    },
+    {
+      path: "/setting/:id",
+      element: (
+        <LayoutNavbar />
+      ),
+      children: [
+        {
+          index: true,
+          element: <Setting />
+        },
+        {
+          path: "changepassword",
+          element: <ChangePassword />
+        },
+        {
+          path: "deleteaccount",
+          element: <DeleteAccount />
         },
       ]
     },
