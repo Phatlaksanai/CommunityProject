@@ -61,7 +61,9 @@ const CommuDetail = () => {
         <div className="profileHeader">
 
           <div className="leftSide">
-            <h1>{community?.name}</h1>
+            <h1 className="custom-tooltip" data-tip={community?.name}>
+              {community?.name.length > 40 ? `${community?.name.substring(0, 40)}...` : community?.name}
+            </h1>
             <span className="handle">{community?.description}</span>
             <div className="statsRow">
               <span>{followers?.length !== undefined ? followers.length : (community?.totalUsers || 0)} Members</span>

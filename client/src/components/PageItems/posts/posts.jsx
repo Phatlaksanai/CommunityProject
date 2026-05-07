@@ -73,13 +73,15 @@ const Posts = ({ userId, project, commuId, isDescCommu }) => {
     }
   }, [inView, hasNextPage, fetchNextPage]);
 
-  if (isLoading) return "Loading posts...";
-  if (error) return "Something went wrong!";
+  if (isLoading) return <div className="posts">Loading...</div>;
+
+  // เพิ่มตรงนี้: ถ้า error หรือ data ยังไม่มาจริงๆ ให้หยุดตรงนี้ก่อน ไม่ให้ไปบรรทัด map
+  if (error || !data) return <div className="posts">Something went wrong or No data.</div>;
 
   return (
     <div className="posts">
       {/* ข้อมูลจาก useInfiniteQuery จะซ้อนอยู่ใน data.pages */}
-      {data.pages.map((page) =>
+      {data?.pages?.map((page) =>
         page.map((post) => <Post post={post} key={post.post_id} commuId={commuId} isDescCommu={isDescCommu} />)
       )}
 

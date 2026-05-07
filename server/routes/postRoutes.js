@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const postController = require("../controllers/postController");
-const verifyToken = require("../middleware/verifyToken");
+const { verifyToken, checkUserOptional } = require("../middleware/verifyToken");
 
-router.get("/", postController.getPosts);
+router.get("/", checkUserOptional, postController.getPosts);
 router.get("/user/:id", postController.getPostsByUserId);
 router.get("/project/:id", postController.getPostsByProjectId);
 router.get("/community/:id", postController.getPostsByCommunityId);

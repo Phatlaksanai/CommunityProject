@@ -1,24 +1,65 @@
 $theme-map: null;
 @use "sass:map"; // =============new
+
 // =============new
 body {
-  margin: 0; 
+  margin: 0;
   padding: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont,
-               "Segoe UI", Roboto, sans-serif;
+    "Segoe UI", Roboto, sans-serif;
+}
+
+/* คลุมตัวอักษรไว้ */
+.custom-tooltip {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.custom-tooltip::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: 120%; 
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* --- จุดที่ต้องแก้เพื่อให้กล่องไม่ตัดและตัดคำสวยงาม --- */
+  white-space: normal;       /* ยอมให้ขึ้นบรรทัดใหม่ได้ */
+  width: max-content;        /* กว้างตามเนื้อหา */
+  max-width: 200px;          /* จำกัดความกว้างสูงสุด (ปรับเพิ่ม/ลดได้ตามชอบ) */
+  word-break: break-all;     /* ถ้าเป็นตัวอักษรติดกันยาวๆ (แบบ สสสสส) ให้ตัดลงบรรทัดใหม่ */
+  line-height: 1.4;          /* เพิ่มระยะบรรทัดให้อ่านง่ายขึ้น */
+  text-align: center;        /* จัดข้อความให้อยู่กลางกล่อง */
+  /* ---------------------------------------------- */
+
+  background-color: #e0e0e0;
+  color: #333;
+  padding: 6px 10px;         /* เพิ่มพื้นที่ข้างในหน่อย */
+  border-radius: 6px;
+  font-size: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;             /* เพื่อให้มั่นใจว่าลอยทับทุกอย่าง */
+
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* เมื่อเอาเมาส์ชี้ ให้โชว์ออกมา */
+.custom-tooltip:hover::after {
+  visibility: visible;
+  opacity: 1;
 }
 
 $themes: (
-  light: (
-    textColor: #000,
+  light: (textColor: #000,
     bg: white,
     logo: darkblue,
     bgSoft: #f6f3f3,
     textColorSoft: #555,
     border: lightgray,
   ),
-  dark: (
-    textColor: whitesmoke,
+  dark: (textColor: whitesmoke,
     bg: #222,
     logo: white,
     bgSoft: #333,
@@ -26,14 +67,18 @@ $themes: (
     border: #444,
   ),
 );
-@mixin themify($themes) {    // =================new
+
+@mixin themify($themes) {
+
+  // =================new
   @each $theme, $map in $themes {
     .theme-#{$theme} & {
-      $theme-map: $map !global; 
+      $theme-map: $map !global;
       @content;
     }
   }
 }
+
 // @mixin themify($themes) {
 //   @each $theme, $map in $themes {
 //     .theme-#{$theme} & {
@@ -65,9 +110,10 @@ $themes: (
 
 
 @function themed($key) {
-  @if $theme-map == null {
+  @if $theme-map ==null {
     @error "themed(#{$key}) must be used inside themify()";
   }
+
   @return map.get($theme-map, $key);
 }
 
@@ -76,10 +122,9 @@ $themes: (
     @content;
   }
 }
+
 @mixin tablet {
   @media (max-width: 960px) {
     @content;
   }
 }
-
-

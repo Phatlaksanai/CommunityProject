@@ -26,7 +26,7 @@ const LeftBar = () => {
         makeRequest.get(`communities/user/${currentUser.user_id}`),
         makeRequest.get(`communities/joined/${currentUser.user_id}`)
       ]);
-      
+
       const createdCommu = createdRes.data || [];
       const joinedCommu = joinedRes.data || [];
 
@@ -44,13 +44,18 @@ const LeftBar = () => {
   // ถ้า showAll เป็น false ให้ตัดมาแค่ 5 ตัวแรก แต่ถ้า true ให้เอามาทั้งหมด
   const displayedCommunities = showAll ? communities : communities.slice(0, 3);
 
+  const displayName = currentUser?.name || currentUser?.username || "Guest";
+  const truncatedName = displayName.length > 17 ? `${displayName.substring(0, 17)}...` : displayName;
+
   return (
     <div className="leftBar">
       <div className="container">
         <div className="menu">
           <div className="user">
             <img src={currentUser?.profilePic || defaultPic} alt="" />
-            <span>{currentUser?.name || currentUser?.username || "Guest"}</span>
+            <span className="custom-tooltip" data-tip={displayName}>
+              {truncatedName}
+            </span>
           </div>
           <div className="item" onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
             <PeopleIcon />
@@ -89,7 +94,7 @@ const LeftBar = () => {
                 >
                   <img src={commu.cover_img || defaultPic} alt="" />
                   <span className="community-name">{commu.name.length > 20 ? `${commu.name.substring(0, 17)}...` : commu.name}</span>
-                  
+
                   {commu.user_id === currentUser.user_id && (
                     <MilitaryTechIcon className="owner-badge" />
                   )}
@@ -101,7 +106,7 @@ const LeftBar = () => {
           {/* 4. ปุ่ม Load More */}
           {!showAll && communities.length > 3 && (
             <div className="load-more" onClick={() => setShowAll(true)}>
-               <span>See more</span>
+              <span>See more</span>
             </div>
           )}
         </div>

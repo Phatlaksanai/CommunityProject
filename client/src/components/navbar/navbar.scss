@@ -12,7 +12,7 @@
     position: sticky;
     top: 0;
     background-color: themed("bg");
-    color:themed("textColor");
+    color: themed("textColor");
     z-index: 999;
 
     .left {
@@ -20,18 +20,22 @@
       align-items: center;
       gap: 30px;
 
-      .Logo::first-letter{//Bug ++++++++++++++++++++++++padding
+      .Logo::first-letter {
+        //Bug ++++++++++++++++++++++++padding
         font-size: 2em;
         font-style: italic;
       }
-      .Logo{
+
+      .Logo {
         font-optical-sizing: auto;
         font-weight: 400;
         font-family: "Jaro", sans-serif;
         text-shadow: #000000 2px 2px 4px;
         color: #ffffff;
         display: block;
-      }//Bug ++++++++++++++++++++++++padding
+      }
+
+      //Bug ++++++++++++++++++++++++padding
 
       .search {
         display: flex;
@@ -47,11 +51,11 @@
           background-color: transparent;
           color: themed("textColor");
 
-          @include mobile{
+          @include mobile {
             display: none;
           }
 
-          @include tablet{
+          @include tablet {
             width: 200px;
           }
         }
@@ -63,7 +67,7 @@
       align-items: center;
       gap: 20px;
 
-      @include mobile{
+      @include mobile {
         display: none;
       }
 
@@ -73,7 +77,7 @@
         gap: 10px;
         font-weight: 500;
 
-        @include tablet{
+        @include tablet {
           display: none;
         }
 
@@ -84,12 +88,12 @@
           object-fit: cover;
         }
 
-        button{
+        button {
           border-radius: 6px;
           background-color: themed("textColor");
           padding: 5px 10px;
           cursor: pointer;
-          color:themed("bg");
+          color: themed("bg");
         }
       }
     }

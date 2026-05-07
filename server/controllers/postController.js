@@ -1,37 +1,72 @@
 const db = require("../config/db");
 
 exports.getPosts = async (req, res) => {
-  // รับค่า page จาก query string (เริ่มต้นที่ 0)
-  const page = parseInt(req.query.page) || 0;
-  const limit = 5; // กำหนดให้โหลดทีละ 5 โพสต์
-  const from = page * limit;
-  const to = from + limit - 1;
+  try {
+    // 1. เช็คว่ามี user ไหม (ถ้า Route มี verifyToken ค่านี้จะมีค่า)
+    const currentUserId = req.user ? req.user.user_id : null;
+    
+    const page = parseInt(req.query.page) || 0;
+    const limit = 5;
+    const from = page * limit;
+    const to = from + limit - 1;
 
-  const { data, error } = await db
-    .from("posts")
-    .select(`
-      *,
-      imgs(img),
-      models(model),
-      users (user_id, username, name, profilePic),
-      communities (communities_id, name, cover_img)
-    `)
-    .eq("status", "show")
-    .order("created_at", { ascending: false })
-    .range(from, to); // ดึงข้อมูลในช่วงที่กำหนด
+    // 2. เตรียม Query หลัก
+    let query = db
+      .from("posts")
+      .select(`
+        *,
+        imgs(img),
+        models(model),
+        users (user_id, username, name, profilePic),
+        communities (communities_id, name, cover_img)
+      `)
+      .eq("status", "show");
 
-  if (error) return res.status(500).json(error);
+    // 3. Logic การกรอง: ถ้า Login แล้ว ให้เช็คกลุ่มที่ "ไม่โดนแบน"
+    if (currentUserId) {
+      const { data: memberData } = await db
+        .from("community_members")
+        .select("community_id")
+        .eq("user_id", currentUserId)
+        .eq("status", "active"); // ดึงเฉพาะกลุ่มที่เป็น active (ไม่เอา banned)
 
-  const formatted = data.map((post) => ({
-    ...post,
-    username: post.users?.username || null,
-    name: post.users?.name || null,
-    profilePic: post.users?.profilePic || null,
-    community_name: post.communities?.name || null,
-    community_cover: post.communities?.cover_img || null,
-  }));
+      const myGroupIds = memberData?.map(item => item.community_id) || [];
 
-  return res.status(200).json(formatted);
+      if (myGroupIds.length > 0) {
+        // เห็นโพสต์ที่ไม่มีกลุ่ม (null) OR โพสต์ในกลุ่มที่เราเป็นสมาชิก (in)
+        query = query.or(`community_id.is.null,community_id.in.(${myGroupIds.join(",")})`);
+      } else {
+        // ถ้าไม่เข้ากลุ่มไหนเลย เห็นแค่โพสต์ทั่วไป
+        query = query.is("community_id", null);
+      }
+    } else {
+      // 4. ถ้าไม่ได้ Login เห็นเฉพาะโพสต์ทั่วไปที่ไม่สังกัดกลุ่ม
+      query = query.is("community_id", null);
+    }
+
+    // 5. รัน Query จริง (ใช้ตัวแปร query ที่เราใส่เงื่อนไขไว้แล้ว)
+    const { data, error } = await query
+      .order("created_at", { ascending: false })
+      .range(from, to);
+
+    if (error) throw error;
+
+    // 6. Format ข้อมูลส่งกลับหน้าบ้าน
+    const formatted = data.map((post) => ({
+      ...post,
+      username: post.users?.username || null,
+      name: post.users?.name || null,
+      profilePic: post.users?.profilePic || null,
+      community_name: post.communities?.name || null,
+      community_cover: post.communities?.cover_img || null,
+    }));
+
+    return res.status(200).json(formatted);
+
+  } catch (error) {
+    console.error("Error in getPosts:", error);
+    return res.status(500).json({ error: error.message });
+  }
 };
 
 exports.getPostsByUserId = async (req, res) => {
