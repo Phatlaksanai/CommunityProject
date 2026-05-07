@@ -52,7 +52,7 @@ const LeftBar = () => {
             <img src={currentUser?.profilePic || defaultPic} alt="" />
             <span>{currentUser?.name || currentUser?.username || "Guest"}</span>
           </div>
-          <div className="item">
+          <div className="item" onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
             <PeopleIcon />
             <span>Friends</span>
           </div>
