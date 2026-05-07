@@ -16,6 +16,8 @@ import Buyitem from './pages/buyitem/Buyitem';
 import Profile from "./pages/profile/Profile";
 import ProfileItems from "./pages/profile/ProfileItems";
 import ProfileProjects from "./pages/profile/ProfileProjects";
+import ManageFriend from "./pages/manageFriend/ManageFriend";
+import ManageAddfriend from "./pages/manageFriend/ManageAddfriend";
 import EditProject from "./pages/editproject/editProject";
 import EditProfile from "./pages/editprofile/editProfile";
 import EditItem from "./pages/edititem/editItem";
@@ -35,6 +37,7 @@ import RightBar from "./components/Right/rightbar/rightbar";
 import ProfileDetail from "./components/TopDetail/ProfileDetail/ProfileDetail";
 import ProjectDetail from "./components/TopDetail/ProjectDetail/ProjectDetail";
 import CommuDetail from "./components/TopDetail/CommuDetail/CommuDetail";
+import FriendDetail from "./components/TopDetail/FriendDetail/FriendDetail";
 import Projects from "./components/PageItems/projects/projects"
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
@@ -129,6 +132,19 @@ function App() {
       </div>
     )
   }
+  const Friend = () => {
+    return (
+      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        <Navbar />
+        <FriendDetail />
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 6 }}>
+            <Outlet />
+          </div>
+        </div>
+      </div>
+    )
+  }
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
       return <Navigate to="/login" />
@@ -192,6 +208,22 @@ function App() {
         {
           path: "deleteaccount",
           element: <DeleteAccount />
+        },
+      ]
+    },
+    {
+      path: "/managefriends/:id",
+      element: (
+        <Friend />
+      ),
+      children: [
+        {
+          index: true,
+          element: <ManageFriend />
+        },
+        {
+          path: "addfriend",
+          element: <ManageAddfriend />
         },
       ]
     },

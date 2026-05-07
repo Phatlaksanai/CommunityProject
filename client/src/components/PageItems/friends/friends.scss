@@ -1,0 +1,5 @@
+.friends {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); // 5 column
+  gap: 10px;
+}

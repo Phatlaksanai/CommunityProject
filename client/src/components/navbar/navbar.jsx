@@ -86,7 +86,7 @@ const Navbar = () => {
         )}
         {user && (<button className="button" onClick={handleLogout}>Logout</button>)} */}
         <ShoppingBasketIcon />
-        <PersonOutlinedIcon />
+        <PersonOutlinedIcon onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}/>
         <EmailOutlinedIcon />
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
