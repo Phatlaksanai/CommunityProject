@@ -27,8 +27,8 @@ const Navbar = () => {
       localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
 
-    // รีเฟรชหน้าเพื่อโหลด state ใหม่
-    window.location.reload();
+      // รีเฟรชหน้าเพื่อโหลด state ใหม่
+      window.location.reload();
 
       navigate("/"); // เด้งไปหน้า Login
     } catch (err) {
@@ -55,20 +55,23 @@ const Navbar = () => {
     }
   };
 
+  const displayName = currentUser?.name || currentUser?.username || "Guest";
+  const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName;
+
   return (
     <div className="navbar">
       <div className="left">
         <Link to="/" style={{ textDecoration: "none" }}>
           <h1 className="Logo">PM</h1>
         </Link>
-        <HomeOutlinedIcon onClick={() => navigate("/")} style={{ cursor: "pointer" }}/>
+        <HomeOutlinedIcon onClick={() => navigate("/")} style={{ cursor: "pointer" }} />
         {darkMode ? (
-          <WbSunnyOutlinedIcon onClick={toggle}  style={{ cursor: "pointer" }}/>
+          <WbSunnyOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
         ) : (
-          <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }}/>
+          <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
         )}
-        <AddShoppingCartIcon onClick={() => navigate("/download")} style={{ cursor: "pointer" }}/>
-        <DownloadIcon/>
+        <AddShoppingCartIcon onClick={() => navigate("/download")} style={{ cursor: "pointer" }} />
+        <DownloadIcon />
         <div className="search">
           <SearchOutlinedIcon />
           <input type="text" placeholder="Search..." />
@@ -86,8 +89,10 @@ const Navbar = () => {
         <PersonOutlinedIcon />
         <EmailOutlinedIcon />
         <div className="user">
-          <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}/>
-          <span>{currentUser?.name || currentUser?.username || "Guest"}</span>
+          <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
+          <span className="custom-tooltip" data-tip={displayName}>
+            {truncatedName}
+          </span>
           {!currentUser && (
             <button onClick={handleLogin}>
               Login

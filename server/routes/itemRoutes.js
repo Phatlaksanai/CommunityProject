@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const itemController = require("../controllers/itemController");
-const verifyToken = require("../middleware/verifyToken");
+const { verifyToken } = require("../middleware/verifyToken");
 
 router.get("/", itemController.getItems);
 router.get("/latest", itemController.getLatestItems);

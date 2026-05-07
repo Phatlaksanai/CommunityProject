@@ -169,7 +169,16 @@ const Post = ({ post, isDescCommu }) => {
           {!isDescCommu && post.community_name && (
             <div className="postCommunityInfo">
               <img src={post.community_cover} alt="" onClick={() => navigate(`/desccommu/${post.community_id}`)} style={{ cursor: "pointer" }} />
-              <Link className="community-link" to={`/desccommu/${post.community_id}`}>Shared in {post.community_name}</Link>
+              <Link
+                className="community-link custom-tooltip"
+                data-tip={post.community_name}
+                to={`/desccommu/${post.community_id}`}
+              >
+                Shared in {post.community_name.length > 10
+                  ? `${post.community_name.substring(0, 10)}...`
+                  : post.community_name}
+              </Link>
+
             </div>
           )}
         </div>

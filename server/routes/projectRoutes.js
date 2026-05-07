@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const projectController = require("../controllers/projectController");
-const verifyToken = require("../middleware/verifyToken");
+const { verifyToken } = require("../middleware/verifyToken");
 
 router.get("/addbypost/:id", projectController.getProjectsAddByPostUser);
 router.get("/:id", projectController.getProjectById);
