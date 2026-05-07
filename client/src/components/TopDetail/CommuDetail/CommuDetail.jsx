@@ -64,7 +64,7 @@ const CommuDetail = () => {
             <h1>{community?.name}</h1>
             <span className="handle">{community?.description}</span>
             <div className="statsRow">
-              <span>{community?.totalUsers || 0} Members</span>
+              <span>{followers?.length !== undefined ? followers.length : (community?.totalUsers || 0)} Members</span>
               <p>{dayjs(community?.created_at).format("D MMM YYYY")}</p>
             </div>
           </div>

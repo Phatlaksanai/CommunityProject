@@ -109,7 +109,7 @@ const LeftBar = () => {
         <hr />
         <div className="menu">
           <span>Other</span>
-          <div className="item">
+          <div className="item" onClick={() => navigate(`/setting/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
             <SettingsIcon />
             <span>Settings</span>
           </div>
