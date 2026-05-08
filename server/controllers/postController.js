@@ -122,6 +122,7 @@ exports.getPostsByProjectId = async (req, res) => {
       models(model),
       users (
         username,
+        name,
         profilePic
       )
     `)
@@ -135,6 +136,7 @@ exports.getPostsByProjectId = async (req, res) => {
   const formatted = data.map((post) => ({
     ...post,
     username: post.users?.username || null,
+    name: post.users?.name || null,
     profilePic: post.users?.profilePic || null,
   }));
 

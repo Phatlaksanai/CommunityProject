@@ -42,6 +42,7 @@ app.use("/api/projects", require("./routes/projectRoutes"));
 app.use("/api/items", require("./routes/itemRoutes"));
 app.use("/api/communities", require("./routes/commuRoutes"));
 app.use("/api/upload", require("./routes/uploadRoutes"));
+app.use("/api/friends", require("./routes/friendRoutes"));
 app.use(express.static(path.join(__dirname, 'public')))
 
 // ===== SERVE REACT =====

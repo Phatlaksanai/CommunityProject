@@ -5,8 +5,8 @@ import "./manageFriend.scss"
 const ManageFriend = () => {
   const { id } = useParams();
   return (
-    <div className="friends">
-      <Friends userId={id}/>
+    <div className="managefriend">
+      <Friends userId={id} isfriend={true} />
     </div>
   )
 }

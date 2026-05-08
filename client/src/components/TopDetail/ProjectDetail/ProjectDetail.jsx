@@ -23,6 +23,9 @@ const ProjectDetail = () => {
     fetchProject();
   }, [id]);
 
+  const displayName = Project?.project_name || "Project Name";
+  const truncatedName = displayName.length > 40 ? `${displayName.substring(0, 40)}...` : displayName;
+
   return (
     <div className="projectDetail">
       <div className="container">
@@ -39,7 +42,9 @@ const ProjectDetail = () => {
         <div className="projectHeader">
           <div className="projectInfo">
             <div className="nameRow">
-              <h1>{Project?.project_name || "Project Name"}</h1>
+              <h1 className="h1 custom-tooltip" data-tip={displayName}>
+                {truncatedName}
+              </h1>
             </div>
             <span className="handle">{Project?.description}</span>
             <p>{dayjs(Project?.createAt).format("D MMM YYYY")}</p>

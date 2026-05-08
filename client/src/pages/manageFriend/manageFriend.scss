@@ -1,6 +1,6 @@
 @use "../../style.scss" as *;
 
-.friends {
+.managefriend {
   @include themify($themes) {
     padding: 20px 15%;
     background-color: themed("bgSoft");

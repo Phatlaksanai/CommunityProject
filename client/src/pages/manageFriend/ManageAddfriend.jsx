@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 const ManageAddfriend = () => {
   const { id } = useParams();
   return (
-    <div className="friends">
+    <div className="managefriend">
       <Addfriends userId={id}/>
     </div>
   )

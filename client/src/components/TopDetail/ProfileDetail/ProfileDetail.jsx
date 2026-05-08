@@ -21,13 +21,17 @@ const ProfileDetail = () => {
       : desc;
 
   useEffect(() => {
-  if (openModal) {
-    document.body.style.overflow = "hidden";
-  } 
-  return () => {
-    document.body.style.overflow = "auto";
-  };
-}, [openModal]);
+    if (openModal) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [openModal]);
+
+  const displayName = currentUser?.name || currentUser?.username || "Guest";
+  const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName;
+
   return (
     <div className="profileDetail">
       <div className="container">
@@ -46,8 +50,10 @@ const ProfileDetail = () => {
             />
           </div>
           <div className="profileInfo">
-            <div className="nameRow">
-              <h1>{currentUser?.name || currentUser?.username}</h1>
+            <div className="nameRow custom-tooltip">
+              <h1 className="h1 custom-tooltip" data-tip={displayName}>
+                {truncatedName}
+              </h1>
               <div className="actions">
                 <button className="followBtn" onClick={() => navigate(`/editprofile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>Edit Profile</button>
               </div>

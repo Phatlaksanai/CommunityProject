@@ -1,16 +1,14 @@
-import Post from "../post/post";
+import Friend from "../friend/friend";
+
 import "./friends.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 
-const Friends = ({ userId }) => {
+const Friends = ({ userId, isfriend }) => {
   const { isLoading, error, data = []} = useQuery({
     queryKey: ["projects", userId],
     queryFn: () => {
-      if (userId) {
-        return makeRequest.get(`/projects/user/${userId}`).then(res => res.data);
-      }
-      return makeRequest.get("/projects").then(res => res.data);
+      return makeRequest.get(`/friends/add/friend`).then(res => res.data);
     }
   });
 
@@ -18,8 +16,8 @@ const Friends = ({ userId }) => {
   if (error) return "Something went wrong!";
 
   return <div className="friends">
-    {data.map((post) => (  // วนลูปแสดงข้อมูลจริงจาก Database
-      <Post key={post.post_id} post={post} />
+    {data.map((user) => (  // วนลูปแสดงข้อมูลจริงจาก Database
+      <Friend key={user.user_id} user={user} isfriend={isfriend} />
     ))}
   </div>
 

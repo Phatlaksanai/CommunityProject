@@ -1,0 +1,51 @@
+@use "../../../style.scss" as *;
+
+.friend {
+    max-width: 325px;
+    max-height: 170px;
+    padding: 20px;
+
+    @include themify($themes) {
+        -webkit-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
+        -moz-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
+        box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
+        //border-radius: 20px;
+        background-color: themed("bg");
+        color: themed("textColor");
+
+        .container {
+
+            display: flex;
+            margin-bottom: 20px;
+            gap: 20px;
+
+            .content {
+                img {
+                    width: 70px;
+                    height: 70px;
+                    border-radius: 100%;
+                    object-fit: cover;
+                    display: block;
+                }
+            }
+
+            .desc {
+
+                p,
+                h3 {
+                    margin: 0;
+                }
+            }
+        }
+
+        button {
+            display: block; // ต้องเปลี่ยนจาก inline เป็น block ก่อน
+            margin-left: auto;
+
+            border-radius: 6px;
+            color: #fff;
+            background-color: #5271ff;
+            padding: 10px 30px;
+        }
+    }
+}
