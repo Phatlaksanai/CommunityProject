@@ -65,11 +65,11 @@ const LeftBar = () => {
             <ForumIcon />
             <span>Messenger</span>
           </div>
-          <div className="item" onClick={() => navigate("/download")} style={{ cursor: "pointer" }}>
+          <div className="item" onClick={() => navigate("/market")} style={{ cursor: "pointer" }}>
             <StorefrontIcon />
             <span>Market</span>
           </div>
-          <div className="item">
+          <div className="item" onClick={() => navigate("/download")} style={{ cursor: "pointer" }}>
             <DownloadIcon />
             <span>Download</span>
           </div>

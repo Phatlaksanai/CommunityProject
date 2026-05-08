@@ -1,0 +1,85 @@
+@use "../../style.scss" as *;
+
+.descDownload{
+  @include themify($themes) {
+    padding: 50px 15%; 
+    background-color: themed("bg");
+    min-height: 100vh;
+    color: themed("textColor");
+
+    @include mobile {
+      padding: 10px;
+    }
+
+    @include tablet{
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .Header, .content {
+      display: grid;
+      grid-template-columns: 1fr 160px 100px; 
+      align-items: center;
+      gap: 20px;
+    }
+
+    .Header {
+      h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        &:not(:first-child) {
+          text-align: center;
+        }
+      }
+    }
+
+    hr {
+      margin: 0;
+      border: none;
+      border-bottom: 1px solid #555555;
+      width: 100%;
+    }
+
+    .content {
+      h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      button {
+        padding: 10px 20px;
+        border-radius: 20px;
+        border: none;
+        background-color: #5B73E8;
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        width: fit-content;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: #4a62d6;
+        }
+      }
+      .review-btn {
+        background-color: themed("bgSoft");
+        color: themed("textColor");
+        
+        &:hover {
+          background-color: #555;
+        }
+      }
+    }
+  }
+}

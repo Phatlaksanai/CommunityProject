@@ -2,9 +2,9 @@
 import { useState } from "react";
 import Items from "../../components/PageItems/items/items"
 import LeftBarDownload from "../../components/Left/leftbarDL/leftbarDL";
-import "./download.scss"
+import "./market.scss"
 
-const download = () => {
+const Market = () => {
   const [filters, setFilters] = useState({
     category: {
       Vehicles: false,
@@ -17,7 +17,7 @@ const download = () => {
     date: "AllTime",
   });
   return (
-    <div className="download">
+    <div className="market">
       <LeftBarDownload filters={filters} setFilters={setFilters} />
       <div className="content">
         <Items filters={filters} isShop={true}/>
@@ -26,4 +26,4 @@ const download = () => {
   )
 }
 
-export default download
+export default Market;
