@@ -452,10 +452,6 @@ exports.resetPassword = async (req, res) => {
     }
 };
 
-exports.changePassword = async (req, res) => {
-    const { email, otp, newPassword, confirmPassword } = req.body;
-};
-
 exports.deleteAccount = async (req, res) => {
     const { email, otp } = req.body;
 };

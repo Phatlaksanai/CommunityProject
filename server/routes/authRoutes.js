@@ -12,7 +12,6 @@ router.put("/update-profile", verifyToken, authController.updateProfile);
 router.put("/update-item", verifyToken, authController.updateItem);
 router.post("/reset-password", authController.resetPassword);
 router.post("/verify-otp-resetpassword", authController.verifyOtpResetPassword);
-router.post("/changepassword", authController.changePassword);
 router.post("/deleteaccount", authController.deleteAccount);
 
 module.exports = router;
