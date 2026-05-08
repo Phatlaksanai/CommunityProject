@@ -1,6 +1,6 @@
 @use "../../style.scss" as *;
 
-.download{
+.market{
   display: flex;
   gap: 20px;
   @include themify($themes) {

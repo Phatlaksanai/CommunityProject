@@ -1,0 +1,38 @@
+@use "../../../style.scss" as *;
+
+.downloadDetail {
+  @include themify($themes) {
+    flex: 2;
+    top: 70px;
+    overflow: scroll;
+    background-color: themed("bgSoft");
+    color: themed("textColor");
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    .container {
+      padding: 0;
+    }
+    .Header {
+      padding: 40px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background-color: themed("bgSoft");
+
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+        color: themed("textColor");
+      }
+
+      span {
+        font-size: 14px;
+        font-weight: 500;
+        color: themed("textColorSoft");
+      }
+    }
+  }
+}
