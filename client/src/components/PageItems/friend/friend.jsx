@@ -1,18 +1,65 @@
 import "./friend.scss";
 import "dayjs/locale/th";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
-import SettingsIcon from '@mui/icons-material/Settings';
-import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { useNavigate } from "react-router-dom";
+import { makeRequest } from "../../../api/axios";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
 const Friend = ({ user, isfriend }) => {
 
     const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const displayName = user.name || user.username;
     const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName;
+
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn: (userId) => {
+            return makeRequest.post(`/friends/addfriend`, { receiver_id: userId });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+            setSuccess("Friend Request Sent!");
+        },
+        onError: (err) => {
+            console.error(err);
+            setError("Failed to send friend request");
+        }
+    });
+
+    const handleAddFriend = () => {
+        mutation.mutate(user.user_id);
+    };
+
+    const renderButton = () => {
+        if (isfriend || user.status === 'accepted') {
+            return (
+                <button disabled className="friend-btn accepted" style={{ backgroundColor: "#2ecc71", color: "white" }}>
+                    Friends
+                </button>
+            );
+        }
+        if (mutation.isSuccess || user.status === 'pending') {
+            return (
+                <button disabled style={{ backgroundColor: "#ccc", cursor: "not-allowed" }}>
+                    Pending...
+                </button>
+            );
+        }
+        return (
+            <button
+                onClick={handleAddFriend}
+                disabled={mutation.isLoading}
+                style={{ cursor: mutation.isLoading ? "not-allowed" : "pointer" }}
+            >
+                {mutation.isLoading ? "Sending..." : "Add +"}
+            </button>
+        );
+    };
 
     return (
         <div className="friend">
@@ -26,11 +73,12 @@ const Friend = ({ user, isfriend }) => {
                     </h3>
                     <p>@{user.username}</p>
                 </div>
-                
             </div>
-            {!isfriend && (
-                <button>Add +</button>
-            )}
+            <div className="actions">
+                {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
+                {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
+                {renderButton()}
+            </div>
         </div>
     );
 };
