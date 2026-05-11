@@ -8,7 +8,7 @@ const Friends = ({ userId, isfriend }) => {
   const { isLoading, error, data = []} = useQuery({
     queryKey: ["friends", userId],
     queryFn: () => {
-      return makeRequest.get(`/friends/add/friend`).then(res => res.data);
+      return makeRequest.get(`/friends/${userId}`).then(res => res.data);
     }
   });
 

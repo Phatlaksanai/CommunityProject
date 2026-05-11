@@ -3,6 +3,8 @@ const router = express.Router();
 const friendController = require("../controllers/friendController");
 const { verifyToken } = require("../middleware/verifyToken");
 
-router.get("/add/friend", friendController.getAllUserForAdd);
+router.get("/:userId", friendController.getFriendsByUserId);
+router.get("/:userId/alluser", friendController.getAllUserForAdd);
+
 
 module.exports = router;
