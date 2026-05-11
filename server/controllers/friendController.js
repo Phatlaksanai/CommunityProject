@@ -12,7 +12,7 @@ exports.getAllUserForAdd = async (req, res) => {
     if (friendshipError) throw friendshipError;
 
     // 2. รวบรวม ID เพื่อนใส่ Array และรวม ID ตัวเราเองเข้าไปด้วย (เพื่อไม่ให้ดึงตัวเองมาแสดง)
-    const friendIds = friendshipData.map(f => 
+    const friendIds = friendshipData.map(f =>
       f.requester_id == userId ? f.receiver_id : f.requester_id
     );
     const excludeIds = [...friendIds, userId];
@@ -25,7 +25,7 @@ exports.getAllUserForAdd = async (req, res) => {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    
+
     return res.status(200).json(data);
   } catch (err) {
     console.error(err);
@@ -54,7 +54,16 @@ exports.getFriendsByUserId = async (req, res) => {
 
     // จัดระเบียบ Data: เลือกเอาข้อมูลเพื่อน (ที่ไม่ใช่ตัวเรา) ออกมาเป็น Array ของ User
     const friendsList = data.map(item => {
-      return item.requester_id == userId ? item.receiver : item.requester;
+      // 1. แยกข้อมูล User ออกมาก่อน
+      const friendInfo = item.requester_id == userId ? item.receiver : item.requester;
+
+      // 2. คืนค่าเป็น Object ใหม่ที่รวม (ข้อมูล User + ข้อมูลจากตาราง friendship)
+      return {
+        ...friendInfo,           // กระจาย name, user_id, profilePic ออกมา
+        status: item.status,     // เพิ่มค่า status จากตาราง friendships
+        friendship_id: item.id,  // เพิ่ม ID ของแถวความสัมพันธ์ (จำเป็นมากตอนกด Accept/Decline)
+        createdAt: item.created_at
+      };
     });
 
     return res.status(200).json(friendsList);
@@ -68,7 +77,7 @@ exports.addfriend = async (req, res) => {
   const requesterId = req.user.user_id;
   try {
     if (!receiver_id) {
-        return res.status(400).json({ error: "Receiver ID is required" });
+      return res.status(400).json({ error: "Receiver ID is required" });
     }
     const { data, error } = await db
       .from("friendships")
@@ -104,5 +113,44 @@ exports.acceptFriend = async (req, res) => {
     return res.status(200).json({ message: "Friend request accepted!" });
   } catch (err) {
     return res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getFriendRequests = async (req, res) => {
+  const userId = req.user.user_id;
+
+  try {
+    // ดึงข้อมูล friendship พร้อมกับข้อมูลของ requester (สมมติว่าเราเป็นคนรับ) 
+    // หรือต้องเขียน Logic ให้ครอบคลุมทั้งสองฝั่ง
+    const { data, error } = await db
+      .from("friendships")
+      .select(`
+        *,
+        requester:requester_id (user_id, name, username, profilePic),
+        receiver:receiver_id (user_id, name, username, profilePic)
+      `)
+      .or(`requester_id.eq.${userId},receiver_id.eq.${userId}`) // ใช้ .or แทน
+      .eq("status", "pending") // กรองเฉพาะที่ไม่ใช่ declined
+      .order("created_at", { ascending: false }); // เรียงจากใหม่ไปเก่า
+
+    if (error) throw error;
+
+    // จัดระเบียบ Data: เลือกเอาข้อมูลเพื่อน (ที่ไม่ใช่ตัวเรา) ออกมาเป็น Array ของ User
+    const friendsList = data.map(item => {
+      // 1. แยกข้อมูล User ออกมาก่อน
+      const friendInfo = item.requester_id == userId ? item.receiver : item.requester;
+
+      // 2. คืนค่าเป็น Object ใหม่ที่รวม (ข้อมูล User + ข้อมูลจากตาราง friendship)
+      return {
+        ...friendInfo,           // กระจาย name, user_id, profilePic ออกมา
+        status: item.status,     // เพิ่มค่า status จากตาราง friendships
+        friendship_id: item.id,  // เพิ่ม ID ของแถวความสัมพันธ์ (จำเป็นมากตอนกด Accept/Decline)
+        createdAt: item.created_at
+      };
+    });
+
+    return res.status(200).json(friendsList);
+  } catch (err) {
+    return res.status(500).json(err);
   }
 };

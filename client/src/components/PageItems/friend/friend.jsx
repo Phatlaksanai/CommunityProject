@@ -22,7 +22,7 @@ const Friend = ({ user, isfriend }) => {
             return makeRequest.post(`/friends/addfriend`, { receiver_id: userId });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["users"] });
+            queryClient.invalidateQueries({ queryKey: ["friend"] });
             setSuccess("Friend Request Sent!");
         },
         onError: (err) => {
@@ -36,6 +36,7 @@ const Friend = ({ user, isfriend }) => {
     };
 
     const renderButton = () => {
+        console.log("Friend status:",user);
         if (isfriend || user.status === 'accepted') {
             return (
                 <button disabled className="friend-btn accepted" style={{ backgroundColor: "#2ecc71", color: "white" }}>
