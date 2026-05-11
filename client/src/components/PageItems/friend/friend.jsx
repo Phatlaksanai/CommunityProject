@@ -37,21 +37,10 @@ const Friend = ({ user, isfriend }) => {
 
     const renderButton = () => {
         console.log("Friend status:",user);
-        if (isfriend || user.status === 'accepted') {
+        if (!isfriend) {
+            
+
             return (
-                <button disabled className="friend-btn accepted" style={{ backgroundColor: "#2ecc71", color: "white" }}>
-                    Friends
-                </button>
-            );
-        }
-        if (mutation.isSuccess || user.status === 'pending') {
-            return (
-                <button disabled style={{ backgroundColor: "#ccc", cursor: "not-allowed" }}>
-                    Pending...
-                </button>
-            );
-        }
-        return (
             <button
                 onClick={handleAddFriend}
                 disabled={mutation.isLoading}
@@ -60,6 +49,21 @@ const Friend = ({ user, isfriend }) => {
                 {mutation.isLoading ? "Sending..." : "Add +"}
             </button>
         );
+        }
+        if ( user.status === 'pending') {
+            return (
+                <button disabled style={{ backgroundColor: "#ccc", cursor: "not-allowed" }}>
+                    Pending...
+                </button>
+            );
+        }
+        if (user.status === 'accepted') {
+            return (
+                <button disabled className="friend-btn accepted" style={{ backgroundColor: "#4dee20", color: "white" }}>
+                    Friends
+                </button>
+            );
+        }
     };
 
     return (
