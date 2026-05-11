@@ -6,7 +6,7 @@ import { makeRequest } from "../../../api/axios";
 
 const Friends = ({ userId }) => {
   const { isLoading, error, data = []} = useQuery({
-    queryKey: ["projects", userId],
+    queryKey: ["addfriends", userId],
     queryFn: () => {
         return makeRequest.get(`/friends/add/friend`).then(res => res.data);
     }
