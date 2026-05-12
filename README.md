@@ -86,6 +86,7 @@ server
 ├── server.js
 
 
+
 ```
 CommunityProject
 ├─ client
@@ -118,6 +119,12 @@ CommunityProject
 │  │  │  │  ├─ leftbarDL
 │  │  │  │  │  ├─ leftbarDL.jsx
 │  │  │  │  │  └─ leftbarDL.scss
+│  │  │  │  ├─ leftChat
+│  │  │  │  │  ├─ leftChat.jsx
+│  │  │  │  │  └─ leftChat.scss
+│  │  │  │  ├─ leftDC
+│  │  │  │  │  ├─ leftDC.jsx
+│  │  │  │  │  └─ leftDC.scss
 │  │  │  │  ├─ leftDI
 │  │  │  │  │  ├─ leftDI.jsx
 │  │  │  │  │  └─ leftDI.scss
@@ -131,6 +138,18 @@ CommunityProject
 │  │  │  │  ├─ navbar.jsx
 │  │  │  │  └─ navbar.scss
 │  │  │  ├─ PageItems
+│  │  │  │  ├─ addfriend
+│  │  │  │  │  ├─ addfriend.jsx
+│  │  │  │  │  └─ addfriend.scss
+│  │  │  │  ├─ addfriends
+│  │  │  │  │  ├─ addfriends.jsx
+│  │  │  │  │  └─ addfriends.scss
+│  │  │  │  ├─ friend
+│  │  │  │  │  ├─ friend.jsx
+│  │  │  │  │  └─ friend.scss
+│  │  │  │  ├─ friends
+│  │  │  │  │  ├─ friends.jsx
+│  │  │  │  │  └─ friends.scss
 │  │  │  │  ├─ item
 │  │  │  │  │  ├─ item.jsx
 │  │  │  │  │  └─ item.scss
@@ -163,6 +182,15 @@ CommunityProject
 │  │  │  │  ├─ share.jsx
 │  │  │  │  └─ share.scss
 │  │  │  └─ TopDetail
+│  │  │     ├─ CommuDetail
+│  │  │     │  ├─ CommuDetail.jsx
+│  │  │     │  └─ commuDetail.scss
+│  │  │     ├─ DownloadDetail
+│  │  │     │  ├─ DownloadDetail.jsx
+│  │  │     │  └─ downloadDetail.scss
+│  │  │     ├─ FriendDetail
+│  │  │     │  ├─ FriendDetail.jsx
+│  │  │     │  └─ friendDetail.scss
 │  │  │     ├─ ProfileDetail
 │  │  │     │  ├─ ProfileDetail.jsx
 │  │  │     │  └─ profileDetail.scss
@@ -175,39 +203,83 @@ CommunityProject
 │  │  ├─ index.css
 │  │  ├─ main.jsx
 │  │  ├─ pages
+│  │  │  ├─ addcommu
+│  │  │  │  ├─ Addcommu.jsx
+│  │  │  │  └─ addcommu.scss
 │  │  │  ├─ additem
 │  │  │  │  ├─ Additem.jsx
 │  │  │  │  └─ additem.scss
 │  │  │  ├─ addproject
 │  │  │  │  ├─ addproject.jsx
 │  │  │  │  └─ addproject.scss
+│  │  │  ├─ banMember
+│  │  │  │  ├─ banMember.jsx
+│  │  │  │  └─ banMember.scss
 │  │  │  ├─ buyitem
 │  │  │  │  ├─ Buyitem.jsx
 │  │  │  │  └─ buyitem.scss
+│  │  │  ├─ changepassword
+│  │  │  │  ├─ ChangePassword.jsx
+│  │  │  │  └─ changepassword.scss
+│  │  │  ├─ chat
+│  │  │  │  ├─ chat.jsx
+│  │  │  │  └─ chat.scss
+│  │  │  ├─ deleteaccount
+│  │  │  │  ├─ DeleteAccount.jsx
+│  │  │  │  └─ deleteaccount.scss
+│  │  │  ├─ descCommu
+│  │  │  │  ├─ DescCommu.jsx
+│  │  │  │  └─ descCommu.scss
+│  │  │  ├─ descDownload
+│  │  │  │  ├─ DescDownload.jsx
+│  │  │  │  └─ descDownload.scss
 │  │  │  ├─ descItem
 │  │  │  │  ├─ DescItem.jsx
 │  │  │  │  └─ descItem.scss
 │  │  │  ├─ descProject
 │  │  │  │  ├─ descProject.jsx
 │  │  │  │  └─ descProject.scss
-│  │  │  ├─ download
-│  │  │  │  ├─ download.scss
-│  │  │  │  └─ Download1.jsx
+│  │  │  ├─ editcommu
+│  │  │  │  ├─ editCommu.jsx
+│  │  │  │  └─ editCommu.scss
+│  │  │  ├─ edititem
+│  │  │  │  ├─ editItem.jsx
+│  │  │  │  └─ editItem.scss
+│  │  │  ├─ editprofile
+│  │  │  │  ├─ editProfile.jsx
+│  │  │  │  └─ editProfile.scss
+│  │  │  ├─ editproject
+│  │  │  │  ├─ editProject.jsx
+│  │  │  │  └─ editProject.scss
 │  │  │  ├─ home
 │  │  │  │  ├─ Home1.jsx
 │  │  │  │  └─ home1.scss
 │  │  │  ├─ login
 │  │  │  │  ├─ login.scss
 │  │  │  │  └─ Login1.jsx
+│  │  │  ├─ manageFriend
+│  │  │  │  ├─ ManageAddfriend.jsx
+│  │  │  │  ├─ ManageFriend.jsx
+│  │  │  │  └─ manageFriend.scss
+│  │  │  ├─ market
+│  │  │  │  ├─ Market.jsx
+│  │  │  │  └─ market.scss
 │  │  │  ├─ profile
 │  │  │  │  ├─ Profile.jsx
 │  │  │  │  ├─ profile.scss
 │  │  │  │  ├─ ProfileItems.jsx
 │  │  │  │  └─ ProfileProjects.jsx
-│  │  │  └─ register
-│  │  │     ├─ register.scss
-│  │  │     └─ Register1.jsx
-│  │  └─ style.scss
+│  │  │  ├─ register
+│  │  │  │  ├─ register.scss
+│  │  │  │  └─ Register1.jsx
+│  │  │  ├─ resetpassword
+│  │  │  │  ├─ ResetPassword.jsx
+│  │  │  │  └─ resetpassword.scss
+│  │  │  └─ setting
+│  │  │     ├─ Setting.jsx
+│  │  │     └─ setting.scss
+│  │  ├─ style.scss
+│  │  └─ supabaseClient.js
 │  └─ vite.config.js
 ├─ MyRouter.js
 ├─ note
@@ -221,6 +293,8 @@ CommunityProject
 │  │  └─ db.js
 │  ├─ controllers
 │  │  ├─ authController.js
+│  │  ├─ commuController.js
+│  │  ├─ friendController.js
 │  │  ├─ itemController.js
 │  │  ├─ postController.js
 │  │  ├─ projectController.js
@@ -232,6 +306,8 @@ CommunityProject
 │  ├─ README.md
 │  ├─ routes
 │  │  ├─ authRoutes.js
+│  │  ├─ commuRoutes.js
+│  │  ├─ friendRoutes.js
 │  │  ├─ itemRoutes.js
 │  │  ├─ postRoutes.js
 │  │  ├─ projectRoutes.js

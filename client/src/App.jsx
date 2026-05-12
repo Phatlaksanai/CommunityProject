@@ -27,6 +27,7 @@ import BanMember from "./pages/banMember/banMember";
 import Setting from "./pages/setting/Setting";
 import ChangePassword from "./pages/changepassword/ChangePassword";
 import DeleteAccount from "./pages/deleteaccount/DeleteAccount";
+import Chat from "./pages/chat/chat";
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 // import NotFound from "./404";
 
@@ -407,6 +408,18 @@ function App() {
         {
           path: "/buyitem",
           element: <Buyitem />
+        },
+      ]
+    },
+    {
+      path: "/boxchat/:id",
+      element: (
+        <LayoutNavbar />
+      ),
+      children: [
+        {
+          index: true,
+          element: <Chat />
         },
       ]
     },

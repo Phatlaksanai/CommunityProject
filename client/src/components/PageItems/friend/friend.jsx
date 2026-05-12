@@ -36,7 +36,6 @@ const Friend = ({ user, isfriend }) => {
     };
 
     const renderButton = () => {
-        console.log("Friend status:",user);
         if (!isfriend) {
             
 

@@ -87,7 +87,7 @@ const Navbar = () => {
         {user && (<button className="button" onClick={handleLogout}>Logout</button>)} */}
         <ShoppingBasketIcon />
         <PersonOutlinedIcon onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}/>
-        <EmailOutlinedIcon />
+        <EmailOutlinedIcon onClick={() => navigate(`/boxchat/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}/>
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
           <span className="custom-tooltip" data-tip={displayName}>

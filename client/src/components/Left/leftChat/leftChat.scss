@@ -1,0 +1,91 @@
+@use "../../../style.scss" as *;
+
+.leftChat {
+    @include themify($themes) {
+        flex: 2;
+        position: sticky;
+        top: 70px;
+        height: calc(100vh - 70px);
+        background-color: themed("bg");
+        color: themed("textColor");
+
+        @include mobile {
+            display: none;
+        }
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        .container {
+            padding: 10px 0px;
+
+            hr {
+                margin: 2px 0px;
+                border: none;
+                height: 0.5px;
+                background-color: themed("border");
+            }
+
+            .menu {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+
+                .search {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    border: 1px solid themed("border");
+                    border-radius: 5px;
+                    padding: 5px;
+
+                    input {
+                        border: none;
+                        width: 500px;
+                        background-color: transparent;
+                        color: themed("textColor");
+
+                        @include mobile {
+                            display: none;
+                        }
+
+                        @include tablet {
+                            width: 200px;
+                        }
+                    }
+                }
+
+                // ปรับแต่ง Item ทั้งหมด (รวม User, เมนูทั่วไป, และ See more)
+                .user {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 15px 10px; // เพิ่ม padding ให้ดูโปร่งขึ้น
+                    border-radius: 8px; // มนกำลังดี
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    background-color: transparent; // มั่นใจว่าไม่มีสีพื้นหลังแปลกๆ
+                    box-shadow: none !important; // ปิดเงาที่ทำให้ดูเหมือนเฟดดำ
+
+                    &:hover {
+                        // "เปล่งแสง" หรือ Highlight เหมือนกันทุกตัว
+                        background-color: themed("bgSoft");
+                    }
+
+                    img {
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                    }
+
+                    span {
+                        font-size: 14px;
+                    }
+                }
+
+            }
+        }
+    }
+}
