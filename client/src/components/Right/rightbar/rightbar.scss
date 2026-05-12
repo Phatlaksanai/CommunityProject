@@ -35,12 +35,60 @@
           color: gray;
         }
 
+        .load-more {
+          justify-content: center;
+          margin-top: 5px;
+          color: themed("textColorSoft");
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 8px 10px; // เพิ่ม padding ให้ดูโปร่งขึ้น
+          border-radius: 8px; // มนกำลังดี
+          cursor: pointer;
+          transition: all 0.2s ease;
+          background-color: transparent; // มั่นใจว่าไม่มีสีพื้นหลังแปลกๆ
+          box-shadow: none !important; // ปิดเงาที่ทำให้ดูเหมือนเฟดดำ
+
+          &:hover {
+            // "เปล่งแสง" หรือ Highlight เหมือนกันทุกตัว
+            background-color: themed("bgSoft");
+          }
+
+          img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+
+          span {
+            font-size: 13px;
+          }
+        }
+        .community-list-wrapper {
+          max-height: 188px;
+          overflow-y: auto;
+          // ลบเงาหรือ background แปลกๆ ออกจาก wrapper
+          background: transparent;
+
+          &::-webkit-scrollbar {
+            width: 4px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background-color: themed("border");
+            border-radius: 10px;
+          }
+        }
         .user {
           display: flex;
           align-items: center;
           gap: 20px;
           // justify-content: space-between;
           margin: 20px 0px;
+          border-radius: 8px;
+          padding: 8px;
 
           &:hover {
             // "เปล่งแสง" หรือ Highlight เหมือนกันทุกตัว

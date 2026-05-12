@@ -2,12 +2,13 @@ import "./rightBar.scss";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 const RightBar = () => {
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
   const queryClient = useQueryClient();
+  const [showAll, setShowAll] = useState(false);
 
   const { isLoading, error, data: latestItems } = useQuery({
     queryKey: ["latestItems"],
@@ -46,6 +47,8 @@ const RightBar = () => {
     }
   };
 
+  const displayedFriendRequests = showAll ? FriendRequests : FriendRequests?.slice(0, 2);
+
   return (
     <div className="rightBar">
       <div className="container">
@@ -70,10 +73,11 @@ const RightBar = () => {
         {/* Section: Friend Requests */}
         <div className="item">
           <span>Friend Requests</span>
-          {FriendRequests?.map((user) => {
+          <div className="community-list-wrapper">
+          {displayedFriendRequests?.map((user) => {
             // เนื่องจาก Backend ส่ง Array ของ User มาแล้ว ใช้ user ได้เลย
             const displayName = user?.name || user?.username || "Unknown User";
-            const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName;
+            const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 8)}...` : displayName;
 
             return (
               <div className="user" key={user.user_id}>
@@ -101,6 +105,12 @@ const RightBar = () => {
             );
           })
           }
+          </div>
+          {!showAll && FriendRequests?.length > 2 && (
+            <div className="load-more" onClick={() => setShowAll(true)} style={{ cursor: "pointer" }}>
+              <span>See more</span>
+            </div>
+          )}
         </div>
 
         {/* Section: Contacts */}
