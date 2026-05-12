@@ -1,5 +1,4 @@
 import "./friend.scss";
-import "dayjs/locale/th";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +22,8 @@ const Friend = ({ user, isfriend }) => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["friend"] });
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+            navigate(`/managefriends/${currentUser.user_id}`);
             setSuccess("Friend Request Sent!");
         },
         onError: (err) => {
@@ -35,25 +36,51 @@ const Friend = ({ user, isfriend }) => {
         mutation.mutate(user.user_id);
     };
 
+    // Mutation สำหรับลบคำขอเพื่อน (Cancel/Unfriend)
+    const cancelMutation = useMutation({
+        mutationFn: (userId) => {
+            // ใช้ path เดียวกับ decline เพราะ logic คือการลบ row ที่มี requester_id และ receiver_id ตรงกัน
+            return makeRequest.delete("/friends/declinefriend", {
+                data: { targetId: userId }
+            });
+        },
+        onSuccess: () => {
+            // รีเฟรชข้อมูลเพื่อน
+            queryClient.invalidateQueries({ queryKey: ["friend"] });
+            queryClient.invalidateQueries({ queryKey: ["friends"] });
+            setSuccess("Cancelled");
+            setTimeout(() => setSuccess(""), 2000);
+        },
+        onError: (err) => {
+            console.error(err);
+            setError("Failed to cancel request");
+        }
+    });
+
+    const handleCancelFriend = () => {
+        cancelMutation.mutate(user.user_id);
+    };
+
     const renderButton = () => {
-        console.log("Friend status:",user);
         if (!isfriend) {
-            
 
             return (
-            <button
-                onClick={handleAddFriend}
-                disabled={mutation.isLoading}
-                style={{ cursor: mutation.isLoading ? "not-allowed" : "pointer" }}
-            >
-                {mutation.isLoading ? "Sending..." : "Add +"}
-            </button>
-        );
+                <button
+                    onClick={handleAddFriend}
+                    disabled={mutation.isLoading}
+                    style={{ cursor: mutation.isLoading ? "not-allowed" : "pointer" }}
+                >
+                    {mutation.isLoading ? "Sending..." : "Add +"}
+                </button>
+            );
         }
-        if ( user.status === 'pending') {
+        if (user.status === 'pending') {
             return (
-                <button disabled style={{ backgroundColor: "#ccc", cursor: "not-allowed" }}>
-                    Pending...
+                <button onClick={handleCancelFriend}
+                    disabled={cancelMutation.isLoading}
+                    style={{ backgroundColor: "#ccc", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
+                >
+                    Cancel Request
                 </button>
             );
         }

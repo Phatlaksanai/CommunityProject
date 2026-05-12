@@ -42,6 +42,10 @@
           // justify-content: space-between;
           margin: 20px 0px;
 
+          &:hover {
+            // "เปล่งแสง" หรือ Highlight เหมือนกันทุกตัว
+            background-color: themed("bgSoft");
+          }
           .userInfo {
             display: flex;
             align-items: center;
@@ -59,7 +63,7 @@
               width: 12px;
               height: 12px;
               border-radius: 50%;
-              background-color: limegreen;
+              // background-color: limegreen;
               position: absolute;
               top: 0;
               left: 30px;
