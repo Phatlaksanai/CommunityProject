@@ -82,6 +82,7 @@
           }
         }
         .user {
+          justify-content: space-between;
           display: flex;
           align-items: center;
           gap: 20px;
@@ -151,10 +152,11 @@
           }
         }
       }
+
       .new-releases {
         .user {
           align-items: flex-start;
-
+          justify-content: left !important;
         .userInfo {
           img {
             width: 100px; 
