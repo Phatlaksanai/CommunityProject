@@ -30,7 +30,7 @@ const Chat = () => {
 
                 {/* ส่วนเนื้อหาแชทที่เลื่อนได้ */}
                 <div className="chatContent">
-                    {/* <Posts /> */}
+                    <Posts />
                 </div>
 
                 {/* ส่วนช่อง Input พิมพ์ข้อความ */}
