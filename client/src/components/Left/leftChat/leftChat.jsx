@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { makeRequest } from "../../../api/axios";
 import { useQuery } from "@tanstack/react-query";
 
-const LeftChat = ({ userId }) => {
+const LeftChat = ({ userId, setCurrentChat }) => {
     const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
     const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
@@ -29,7 +29,7 @@ const LeftChat = ({ userId }) => {
             {data.map((chat, index) => (
             
             // เพิ่ม prop key ตรงแท็กนอกสุดของลูป
-            <div className="container" key={chat?.conversation_id || index}> 
+            <div className="container" key={chat?.conversation_id || index} onClick={() => setCurrentChat(chat)} style={{ cursor: "pointer" }}> 
                 <div className="menu">
                     <div className="user">
                         

@@ -70,3 +70,20 @@ exports.createConversation = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
+exports.getMessages = async (req, res) => {
+    const { conversationId } = req.params;
+    try {
+        const { data, error } = await db
+            .from("messages")
+            .select("*")
+            .eq("conversation_id", conversationId)
+            .order("created_at", { ascending: true });
+
+        if (error) throw error;
+
+        return res.status(200).json(data);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
