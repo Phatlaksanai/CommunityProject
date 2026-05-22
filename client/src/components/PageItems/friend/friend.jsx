@@ -9,6 +9,7 @@ const Friend = ({ user, isfriend }) => {
 
     const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
+    const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
@@ -97,7 +98,7 @@ const Friend = ({ user, isfriend }) => {
         <div className="friend">
             <div className="container">
                 <div className="content" onClick={() => navigate(`/descitem/${user.user_id}`)} style={{ cursor: "pointer" }}>
-                    <img src={user.profilePic} alt="" onError={(e) => { e.currentTarget.src = "https://placehold.co/600x400?text=Image+Error"; }} />
+                    <img src={user.profilePic || defaultPic} alt="" onError={(e) => { e.currentTarget.src = "https://placehold.co/600x400?text=Image+Error"; }} />
                 </div>
                 <div className="desc">
                     <h3 className="h3 custom-tooltip" data-tip={displayName}>
