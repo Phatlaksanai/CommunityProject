@@ -2,13 +2,12 @@
 
 .chat {
     display: flex;
-    height: 100vh; // บังคับให้สูงเท่าหน้าจอพอดี ไม่ให้ทะลุลงไป
+    height: calc(100vh - 60px);
     overflow: hidden; // กันตัวแม่เลื่อน
+    box-sizing: border-box;
 
     @include themify($themes) {
-        display: flex;
         background-color: themed("bgSoft");
-        min-height: 100vh;
 
         @include mobile {
             padding: 10px;
@@ -34,12 +33,14 @@
             flex-direction: column; // เรียงจากบนลงล่าง
             height: 100%;
             background-color: themed("bgSoft");
+            overflow: hidden;
 
             .chatHeader {
                 padding: 20px;
                 background-color: themed("bg");
                 box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
                 z-index: 10; // ให้อยู่เหนือ Posts
+                flex-shrink: 0;
 
                 .userInfo {
                     display: flex;
@@ -92,6 +93,7 @@
                 padding: 20px;
                 background-color: themed("bg");
                 box-shadow: 0px -5px 15px 1px rgba(0, 0, 0, 0.05); // เงาด้านบน
+                flex-shrink: 0;
             }
         }
 
