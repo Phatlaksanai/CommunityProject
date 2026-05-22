@@ -21,20 +21,23 @@ const LeftChat = ({ userId }) => {
     if (isLoading) return "Loading items...";
     if (error) return "Something went wrong!";
 
-    console.log("Chat Data:", data);
+    
 
     return (
-        
         <div className="leftChat">
-            {data.map((chat) => (
-            <div className="container">
+            {/* เพิ่ม index ในวงเล็บของ map */}
+            {data.map((chat, index) => (
+            
+            // เพิ่ม prop key ตรงแท็กนอกสุดของลูป
+            <div className="container" key={chat?.conversation_id || index}> 
                 <div className="menu">
-                    <hr />
                     <div className="user">
                         
                         <img src={chat?.profilePic || defaultPic} alt="" />
                         <span className="custom-tooltip" data-tip={chat?.name || chat?.username || "Guest"}>
-                            {chat?.name.length > 17 || chat?.username.length > 17 ? `${chat.name.substring(0, 17) || chat.username.substring(0, 17)}...` : chat?.name || chat?.username || "Guest"}
+                            {chat?.name?.length > 17 || chat?.username?.length > 17 
+                                ? `${(chat.name || chat.username).substring(0, 17)}...` 
+                                : chat?.name || chat?.username || "Guest"}
                         </span>
                         
                     </div>
@@ -42,7 +45,6 @@ const LeftChat = ({ userId }) => {
             </div>
             ))}
         </div>
-        
     );
 };
 

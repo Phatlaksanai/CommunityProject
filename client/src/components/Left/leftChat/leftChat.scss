@@ -18,15 +18,7 @@
         }
 
         .container {
-            padding: 10px 0px;
-
-            hr {
-                margin: 2px 0px;
-                border: none;
-                height: 0.5px;
-                background-color: themed("border");
-            }
-
+            
             .menu {
                 display: flex;
                 flex-direction: column;

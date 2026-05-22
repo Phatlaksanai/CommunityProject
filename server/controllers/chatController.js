@@ -9,27 +9,33 @@ exports.getConversations = async (req, res) => {
     .select(
       `
       *,
-      users!user2_id (
-        username,
-        name,
-        profilePic
-      )
+      user1:users!user1_id ( username, name, profilePic ),
+      user2:users!user2_id ( username, name, profilePic )
     `,
     )
-    .eq("user1_id", userId)
+    .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
     .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
 
-  const formatted = data.map((chat) => ({
-    ...chat,
-    username: chat.users?.username || null,
-    name: chat.users?.name || null,
-    profilePic: chat.users?.profilePic || null,
-  }));
+  const formatted = data.map((chat) => {
+    // เช็คว่าไอดีของเราตรงกับ user1_id หรือไม่ (ใช้ == เพื่อกันปัญหา String vs Number)
+    const isUser1 = chat.user1_id == userId; 
+    
+    // ถ้าเราเป็น user1 คู่สนทนาคือ user2 แต่ถ้าเราไม่ใช่ ให้คู่สนทนาคือ user1
+    const partner = isUser1 ? chat.user2 : chat.user1;
+
+    return {
+      ...chat,
+      username: partner?.username || null,
+      name: partner?.name || null,
+      profilePic: partner?.profilePic || null,
+    };
+  });
 
   return res.status(200).json(formatted || []);
 };
+
 exports.createConversation = async (req, res) => {
   const { user2Id } = req.body;
   const myuserId = req.user.user_id;
