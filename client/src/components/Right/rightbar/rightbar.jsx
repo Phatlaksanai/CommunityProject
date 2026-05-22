@@ -54,7 +54,9 @@ const RightBar = () => {
   const handleConversation = async (contactId) => {
     try {
       await makeRequest.post("/chats/createconversation", { user2Id: contactId });
-      queryClient.invalidateQueries(["rightBar", currentUser?.user_id]);
+      // const conversationId = res.data.conversation_id;
+
+      queryClient.invalidateQueries(["rightBar", currentUser?.user_id]); // , { state: { activeChatId: conversationId } }
       navigate(`/boxchat/${currentUser?.user_id}`);
     } catch (err) {
       console.log(err);
