@@ -3,11 +3,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
 import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const RightBar = () => {
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [showAll, setShowAll] = useState(false);
 
   const { isLoading, error, data: latestItems } = useQuery({
@@ -48,6 +50,16 @@ const RightBar = () => {
   };
 
   const displayedFriendRequests = showAll ? FriendRequests : FriendRequests?.slice(0, 2);
+
+  const handleConversation = async (contactId) => {
+    try {
+      await makeRequest.post("/chats/createconversation", { user2Id: contactId });
+      queryClient.invalidateQueries(["rightBar", currentUser?.user_id]);
+      navigate(`/boxchat/${currentUser?.user_id}`);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="rightBar">
@@ -120,7 +132,7 @@ const RightBar = () => {
             const displayName2 = contact?.name || contact?.username || "Unknown User";
             const truncatedName2 = displayName2.length > 15 ? `${displayName2.substring(0, 15)}...` : displayName2;
             return (
-              <div className="user" key={contact.user_id}>
+              <div className="user" key={contact.user_id} onClick={() => handleConversation(contact.user_id)} style={{ cursor: "pointer" }}>
                 <div className="userInfo">
                   <img src={contact.profilePic || defaultPic} alt="" />
                   <div className="online" />
