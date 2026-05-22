@@ -1,18 +1,21 @@
 import LeftChat from "../../components/Left/leftChat/leftChat"
 import Posts from "../../components/PageItems/posts/posts"
+import { useParams } from "react-router-dom";
 
 import "./chat.scss"
 import ImageIcon from '@mui/icons-material/Image';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 
 const Chat = () => {
+    const { id } = useParams();
+
     return (
         <div className="chat">
             <div className="Lchat">
                 <div className="search">
                     <input type="text" placeholder="Search..." />
                 </div>
-                <LeftChat />
+                <LeftChat userId={id} />
             </div>
 
             <div className="Rchat">
