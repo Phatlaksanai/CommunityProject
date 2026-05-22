@@ -18,7 +18,7 @@
         }
 
         .container {
-            
+
             .menu {
                 display: flex;
                 flex-direction: column;
@@ -73,10 +73,17 @@
                     }
 
                     span {
-                        font-size: 14px;
+                        font-size: 18px;
                     }
-                }
 
+                    .userDetails {
+                        display: flex;
+                        flex-direction: column;
+                        overflow: hidden;
+                        justify-content: space-between;
+                    }
+
+                }
             }
         }
     }

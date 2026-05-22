@@ -4,36 +4,62 @@ const cloudinary = require("../config/cloudinary");
 exports.getConversations = async (req, res) => {
   const { userId } = req.params;
 
-  const { data, error } = await db
-    .from("conversations")
-    .select(
+  try {
+    // 1. ทำระบบ Pagination (ดึงทีละ 12 รายการ เหมือนใน getPosts)
+    const page = parseInt(req.query.page) || 0; // ถ้าไม่ส่งมาจะเริ่มต้นที่หน้า 0
+    const limit = 12; // กำหนดให้โหลดทีละ 12 แชทตามที่ต้องการ
+    const from = page * limit;
+    const to = from + limit - 1;
+
+    // 2. ดึงข้อมูลจากตาราง conversations พร้อมข้อมูลผู้ใช้ทั้ง 2 ฝั่ง
+    const { data, error } = await db
+      .from("conversations")
+      .select(
+        `
+        *,
+        user1:users!user1_id ( user_id, username, name, profilePic ),
+        user2:users!user2_id ( user_id, username, name, profilePic )
       `
-      *,
-      user1:users!user1_id ( username, name, profilePic ),
-      user2:users!user2_id ( username, name, profilePic )
-    `,
-    )
-    .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
-    .order("created_at", { ascending: false });
+      )
+      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+      // แนะนำให้เปลี่ยนมาเรียงตาม updated_at จากใหม่ไปเก่า 
+      // เพื่อให้แชทที่มีข้อความใหม่ล่าสุดเด้งขึ้นมาอยู่ด้านบนสุดเสมอครับ
+      .order("updated_at", { ascending: false }) 
+      .range(from, to); // ใส่ช่วงที่ต้องการตัดดึงข้อมูลมาแสดงผล
 
-  if (error) return res.status(500).json(error);
+    if (error) throw error;
 
-  const formatted = data.map((chat) => {
-    // เช็คว่าไอดีของเราตรงกับ user1_id หรือไม่ (ใช้ == เพื่อกันปัญหา String vs Number)
-    const isUser1 = chat.user1_id == userId; 
-    
-    // ถ้าเราเป็น user1 คู่สนทนาคือ user2 แต่ถ้าเราไม่ใช่ ให้คู่สนทนาคือ user1
-    const partner = isUser1 ? chat.user2 : chat.user1;
+    // 3. จัดระเบียบ Data เลียนแบบ getFriendsByUserId
+    const formatted = data.map((chat) => {
+      // เช็คว่าเราเป็น user1 หรือไม่
+      const isUser1 = chat.user1_id == userId; 
+      
+      // เลือกเอาข้อมูลโปรไฟล์ของ "คู่สนทนา" (คนที่ไม่ใช่เรา) ออกมา
+      const partnerInfo = isUser1 ? chat.user2 : chat.user1;
 
-    return {
-      ...chat,
-      username: partner?.username || null,
-      name: partner?.name || null,
-      profilePic: partner?.profilePic || null,
-    };
-  });
+      return {
+        // กระจายข้อมูลโปรไฟล์ของคู่สนทนาออกมาเป็นชั้นนอกสุด (เหมือน ...friendInfo)
+        partner_id: partnerInfo?.user_id || null,
+        username: partnerInfo?.username || null,
+        name: partnerInfo?.name || null,
+        profilePic: partnerInfo?.profilePic || null,
+        
+        // ส่งค่าจากตารางตัวเองไปด้วยตามที่คุณต้องการ
+        conversation_id: chat.conversation_id,
+        user1_id: chat.user1_id,
+        user2_id: chat.user2_id,
+        last_message: chat.last_message, // ข้อความล่าสุดที่ส่งมา
+        updated_at: chat.updated_at,     // เวลาล่าสุดที่มีการส่งข้อความ
+        created_at: chat.created_at,
+      };
+    });
 
-  return res.status(200).json(formatted || []);
+    return res.status(200).json(formatted);
+
+  } catch (err) {
+    console.error("Error in getConversations:", err);
+    return res.status(500).json({ error: err.message });
+  }
 };
 
 exports.createConversation = async (req, res) => {
