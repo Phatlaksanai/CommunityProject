@@ -66,7 +66,7 @@ const LeftChat = ({ userId, currentChat, setCurrentChat }) => {
                                     <img src={chat?.profilePic || defaultPic} alt="" />
 
                                     <div className="userDetails" >
-                                        <span className="custom-tooltip" data-tip={chat?.name || chat?.username || "Guest"}>
+                                        <span className="name custom-tooltip" data-tip={chat?.name || chat?.username || "Guest"}>
                                             {chat?.name?.length > 17 || chat?.username?.length > 17
                                                 ? `${(chat.name || chat.username).substring(0, 17)}...`
                                                 : chat?.name || chat?.username || "Guest"}
@@ -74,15 +74,16 @@ const LeftChat = ({ userId, currentChat, setCurrentChat }) => {
 
                                         <div className="details">
 
-                                            <span style={{ fontSize: "14px", color: "gray", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                            <span className="lastMessage">
                                                 {chat?.last_message && (chat.last_message.length > 35)
                                                     ? `${(chat?.last_message).substring(0, 35)}...`
-                                                    : "Started a conversation"}
+                                                    : chat?.last_message || "Started a conversation"}
                                             </span>
 
-
                                             {chat?.last_message &&
-                                                <span style={{ fontSize: "14px", color: "gray", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{dayjs(chat?.updated_at).fromNow()}</span>
+                                                <span style={{ fontSize: "12px", color: "gray", marginLeft: "10px" }}>
+                                                    {dayjs(chat?.updated_at).fromNow()}
+                                                </span>
                                             }
 
                                         </div>

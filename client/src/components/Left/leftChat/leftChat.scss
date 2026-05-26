@@ -72,8 +72,9 @@
                         object-fit: cover;
                     }
 
-                    span {
+                    .name {
                         font-size: 18px;
+                        font-weight: bold;
                     }
 
                     .userDetails {
@@ -81,6 +82,22 @@
                         flex-direction: column;
                         overflow: hidden;
                         justify-content: space-between;
+
+                        .details {
+                           display: flex;
+                           justify-Content: space-between;
+                           align-Items: center;
+                           width: 100%;
+
+                            .lastMessage {
+                                font-size: 14px;
+                                color: themed("textSoft");
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
+
+                        }
                     }
 
                 }
