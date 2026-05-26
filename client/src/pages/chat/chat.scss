@@ -60,7 +60,7 @@
                         width: 12px;
                         height: 12px;
                         border-radius: 50%;
-                        background-color: limegreen;
+                        // background-color: limegreen;
                         position: absolute;
                         top: 0;
                         left: 30px;
@@ -69,11 +69,13 @@
             }
 
             .chatContent {
-                flex: 1; // กินพื้นที่ที่เหลือทั้งหมดตรงกลาง
-                overflow-y: auto; // ถ้าคอนเทนต์ยาว ให้เกิด Scroll แค่ตรงนี้
+                flex: 1; 
+                overflow-y: auto; 
                 padding: 20px;
+                display: flex;
+                flex-direction: column; // ให้ข้อความเรียงจากบนลงล่าง
+                gap: 20px; // ระยะห่างระหว่างกล่องข้อความแต่ละอัน
 
-                // ปรับแต่ง Scrollbar ให้สวยเหมือนใน Messenger (Optional)
                 &::-webkit-scrollbar {
                     width: 5px;
                 }
@@ -81,6 +83,45 @@
                 &::-webkit-scrollbar-thumb {
                     background-color: #ccc;
                     border-radius: 10px;
+                }
+
+                // 🟢 เพิ่มใหม่: CSS สำหรับกล่องข้อความ
+                .message {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start; // ข้อความคนอื่นชิดซ้าย
+                    max-width: 60%; // ไม่ให้กล่องข้อความยาวทะลุขอบจอ
+
+                    p {
+                        padding: 10px 15px;
+                        background-color: rgb(171, 171, 171); // สีพื้นหลังของเพื่อน
+                        color: themed("textColor");
+                        border-radius: 0px 15px 15px 15px; // ทำมุมเหลี่ยมด้านซ้ายบน (หางจุก)
+                        margin: 0;
+                        word-wrap: break-word; // ถ้าพิมพ์ติดกันยาวๆ ให้ตัดขึ้นบรรทัดใหม่
+                        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); // เพิ่มมิติเล็กน้อย
+                    }
+
+                    // 🟢 ถ้าเป็นข้อความของเราเอง (มีคลาส own)
+                    &.own {
+                        align-items: flex-end; // ข้อความชิดขวา
+                        align-self: flex-end; // ดันทั้งกลุ่มข้อความไปอยู่ฝั่งขวา
+
+                        p {
+                            background-color: #0084ff; // สีพื้นหลังของเรา (สีฟ้าน้ำทะเลแบบ Messenger)
+                            color: white;
+                            border-radius: 15px 0px 15px 15px; // ทำมุมเหลี่ยมด้านขวาบนแทน
+                        }
+                    }
+                }
+
+                // CSS สำหรับข้อความตอนยังไม่ได้เลือกห้องแชท
+                .noConversationText {
+                    text-align: center;
+                    color: gray;
+                    margin-top: auto;
+                    margin-bottom: auto; // ให้อยู่กึ่งกลางจอ
+                    font-size: 20px;
                 }
             }
 
