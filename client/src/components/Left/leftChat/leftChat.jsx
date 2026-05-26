@@ -67,16 +67,16 @@ const LeftChat = ({ userId, setCurrentChat }) => {
                                         </span>
 
                                         <div className="details">
-                                                
+
                                             <span style={{ fontSize: "14px", color: "gray", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                                 {chat?.last_message || "Started a conversation"}
                                             </span>
-                                            
-                                                
+
+
                                             {chat?.last_message &&
                                                 <span style={{ fontSize: "14px", color: "gray", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{dayjs(chat?.updated_at).fromNow()}</span>
                                             }
-                                           
+
                                         </div>
 
                                     </div>
