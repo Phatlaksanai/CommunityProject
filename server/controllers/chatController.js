@@ -113,3 +113,36 @@ exports.getMessages = async (req, res) => {
         return res.status(500).json({ error: err.message });
     }
 };
+
+exports.addMessage = async (req, res) => {
+    const { conversationId } = req.params;
+    const { text } = req.body;
+    const senderId = req.user.user_id;
+    try {
+        const { data: messageData, error: messageError } = await db
+            .from("messages")
+            .insert({
+                conversation_id: conversationId,
+                sender_id: senderId,
+                text: text,
+            })
+            .select()
+            .single();
+
+        if (messageError) throw messageError;
+
+        const { error: updateError } = await db
+            .from("conversations")
+            .update({ 
+                last_message: text,
+                updated_at: new Date() // อัปเดตเวลาเพื่อให้ช่องแชทที่มีคนพิมพ์ล่าสุดเด้งขึ้นมาบนสุด
+            })
+            .eq("conversation_id", conversationId);
+
+        if (updateError) throw updateError;
+
+        return res.status(200).json(messageData);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
