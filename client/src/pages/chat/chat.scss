@@ -168,6 +168,29 @@
                     width: 200px;
                 }
             }
+            .chatTextArea {
+        border: none;
+        width: 500px;
+        background-color: transparent;
+        color: themed("textColor");
+        resize: none; // ❌ ปิดไม่ให้ผู้ใช้ดึงมุมขยายขนาดกล่องได้
+        outline: none; // เอาขอบสีดำตอนกดคลิกออก
+        font-family: inherit; // ใช้ฟอนต์เดียวกับเว็บ
+        padding-top: 8px; // ดันข้อความลงมาให้ตรงกลางพอดี
+        
+        // ซ่อน Scrollbar ถ้าไม่อยากให้เห็น
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        @include mobile {
+            display: none;
+        }
+
+        @include tablet {
+            width: 200px;
+        }
+    }
         }
     }
 }

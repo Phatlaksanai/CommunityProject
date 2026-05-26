@@ -43,14 +43,15 @@ const Chat = () => {
     }, [messages]);
 
     const handleKeyDown = async (event) => {
-        if (event.key === "Enter") {
+        if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
 
-            if (!newMessage.trim() || !currentChat) return;
+            const cleanMessage = newMessage.trim();
+            if (!cleanMessage || !currentChat) return;
 
             try {
                 const res = await makeRequest.post(`/chats/${currentChat.conversation_id}/messages`, {
-                    text: newMessage
+                    text: cleanMessage
                 });
 
                 // อัปเดต State messages ทันที เพื่อให้ข้อความใหม่โผล่ขึ้นมาบนหน้าจอโดยไม่ต้องรีเฟรช
@@ -115,12 +116,14 @@ const Chat = () => {
                 <div className="chatInput">
                     <ImageIcon style={{ cursor: "pointer" }} />
                     <div className="search">
-                        <input
+                        <textarea
                             type="text"
                             placeholder="Text..."
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyDown={handleKeyDown}
+                            rows={1}
+                            className="chatTextArea"
                         />
                     </div>
                     <ThumbUpAltIcon style={{ cursor: "pointer" }} />
