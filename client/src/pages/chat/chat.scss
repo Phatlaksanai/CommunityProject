@@ -82,6 +82,18 @@
                     background-color: #ccc;
                     border-radius: 10px;
                 }
+
+                p {
+                    max-width: 100%;
+
+                    /* บังคับตัดคำยาวๆ หรือข้อความที่ไม่มีการเว้นวรรค (เช่น ลิงก์) */
+                    overflow-wrap: break-word;
+                    word-break: break-word;
+
+                    /* คงรูปแบบการเว้นวรรคและการกด Enter ( \n ) ของข้อความเดิมไว้ และตัดบรรทัดเมื่อชนขอบ */
+                    white-space: pre-wrap;
+                }
+
             }
 
             .chatInput {
