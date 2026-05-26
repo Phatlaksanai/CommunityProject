@@ -51,13 +51,23 @@ const RightBar = () => {
 
   const displayedFriendRequests = showAll ? FriendRequests : FriendRequests?.slice(0, 2);
 
-  const handleConversation = async (contactId) => {
+  const handleConversation = async (contact) => {
     try {
-      await makeRequest.post("/chats/createconversation", { user2Id: contactId });
-      // const conversationId = res.data.conversation_id;
+      const res = await makeRequest.post("/chats/createconversation", { user2Id: contact.user_id });
 
-      queryClient.invalidateQueries(["rightBar", currentUser?.user_id]); // , { state: { activeChatId: conversationId } }
-      navigate(`/boxchat/${currentUser?.user_id}`);
+      // จัดรูปแบบ Object ให้ตรงกับที่ระบบแชทต้องการ
+      const chatData = {
+        conversation_id: res.data.conversation_id,
+        partner_id: contact.user_id,
+        username: contact.username,
+        name: contact.name,
+        profilePic: contact.profilePic,
+      };
+
+      queryClient.invalidateQueries(["rightBar", currentUser?.user_id]);
+
+      // ส่งข้อมูล state ไปกับ navigate
+      navigate(`/boxchat/${currentUser?.user_id}`, { state: { selectedChat: chatData } });
     } catch (err) {
       console.log(err);
     }
@@ -88,37 +98,37 @@ const RightBar = () => {
         <div className="item">
           <span>Friend Requests</span>
           <div className="community-list-wrapper">
-          {displayedFriendRequests?.map((user) => {
-            // เนื่องจาก Backend ส่ง Array ของ User มาแล้ว ใช้ user ได้เลย
-            const displayName = user?.name || user?.username || "Unknown User";
-            const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 8)}...` : displayName;
+            {displayedFriendRequests?.map((user) => {
+              // เนื่องจาก Backend ส่ง Array ของ User มาแล้ว ใช้ user ได้เลย
+              const displayName = user?.name || user?.username || "Unknown User";
+              const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 8)}...` : displayName;
 
-            return (
-              <div className="user" key={user.user_id}>
-                <div className="userInfo">
-                  <img
-                    src={user.profilePic || defaultPic}
-                    alt=""
-                    onError={(e) => { e.currentTarget.src = defaultPic; }}
-                  />
-                  <p>
-                    <span className="custom-tooltip" data-tip={displayName}>
-                      {truncatedName}
-                    </span>
-                  </p>
+              return (
+                <div className="user" key={user.user_id}>
+                  <div className="userInfo">
+                    <img
+                      src={user.profilePic || defaultPic}
+                      alt=""
+                      onError={(e) => { e.currentTarget.src = defaultPic; }}
+                    />
+                    <p>
+                      <span className="custom-tooltip" data-tip={displayName}>
+                        {truncatedName}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="buttons">
+                    <button className="accept" onClick={() => handleAccept(user.user_id)}>
+                      Accept
+                    </button>
+                    <button className="decline" onClick={() => handleDecline(user.user_id)}>
+                      Decline
+                    </button>
+                  </div>
                 </div>
-                <div className="buttons">
-                  <button className="accept" onClick={() => handleAccept(user.user_id)}>
-                    Accept
-                  </button>
-                  <button className="decline" onClick={() => handleDecline(user.user_id)}>
-                    Decline
-                  </button>
-                </div>
-              </div>
-            );
-          })
-          }
+              );
+            })
+            }
           </div>
           {!showAll && FriendRequests?.length > 2 && (
             <div className="load-more" onClick={() => setShowAll(true)} style={{ cursor: "pointer" }}>
@@ -134,7 +144,7 @@ const RightBar = () => {
             const displayName2 = contact?.name || contact?.username || "Unknown User";
             const truncatedName2 = displayName2.length > 15 ? `${displayName2.substring(0, 15)}...` : displayName2;
             return (
-              <div className="user" key={contact.user_id} onClick={() => handleConversation(contact.user_id)} style={{ cursor: "pointer" }}>
+              <div className="user" key={contact.user_id} onClick={() => handleConversation(contact)} style={{ cursor: "pointer" }}>
                 <div className="userInfo">
                   <img src={contact.profilePic || defaultPic} alt="" />
                   <div className="online" />
