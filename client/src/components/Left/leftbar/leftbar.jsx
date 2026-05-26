@@ -61,7 +61,7 @@ const LeftBar = () => {
             <PeopleIcon />
             <span>Friends</span>
           </div>
-          <div className="item">
+          <div className="item" onClick={() => navigate(`/boxchat/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
             <ForumIcon />
             <span>Messenger</span>
           </div>

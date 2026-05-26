@@ -11,7 +11,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 // 1. เพิ่ม Import useInView เข้ามา
 import { useInView } from "react-intersection-observer";
 
-const LeftChat = ({ userId, setCurrentChat }) => {
+const LeftChat = ({ userId, currentChat, setCurrentChat }) => {
     const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
     const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
@@ -35,6 +35,12 @@ const LeftChat = ({ userId, setCurrentChat }) => {
             return lastPage.length === 12 ? allPages.length : undefined;
         }
     });
+
+    useEffect(() => {
+        if (data?.pages?.[0]?.length > 0 && !currentChat) {
+            setCurrentChat(data.pages[0][0]);
+        }
+    }, [data, currentChat, setCurrentChat]);
 
     // 3. เมื่อเลื่อนมาถึงจุดที่แปะ ref ไว้ ให้สั่งโหลดหน้าถัดไปทันที
     useEffect(() => {

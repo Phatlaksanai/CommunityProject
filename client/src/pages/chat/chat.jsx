@@ -10,8 +10,8 @@ import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 
 const Chat = () => {
     const { id } = useParams();
-    // const location = useLocation();
-    const [currentChat, setCurrentChat] = useState(null);
+    const location = useLocation();
+    const [currentChat, setCurrentChat] = useState(location.state?.selectedChat || null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
     const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
@@ -69,7 +69,7 @@ const Chat = () => {
                 <div className="search">
                     <input type="text" placeholder="Search..." />
                 </div>
-                <LeftChat userId={id} setCurrentChat={setCurrentChat} />
+                <LeftChat userId={id} currentChat={currentChat} setCurrentChat={setCurrentChat}/>
             </div>
 
             <div className="Rchat">
