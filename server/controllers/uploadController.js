@@ -71,3 +71,4 @@ exports.uploadProject = uploadHandler("Projects", false);
 exports.uploadProfile = uploadHandler("Profiles", false);
 exports.uploadComment = uploadHandler("Comments", false);
 exports.uploadCommunities = uploadHandler("Communities", true);
+exports.uploadChat = uploadHandler("Chats", false);

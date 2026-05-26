@@ -102,7 +102,10 @@ exports.getMessages = async (req, res) => {
     try {
         const { data, error } = await db
             .from("messages")
-            .select("*")
+            .select(`
+                *,
+                imgs ( img ) 
+            `)
             .eq("conversation_id", conversationId)
             .order("created_at", { ascending: true });
 
@@ -116,7 +119,7 @@ exports.getMessages = async (req, res) => {
 
 exports.addMessage = async (req, res) => {
     const { conversationId } = req.params;
-    const { text } = req.body;
+    const { text, img } = req.body;
     const senderId = req.user.user_id;
     try {
         const { data: messageData, error: messageError } = await db
@@ -124,24 +127,45 @@ exports.addMessage = async (req, res) => {
             .insert({
                 conversation_id: conversationId,
                 sender_id: senderId,
-                text: text,
+                text: text || null,
             })
             .select()
             .single();
 
         if (messageError) throw messageError;
 
+        let savedImgUrl = null;
+        if (img) {
+            const { error: imgError } = await db
+                .from("imgs")
+                .insert({
+                    message_id: messageData.message_id, // ใช้ ID จากข้อความที่เพิ่งสร้างเมื่อกี้
+                    post_id: null, // อันนี้เป็นแชท ไม่ใช่โพสต์ เลยใส่ null
+                    img: img
+                });
+
+            if (imgError) throw imgError;
+            savedImgUrl = img; // เก็บ URL ไว้ส่งกลับให้ React
+        }
+        let lastMessageText = text;
+        if (!text && img) {
+            lastMessageText = "📷 Sent an image"; 
+        }
+
         const { error: updateError } = await db
             .from("conversations")
             .update({ 
-                last_message: text,
+                last_message: lastMessageText,
                 updated_at: new Date() // อัปเดตเวลาเพื่อให้ช่องแชทที่มีคนพิมพ์ล่าสุดเด้งขึ้นมาบนสุด
             })
             .eq("conversation_id", conversationId);
 
         if (updateError) throw updateError;
 
-        return res.status(200).json(messageData);
+        return res.status(200).json({
+            ...messageData,
+            img: savedImgUrl 
+        });
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }

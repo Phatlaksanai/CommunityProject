@@ -7,5 +7,6 @@ router.post("/project", uploadController.uploadProject);
 router.post("/profile", uploadController.uploadProfile);
 router.post("/comment", uploadController.uploadComment);
 router.post("/communities", uploadController.uploadCommunities);
+router.post("/chat", uploadController.uploadChat);
 
 module.exports = router;
