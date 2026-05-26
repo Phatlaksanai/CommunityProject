@@ -75,7 +75,9 @@ const LeftChat = ({ userId, currentChat, setCurrentChat }) => {
                                         <div className="details">
 
                                             <span style={{ fontSize: "14px", color: "gray", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                                {chat?.last_message || "Started a conversation"}
+                                                {chat?.last_message && (chat.last_message.length > 35)
+                                                    ? `${(chat?.last_message).substring(0, 35)}...`
+                                                    : "Started a conversation"}
                                             </span>
 
 
