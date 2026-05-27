@@ -100,7 +100,7 @@ const Chat = () => {
                 if (files.length > 0) { // ถ้ามีการเลือกรูปภาพ ให้อัปโหลดรูปภาพก่อน
                     for (const file of files) {
                         const uploadRes = await uploadFile(file); // อัปโหลดรูปนี้
-                        
+
                         if (uploadRes?.url) {
                             // ส่งรูปลง Database โดยให้ text เป็นค่าว่าง
                             await makeRequest.post(`/chats/${currentChat.conversation_id}/messages`, {
@@ -114,15 +114,37 @@ const Chat = () => {
                 const updatedMessages = await makeRequest.get(`/chats/${currentChat.conversation_id}/messages`);
                 setMessages(updatedMessages.data);
 
-                // อัปเดต State messages ทันที เพื่อให้ข้อความใหม่โผล่ขึ้นมาบนหน้าจอโดยไม่ต้องรีเฟรช
-                setMessages([...messages, res.data]);
-                setNewMessage("");  // เคลียร์ช่อง Input
-                setFiles([]); // เคลียร์รูปภาพหลังส่ง
-                setFilePreviews([]); // เคลียร์พรีวิว
+                // 4. ล้างหน่วยความจำของรูปพรีวิว (ป้องกัน Memory Leak)
+                filePreviews.forEach(url => URL.revokeObjectURL(url));
+
+                // 5. เคลียร์ค่าทั้งหมดหลังส่งสำเร็จ 🎉
+                setNewMessage("");   // เคลียร์ช่องพิมพ์
+                setFiles([]);        // เคลียร์ไฟล์
+                setFilePreviews([]); // เคลียร์รูปพรีวิว
                 queryClient.invalidateQueries({ queryKey: ["chats", id] });
             } catch (err) {
                 console.log("Error sending message:", err);
             }
+        }
+    };
+
+    const handleLikeSubmit = async () => {
+        if (!currentChat) return;
+
+        try {
+            // ส่งข้อความคีย์เวิร์ด หรืออิโมจิ 👍 เข้าไปตรงๆ
+            await makeRequest.post(`/chats/${currentChat.conversation_id}/messages`, {
+                text: "👍",
+                img: null
+            });
+
+            // ดึงข้อความใหม่มาอัปเดตหน้าจอเหมือนตอนส่งข้อความปกติ
+            const updatedMessages = await makeRequest.get(`/chats/${currentChat.conversation_id}/messages`);
+            setMessages(updatedMessages.data);
+
+            queryClient.invalidateQueries({ queryKey: ["chats", id] });
+        } catch (err) {
+            console.log("Error sending like:", err);
         }
     };
 
@@ -165,7 +187,9 @@ const Chat = () => {
                                         <img src={chat.imgs[0].img} alt="attachment" className="chatImageMessage" />
                                     )}
                                     {/* สมมติว่าคอลัมน์ข้อความใน DB ของคุณชื่อ text */}
-                                    <p>{chat.text}</p>
+                                    {chat.text && (
+                                        <p>{chat.text}</p>
+                                    )}
                                 </div>
                             ))}
                             <div ref={scrollRef} />
@@ -213,7 +237,7 @@ const Chat = () => {
                             className="chatTextArea"
                         />
                     </div>
-                    <ThumbUpAltIcon style={{ cursor: "pointer" }} />
+                    <ThumbUpAltIcon onClick={handleLikeSubmit} style={{ cursor: "pointer" }} />
                 </div>
             </div>
         </div>
