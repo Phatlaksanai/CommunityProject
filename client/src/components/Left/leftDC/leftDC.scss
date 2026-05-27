@@ -162,4 +162,161 @@
       }
     }
   }
+
+  .galleryModalOverlay {
+    z-index: 9999 !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.75); // พื้นหลังมืดโปร่งแสง
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+
+    .galleryModalContainer {
+      background-color: #242526; // สีมืดสไตล์เฟซบุ๊ก
+      color: #e4e6eb;
+      width: 90%;
+      max-width: 800px;
+      height: 80vh;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+
+      .modalHeader {
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #3e4042;
+
+        h3 {
+          margin: 0;
+          font-size: 1.2rem;
+        }
+
+        .closeBtn {
+          background: none;
+          border: none;
+          color: #b0b3b8;
+          cursor: pointer;
+
+          &:hover {
+            color: #ffffff;
+          }
+        }
+      }
+
+      .modalGridContent {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto; // เปิดให้สกรอลล์แนวตั้งได้ในหน้านี้
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); // เรียง Grid อัตโนมัติ
+        gap: 12px;
+
+        .gridImgItem {
+          aspect-ratio: 1 / 1; // บังคับให้เป็นสี่เหลี่ยมจัตุรัสเท่ากันทุกรูป
+          overflow: hidden;
+          border-radius: 6px;
+          cursor: pointer;
+          background-color: #18191a;
+          transition: transform 0.2s;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; // ตัดรูปให้เต็มช่องพอดี
+          }
+
+          &:hover {
+            transform: scale(1.03);
+            filter: brightness(0.9);
+          }
+        }
+      }
+    }
+  }
+
+  // --- 2. สไตล์หน้าต่างดูรูปใหญ่เต็มจอ (Lightbox Overlay) ---
+  .lightboxOverlay {
+    z-index: 10000 !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.95); // ดำสนิทเกือบ 100%
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; // ซ้อนทับเลเยอร์ทุกอย่างสูงที่สุด
+
+    .lightboxCloseBtn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      opacity: 0.7;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    .navBtn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      padding: 15px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: 0.2s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      &.prev {
+        left: 30px;
+      }
+
+      &.next {
+        right: 30px;
+      }
+    }
+
+    .lightboxContent {
+      max-width: 80%;
+      max-height: 85vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        max-width: 100%;
+        max-height: 85vh;
+        object-fit: contain; // ให้เห็นรูปสัดส่วนจริงทั้งหมด ไม่โดนตัดขอบ
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    .imageCounter {
+      position: absolute;
+      bottom: 20px;
+      color: #b0b3b8;
+      font-size: 0.9rem;
+    }
+  }
 }

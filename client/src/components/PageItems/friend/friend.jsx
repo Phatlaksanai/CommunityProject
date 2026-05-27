@@ -75,7 +75,7 @@ const Friend = ({ user, isfriend }) => {
                 </button>
             );
         }
-        if (user.status === 'pending') {
+        if (user.status === 'pending' && user.receiver_id !== currentUser.user_id) {
             return (
                 <button onClick={handleCancelFriend}
                     disabled={cancelMutation.isLoading}
@@ -85,6 +85,17 @@ const Friend = ({ user, isfriend }) => {
                 </button>
             );
         }
+        if (user.status === 'pending' && user.receiver_id === currentUser.user_id) {
+            return (
+                <button onClick={handleCancelFriend}
+                    disabled={cancelMutation.isLoading}
+                    style={{ backgroundColor: "#ccc", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
+                >
+                    Decline Request
+                </button>
+            );
+        }
+
         if (user.status === 'accepted') {
             return (
                 <button disabled className="friend-btn accepted" style={{ backgroundColor: "#4dee20", color: "white" }}>

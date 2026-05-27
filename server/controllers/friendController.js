@@ -63,6 +63,7 @@ exports.getFriendsByUserId = async (req, res) => {
       // 2. คืนค่าเป็น Object ใหม่ที่รวม (ข้อมูล User + ข้อมูลจากตาราง friendship)
       return {
         ...friendInfo, // กระจาย name, user_id, profilePic ออกมา
+        receiver_id: item.receiver_id, // เพิ่มค่า receiver_id จากตาราง friendships
         status: item.status, // เพิ่มค่า status จากตาราง friendships
         friendship_id: item.id, // เพิ่ม ID ของแถวความสัมพันธ์ (จำเป็นมากตอนกด Accept/Decline)
         createdAt: item.created_at,

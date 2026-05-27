@@ -138,9 +138,6 @@ CommunityProject
 │  │  │  │  ├─ navbar.jsx
 │  │  │  │  └─ navbar.scss
 │  │  │  ├─ PageItems
-│  │  │  │  ├─ addfriend
-│  │  │  │  │  ├─ addfriend.jsx
-│  │  │  │  │  └─ addfriend.scss
 │  │  │  │  ├─ addfriends
 │  │  │  │  │  ├─ addfriends.jsx
 │  │  │  │  │  └─ addfriends.scss
@@ -293,6 +290,7 @@ CommunityProject
 │  │  └─ db.js
 │  ├─ controllers
 │  │  ├─ authController.js
+│  │  ├─ chatController.js
 │  │  ├─ commuController.js
 │  │  ├─ friendController.js
 │  │  ├─ itemController.js
@@ -306,6 +304,7 @@ CommunityProject
 │  ├─ README.md
 │  ├─ routes
 │  │  ├─ authRoutes.js
+│  │  ├─ chatRoutes.js
 │  │  ├─ commuRoutes.js
 │  │  ├─ friendRoutes.js
 │  │  ├─ itemRoutes.js

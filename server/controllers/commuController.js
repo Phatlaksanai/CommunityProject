@@ -263,7 +263,6 @@ exports.getLatestCommunityImages = async (req, res) => {
       .eq("posts.community_id", id)
       .eq("posts.status", "show")
       .order("posts(created_at)", { ascending: false })
-      .range(0, 3); // ดึงแค่ 4 รูป (index 0 ถึง 3)
 
     if (error) throw error;
 
