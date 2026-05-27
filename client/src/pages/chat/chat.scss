@@ -94,7 +94,7 @@
                     display: flex;
                     flex-direction: column;
                     align-items: flex-start; // ข้อความคนอื่นชิดซ้าย
-                    max-width: 60%; // ไม่ให้กล่องข้อความยาวทะลุขอบจอ
+                    width: 100%; // ไม่ให้กล่องข้อความยาวทะลุขอบจอ
 
                     .chatImageMessage {
                         max-width: 250px;
@@ -103,6 +103,29 @@
                         object-fit: cover;
                         margin-bottom: 5px;
                         box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .messageWrapper {
+                        display: flex;
+                        align-items: flex-end; // ให้ฐานด้านล่างเท่ากัน
+                        gap: 8px; // ระยะห่างระหว่างกล่องข้อความกับเวลา
+                        max-width: 70%; // ไม่ให้ยาวทะลุจอ
+                    }
+
+                    // ส่วนที่แสดง Read / เวลา
+                    .messageInfo {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start; // ฝั่งคนอื่น เวลาชิดซ้าย
+                        margin-bottom: 2px; // ยกขึ้นนิดนึงให้สวยงาม
+                        gap: 2px; // ระยะห่างระหว่างคำว่า Read กับ เวลา
+
+                        span {
+                            font-size: 11px;
+                            color: themed("textColor");
+                            opacity: 0.6; // ให้สีดูจางลง เป็นข้อความรอง
+                            white-space: nowrap; // ไม่ให้ตัวหนังสือขึ้นบรรทัดใหม่
+                        }
                     }
 
                     p {
@@ -123,15 +146,37 @@
                         white-space: pre-wrap;
                     }
 
+                    span {
+                        font-size: 12px;
+                        color: themed("textColor");
+                        margin-top: 2px;
+                    }
+
                     // 🟢 ถ้าเป็นข้อความของเราเอง (มีคลาส own)
                     &.own {
-                        align-items: flex-end; // ข้อความชิดขวา
-                        align-self: flex-end; // ดันทั้งกลุ่มข้อความไปอยู่ฝั่งขวา
+                        align-items: flex-end; // ดันทั้งกลุ่มข้อความไปอยู่ฝั่งขวา
 
-                        p {
-                            background-color: #0084ff; // สีพื้นหลังของเรา (สีฟ้าน้ำทะเลแบบ Messenger)
-                            color: white;
-                            border-radius: 15px 0px 15px 15px; // ทำมุมเหลี่ยมด้านขวาบนแทน
+                        // จัด messageWrapper ให้เรียงซ้ายไปขวาตามปกติ
+                        .messageWrapper {
+                            flex-direction: row; 
+                        }
+
+                        // 🟢 ดันข้อความสถานะ (Read/Sent) และเวลา ให้ "ชิดขวา"
+                        .messageInfo {
+                            align-items: flex-end; 
+                            
+                            span {
+                                text-align: right; // บังคับตัวอักษรชิดขวา
+                            }
+                        }
+
+                        // สีและรูปร่างกล่องข้อความฝั่งเรา
+                        .messageContent {
+                            p {
+                                background-color: #0084ff; // สีฟ้าน้ำทะเล
+                                color: white;
+                                border-radius: 15px 0px 15px 15px; // หางจุกด้านขวาบน
+                            }
                         }
                     }
                 }

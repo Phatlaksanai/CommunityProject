@@ -119,7 +119,7 @@ exports.getMessages = async (req, res) => {
 
 exports.addMessage = async (req, res) => {
     const { conversationId } = req.params;
-    const { text, img } = req.body;
+    const { text, img, is_read   } = req.body;
     const senderId = req.user.user_id;
     try {
         const { data: messageData, error: messageError } = await db
@@ -128,6 +128,7 @@ exports.addMessage = async (req, res) => {
                 conversation_id: conversationId,
                 sender_id: senderId,
                 text: text || null,
+                is_read: is_read
             })
             .select()
             .single();
@@ -166,6 +167,24 @@ exports.addMessage = async (req, res) => {
             ...messageData,
             img: savedImgUrl 
         });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
+
+exports.markAsRead = async (req, res) => {
+    const { conversationId } = req.params;
+    const { userId } = req.body; // ไอดีของคนที่อ่านข้อความ (คือเรา)
+    try {
+        const { error } = await db
+            .from("messages")
+            .update({ is_read: "read" })
+            .eq("conversation_id", conversationId)
+            .neq("sender_id", userId) // อัปเดตเฉพาะข้อความที่ไม่ใช่ของเราเท่านั้น
+            .eq("is_read", "sent"); // อัปเดตเฉพาะข้อความที่ยังไม่ได้อ่าน (สถานะ sent)
+
+        if (error) throw error;
+        return res.status(200).json({ message: "Messages marked as read" });
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
