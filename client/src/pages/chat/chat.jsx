@@ -210,7 +210,7 @@ const Chat = () => {
                                         {chat.sender_id === parseInt(id) && (
                                             <>
                                                 <div className="messageInfo">
-                                                    <span>{chat.is_read}</span>
+                                                    <span>{chat.is_read === "read" ? "Read" : "Sent"}</span>
                                                     <span>{dayjs(chat.created_at).format("h:mm A")}</span>
                                                 </div>
                                                 <div className="messageContent">
