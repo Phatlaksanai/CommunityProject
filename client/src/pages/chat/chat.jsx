@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import dayjs from "dayjs";
 
 import "./chat.scss"
 import ImageIcon from '@mui/icons-material/Image';
@@ -37,12 +38,17 @@ const Chat = () => {
             try {
                 const res = await makeRequest.get(`/chats/${currentChat.conversation_id}/messages`);
                 setMessages(res.data);
+
+                await makeRequest.put(`/chats/${currentChat.conversation_id}/read`, {
+                    userId: id 
+                });
+                queryClient.invalidateQueries({ queryKey: ["chats", id] });
             } catch (err) {
                 console.log(err);
             }
         };
         fetchMessages();
-    }, [currentChat]);
+    }, [currentChat, id, queryClient]);
 
     useEffect(() => { // สั่งให้เลื่อนจออัตโนมัติ ทุกครั้งที่ตัวแปร messages มีการอัปเดต
         scrollRef.current?.scrollIntoView({ behavior: "smooth" }); // เช็คว่ามี ref หรือยัง ถ้ามีให้เลื่อนลงมาหาแบบนุ่มนวล (smooth)
@@ -93,7 +99,8 @@ const Chat = () => {
                 if (cleanMessage) {
                     await makeRequest.post(`/chats/${currentChat.conversation_id}/messages`, {
                         text: cleanMessage,
-                        img: null
+                        img: null,
+                        is_read: "sent"
                     });
                 }
 
@@ -105,7 +112,8 @@ const Chat = () => {
                             // ส่งรูปลง Database โดยให้ text เป็นค่าว่าง
                             await makeRequest.post(`/chats/${currentChat.conversation_id}/messages`, {
                                 text: null,
-                                img: uploadRes.url
+                                img: uploadRes.url,
+                                is_read: "sent"
                             });
                         }
                     }
@@ -135,7 +143,8 @@ const Chat = () => {
             // ส่งข้อความคีย์เวิร์ด หรืออิโมจิ 👍 เข้าไปตรงๆ
             await makeRequest.post(`/chats/${currentChat.conversation_id}/messages`, {
                 text: "👍",
-                img: null
+                img: null,
+                is_read: "sent"
             });
 
             // ดึงข้อความใหม่มาอัปเดตหน้าจอเหมือนตอนส่งข้อความปกติ
@@ -183,13 +192,36 @@ const Chat = () => {
                                     key={chat.id || index}
                                     className={chat.sender_id === parseInt(id) ? "message own" : "message"}
                                 >
-                                    {chat.imgs && chat.imgs.length > 0 && (
-                                        <img src={chat.imgs[0].img} alt="attachment" className="chatImageMessage" />
-                                    )}
-                                    {/* สมมติว่าคอลัมน์ข้อความใน DB ของคุณชื่อ text */}
-                                    {chat.text && (
-                                        <p>{chat.text}</p>
-                                    )}
+                                    <div className="messageWrapper">
+                                        {chat.sender_id !== parseInt(id) && (
+                                            <>
+                                                <div className="messageContent">
+                                                    {chat.imgs && chat.imgs.length > 0 && (
+                                                        <img src={chat.imgs[0].img} alt="attachment" className="chatImageMessage" />
+                                                    )}
+                                                    {chat.text && <p>{chat.text}</p>}
+                                                </div>
+                                                <div className="messageInfo">
+                                                    <span>{dayjs(chat.created_at).format("h:mm A")}</span>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {chat.sender_id === parseInt(id) && (
+                                            <>
+                                                <div className="messageInfo">
+                                                    <span>{chat.is_read}</span>
+                                                    <span>{dayjs(chat.created_at).format("h:mm A")}</span>
+                                                </div>
+                                                <div className="messageContent">
+                                                    {chat.imgs && chat.imgs.length > 0 && (
+                                                        <img src={chat.imgs[0].img} alt="attachment" className="chatImageMessage" />
+                                                    )}
+                                                    {chat.text && <p>{chat.text}</p>}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                             <div ref={scrollRef} />
