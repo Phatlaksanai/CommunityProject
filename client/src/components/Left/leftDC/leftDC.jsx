@@ -3,15 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
 
 const LeftDC = ({ project, commuId }) => {
   const navigate = useNavigate();
-  const [openAllimg, setOpenAllimg] = useState(false);
 
-  // State สำหรับเก็บ Index ของรูปที่กำลังกดดูขนาดเต็ม (ถ้าเป็น null แปลว่าไม่ได้เปิดดูรูปใหญ่)
+  // State สำหรับคุมการเปิดขยายรูปภาพภายในกล่องแกลลอรี่ฝั่งซ้าย
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // State สำหรับเก็บ Index ของรูปที่กำลังกดดูขนาดเต็ม (Lightbox)
   const [activeImageIndex, setActiveImageIndex] = useState(null);
 
   const { data: latestImages = [], error, isLoading } = useQuery({
@@ -19,9 +22,9 @@ const LeftDC = ({ project, commuId }) => {
     queryFn: () => makeRequest.get(`/communities/${commuId}/images`).then(res => res.data)
   });
 
-  // ล็อกไม่ให้หน้าจอหลักขยับสกรอลล์เวลาเปิด Modal หรือเปิดดูรูปใหญ่
+  // ล็อกไม่ให้หน้าจอหลักขยับสกรอลล์เวลาเปิดดูรูปใหญ่เต็มจอ
   useEffect(() => {
-    if (openAllimg || activeImageIndex !== null) {
+    if (activeImageIndex !== null) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -29,11 +32,11 @@ const LeftDC = ({ project, commuId }) => {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [openAllimg, activeImageIndex]);
+  }, [activeImageIndex]);
 
   // ฟังก์ชันสำหรับกดเลื่อนรูปไปทางซ้าย
   const handlePrevImage = (e) => {
-    e.stopPropagation(); // กันไม่ให้ click ทะลุไปโดนพื้นหลัง
+    e.stopPropagation();
     setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : latestImages.length - 1));
   };
 
@@ -43,64 +46,60 @@ const LeftDC = ({ project, commuId }) => {
     setActiveImageIndex((prev) => (prev < latestImages.length - 1 ? prev + 1 : 0));
   };
 
+  // คำนวณชุดรูปภาพที่จะนำมาแสดงผลบนหน้าจอปกติ
+  // ถ้ายังไม่กดปุ่มขยาย (isExpanded เป็น false) จะหั่นเอามาแค่ 4 รูปแรกเท่านั้น
+  const displayImages = isExpanded ? latestImages : latestImages.slice(0, 4);
+
   return (
     <div className="leftDC">
       {/* --- ส่วนของหน้าจอปกติ --- */}
       <div className="container">
         <div className="item">
-          <h2>Gallery</h2>
-          <div className="img-container">
+          <h2>Gallery ({latestImages.length})</h2>
+          
+          {/* เปิดระบบ Scroll แนวตั้งเฉพาะตอนที่เปิดสถานะ expanded เท่านั้น */}
+          <div className={`img-container ${isExpanded ? "expanded" : ""}`}>
             {isLoading ? (
               <div className="loading-text">Loading...</div>
             ) : (
-              latestImages.slice(0, 4).map((imgUrl, index) => (
-                <div className="img" key={index} onClick={() => { setOpenAllimg(true); setActiveImageIndex(index); }}>
+              displayImages.map((imgUrl, index) => (
+                <div className="img" key={index} onClick={() => setActiveImageIndex(index)}>
                   <img src={imgUrl} alt={`latest-${index}`} />
                 </div>
               ))
             )}
 
-            {!isLoading && latestImages.length < 4 &&
+            {/* ช่องว่างตัวอย่าง (Empty Slot) แสดงเฉพาะตอนยังไม่ขยาย และรูปที่มีจริงดันน้อยกว่า 4 รูป */}
+            {!isLoading && !isExpanded && latestImages.length < 4 &&
               Array(4 - latestImages.length).fill(0).map((_, i) => (
                 <div className="img empty-slot" key={`empty-${i}`}>
                   <div className="no-image-text"><span>No Image</span></div>
                 </div>
               ))
             }
+
+            {/* กรณีไม่มีรูปในกลุ่มนี้เลยแม้แต่รูปเดียว */}
+            {!isLoading && latestImages.length === 0 && (
+              <div className="img empty-slot main-empty">
+                <div className="no-image-text"><span>No Image</span></div>
+              </div>
+            )}
           </div>
-          <button onClick={() => setOpenAllimg(true)} disabled={isLoading}>View All</button>
+
+          {/* ปุ่มสลับสถานะ: แสดงเมื่อรูปภาพทั้งหมดในระบบมีมากกว่า 4 รูปขึ้นไป */}
+          {!isLoading && latestImages.length > 4 && (
+            <button 
+              className="view-all-btn" 
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? "Show Less" : "View All"}
+            </button>
+          )}
         </div>
       </div>
 
-      {/* --- 1. MODAL: หน้าต่างรวมรูปภาพทั้งหมด (เลื่อนสกรอลล์ได้แบบ Facebook) --- */}
-      {openAllimg && (
-        <div className="galleryModalOverlay" onClick={() => setOpenAllimg(false)}>
-          <div className="galleryModalContainer" onClick={(e) => e.stopPropagation()}>
-            <div className="modalHeader">
-              <h3>All Community Images ({latestImages.length})</h3>
-              <button className="closeBtn" onClick={() => setOpenAllimg(false)}>
-                <CloseIcon />
-              </button>
-            </div>
-
-            {/* โซนนี้จะจัดเป็น Grid และตั้งความสูงให้ Scroll ได้ภายในตัว */}
-            <div className="modalGridContent">
-              {latestImages.map((imgUrl, index) => (
-                <div
-                  className="gridImgItem"
-                  key={index}
-                  onClick={() => setActiveImageIndex(index)} // คลิกแล้วจะเปิดเป็นรูปใหญ่
-                >
-                  <img src={imgUrl} alt={`gallery-${index}`} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- 2. LIGHTBOX: หน้าต่างดูรูปใหญ่เต็มจอ ซ้อนทับอีกชั้น (มีปุ่มซ้าย-ขวา) --- */}
-      {activeImageIndex !== null && (
+      {/* --- LIGHTBOX: หน้าต่างดูรูปใหญ่เต็มจอ ซ้อนทับอีกชั้น ยิงพอร์ทัลออกไปครอบสูงสุด --- */}
+      {activeImageIndex !== null && createPortal(
         <div className="lightboxOverlay" onClick={() => setActiveImageIndex(null)}>
           {/* ปุ่มปิดรูปใหญ่ */}
           <button className="lightboxCloseBtn" onClick={() => setActiveImageIndex(null)}>
@@ -126,7 +125,8 @@ const LeftDC = ({ project, commuId }) => {
           <div className="imageCounter">
             {activeImageIndex + 1} / {latestImages.length}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
