@@ -81,7 +81,7 @@ const RightBar = () => {
           <span>New Releases</span>
           {error ? "Something went wrong" : isLoading ? "Loading..." :
             latestItems?.map((item) => (
-              <div className="user" key={item.item_id}>
+              <div className="user" key={item.item_id} onClick={() => navigate(`/descitem/${item.item_id}`)} style={{ cursor: "pointer" }}>
                 <div className="userInfo">
                   <img src={item.img} alt="" />
                 </div>
