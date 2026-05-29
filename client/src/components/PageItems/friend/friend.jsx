@@ -98,7 +98,7 @@ const Friend = ({ user, isfriend }) => {
 
         if (user.status === 'accepted') {
             return (
-                <button disabled className="friend-btn accepted" style={{ backgroundColor: "#4dee20", color: "white" }}>
+                <button disabled className="friend-btn accepted" style={{ backgroundColor: "#5271ff", color: "white" }}>
                     Friends
                 </button>
             );
