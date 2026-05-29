@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { makeRequest } from "../../api/axios";
 import LeftDP from "../../components/Left/leftDP/leftDP"
 import Posts from "../../components/PageItems/posts/posts"
+import ScrollToTop from "../../ScrollToTop";
 
 const DescProject = () => {
     const { id } = useParams();
@@ -23,6 +24,7 @@ const DescProject = () => {
 
     return (
         <div className="descProject">
+            <ScrollToTop />
             <div className="descProjectleft">
                 {Project && <LeftDP project={Project.project_id} />}
             </div>

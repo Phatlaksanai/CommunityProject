@@ -85,15 +85,10 @@ const Post = ({ post, isDescCommu }) => {
     <div className="post">
       <div className="container">
         <div className="user">
-          <div className="userInfo">
+          <div className="userInfo" onClick={() => navigate(`/profile/${post.user_id}`)} style={{ cursor: "pointer" }}>
             <img src={post.profilePic || defaultPic} alt="" />
             <div className="details">
-              <Link
-                to={`/profile/${post.user_id}`}
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
                 <span className="name">{post.name || post.username}</span>
-              </Link>
               <span className="date">{dayjs(post.created_at).fromNow()}</span>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { AuthContext } from "../../../context/authContext";
 import { useContext, useState, useEffect } from "react";
 import { NavLink, useParams, useNavigate } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 
 
@@ -11,6 +11,7 @@ const ProfileDetail = () => {
   const { currentUser } = useContext(AuthContext);
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   const [openModal, setOpenModal] = useState(false);
@@ -20,6 +21,31 @@ const ProfileDetail = () => {
     queryKey: ["user", id],
     queryFn: () => makeRequest.get(`/friends/find/${id}`).then((res) => res.data),
   });
+
+  const { data: followers } = useQuery({
+    queryKey: ["friendFollowers", id],
+    queryFn: () => makeRequest.get(`/friends/followers/${id}`).then((res) => res.data),
+  });
+
+  const isFollowing = !!followers?.includes(currentUser?.user_id);
+
+  // ✅ ระบบกดติดตาม / เลิกติดตาม
+  const followMutation = useMutation({
+    mutationFn: (following) => {
+      if (following) {
+        return makeRequest.delete(`/friends/unfollow/${id}`);
+      }
+      return makeRequest.post("/friends/follow", { userid: id });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["friendFollowers", id]);
+      queryClient.invalidateQueries(["user", id]);
+    },
+  });
+
+  const handleFollow = () => {
+    followMutation.mutate(isFollowing);
+  };
 
   const MAX_LENGTH = 15;
   const desc = userData?.description || "";
@@ -58,15 +84,36 @@ const ProfileDetail = () => {
             />
           </div>
           <div className="profileInfo">
-            <div className="nameRow custom-tooltip">
+            <div className="nameRow">
               <h1 className="h1 custom-tooltip" data-tip={displayName}>
                 {truncatedName}
               </h1>
 
               {isOwner && (
-              <div className="actions">
-                <button className="followBtn" onClick={() => navigate(`/editprofile/${userData?.user_id}`)} style={{ cursor: "pointer" }}>Edit Profile</button>
-              </div>
+                <div className="actions">
+                  <button className="followBtn" onClick={() => navigate(`/editprofile/${userData?.user_id}`)} style={{ cursor: "pointer" }}>Edit Profile</button>
+                </div>
+              )}
+
+              {!isOwner && (
+                <div className="actions">
+                  <button
+                    className="followBtn"
+                    onClick={handleFollow}
+                    style={{
+                      backgroundColor: isFollowing ? "#bababa" : "#5271ff",
+                      cursor: "pointer"
+                    }}
+                  >
+                    {isFollowing ? "Following" : "Follow"}
+                  </button>
+                </div>
+              )}
+
+              {!isOwner && (
+                <div className="actions">
+                  <button className="followBtn" onClick={() => navigate(`/follow/${userData?.user_id}`)} style={{ cursor: "pointer" }}>Message</button>
+                </div>
               )}
 
             </div>
@@ -86,7 +133,7 @@ const ProfileDetail = () => {
           <NavLink to={`/profile/${id}`} end>Posts</NavLink>
           <NavLink to={`/profile/${id}/items`}>Models</NavLink>
           <NavLink to={`/profile/${id}/projects`}>Projects</NavLink>
-          
+
           {isOwner && (
             <button onClick={() => navigate(`/profile/${id}/projects/addproject`)} style={{ cursor: "pointer" }}>
               Create Project

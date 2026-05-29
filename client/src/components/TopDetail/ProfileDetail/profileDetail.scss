@@ -123,6 +123,8 @@
                 cursor: pointer;
                 font-size: 14px;
                 font-weight: 500;
+                background-color: themed("textColor");
+                color: themed("bg");
               }
             }
           }

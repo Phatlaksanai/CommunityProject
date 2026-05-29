@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import LeftDC from "../../components/Left/leftDC/leftDC"
 import Posts from "../../components/PageItems/posts/posts"
 import Share from "../../components/Share/Share";
+import ScrollToTop from "../../ScrollToTop";
 
 const DescCommu = () => {
     const { id } = useParams();
@@ -33,6 +34,7 @@ const DescCommu = () => {
 
     return (
         <div className="descCommu">
+            <ScrollToTop />
             <div className="descCommuleft">
                 <LeftDC commuId={id}/>
             </div>
