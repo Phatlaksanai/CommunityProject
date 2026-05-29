@@ -10,5 +10,6 @@ router.put("/acceptfriend", verifyToken, friendController.acceptFriend);
 router.get("/:userId/requests", verifyToken, friendController.getFriendRequests);
 router.get("/:userId/contacts", verifyToken, friendController.getContacts);
 router.delete("/declinefriend", verifyToken, friendController.declineFriend);
+router.get('/find/:id', friendController.getUserProfile);
 
 module.exports = router;

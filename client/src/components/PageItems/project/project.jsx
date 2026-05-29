@@ -3,9 +3,12 @@ import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import SettingsIcon from '@mui/icons-material/Settings';
+import { AuthContext } from "../../../context/authContext";
+import { useContext } from "react";
 
-const Project = ({ project }) => {
+const Project = ({ project, isProfile }) => {
 
+  const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
   return (
     <div className="project">
@@ -23,7 +26,9 @@ const Project = ({ project }) => {
       </div>
       <div className="price">
         <p>{dayjs(project.created_at).format("D MMM YYYY")}</p>
-        <SettingsIcon onClick={() => navigate(`/editproject/${project.project_id}`)} style={{ cursor: "pointer" }} />
+        {isProfile && project.user_id === currentUser.user_id && (
+          <SettingsIcon onClick={() => navigate(`/editproject/${project.project_id}`)} style={{ cursor: "pointer" }} />
+        )}
       </div>
     </div>
   );

@@ -205,3 +205,23 @@ exports.declineFriend = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
+exports.getUserProfile = async (req, res) => {
+  const { id } = req.params; // รับ id (ของเพื่อนหรือของเรา) จาก URL ที่หน้าบ้านส่งมา
+
+  try {
+    const { data, error } = await db
+      .from('users')
+      .select('user_id, username, name, profilePic, coverPic, description, city, website')
+      .eq('user_id', id)
+      .single(); // ใช้ .single() เพื่อให้ส่งกลับมาเป็น Object อันเดียว
+
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+    return res.status(200).json(data);
+
+  } catch (err) {
+    return res.status(500).json({ message: "Internal Server Error", error: err.message });
+  }
+};

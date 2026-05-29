@@ -5,7 +5,7 @@ const ProfileProjects = () => {
   const { id } = useParams(); 
   return (
     <div className="profile">
-      <Projects userId={id} />
+      <Projects userId={id} isProfile={true}/>
     </div>
   );
 };

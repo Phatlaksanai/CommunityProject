@@ -3,7 +3,7 @@ import "./projects.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 
-const Projects = ({ userId }) => {
+const Projects = ({ userId, isProfile }) => {
   const { isLoading, error, data = []} = useQuery({
     queryKey: ["projects", userId],
     queryFn: () => {
@@ -19,7 +19,7 @@ const Projects = ({ userId }) => {
 
   return <div className="projects">
     {data.map((project) => (  // วนลูปแสดงข้อมูลจริงจาก Database
-      <Project project={project} key={project.project_id} />
+      <Project project={project} key={project.project_id} isProfile={isProfile} />
     ))}
   </div>
 

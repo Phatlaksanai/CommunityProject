@@ -89,7 +89,7 @@ const Post = ({ post, isDescCommu }) => {
             <img src={post.profilePic || defaultPic} alt="" />
             <div className="details">
               <Link
-                to={`/profile/${post.userId}`}
+                to={`/profile/${post.user_id}`}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
                 <span className="name">{post.name || post.username}</span>
