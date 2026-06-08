@@ -77,7 +77,7 @@ const ProfileDetail = () => {
             disabled={addMutation.isLoading}
             style={{ backgroundColor: "#5271ff", cursor: addMutation.isLoading ? "not-allowed" : "pointer" }}
           >
-            Add Friend"
+            Add Friend
           </button>
         </div>
       );
