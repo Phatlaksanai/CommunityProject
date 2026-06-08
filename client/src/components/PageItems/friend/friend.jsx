@@ -49,6 +49,7 @@ const Friend = ({ user, isfriend }) => {
             // รีเฟรชข้อมูลเพื่อน
             queryClient.invalidateQueries({ queryKey: ["friend"] });
             queryClient.invalidateQueries({ queryKey: ["friends"] });
+            queryClient.invalidateQueries({ queryKey: ["users"] });
             setSuccess("Cancelled");
             setTimeout(() => setSuccess(""), 2000);
         },
@@ -71,7 +72,7 @@ const Friend = ({ user, isfriend }) => {
                     disabled={mutation.isLoading}
                     style={{ cursor: mutation.isLoading ? "not-allowed" : "pointer" }}
                 >
-                    {mutation.isLoading ? "Sending..." : "Add +"}
+                    Add Friend
                 </button>
             );
         }
@@ -98,8 +99,16 @@ const Friend = ({ user, isfriend }) => {
 
         if (user.status === 'accepted') {
             return (
-                <button disabled className="friend-btn accepted" style={{ backgroundColor: "#5271ff", color: "white" }}>
-                    Friends
+                <button 
+                    onClick={handleCancelFriend}
+                    disabled={cancelMutation.isLoading}
+                    style={{ 
+                        backgroundColor: "#f0544f", 
+                        color: "white", 
+                        cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" 
+                    }}
+                >
+                    Unfriend
                 </button>
             );
         }
@@ -108,11 +117,11 @@ const Friend = ({ user, isfriend }) => {
     return (
         <div className="friend">
             <div className="container">
-                <div className="content" onClick={() => navigate(`/descitem/${user.user_id}`)} style={{ cursor: "pointer" }}>
+                <div className="content" onClick={() => navigate(`/profile/${user.user_id}`)} style={{ cursor: "pointer" }}>
                     <img src={user.profilePic || defaultPic} alt="" onError={(e) => { e.currentTarget.src = "https://placehold.co/600x400?text=Image+Error"; }} />
                 </div>
                 <div className="desc">
-                    <h3 className="h3 custom-tooltip" data-tip={displayName}>
+                    <h3 className="h3 custom-tooltip" data-tip={displayName} onClick={() => navigate(`/profile/${user.user_id}`)} style={{ cursor: "pointer" }}>
                         {truncatedName}
                     </h3>
                     <p>@{user.username}</p>

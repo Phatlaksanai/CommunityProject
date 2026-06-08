@@ -10,9 +10,6 @@ router.put("/acceptfriend", verifyToken, friendController.acceptFriend);
 router.get("/:userId/requests", verifyToken, friendController.getFriendRequests);
 router.get("/:userId/contacts", verifyToken, friendController.getContacts);
 router.delete("/declinefriend", verifyToken, friendController.declineFriend);
-router.get("/find/:id", friendController.getUserProfile);
-router.get("/followers/:userId", verifyToken, friendController.getFollowers);
-router.delete("/unfollow/:targetId", verifyToken, friendController.removeFollower);
-router.post("/follow", verifyToken, friendController.addFollower);
+router.get("/userprofile/:id", friendController.getUserProfile);
 
 module.exports = router;
