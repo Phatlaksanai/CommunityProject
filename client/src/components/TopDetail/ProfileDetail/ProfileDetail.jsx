@@ -47,6 +47,28 @@ const ProfileDetail = () => {
     followMutation.mutate(isFollowing);
   };
 
+  const handleConversation = async (userData) => {
+    try {
+      const res = await makeRequest.post("/chats/createconversation", { user2Id: userData.user_id });
+
+      // จัดรูปแบบ Object ให้ตรงกับที่ระบบแชทต้องการ
+      const chatData = {
+        conversation_id: res.data.conversation_id,
+        partner_id: userData.user_id,
+        username: userData.username,
+        name: userData.name,
+        profilePic: userData.profilePic,
+      };
+
+      queryClient.invalidateQueries(["rightBar", currentUser?.user_id]);
+
+      // ส่งข้อมูล state ไปกับ navigate
+      navigate(`/boxchat/${currentUser?.user_id}`, { state: { selectedChat: chatData } });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const MAX_LENGTH = 15;
   const desc = userData?.description || "";
   const shortDesc =
@@ -109,10 +131,10 @@ const ProfileDetail = () => {
                   </button>
                 </div>
               )}
-
+  
               {!isOwner && (
                 <div className="actions">
-                  <button className="followBtn" onClick={() => navigate(`/follow/${userData?.user_id}`)} style={{ cursor: "pointer" }}>Message</button>
+                  <button className="followBtn" onClick={() => handleConversation(userData)} style={{ cursor: "pointer" }}>Message</button>
                 </div>
               )}
 

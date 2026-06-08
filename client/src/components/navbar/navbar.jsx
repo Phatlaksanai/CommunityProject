@@ -9,7 +9,7 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import DownloadIcon from '@mui/icons-material/Download';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import { Link, useNavigate } from "react-router-dom";
-import { useContext } from "react";
+import { useState, useContext } from "react";
 import { DarkModeContext } from "../../context/darkModeContext";
 import { AuthContext } from "../../context/authContext";
 import { makeRequest } from "../../api/axios";
@@ -17,6 +17,9 @@ import { makeRequest } from "../../api/axios";
 const Navbar = () => {
   const { toggle, darkMode } = useContext(DarkModeContext);
   const { currentUser, setUser } = useContext(AuthContext);
+
+  const [error, setError] = useState("");
+
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   const navigate = useNavigate();
@@ -27,13 +30,14 @@ const Navbar = () => {
       localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
 
+      navigate("/"); // เด้งไปหน้า Login
       // รีเฟรชหน้าเพื่อโหลด state ใหม่
       window.location.reload();
 
-      navigate("/"); // เด้งไปหน้า Login
+
     } catch (err) {
       console.error(err);
-      alert("Logout failed");
+      setError("Logout failed");
     }
   };
 
@@ -42,7 +46,7 @@ const Navbar = () => {
       navigate("/"); // เด้งไปหน้า Login
     } catch (err) {
       console.error(err);
-      alert("Logout failed");
+      setError("Logout failed");
     }
   };
 
@@ -51,7 +55,7 @@ const Navbar = () => {
       navigate("/login"); // เด้งไปหน้า Login
     } catch (err) {
       console.error(err);
-      alert("Login failed");
+      setError("Login failed");
     }
   };
 
@@ -71,7 +75,7 @@ const Navbar = () => {
           <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
         )}
         <AddShoppingCartIcon onClick={() => navigate("/market")} style={{ cursor: "pointer" }} />
-        <DownloadIcon onClick={() => navigate("/download")} style={{ cursor: "pointer" }}/>
+        <DownloadIcon onClick={() => navigate("/download")} style={{ cursor: "pointer" }} />
         <div className="search">
           <SearchOutlinedIcon />
           <input type="text" placeholder="Search..." />
@@ -86,8 +90,8 @@ const Navbar = () => {
         )}
         {user && (<button className="button" onClick={handleLogout}>Logout</button>)} */}
         <ShoppingBasketIcon />
-        <PersonOutlinedIcon onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}/>
-        <EmailOutlinedIcon onClick={() => navigate(`/boxchat/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}/>
+        <PersonOutlinedIcon onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
+        <EmailOutlinedIcon onClick={() => navigate(`/boxchat/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
           <span className="custom-tooltip" data-tip={displayName}>

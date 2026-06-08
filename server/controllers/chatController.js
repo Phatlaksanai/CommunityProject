@@ -5,54 +5,58 @@ exports.getConversations = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    // 1. ทำระบบ Pagination (ดึงทีละ 12 รายการ เหมือนใน getPosts)
-    const page = parseInt(req.query.page) || 0; // ถ้าไม่ส่งมาจะเริ่มต้นที่หน้า 0
-    const limit = 12; // กำหนดให้โหลดทีละ 12 แชทตามที่ต้องการ
+    const page = parseInt(req.query.page) || 0; 
+    const limit = 12; 
     const from = page * limit;
     const to = from + limit - 1;
 
-    // 2. ดึงข้อมูลจากตาราง conversations พร้อมข้อมูลผู้ใช้ทั้ง 2 ฝั่ง
+    // ดึงข้อมูลจากตาราง conversations และ Join ไปยังตาราง friendships กับ users
     const { data, error } = await db
       .from("conversations")
       .select(
         `
         *,
-        user1:users!user1_id ( user_id, username, name, profilePic ),
-        user2:users!user2_id ( user_id, username, name, profilePic )
+        friendships!friendship_id (
+          friendship_id,
+          requester_id,
+          receiver_id,
+          requester:users!requester_id ( user_id, username, name, profilePic ),
+          receiver:users!receiver_id ( user_id, username, name, profilePic )
+        )
       `
       )
-      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
-      // แนะนำให้เปลี่ยนมาเรียงตาม updated_at จากใหม่ไปเก่า 
-      // เพื่อให้แชทที่มีข้อความใหม่ล่าสุดเด้งขึ้นมาอยู่ด้านบนสุดเสมอครับ
+      // เลือกเฉพาะแชทที่ใน friendship มีเราเป็น requester หรือ receiver
+      .or(`requester_id.eq.${userId},receiver_id.eq.${userId}`, { foreignTable: "friendships" })
       .order("updated_at", { ascending: false }) 
-      .range(from, to); // ใส่ช่วงที่ต้องการตัดดึงข้อมูลมาแสดงผล
+      .range(from, to);
 
     if (error) throw error;
 
-    // 3. จัดระเบียบ Data เลียนแบบ getFriendsByUserId
+    // จัดระเบียบ Data ส่งกลับไปให้หน้าบ้านเหมือนเดิมเป๊ะๆ หน้าบ้านจะได้ไม่ต้องแก้ code
     const formatted = data.map((chat) => {
-      // เช็คว่าเราเป็น user1 หรือไม่
-      const isUser1 = chat.user1_id == userId; 
+      const friendship = chat.friendships;
       
-      // เลือกเอาข้อมูลโปรไฟล์ของ "คู่สนทนา" (คนที่ไม่ใช่เรา) ออกมา
-      const partnerInfo = isUser1 ? chat.user2 : chat.user1;
+      if (!friendship) return null;
+
+      // ตรวจสอบว่าตัวเราคือ requester หรือไม่
+      const isRequester = friendship.requester_id == userId; 
+      
+      // เลือกข้อมูลของคู่สนทนา (คนที่ไม่ใช่เรา)
+      const partnerInfo = isRequester ? friendship.receiver : friendship.requester;
 
       return {
-        // กระจายข้อมูลโปรไฟล์ของคู่สนทนาออกมาเป็นชั้นนอกสุด (เหมือน ...friendInfo)
         partner_id: partnerInfo?.user_id || null,
         username: partnerInfo?.username || null,
         name: partnerInfo?.name || null,
         profilePic: partnerInfo?.profilePic || null,
         
-        // ส่งค่าจากตารางตัวเองไปด้วยตามที่คุณต้องการ
         conversation_id: chat.conversation_id,
-        user1_id: chat.user1_id,
-        user2_id: chat.user2_id,
-        last_message: chat.last_message, // ข้อความล่าสุดที่ส่งมา
-        updated_at: chat.updated_at,     // เวลาล่าสุดที่มีการส่งข้อความ
+        friendship_id: chat.friendship_id,
+        last_message: chat.last_message, 
+        updated_at: chat.updated_at,     
         created_at: chat.created_at,
       };
-    });
+    }).filter(Boolean); // กรองเอาค่า null ออกในกรณีที่ดึงติดขัด
 
     return res.status(200).json(formatted);
 
@@ -67,31 +71,46 @@ exports.createConversation = async (req, res) => {
   const myuserId = req.user.user_id;
 
   try {
-    // ตรวจสอบว่ามี conversation อยู่แล้วหรือไม่
-    const { data: existingChats, error: checkError } = await db
+    // 1. ค้นหา friendship_id จากตาราง friendships ที่เป็นเพื่อนกันระหว่างสองคนนี้
+    const { data: friendship, error: friendError } = await db
+      .from("friendships")
+      .select("friendship_id")
+      .or(`and(status.eq.accepted,requester_id.eq.${myuserId},receiver_id.eq.${user2Id}),and(status.eq.accepted,requester_id.eq.${user2Id},receiver_id.eq.${myuserId})`)
+      .maybeSingle(); // ใช้ maybeSingle เพื่อไม่ให้ throw error ถ้าไม่เจอ
+
+    if (friendError) throw friendError;
+    if (!friendship) {
+      return res.status(400).json({ error: " ไม่พบสถานะความเป็นเพื่อนกับผู้ใช้นี้" });
+    }
+
+    const targetFriendshipId = friendship.friendship_id;
+
+    // 2. ตรวจสอบว่ามี conversation ที่ผูกกับ friendship_id นี้อยู่แล้วหรือไม่
+    const { data: existingChat, error: checkError } = await db
       .from("conversations")
       .select("*")
-      .or(`and(user1_id.eq.${myuserId},user2_id.eq.${user2Id}),and(user1_id.eq.${user2Id},user2_id.eq.${myuserId})`);
+      .eq("friendship_id", targetFriendshipId)
+      .maybeSingle();
 
     if (checkError) throw checkError;
 
-    // ถ้ามีห้องอยู่แล้ว ให้ส่งข้อมูลห้องเดิมกลับไปเลย โดยไม่ต้องสร้างใหม่
-    if (existingChats && existingChats.length > 0) {
-      return res.status(200).json(existingChats[0]);
+    // ถ้ามีห้องอยู่แล้ว ให้ส่งข้อมูลห้องเดิมกลับไปเลย
+    if (existingChat) {
+      return res.status(200).json(existingChat);
     }
 
+    // 3. ถ้ายังไม่มีห้อง ให้สร้างห้องใหม่โดยใช้ friendship_id
     const { data: newChat, error: chatError } = await db
       .from("conversations")
       .insert({
-        user1_id: myuserId,
-        user2_id: user2Id
+        friendship_id: targetFriendshipId
       })
       .select()
       .single();
 
     if (chatError) throw chatError;
 
-    return res.status(200).json(newChat); // ส่งกลับข้อมูล conversation
+    return res.status(200).json(newChat); 
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
