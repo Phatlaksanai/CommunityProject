@@ -1,7 +1,10 @@
 import "./leftDI.scss";
 import ModelViewer from "../../modelViewer/model_viewer";
+import { useNavigate } from "react-router-dom";
 
 const LeftDI = ({ item }) => {
+  const navigate = useNavigate();
+
   if (!item) return null;
   return (
     <div className="leftDI">
@@ -21,16 +24,13 @@ const LeftDI = ({ item }) => {
         <div className="item">
           <h2>Owner</h2>
           <div className="user">
-            <div className="userInfo">
+            <div className="userInfo" onClick={() => navigate(`/profile/${item.user_id}`)} style={{ cursor: "pointer" } }>
               <img
                 src={item.profilePic}
                 alt=""
               />
               <div className="online" />
               <span>{item.name || item.username}</span>
-            </div>
-            <div className="buttons">
-              <button>Add+</button>
             </div>
           </div>
         </div>

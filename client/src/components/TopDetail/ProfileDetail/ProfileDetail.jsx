@@ -14,37 +14,122 @@ const ProfileDetail = () => {
   const queryClient = useQueryClient();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
+  const [error, setError] = useState("");
   const [openModal, setOpenModal] = useState(false);
+
   const isOwner = currentUser?.user_id == id;
 
-  const { isLoading, error, data: userData } = useQuery({
+  const { isLoading, error: userError, data: userData } = useQuery({
     queryKey: ["user", id],
-    queryFn: () => makeRequest.get(`/friends/find/${id}`).then((res) => res.data),
+    queryFn: () => makeRequest.get(`/friends/userprofile/${id}`).then((res) => res.data),
   });
 
-  const { data: followers } = useQuery({
-    queryKey: ["friendFollowers", id],
-    queryFn: () => makeRequest.get(`/friends/followers/${id}`).then((res) => res.data),
+  const { data: friendsList } = useQuery({
+    queryKey: ["friendships", currentUser?.user_id],
+    queryFn: () => makeRequest.get(`/friends/${currentUser?.user_id}`).then((res) => res.data),
+    enabled: !!currentUser?.user_id, // ดึงก็ต่อเมื่อมี currentUser
   });
 
-  const isFollowing = !!followers?.includes(currentUser?.user_id);
+  const relationship = friendsList?.find((friend) => friend.user_id == id);
+  const isFriend = !!relationship;
 
-  // ✅ ระบบกดติดตาม / เลิกติดตาม
-  const followMutation = useMutation({
-    mutationFn: (following) => {
-      if (following) {
-        return makeRequest.delete(`/friends/unfollow/${id}`);
-      }
-      return makeRequest.post("/friends/follow", { userid: id });
+  const addMutation = useMutation({
+    mutationFn: () => {
+      // แก้ไขจาก receiver_id: userId เป็น id (อิงจาก useParams)
+      return makeRequest.post(`/friends/addfriend`, { receiver_id: id });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["friendFollowers", id]);
+      queryClient.invalidateQueries(["friendships", currentUser?.user_id]);
       queryClient.invalidateQueries(["user", id]);
     },
+    onError: (err) => {
+      console.error(err);
+      setError("Failed to send friend request");
+    }
   });
 
-  const handleFollow = () => {
-    followMutation.mutate(isFollowing);
+  const cancelMutation = useMutation({
+    mutationFn: () => {
+      return makeRequest.delete("/friends/declinefriend", {
+        data: { targetId: id }
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["friendships", currentUser?.user_id]);
+      queryClient.invalidateQueries(["user", id]);
+    },
+    onError: (err) => {
+      console.error(err);
+      setError("Failed to process request");
+    }
+  });
+
+  const renderFriendButton = () => {
+    if (isOwner) return null; // ถ้าเป็นหน้าโปรไฟล์ตัวเอง ไม่ต้องแสดงปุ่ม
+
+    // กรณีที่ 1: ยังไม่มีความสัมพันธ์ใดๆ
+    if (!isFriend) {
+      return (
+        <div className="actions">
+          <button
+            className="followBtn"
+            onClick={() => addMutation.mutate()}
+            disabled={addMutation.isLoading}
+            style={{ backgroundColor: "#5271ff", cursor: addMutation.isLoading ? "not-allowed" : "pointer" }}
+          >
+            Add Friend"
+          </button>
+        </div>
+      );
+    }
+
+    // กรณีที่ 2: สถานะ Pending และ "เรา" เป็นคนส่งคำขอไป
+    if (relationship.status === 'pending' && relationship.receiver_id != currentUser.user_id) {
+      return (
+        <div className="actions">
+          <button
+            className="followBtn"
+            onClick={() => cancelMutation.mutate()}
+            disabled={cancelMutation.isLoading}
+            style={{ backgroundColor: "#ccc", color: "black", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
+          >
+            Cancel Request
+          </button>
+        </div>
+      );
+    }
+
+    // กรณีที่ 3: สถานะ Pending และ "เรา" เป็นคนรับคำขอ (มีคนขอแอดมา)
+    if (relationship.status === 'pending' && relationship.receiver_id == currentUser.user_id) {
+      return (
+        <div className="actions">
+          <button
+            className="followBtn"
+            onClick={() => cancelMutation.mutate()} // สามารถใช้ API ปฏิเสธคำขอได้ถ้าต้องการแยก
+            disabled={cancelMutation.isLoading}
+            style={{ backgroundColor: "#ccc", color: "black", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
+          >
+            Decline Request
+          </button>
+        </div>
+      );
+    }
+
+    // กรณีที่ 4: สถานะ Accepted (เป็นเพื่อนกันแล้ว) - กดเพื่อ Unfriend
+    if (relationship.status === 'accepted') {
+      return (
+        <div className="actions">
+          <button
+            className="followBtn"
+            onClick={() => cancelMutation.mutate()}
+            disabled={cancelMutation.isLoading}
+            style={{ backgroundColor: "#bababa", color: "black", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
+          >
+            Unfriend
+          </button>
+        </div>
+      );
+    }
   };
 
   const handleConversation = async (userData) => {
@@ -111,7 +196,7 @@ const ProfileDetail = () => {
                 {truncatedName}
               </h1>
 
-              {isOwner && (
+              {/* {isOwner && (
                 <div className="actions">
                   <button className="followBtn" onClick={() => navigate(`/editprofile/${userData?.user_id}`)} style={{ cursor: "pointer" }}>Edit Profile</button>
                 </div>
@@ -136,6 +221,19 @@ const ProfileDetail = () => {
                 <div className="actions">
                   <button className="followBtn" onClick={() => handleConversation(userData)} style={{ cursor: "pointer" }}>Message</button>
                 </div>
+              )} */}
+
+              {isOwner ? (
+                <div className="actions">
+                  <button className="followBtn" onClick={() => navigate(`/editprofile/${userData?.user_id}`)} style={{ cursor: "pointer" }}>Edit Profile</button>
+                </div>
+              ) : (
+                <>
+                  {renderFriendButton()}
+                  <div className="actions">
+                    <button className="followBtn" style={{ cursor: "pointer" }}>Message</button>
+                  </div>
+                </>
               )}
 
             </div>
@@ -151,6 +249,9 @@ const ProfileDetail = () => {
             </span>
           </div>
         </div>
+
+        {error && <div style={{ color: "red", textAlign: "center", marginTop: "10px" }}>{error}</div>}
+
         <div className="tabs">
           <NavLink to={`/profile/${id}`} end>Posts</NavLink>
           <NavLink to={`/profile/${id}/items`}>Models</NavLink>
