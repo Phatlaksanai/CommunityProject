@@ -77,7 +77,7 @@ const ProfileDetail = () => {
             disabled={addMutation.isLoading}
             style={{ backgroundColor: "#5271ff", cursor: addMutation.isLoading ? "not-allowed" : "pointer" }}
           >
-            {addMutation.isLoading ? "Sending..." : "Add Friend"}
+            Add Friend"
           </button>
         </div>
       );
@@ -125,7 +125,7 @@ const ProfileDetail = () => {
             disabled={cancelMutation.isLoading}
             style={{ backgroundColor: "#bababa", color: "black", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
           >
-            {cancelMutation.isLoading ? "Processing..." : "Unfriend"}
+            Unfriend
           </button>
         </div>
       );
