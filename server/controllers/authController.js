@@ -296,6 +296,8 @@ exports.verifyOtpResetPassword = async (req, res) => {
         return res.status(400).json({ error: "OTP expired" });
     }
 
+    await db.from('otps').delete().eq('user_id', user.user_id);
+
     return res.json({ success: true });
 };
 
@@ -455,5 +457,72 @@ exports.resetPassword = async (req, res) => {
 };
 
 exports.deleteAccount = async (req, res) => {
-    const { email, otp } = req.body;
+    const { email, otp, userId } = req.body;
+
+    if (!email || !otp || !userId) {
+        return res.status(400).json({ error: "Email, OTP, and User ID are required" });
+    }
+
+    try {        
+        // ค้นหา user_id จากอีเมลก่อน
+        const { data: users, error: userError } = await db
+            .from('users')
+            .select('user_id, email, username')
+            .eq('user_id', userId)
+            .eq('email', email)
+
+        if (userError || !users || users.length === 0) {
+            return res.status(404).json({ error: "User account not found" });
+        }
+
+        const user = users[0];
+
+        // ดึงข้อมูล OTP ล่าสุดของ user_id นี้มาเช็ค
+        const { data: otpData, error: otpError } = await db
+            .from('otps')
+            .select('otp, otp_expire')
+            .eq('user_id', user.user_id)
+            .maybeSingle();
+
+        if (otpError || !otpData) {
+            return res.status(400).json({ error: "Invalid OTP request or OTP not found" });
+        }
+
+        // ตรวจสอบว่า OTP ตรงกันไหม
+        if (otpData.otp !== otp) {
+            return res.status(400).json({ error: "OTP incorrect" });
+        }
+
+        // ตรวจสอบว่า OTP หมดอายุหรือยัง
+        if (new Date(otpData.otp_expire) < new Date()) {
+            return res.status(400).json({ error: "OTP expired" });
+        }
+
+        // ผ่านทุกเงื่อนไข -> เตรียมแปลงอีเมลเพื่อหลบสัญญลักษณ์ UNIQUE ประจำคอลัมน์
+        const timestamp = Date.now();
+        const maskedEmail = `${user.email}_deleted_${timestamp}`;
+
+        // ผ่านทุกเงื่อนไข -> ทำการเปลี่ยนสถานะเป็นลบบัญชี (Soft Delete)
+        const { error: updateError } = await db
+            .from('users')
+            .update({ 
+                email: maskedEmail,
+                isdelete: 'deleted',
+            })
+            .eq('user_id', user.user_id);
+            
+        if (updateError) throw updateError;
+
+        // (เลือกทำ) ลบแถว OTP นี้ทิ้งไปเลยเพื่อไม่ให้เอามาใช้ซ้ำได้อีก
+        await db.from('otps').delete().eq('user_id', user.user_id);
+
+        return res
+            .clearCookie("accessToken", { httpOnly: true, sameSite: "lax" })
+            .status(200)
+            .json({ success: true, message: "Account deleted and logged out successfully" });
+            
+    } catch (err) {
+        console.error("Delete Account Error:", err);
+        return res.status(500).json({ error: "Failed to delete account" });
+    }
 };

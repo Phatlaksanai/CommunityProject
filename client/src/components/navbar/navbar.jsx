@@ -30,10 +30,10 @@ const Navbar = () => {
       localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
 
-      navigate("/"); // เด้งไปหน้า Login
-      // รีเฟรชหน้าเพื่อโหลด state ใหม่
-      window.location.reload();
-
+      // เคลียร์ค่า currentUser ใน AuthContext ให้เป็น null ทันที
+      setUser(null);
+      
+      navigate("/");
 
     } catch (err) {
       console.error(err);

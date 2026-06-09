@@ -56,7 +56,25 @@
 
     .btn-group{
         display: flex;
-        gap: 30px;
+        align-items: center; /* จัดให้ข้อความและปุ่มอยู่ตรงกลางในแนวตั้งเท่ากัน */
+        gap: 15px; /* ปรับ gap ให้กระชับขึ้นเล็กน้อยสำหรับสเปซแจ้งเตือน */
+        flex-wrap: wrap; /* ป้องกันกล่องฟอร์มเบี้ยวกรณีเปิดในมือถือจอเล็ก */
+        
+        .msg {
+          font-size: 14px;
+          font-weight: 500;
+          white-space: nowrap; /* ห้ามข้อความตัดขึ้นบรรทัดใหม่แบบไร้เหตุผล */
+          margin-left: 5px;
+          margin-top: 15px; /* ขยับลงมาให้บาลานซ์กับปุ่มที่มี margin-top */
+        }
+
+        .error-msg {
+          color: #f0544f;
+        }
+
+        .success-msg {
+          color: #2ec4b6; 
+        }
     }
 
     .file-input {
