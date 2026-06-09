@@ -4,7 +4,7 @@ exports.getPosts = async (req, res) => {
   try {
     // 1. เช็คว่ามี user ไหม (ถ้า Route มี verifyToken ค่านี้จะมีค่า)
     const currentUserId = req.user ? req.user.user_id : null;
-    
+
     const page = parseInt(req.query.page) || 0;
     const limit = 5;
     const from = page * limit;
@@ -17,10 +17,16 @@ exports.getPosts = async (req, res) => {
         *,
         imgs(img),
         models(model),
-        users (user_id, username, name, profilePic),
-        communities (communities_id, name, cover_img)
+        users!inner(user_id, username, name, profilePic, isdelete),
+        communities (
+          communities_id, 
+          name, 
+          cover_img,
+          users!inner(isdelete)
+        )
       `)
-      .eq("status", "show");
+      .eq("status", "show")
+      .eq("users.isdelete", "active");
 
     // 3. Logic การกรอง: ถ้า Login แล้ว ให้เช็คกลุ่มที่ "ไม่โดนแบน"
     if (currentUserId) {
@@ -52,15 +58,23 @@ exports.getPosts = async (req, res) => {
     if (error) throw error;
 
     // 6. Format ข้อมูลส่งกลับหน้าบ้าน
-    const formatted = data.map((post) => ({
-      ...post,
-      username: post.users?.username || null,
-      name: post.users?.name || null,
-      profilePic: post.users?.profilePic || null,
-      community_name: post.communities?.name || null,
-      community_cover: post.communities?.cover_img || null,
-    }));
-
+    const formatted = data
+      .filter((post) => {
+        // 2. ถ้าโพสต์นั้นมีกลุ่ม แต่ปรากฎว่าเจ้าของกลุ่มลบบัญชีไปแล้ว (communities กลายเป็น null จาก !inner) 
+        // ให้กรองโพสต์ชุดนั้นทิ้ง ไม่เอาไปแสดงผลบนหน้าฟีด
+        if (post.community_id !== null && !post.communities) {
+          return false;
+        }
+        return true;
+      })
+      .map((post) => ({
+        ...post,
+        username: post.users?.username || null,
+        name: post.users?.name || null,
+        profilePic: post.users?.profilePic || null,
+        community_name: post.communities?.name || null,
+        community_cover: post.communities?.cover_img || null,
+      }));
     return res.status(200).json(formatted);
 
   } catch (error) {
@@ -107,10 +121,10 @@ exports.getPostsByUserId = async (req, res) => {
 
 exports.getPostsByProjectId = async (req, res) => {
   const { id } = req.params;
-  
+
   // 1. เพิ่ม Logic การคำนวณ Page เหมือนใน getPosts
   const page = parseInt(req.query.page) || 0;
-  const limit = 5; 
+  const limit = 5;
   const from = page * limit;
   const to = from + limit - 1;
 
@@ -145,10 +159,10 @@ exports.getPostsByProjectId = async (req, res) => {
 
 exports.getPostsByCommunityId = async (req, res) => {
   const { id } = req.params;
-  
+
   // 1. เพิ่ม Logic การคำนวณ Page เหมือนใน getPosts
   const page = parseInt(req.query.page) || 0;
-  const limit = 5; 
+  const limit = 5;
   const from = page * limit;
   const to = from + limit - 1;
 
@@ -214,7 +228,7 @@ exports.addPost = async (req, res) => {
           user_id: req.user.user_id,
           project_id: project_id || null,
           community_id: commu_id || null,
-          status: "show", 
+          status: "show",
         },
       ])
       .select()
@@ -290,8 +304,8 @@ exports.addComment = async (req, res) => {
     return res.status(400).json({ error: "Empty comment" });
   }
   if (!userId) {
-  return res.status(400).json({ error: "Missing userId" });
-}
+    return res.status(400).json({ error: "Missing userId" });
+  }
 
   try {
     const { data, error } = await db
@@ -368,16 +382,16 @@ exports.getLikes = async (req, res) => {
     .eq("post_id", req.params.post_id);
 
   if (error) return res.status(500).json(error);
-  
+
   // แปลงจาก [{userId: 1}, {userId: 2}] เป็น [1, 2]
   return res.status(200).json(data ? data.map((like) => like.user_id) : []);
 };
 
 // POST: เพิ่ม Like
 exports.addLike = async (req, res) => {
-  const userId = req.user.user_id; 
+  const userId = req.user.user_id;
   // ดึงค่าได้ทั้งสองแบบกันพลาด
-  const postId = req.body.post_id; 
+  const postId = req.body.post_id;
 
   if (!postId) {
     return res.status(400).json("post_id is required");
@@ -385,9 +399,9 @@ exports.addLike = async (req, res) => {
 
   const { error } = await db
     .from("likes")
-    .insert([{ 
-      user_id: userId,        
-      post_id: postId 
+    .insert([{
+      user_id: userId,
+      post_id: postId
     }]);
 
   if (error) {
@@ -422,7 +436,7 @@ exports.getCommentsCount = async (req, res) => {
     .eq("post_id", post_id);
 
   if (error) return res.status(500).json(error);
-  
+
   return res.status(200).json(count || 0);
 };
 
