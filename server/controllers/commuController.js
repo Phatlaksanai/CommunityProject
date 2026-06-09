@@ -17,24 +17,24 @@ exports.addCommunity = async (req, res) => {
   if (!description.trim()) {
     return res.status(400).json({ error: "Description cannot be empty" });
   }
-try {
-  const { data: newCommunity, error: communityError } = await db
-    .from("communities")
-    .insert([
-      {
-        name: CommunityName,
-        description: description || null,
-        cover_img: img || null,
-        user_id: userId,
-        totalUsers: 1,
-      },
-    ])
-    .select()
-    .single();
+  try {
+    const { data: newCommunity, error: communityError } = await db
+      .from("communities")
+      .insert([
+        {
+          name: CommunityName,
+          description: description || null,
+          cover_img: img || null,
+          user_id: userId,
+          totalUsers: 1,
+        },
+      ])
+      .select()
+      .single();
 
-  if (communityError) return res.status(500).json(communityError);
+    if (communityError) return res.status(500).json(communityError);
 
-  // เพิ่มผู้สร้างลงในตาราง community_members ทันที
+    // เพิ่มผู้สร้างลงในตาราง community_members ทันที
     // เพื่อให้ระบบนับว่าผู้สร้างเป็นสมาชิกคนแรกอย่างสมบูรณ์
     const { error: memberError } = await db
       .from("community_members")
@@ -59,7 +59,11 @@ try {
 exports.getCommunityById = async (req, res) => {
   const { id } = req.params;
 
-  const { data, error } = await db.from("communities").select().eq("communities_id", id).single();
+  const { data, error } = await db
+    .from("communities")
+    .select()
+    .eq("communities_id", id)
+    .single();
 
   if (error) return res.status(500).json(error);
 
@@ -69,7 +73,15 @@ exports.getCommunityById = async (req, res) => {
 exports.getCommunitiesByUserId = async (req, res) => {
   const { id } = req.params;
 
-  const { data, error } = await db.from("communities").select().eq("user_id", id).order("created_at", { ascending: false });
+  const { data, error } = await db
+    .from("communities")
+    .select(`
+      *, 
+      users!inner(isdelete)
+    `) // ใส่ !inner เพื่อบอกว่าถ้าเงื่อนไขตาราง users ไม่ผ่าน ไม่ต้องดึง communities แถวนั้นออกมาเลย
+    .eq("user_id", id)
+    .eq("users.isdelete", "active") // กรองเฉพาะคอมมูนิตี้ที่เจ้าของยังไม่ถูกลบ
+    .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
 
@@ -85,10 +97,14 @@ exports.getJoinedCommunities = async (req, res) => {
       .select(`
         community_id,
         status,
-        communities (*)
+        communities (
+          *,
+          users!inner(isdelete) 
+        )
       `)
       .eq("user_id", id)
       .eq("status", "active") // ดึงเฉพาะกลุ่มที่สถานะยัง active (ไม่ได้ถูกแบนหรือออก)
+      .eq("communities.users.isdelete", "active")
       .order("created_at", { ascending: false });
 
     if (error) return res.status(500).json(error);
@@ -126,26 +142,26 @@ exports.updateCommunity = async (req, res) => {
       .select("cover_public_id")
       .eq("communities_id", communityId)
       .maybeSingle();
-      if (error) {
-        return res.status(500).json(error);
-      }
-      // ถ้ามีการอัปโหลดรูปใหม่ และ public_id เปลี่ยน
+    if (error) {
+      return res.status(500).json(error);
+    }
+    // ถ้ามีการอัปโหลดรูปใหม่ และ public_id เปลี่ยน
     if (imgPublicId && oldCommunity?.cover_public_id && oldCommunity.cover_public_id !== imgPublicId) {
-  try {
-    await cloudinary.uploader.destroy(oldCommunity.cover_public_id);
-  } catch (cloudErr) {
-    console.log("CLOUD DELETE ERROR:", cloudErr);
-  }
-}
+      try {
+        await cloudinary.uploader.destroy(oldCommunity.cover_public_id);
+      } catch (cloudErr) {
+        console.log("CLOUD DELETE ERROR:", cloudErr);
+      }
+    }
     const { error: updateError } = await db
       .from("communities")
       .update({
-      name,
-      description,
-      cover_img: img,
-      cover_public_id: imgPublicId
-    })
-    .eq("communities_id", communityId);
+        name,
+        description,
+        cover_img: img,
+        cover_public_id: imgPublicId
+      })
+      .eq("communities_id", communityId);
 
     if (updateError) {
       console.error("UPDATE ERROR:", updateError);
@@ -166,22 +182,22 @@ exports.addFollower = async (req, res) => {
     const { error } = await db
       .from("community_members")
       .insert([
-        { 
-          community_id: commu_id, 
-          user_id: user_id, 
+        {
+          community_id: commu_id,
+          user_id: user_id,
           status: "active" // กำหนด status เริ่มต้น
         }
       ]);
-      // ดึงยอด totalUsers เดิมมา เพื่อเตรียมบวก 1
-      const { data: commuData } = await db
+    // ดึงยอด totalUsers เดิมมา เพื่อเตรียมบวก 1
+    const { data: commuData } = await db
       .from("communities")
       .select('"totalUsers"')
       .eq("communities_id", commu_id)
       .single();
 
-      const currentTotal = commuData?.totalUsers || 0;
+    const currentTotal = commuData?.totalUsers || 0;
 
-      // อัปเดตตาราง communities ให้ totalUsers + 1
+    // อัปเดตตาราง communities ให้ totalUsers + 1
     await db
       .from("communities")
       .update({ totalUsers: currentTotal + 1 })
@@ -236,14 +252,14 @@ exports.getFollwersByCommunityId = async (req, res) => {
       .select("user_id")
       .eq("community_id", id)
       // สมมติว่าใน Enum ของคุณมีค่า 'active'
-      .eq("status", "active"); 
+      .eq("status", "active");
 
     if (error) return res.status(500).json(error);
 
     // แปลงให้เป็น Array ของตัวเลข [1, 4, 15] 
     const followerIds = data.map(item => item.user_id);
     return res.status(200).json(followerIds);
-    
+
   } catch (err) {
     console.error(err);
     return res.status(500).json(err);

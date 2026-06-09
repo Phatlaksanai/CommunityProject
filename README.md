@@ -44,6 +44,7 @@ npm i react-intersection-observer // client
 18.หน้า edit item ✅ || ลบ item???? 
 19.เปลี่ยน Fetch ปกติเป็น Axios ให้หมด ✅
 20.จัดหน้าตาพวก setError , setSuccess ให้เป็นระเบียบ ✅
+21.โพสที่มาจากโปรเจคให้ขึ้นเหมือนคอมมู
 
 Feature
 1.run 3D ขึ้นโชว์ ✅

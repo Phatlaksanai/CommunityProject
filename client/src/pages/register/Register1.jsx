@@ -15,6 +15,7 @@ const Register = () => {
   const [password2, setPassword2] = useState("");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
+  const [isdelete, setIsdelete] = useState("active");
 
   // message
   const [error, setError] = useState("");
@@ -64,11 +65,11 @@ const Register = () => {
       const res = await makeRequest.post("/send-otp-register", { email });
       const data = res.data;
       if (data.success) {
-      setSuccess("Send OTP Successfully");
-      setOtpCooldown(8);
-    } else {
-      setError(data.error || "OTP sending failed");
-    }
+        setSuccess("Send OTP Successfully");
+        setOtpCooldown(8);
+      } else {
+        setError(data.error || "OTP sending failed");
+      }
     } catch (err) {
       setError("Connect to server failed");
     } finally {
@@ -88,18 +89,23 @@ const Register = () => {
         password,
         password2,
         email,
-        otp
+        otp,
+        isdelete
       });
       const data = res.data;
 
       if (data.success) {
-      setSuccess("Register success");
-      navigate("/login");
-    } else {
-      setError(data.error || "Registration failed");
-    }
+        setSuccess("Register success");
+        navigate("/login");
+      } else {
+        setError(data.error || "Registration failed");
+      }
     } catch (err) {
-      setError("Connect to server failed");
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Failed to connect to server");
+      }
     }
   };
 

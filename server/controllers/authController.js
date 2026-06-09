@@ -16,6 +16,7 @@ exports.login = async (req, res) => {
             .from('users')
             .select('*')
             .eq('username', username)
+            .eq('isdelete', "active")
             .single(); // .single() จะคืนค่าเป็น object เดียว ไม่ใช่ array
 
         if (error || !user) {
@@ -67,7 +68,7 @@ exports.logout = (req, res) => {
 
 exports.register = async (req, res) => {
     try {
-        let { username, password, password2, email, otp } = req.body;
+        let { username, password, password2, email, otp, isdelete } = req.body;
 
         if (!email || !username || !password) {
             return res.status(400).json({ error: "Please enter all required fields" });
@@ -131,7 +132,7 @@ exports.register = async (req, res) => {
         let hashedPassword = await bcrypt.hash(password, 8);
         const { error: updateError } = await db
             .from('users')
-            .update({ username: username, password: hashedPassword })
+            .update({ username: username, password: hashedPassword, isdelete: isdelete })
             .eq('user_id', user.user_id);
 
         if (updateError) throw updateError;

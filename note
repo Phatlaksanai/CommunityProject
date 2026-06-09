@@ -60,3 +60,8 @@ create type status_post as enum (
   'show',
   'hide'
 );
+
+create type isdelete as enum (
+  'active',
+  'deleted'
+);
