@@ -231,7 +231,7 @@ const ProfileDetail = () => {
                 <>
                   {renderFriendButton()}
                   <div className="actions">
-                    <button className="followBtn" style={{ cursor: "pointer" }}>Message</button>
+                    <button className="followBtn" onClick={() => handleConversation(userData)} style={{ cursor: "pointer" }}>Message</button>
                   </div>
                 </>
               )}
