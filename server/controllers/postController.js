@@ -106,37 +106,79 @@ exports.getPosts = async (req, res) => {
 exports.getPostsByUserId = async (req, res) => {
   const { id } = req.params;
 
-  const { data, error } = await db
-    .from("posts")
-    .select(
-      `
-      *,
-      imgs(img),
-      models(model),
-      users (
-        username,
-        name,
-        profilePic
-      ),
-      communities (communities_id, name, cover_img)
-    `,
-    )
-    .eq("user_id", id)
-    .eq("status", "show")
-    .order("created_at", { ascending: false });
+  try {
+    const page = parseInt(req.query.page) || 0;
+    const limit = 5; // หน้าบ้านต้องการแสดงผลรอบละ 5 โพสต์
 
-  if (error) return res.status(500).json(error);
+    let finalPosts = [];
+    let currentOffset = page * limit;
+    let fetchSize = 10; // ดึงมาตรวจสอบทีละ 10 โพสต์เพื่อความรวดเร็ว
 
-  const formatted = data.map((post) => ({
-    ...post,
-    username: post.users?.username || null,
-    name: post.users?.name || null,
-    profilePic: post.users?.profilePic || null,
-    community_name: post.communities?.name || null,
-    community_cover: post.communities?.cover_img || null,
-  }));
+    // ลูปตรวจสอบข้อมูลจนกว่าจะได้โพสต์ที่ปลอดภัยครบ 5 รายการ หรือจนกว่าข้อมูลใน DB จะหมด
+    while (finalPosts.length < limit) {
+      const { data: dbData, error } = await db
+        .from("posts")
+        .select(`
+          *,
+          imgs(img),
+          models(model),
+          users!inner(user_id, username, name, profilePic, isdelete),
+          communities(
+            communities_id, 
+            name, 
+            cover_img,
+            users(isdelete)
+          )
+        `)
+        .eq("user_id", id)
+        .eq("status", "show")
+        .eq("users.isdelete", "active")
+        .order("created_at", { ascending: false })
+        .range(currentOffset, currentOffset + fetchSize - 1);
 
-  return res.status(200).json(formatted || []);
+      if (error) return res.status(500).json(error);
+
+      // ถ้าไม่มีข้อมูลใน Database เหลือให้ดึงแล้ว ให้หยุดลูปทันที
+      if (!dbData || dbData.length === 0) {
+        break;
+      }
+
+      // กรองเอาเฉพาะโพสต์ที่ไม่อยู่ในกลุ่มที่เจ้าของกลุ่มลบบัญชีไปแล้ว
+      const approvedPosts = dbData.filter((post) => {
+        if (post.community_id !== null) {
+          if (!post.communities || !post.communities.users || post.communities.users.isdelete === 'deleted') {
+            return false; // เจ้าของกลุ่มโดนลบ -> คัดออก
+          }
+        }
+        return true;
+      });
+
+      // เติมโพสต์ที่ผ่านการกรองลงในอาเรย์หลัก
+      finalPosts = [...finalPosts, ...approvedPosts];
+
+      // ขยับพิกัดตัวชี้ Offset ไปข้างหน้าเพื่อเตรียมดึงรอบถัดไป (กรณีที่ข้อมูลยังได้ไม่ครบ 5)
+      currentOffset += fetchSize;
+    }
+
+    // ตัดเอาข้อมูลให้เหลือพอดี 5 รายการตามต้องการ
+    const resultPosts = finalPosts.slice(0, limit);
+
+    // Format ข้อมูลส่งกลับหน้าบ้าน
+    const formatted = resultPosts.map((post) => ({
+      ...post,
+      username: post.users?.username || null,
+      name: post.users?.name || null,
+      profilePic: post.users?.profilePic || null,
+      community_name: post.communities?.name || null,
+      community_cover: post.communities?.cover_img || null,
+    }));
+
+    return res.status(200).json(formatted);
+
+  } catch (error) {
+    console.error("Error in getPostsByUserId:", error);
+    return res.status(500).json({ error: error.message });
+  }
 };
 
 exports.getPostsByProjectId = async (req, res) => {
