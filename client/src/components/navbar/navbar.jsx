@@ -14,11 +14,39 @@ import { DarkModeContext } from "../../context/darkModeContext";
 import { AuthContext } from "../../context/authContext";
 import { makeRequest } from "../../api/axios";
 
+// 🚀 [เพิ่มการ Import สำหรับ Algolia v5 และ InstantSearch]
+import { algoliasearch } from 'algoliasearch';
+import { InstantSearch, SearchBox, Hits } from 'react-instantsearch';
+import { searchClient } from "../../api/algoliaClient";
+
+// ============================================================
+// 1. วางตัวแสดงผลการ์ดค้นหาแต่ละแถวไว้ตรงนี้ (ก่อนตัว Navbar)
+// ============================================================
+const SearchHit = ({ hit }) => {
+  let targetLink = "/";
+  // แมปปิ้งหน้าดีไซน์ปลายทางตามความเหมาะสมในโปรเจกต์ของคุณ
+  if (hit.type === 'community') targetLink = `/descCommu/${hit.targetId}`;
+  if (hit.type === 'item') targetLink = `/descItem/${hit.targetId}`;
+
+  return (
+    <Link to={targetLink} className="search-hit-item">
+      <div className="hit-content">
+        <span className={`badge ${hit.type}`}>{hit.type.toUpperCase()}</span>
+        <h4 className="hit-title">{hit.title}</h4>
+        <p className="hit-desc">{hit.description?.substring(0, 50)}...</p>
+      </div>
+    </Link>
+  );
+};
+
 const Navbar = () => {
   const { toggle, darkMode } = useContext(DarkModeContext);
   const { currentUser, setUser } = useContext(AuthContext);
 
   const [error, setError] = useState("");
+
+  // 2. วาง State คุม เปิด/ปิด ดรอปดาวน์ผลลัพธ์ ไว้ตรงนี้ครับ
+  const [isSearching, setIsSearching] = useState(false);
 
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
@@ -76,10 +104,33 @@ const Navbar = () => {
         )}
         <AddShoppingCartIcon onClick={() => navigate("/market")} style={{ cursor: "pointer" }} />
         <DownloadIcon onClick={() => navigate("/download")} style={{ cursor: "pointer" }} />
-        <div className="search">
+        {/* <div className="search">
           <SearchOutlinedIcon />
           <input type="text" placeholder="Search..." />
+        </div> */}
+        {/* ============================================================ */}
+        {/* 3. แทนที่ชุดค้นหาเดิม ด้วยก้อนโครงข่ายของ Algolia ตรงจุดนี้ครับ */}
+        {/* ============================================================ */}
+        <div className="search-container-algolia">
+          <InstantSearch searchClient={searchClient} indexName="WebCommunity_Search">
+            <div className="search-box-wrapper">
+              <SearchOutlinedIcon className="search-icon-inside" />
+              <SearchBox 
+                placeholder="Search everything..." 
+                onFocus={() => setIsSearching(true)}
+                onBlur={() => setTimeout(() => setIsSearching(false), 300)} // หน่วงเวลาเล็กน้อยให้ Event คลิกไปหน้าอื่นทำงานเสร็จก่อนกล่องยุบ
+              />
+            </div>
+            
+            {/* ดรอปดาวน์รายการผลลัพธ์ที่จะเด้งสไลด์ลงมาเมื่อมีการ Focus ที่กล่องข้อความ */}
+            {isSearching && (
+              <div className="search-dropdown-results">
+                <Hits hitComponent={SearchHit} />
+              </div>
+            )}
+          </InstantSearch>
         </div>
+        {/* ============================================================ */}
       </div>
       <div className="right">
         {/* {!user && (

@@ -101,7 +101,7 @@ const AddItem = () => {
       });
 
       setSuccess("add item success");
-      navigate("/download");
+      navigate("/market");
     } catch (err) {
       console.error(err);
       setError("Failed to connect to server");

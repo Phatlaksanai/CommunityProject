@@ -12,13 +12,16 @@ npm install cors //server
 npm install dayjs //server + client
 npm install @mui/icons-material @mui/material @emotion/styled @emotion/react // client 
 
-npm install -D sass // client 🆕🆕
+npm install -D sass // client 
 npm install @tanstack/react-query // client 
-npm install cloudinary multer // server =============new
-npm install three // client ================new
+npm install cloudinary multer // server 
+npm install three // client 
 npm install @supabase/supabase-js // server
 npm install swiper // client
 npm i react-intersection-observer // client
+
+npm install algoliasearch // server 🆕🆕🆕🆕
+npm install algoliasearch react-instantsearch // client 🆕🆕🆕🆕
 
     เพิ่มลบ project ได้ และก็ลบรูปออกจาก cloud ด้วย
 
@@ -57,36 +60,6 @@ Feature
 ทดสอบระบบ
 
 https://mui.com/material-ui/material-icons/
-
-server
-│
-├── config
-│   ├── db.js
-│   └── cloudinary.js
-│
-├── middleware
-│   └── verifyToken.js
-│
-├── controllers
-│   ├── authController.js
-│   ├── postController.js
-│   ├── projectController.js
-│   ├── itemController.js
-│   └── uploadController.js
-│
-├── routes
-│   ├── authRoutes.js
-│   ├── postRoutes.js
-│   ├── projectRoutes.js
-│   ├── itemRoutes.js
-│   └── uploadRoutes.js
-│
-├── services
-│   └── mailService.js
-│
-├── server.js
-
-
 
 ```
 CommunityProject
@@ -276,6 +249,7 @@ CommunityProject
 │  │  │  └─ setting
 │  │  │     ├─ Setting.jsx
 │  │  │     └─ setting.scss
+│  │  ├─ ScrollToTop.jsx
 │  │  ├─ style.scss
 │  │  └─ supabaseClient.js
 │  └─ vite.config.js

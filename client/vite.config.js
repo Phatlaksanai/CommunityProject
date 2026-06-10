@@ -11,5 +11,7 @@ export default defineConfig({
         changeOrigin: true
       }
     }
-  }
+  },
+  // 🔥 ใส่เพิ่มตรงนี้ครับ! เพื่อสั่งให้ Vite ถอยออกไปอ่านไฟล์ .env ที่อยู่โฟลเดอร์นอกสุด
+  envDir: '../'
 })

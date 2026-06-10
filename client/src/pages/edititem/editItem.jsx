@@ -116,7 +116,7 @@ const EditItem = () => {
             }
 
             // 3. ส่งไปที่ API
-            await makeRequest.put("/update-item", {
+            await makeRequest.put("/items/update-item", {
                 itemId: items?.item_id,
                 modelName,
                 description,

@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const cloudinary = require("../config/cloudinary");
+const algoliaClient = require("../config/algolia");
 
 exports.addCommunity = async (req, res) => {
   const { CommunityName, description, img, public_id } = req.body;
@@ -35,6 +36,22 @@ exports.addCommunity = async (req, res) => {
 
     if (communityError) return res.status(500).json(communityError);
 
+    // 🚀 2. [เพิ่มคำสั่ง Algolia v5] ส่งข้อมูลคอมมูนิตี้ใหม่ขึ้นคลังค้นหาทันที
+    try {
+      await algoliaClient.saveObject({
+        indexName: 'WebCommunity_Search', // ชื่อดัชนีตรงกลางของคุณ
+        body: {
+          objectID: `commu_${newCommunity.communities_id}`, // ใช้รูปแบบ commu_รหัส เพื่อแยกหมวดหมู่
+          title: newCommunity.name,
+          description: newCommunity.description,
+          type: 'community',
+          targetId: newCommunity.communities_id
+        }
+      });
+    } catch (algoliaErr) {
+      // ดักจับ error แยกส่วน เผื่อกรณีคีย์มีปัญหา ระบบลงทะเบียนหลักในฐานข้อมูลจะได้ไม่ล่มตามครับ
+      console.error("Algolia Insert Warning:", algoliaErr);
+    }
     // เพิ่มผู้สร้างลงในตาราง community_members ทันที
     // เพื่อให้ระบบนับว่าผู้สร้างเป็นสมาชิกคนแรกอย่างสมบูรณ์
     const { error: memberError } = await db
@@ -167,6 +184,22 @@ exports.updateCommunity = async (req, res) => {
     if (updateError) {
       console.error("UPDATE ERROR:", updateError);
       return res.status(500).json(updateError);
+    }
+
+    // 🚀 3. [เพิ่มคำสั่ง Algolia v5] สั่งบันทึกทับ (Update) ข้อมูลใหม่ลงคลังค้นหาด้วย objectID เดิม
+    try {
+      await algoliaClient.saveObject({
+        indexName: 'WebCommunity_Search',
+        body: {
+          objectID: `commu_${communityId}`, // อ้างอิง ID แถวเดิมให้ตรงกัน ระบบจะสลับข้อมูลไส้ในให้เองอัตโนมัติ
+          title: name,
+          description: description,
+          type: 'community',
+          targetId: communityId
+        }
+      });
+    } catch (algoliaErr) {
+      console.error("Algolia Update Warning:", algoliaErr);
     }
 
     return res.status(200).json({ success: true });

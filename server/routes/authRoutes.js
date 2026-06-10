@@ -9,7 +9,6 @@ router.post("/send-otp-register", authController.sendOtpRegister);
 router.post("/send-otp-resetpassword", authController.sendOtpResetPassword);
 router.post("/logout", authController.logout);
 router.put("/update-profile", verifyToken, authController.updateProfile);
-router.put("/update-item", verifyToken, authController.updateItem);
 router.post("/reset-password", authController.resetPassword);
 router.post("/verify-otp-resetpassword", authController.verifyOtpResetPassword);
 router.post("/deleteaccount", authController.deleteAccount);

@@ -21,7 +21,6 @@
       gap: 30px;
 
       .Logo::first-letter {
-        //Bug ++++++++++++++++++++++++padding
         font-size: 2em;
         font-style: italic;
       }
@@ -35,28 +34,179 @@
         display: block;
       }
 
-      //Bug ++++++++++++++++++++++++padding
+      .search-container-algolia {
+        position: relative;
+        width: 500px;
 
-      .search {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        border: 1px solid themed("border");
-        border-radius: 5px;
-        padding: 5px;
+        @include tablet {
+          width: 200px;
+        }
 
-        input {
-          border: none;
-          width: 500px;
-          background-color: transparent;
-          color: themed("textColor");
+        @include mobile {
+          display: none;
+        }
 
-          @include mobile {
-            display: none;
+        .search-box-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          border: 1px solid themed("border");
+          border-radius: 5px;
+          padding: 5px 10px;
+
+          .search-icon-inside {
+            color: gray;
+            font-size: 20px;
           }
 
-          @include tablet {
-            width: 200px;
+          // 🚀 1. บังคับให้กล่องครอบตัวหลักของ Algolia ขยายพื้นที่ 100% ตามกรอบ 500px
+          .ais-SearchBox {
+            flex: 1;
+            width: 100%;
+          }
+
+          .ais-SearchBox-form {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            background: transparent;
+            position: relative;
+
+            .ais-SearchBox-input {
+              border: none;
+              outline: none;
+              background-color: transparent;
+              width: calc(100% - 25px);
+              color: themed("textColor");
+              font-family: inherit;
+              font-size: 14px;
+              padding-right: 5px;
+
+              // 🚀 2. เจาะยางกากบาทสีฟ้า (Native Search Cancel Button ของเบราว์เซอร์)
+              &::-webkit-search-cancel-button,
+              &::-webkit-search-decoration,
+              &::-webkit-search-results-button,
+              &::-webkit-search-results-decoration {
+                -webkit-appearance: none;
+                appearance: none;
+              }
+            }
+
+            .ais-SearchBox-submit {
+              display: none;
+            }
+
+            .ais-SearchBox-reset {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: transparent;
+              border: none;
+              cursor: pointer;
+              padding: 0;
+              position: absolute;
+              right: 0;
+
+              svg {
+                width: 14px;
+                height: 14px;
+                fill: gray;
+                transition: fill 0.2s;
+
+                &:hover {
+                  fill: themed("textColor");
+                }
+              }
+            }
+          }
+        }
+
+        // 🎨 ดรอปดาวน์แสดงรายการผลลัพธ์
+        .search-dropdown-results {
+          position: absolute;
+          top: 115%;
+          left: 0;
+          right: 0;
+          background-color: themed("bg");
+          border: 1px solid themed("border");
+          border-radius: 8px;
+          max-height: 280px;
+          overflow-y: auto;
+          z-index: 1000;
+          box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
+
+          &::-webkit-scrollbar {
+            width: 6px;
+          }
+          &::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          &::-webkit-scrollbar-thumb {
+            background-color: rgba(128, 128, 128, 0.3);
+            border-radius: 4px;
+            &:hover {
+              background-color: rgba(128, 128, 128, 0.5);
+            }
+          }
+
+          .ais-Hits {
+            background: transparent;
+            border: none;
+          }
+
+          .ais-Hits-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+          }
+
+          .search-hit-item {
+            display: block;
+            padding: 12px;
+            text-decoration: none;
+            color: themed("textColor");
+            border-bottom: 1px solid themed("border");
+            transition: background 0.2s ease;
+
+            &:hover {
+              background-color: rgba(128, 128, 128, 0.12);
+            }
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            .hit-content {
+              display: flex;
+              flex-direction: column;
+              gap: 3px;
+
+              .badge {
+                align-self: flex-start;
+                font-size: 9px;
+                font-weight: bold;
+                padding: 2px 6px;
+                border-radius: 4px;
+                color: white;
+
+                &.community { background-color: #3f51b5; }
+                &.item { background-color: #ff9800; }
+              }
+
+              .hit-title {
+                margin: 2px 0 0 0;
+                font-size: 13px;
+                font-weight: 600;
+              }
+
+              .hit-desc {
+                margin: 0;
+                font-size: 11px;
+                color: gray;
+              }
+            }
           }
         }
       }
