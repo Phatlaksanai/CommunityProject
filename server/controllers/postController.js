@@ -2,79 +2,99 @@ const db = require("../config/db");
 
 exports.getPosts = async (req, res) => {
   try {
-    // 1. เช็คว่ามี user ไหม (ถ้า Route มี verifyToken ค่านี้จะมีค่า)
     const currentUserId = req.user ? req.user.user_id : null;
 
-    const page = parseInt(req.query.page) || 0;
+    // หน้าบ้านขอมาทีละ 5 โพสต์
     const limit = 5;
-    const from = page * limit;
-    const to = from + limit - 1;
+    const page = parseInt(req.query.page) || 0;
 
-    // 2. เตรียม Query หลัก
-    let query = db
-      .from("posts")
-      .select(`
-        *,
-        imgs(img),
-        models(model),
-        users!inner(user_id, username, name, profilePic, isdelete),
-        communities (
-          communities_id, 
-          name, 
-          cover_img,
-          users!inner(isdelete)
-        )
-      `)
-      .eq("status", "show")
-      .eq("users.isdelete", "active");
-
-    // 3. Logic การกรอง: ถ้า Login แล้ว ให้เช็คกลุ่มที่ "ไม่โดนแบน"
+    // ดึงรายชื่อกลุ่มที่ผู้ใช้งานคนนี้ "ไม่โดนแบน" เตรียมไว้ก่อน
+    let myGroupIds = [];
     if (currentUserId) {
       const { data: memberData } = await db
         .from("community_members")
         .select("community_id")
         .eq("user_id", currentUserId)
-        .eq("status", "active"); // ดึงเฉพาะกลุ่มที่เป็น active (ไม่เอา banned)
-
-      const myGroupIds = memberData?.map(item => item.community_id) || [];
-
-      if (myGroupIds.length > 0) {
-        // เห็นโพสต์ที่ไม่มีกลุ่ม (null) OR โพสต์ในกลุ่มที่เราเป็นสมาชิก (in)
-        query = query.or(`community_id.is.null,community_id.in.(${myGroupIds.join(",")})`);
-      } else {
-        // ถ้าไม่เข้ากลุ่มไหนเลย เห็นแค่โพสต์ทั่วไป
-        query = query.is("community_id", null);
-      }
-    } else {
-      // 4. ถ้าไม่ได้ Login เห็นเฉพาะโพสต์ทั่วไปที่ไม่สังกัดกลุ่ม
-      query = query.is("community_id", null);
+        .eq("status", "active");
+      myGroupIds = memberData?.map(item => item.community_id) || [];
     }
 
-    // 5. รัน Query จริง (ใช้ตัวแปร query ที่เราใส่เงื่อนไขไว้แล้ว)
-    const { data, error } = await query
-      .order("created_at", { ascending: false })
-      .range(from, to);
+    let finalPosts = [];
+    let currentOffset = page * limit;
+    let fetchSize = 10; // ดึงมาตรวจสอบทีละ 10 โพสต์เพื่อความเร็ว
 
-    if (error) throw error;
+    // ลูปนี้จะทำงานไปเรื่อย ๆ จนกว่าจะได้โพสต์ที่กรองผ่านครบ 5 โพสต์ หรือจนกว่าจะไม่มีข้อมูลให้ดึงแล้ว
+    while (finalPosts.length < limit) {
+      let query = db
+        .from("posts")
+        .select(`
+          *,
+          imgs(img),
+          models(model),
+          users!inner(user_id, username, name, profilePic, isdelete),
+          communities(
+            communities_id, 
+            name, 
+            cover_img,
+            users(isdelete)
+          )
+        `)
+        .eq("status", "show")
+        .eq("users.isdelete", "active");
 
-    // 6. Format ข้อมูลส่งกลับหน้าบ้าน
-    const formatted = data
-      .filter((post) => {
-        // 2. ถ้าโพสต์นั้นมีกลุ่ม แต่ปรากฎว่าเจ้าของกลุ่มลบบัญชีไปแล้ว (communities กลายเป็น null จาก !inner) 
-        // ให้กรองโพสต์ชุดนั้นทิ้ง ไม่เอาไปแสดงผลบนหน้าฟีด
-        if (post.community_id !== null && !post.communities) {
-          return false;
+      // Logic การกรองเกี่ยวกับกลุ่ม
+      if (currentUserId) {
+        if (myGroupIds.length > 0) {
+          query = query.or(`community_id.is.null,community_id.in.(${myGroupIds.join(",")})`);
+        } else {
+          query = query.is("community_id", null);
+        }
+      } else {
+        query = query.is("community_id", null);
+      }
+
+      // ดึงข้อมูลตามขอบเขต Offset ปัจจุบัน
+      const { data: dbData, error } = await query
+        .order("created_at", { ascending: false })
+        .range(currentOffset, currentOffset + fetchSize - 1);
+
+      if (error) throw error;
+
+      // ถ้าไม่มีข้อมูลใน Database เหลือให้ดึงแล้ว ให้หยุดลูปทันที
+      if (!dbData || dbData.length === 0) {
+        break;
+      }
+
+      // กรองข้อมูลที่ดึงมารอบนี้
+      const approvedPosts = dbData.filter((post) => {
+        if (post.community_id !== null) {
+          if (!post.communities || !post.communities.users || post.communities.users.isdelete === 'deleted') {
+            return false; // เจ้าของกลุ่มโดนลบ -> คัดออก
+          }
         }
         return true;
-      })
-      .map((post) => ({
-        ...post,
-        username: post.users?.username || null,
-        name: post.users?.name || null,
-        profilePic: post.users?.profilePic || null,
-        community_name: post.communities?.name || null,
-        community_cover: post.communities?.cover_img || null,
-      }));
+      });
+
+      // เติมโพสต์ที่ผ่านการกรองลงในอาเรย์หลัก
+      finalPosts = [...finalPosts, ...approvedPosts];
+
+      // ขยับพิกัดตัวชี้ Offset ไปข้างหน้าเพื่อเตรียมดึงรอบถัดไป (กรณีที่ข้อมูลยังได้ไม่ครบ 5)
+      currentOffset += fetchSize;
+    }
+
+    // ตัดเอาข้อมูลให้เหลือพอดี 5 รายการตามต้องการ
+    const resultPosts = finalPosts.slice(0, limit);
+
+    // Format โครงสร้าง Object ก่อนส่งกลับหน้าบ้าน
+    const formatted = resultPosts.map((post) => ({
+      ...post,
+      username: post.users?.username || null,
+      name: post.users?.name || null,
+      profilePic: post.users?.profilePic || null,
+      community_name: post.communities?.name || null,
+      community_cover: post.communities?.cover_img || null,
+    }));
+
     return res.status(200).json(formatted);
 
   } catch (error) {
