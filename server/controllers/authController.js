@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const cloudinary = require("../config/cloudinary");
+const algoliaClient = require('../config/algolia');
 
 exports.login = async (req, res) => {
     try {
@@ -368,67 +369,6 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-exports.updateItem = async (req, res) => {
-    const { itemId, modelName, description, price, category, img, model, imgPublicId, modelPublicId } = req.body;
-
-    try {
-        const { data: items, error } = await db
-            .from("items")
-            .select("img_public_id, model_public_id")
-            .eq("item_id", itemId)
-            .maybeSingle();
-        if (error) {
-            return res.status(500).json(error);
-        }
-
-        // 2. สร้าง Object สำหรับ Update (เช็คเฉพาะที่มีค่าจริงๆ)
-        const updateData = {};
-
-        // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
-        if (modelName && modelName.trim() !== "") updateData.modelName = modelName;
-        if (description && description.trim() !== "") updateData.description = description;
-        if (price && !isNaN(price)) updateData.price = parseFloat(price);
-        if (category && category.trim() !== "") updateData.category = category;
-
-        // ส่วนของรูปภาพ (ใช้ logic เดิมของคุณ)
-        if (img) updateData.img = img;
-        if (model) updateData.model = model;
-        if (imgPublicId) updateData.img_public_id = imgPublicId;
-        if (modelPublicId) updateData.model_public_id = modelPublicId;
-
-        // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
-        if (Object.keys(updateData).length === 0) {
-            return res.status(200).json({ success: true, message: "Nothing to update" });
-        }
-
-        // 3. Update ลง DB
-        const { error: updateError } = await db
-            .from("items")
-            .update(updateData) // ส่งเฉพาะ field ที่มีค่าไป
-            .eq("item_id", itemId);
-
-        if (updateError) return res.status(500).json(updateError);
-
-        // เก็บ id เก่าไว้ก่อน
-        const oldImgId = items?.img_public_id;
-        const oldModelId = items?.model_public_id;
-
-        // แล้วค่อยลบ
-        if (imgPublicId && oldImgId && oldImgId !== imgPublicId) {
-            await cloudinary.uploader.destroy(oldImgId);
-        }
-
-        if (modelPublicId && oldModelId && oldModelId !== modelPublicId) {
-            await cloudinary.uploader.destroy(oldModelId);
-        }
-
-
-        return res.status(200).json({ success: true });
-    } catch (err) {
-        return res.status(500).json(err);
-    }
-};
-
 exports.resetPassword = async (req, res) => {
     const { email, password, confirmpassword } = req.body;
     if (password !== confirmpassword) {
@@ -513,6 +453,19 @@ exports.deleteAccount = async (req, res) => {
             
         if (updateError) throw updateError;
 
+        // ============================================================
+        // 🔥 [เพิ่มคำสั่ง Algolia v5] สั่งลบชื่อผู้ใช้นี้ออกจากคลังค้นหาทันที
+        // ============================================================
+        try {
+            await algoliaClient.deleteObject({
+                indexName: 'WebCommunity_Search', // ชื่อคลังที่คุณตั้งไว้บนเว็บ Algolia
+                objectID: `user_${user.user_id}` // ID อ้างอิงเดียวกับตอนที่คุณใช้เซฟข้อมูลขึ้นไป
+            });
+        } catch (algoliaErr) {
+            // แยก try/catch ไว้ป้องกันกรณีที่ผู้ใช้คนนี้ยังไม่เคยถูกบันทึกในคลัง Algolia
+            console.error("Algolia Delete Warning:", algoliaErr);
+        }
+        
         // (เลือกทำ) ลบแถว OTP นี้ทิ้งไปเลยเพื่อไม่ให้เอามาใช้ซ้ำได้อีก
         await db.from('otps').delete().eq('user_id', user.user_id);
 
