@@ -59,6 +59,7 @@ const AddCommu = () => {
         CommunityName,
         description,
         img: imgURL.url,
+        public_id: imgURL.public_id,
       });
 
       setSuccess("add community success");

@@ -2,7 +2,7 @@ const db = require("../config/db");
 const cloudinary = require("../config/cloudinary");
 
 exports.addCommunity = async (req, res) => {
-  const { CommunityName, description, img } = req.body;
+  const { CommunityName, description, img, public_id } = req.body;
   const userId = req.user.user_id;
 
   if (!CommunityName?.trim()) {
@@ -25,6 +25,7 @@ exports.addCommunity = async (req, res) => {
           name: CommunityName,
           description: description || null,
           cover_img: img || null,
+          cover_public_id: public_id || null,
           user_id: userId,
           totalUsers: 1,
         },
