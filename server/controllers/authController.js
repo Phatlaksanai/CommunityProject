@@ -452,6 +452,25 @@ exports.deleteAccount = async (req, res) => {
             .eq('user_id', user.user_id);
             
         if (updateError) throw updateError;
+        
+        const { error: friendshipDeleteError } = await db
+            .from("friendships")
+            .delete()
+            .eq("status", "pending")
+            .or(`requester_id.eq.${user.user_id},receiver_id.eq.${user.user_id}`);
+
+        if (friendshipDeleteError) {
+            console.error("Clear Friendships Error:", friendshipDeleteError);
+        }
+
+        const { error: DeleteMemberError } = await db
+            .from("community_members")
+            .update({ status: 'banned' })
+            .eq('user_id', user.user_id);
+
+        if (DeleteMemberError) {
+            console.error("Delete Member Error:", DeleteMemberError);
+        }
 
         // ============================================================
         // 🔥 [เพิ่มคำสั่ง Algolia v5] สั่งลบชื่อผู้ใช้นี้ออกจากคลังค้นหาทันที

@@ -40,7 +40,7 @@ const Chat = () => {
                 setMessages(res.data);
 
                 await makeRequest.put(`/chats/${currentChat.conversation_id}/read`, {
-                    userId: id 
+                    userId: id
                 });
                 queryClient.invalidateQueries({ queryKey: ["chats", id] });
             } catch (err) {
@@ -158,7 +158,7 @@ const Chat = () => {
     };
 
     return (
-        
+
         <div className="chat">
             <div className="Lchat">
                 <div className="search">
@@ -246,32 +246,41 @@ const Chat = () => {
                 )}
                 {error && <span style={{ color: "red", padding: "0 20px", fontSize: "12px" }}>{error}</span>}
 
-                {/* ส่วนช่อง Input พิมพ์ข้อความ */}
-                <div className="chatInput">
-                    <input
-                        type="file"
-                        id="chatImageInput"
-                        accept=".png,.jpg,.jpeg,.gif"
-                        multiple
-                        onChange={handleFileChange}
-                        style={{ display: "none" }}
-                    />
-                    <label htmlFor="chatImageInput">
-                        <ImageIcon style={{ cursor: "pointer" }} />
-                    </label>
-                    <div className="search">
-                        <textarea
-                            type="text"
-                            placeholder="Text..."
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            rows={1}
-                            className="chatTextArea"
-                        />
-                    </div>
-                    <ThumbUpAltIcon onClick={handleLikeSubmit} style={{ cursor: "pointer" }} />
-                </div>
+                {/* ค้นหา tag โครงสร้าง <div className="chatInput"> เดิมของคุณ แล้วแก้สลับโครงสร้างแบบนี้ */}
+                {currentChat ? (
+                    // ตรวจสอบว่าคู่สนทนาที่เลือกพิมพ์ลบบัญชีไปแล้วหรือไม่ (อิงค่า isdelete ที่ส่งมาจากตารางร่วม)
+                    currentChat.isdelete === "deleted" ? (
+                        <div className="chatInputDisabled">
+                            This account has been deleted. You can no longer send messages to this conversation.
+                        </div>
+                    ) : (
+                        <div className="chatInput">
+                            <input
+                                type="file"
+                                id="chatImageInput"
+                                accept=".png,.jpg,.jpeg,.gif"
+                                multiple
+                                onChange={handleFileChange}
+                                style={{ display: "none" }}
+                            />
+                            <label htmlFor="chatImageInput">
+                                <ImageIcon style={{ cursor: "pointer" }} />
+                            </label>
+                            <div className="search">
+                                <textarea
+                                    type="text"
+                                    placeholder="Text..."
+                                    value={newMessage}
+                                    onChange={(e) => setNewMessage(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    rows={1}
+                                    className="chatTextArea"
+                                />
+                            </div>
+                            <ThumbUpAltIcon onClick={handleLikeSubmit} style={{ cursor: "pointer" }} />
+                        </div>
+                    )
+                ) : null}
             </div>
         </div>
 

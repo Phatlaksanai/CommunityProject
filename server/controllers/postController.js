@@ -222,37 +222,61 @@ exports.getPostsByProjectId = async (req, res) => {
 exports.getPostsByCommunityId = async (req, res) => {
   const { id } = req.params;
 
-  // 1. เพิ่ม Logic การคำนวณ Page เหมือนใน getPosts
-  const page = parseInt(req.query.page) || 0;
-  const limit = 5;
-  const from = page * limit;
-  const to = from + limit - 1;
+  try {
+    const page = parseInt(req.query.page) || 0;
+    const limit = 5; // ดึงรอบละ 5 โพสต์ส่งให้หน้าบ้าน
 
-  const { data, error } = await db
-    .from("posts")
-    .select(`
-      *,
-      imgs(img),
-      models(model),
-      users (
-        username,
-        profilePic
-      )
-    `)
-    .eq("community_id", id) // ตรวจสอบชื่อ Column ใน DB ให้แม่นยำ (บางที่ใช้ community_id)
-    .eq("status", "show")     // ควรเช็ค status ด้วยเพื่อให้เหมือนหน้า Feed หลัก
-    .order("created_at", { ascending: false })
-    .range(from, to); // 2. เพิ่ม .range() เพื่อดึงข้อมูลตามหน้า
+    let finalPosts = [];
+    let currentOffset = page * limit;
+    let fetchSize = 10; // ดึงมาสแกนทีละ 10 โพสต์
 
-  if (error) return res.status(500).json(error);
+    // ลูปตรวจสอบข้อมูลจนกว่าจะได้โพสต์ที่ปลอดภัยครบ 5 รายการ หรือข้อมูลในระบบหมด
+    while (finalPosts.length < limit) {
+      const { data: dbData, error } = await db
+        .from("posts")
+        .select(`
+          *,
+          imgs(img),
+          models(model),
+          users!inner(user_id, username, name, profilePic, isdelete)
+        `)
+        .eq("community_id", id) // ดึงเฉพาะโพสต์ของกลุ่มนี้เท่านั้น ไม่เอาของกลุ่มอื่นมาปน
+        .eq("status", "show")
+        .eq("users.isdelete", "active") // กรองเอาเฉพาะโพสต์ที่คนโพสต์ยังไม่ลบบัญชี
+        .order("created_at", { ascending: false })
+        .range(currentOffset, currentOffset + fetchSize - 1);
 
-  const formatted = data.map((post) => ({
-    ...post,
-    username: post.users?.username || null,
-    profilePic: post.users?.profilePic || null,
-  }));
+      if (error) return res.status(500).json(error);
 
-  return res.status(200).json(formatted || []);
+      // ถ้าไม่มีข้อมูลใน Database เหลือให้ดึงแล้ว ให้หยุดลูปทันที
+      if (!dbData || dbData.length === 0) {
+        break;
+      }
+
+      // ในกลุ่มนี้ โพสต์ที่ดึงมาผ่านเงื่อนไข active ทั้งหมดแล้ว สามารถเติมลงอาเรย์หลักได้เลย
+      finalPosts = [...finalPosts, ...dbData];
+
+      // ขยับพิกัดตัวชี้ Offset ไปข้างหน้าเพื่อเตรียมดึงรอบถัดไป
+      currentOffset += fetchSize;
+    }
+
+    // ตัดเอาข้อมูลให้เหลือพอดี 5 รายการตามความต้องการของหน้าบ้าน
+    const resultPosts = finalPosts.slice(0, limit);
+
+    // Format ข้อมูลให้โครงสร้างตรงกับหน้าบ้านเหมือนเดิม
+    const formatted = resultPosts.map((post) => ({
+      ...post,
+      username: post.users?.username || null,
+      name: post.users?.name || null,
+      profilePic: post.users?.profilePic || null,
+    }));
+
+    return res.status(200).json(formatted);
+
+  } catch (error) {
+    console.error("Error in getPostsByCommunityId:", error);
+    return res.status(500).json({ error: error.message });
+  }
 };
 
 exports.getPostsByUserIdAvailable = async (req, res) => {

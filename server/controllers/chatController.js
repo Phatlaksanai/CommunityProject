@@ -20,8 +20,8 @@ exports.getConversations = async (req, res) => {
           friendship_id,
           requester_id,
           receiver_id,
-          requester:users!requester_id ( user_id, username, name, profilePic ),
-          receiver:users!receiver_id ( user_id, username, name, profilePic )
+          requester:users!requester_id ( user_id, username, name, profilePic, isdelete ),
+          receiver:users!receiver_id ( user_id, username, name, profilePic, isdelete )
         )
       `
       )
@@ -49,6 +49,7 @@ exports.getConversations = async (req, res) => {
         username: partnerInfo?.username || null,
         name: partnerInfo?.name || null,
         profilePic: partnerInfo?.profilePic || null,
+        isdelete: partnerInfo?.isdelete || "active",
         
         conversation_id: chat.conversation_id,
         friendship_id: chat.friendship_id,
@@ -138,9 +139,39 @@ exports.getMessages = async (req, res) => {
 
 exports.addMessage = async (req, res) => {
     const { conversationId } = req.params;
-    const { text, img, is_read   } = req.body;
+    const { text, img, is_read } = req.body;
     const senderId = req.user.user_id;
     try {
+        // 1. ดึงข้อมูลห้องแชทเพื่อตรวจสอบสถานะผู้ใช้งานฝั่งตรงข้าม
+        const { data: chatData, error: chatGetError } = await db
+            .from("conversations")
+            .select(`
+                friendship_id,
+                friendships!friendship_id (
+                    requester_id,
+                    receiver_id,
+                    requester:users!requester_id ( isdelete ),
+                    receiver:users!receiver_id ( isdelete )
+                )
+            `)
+            .eq("conversation_id", conversationId)
+            .maybeSingle();
+
+        if (chatGetError || !chatData) throw chatGetError || new Error("Conversation not found");
+
+        const friendship = chatData.friendships;
+        if (friendship) {
+            // ค้นหาข้อมูลฝั่งตรงข้ามว่าคือใคร
+            const isRequester = friendship.requester_id == senderId;
+            const partner = isRequester ? friendship.receiver : friendship.requester;
+
+            // สกัดกั้น: หากคู่สนทนาลบบัญชีไปแล้ว ห้ามบันทึกข้อความเพิ่มเด็ดขาด
+            if (partner && partner.isdelete === 'deleted') {
+                return res.status(400).json({ error: "This account has been deleted" });
+            }
+        }
+
+        // 2. ถ้าตรวจสอบผ่าน ทำกระบวนการเพิ่มข้อความตามปกติเดิมของคุณ
         const { data: messageData, error: messageError } = await db
             .from("messages")
             .insert({
@@ -159,13 +190,13 @@ exports.addMessage = async (req, res) => {
             const { error: imgError } = await db
                 .from("imgs")
                 .insert({
-                    message_id: messageData.message_id, // ใช้ ID จากข้อความที่เพิ่งสร้างเมื่อกี้
-                    post_id: null, // อันนี้เป็นแชท ไม่ใช่โพสต์ เลยใส่ null
+                    message_id: messageData.message_id,
+                    post_id: null,
                     img: img
                 });
 
             if (imgError) throw imgError;
-            savedImgUrl = img; // เก็บ URL ไว้ส่งกลับให้ React
+            savedImgUrl = img;
         }
         let lastMessageText = text;
         if (!text && img) {
@@ -176,7 +207,7 @@ exports.addMessage = async (req, res) => {
             .from("conversations")
             .update({ 
                 last_message: lastMessageText,
-                updated_at: new Date() // อัปเดตเวลาเพื่อให้ช่องแชทที่มีคนพิมพ์ล่าสุดเด้งขึ้นมาบนสุด
+                updated_at: new Date()
             })
             .eq("conversation_id", conversationId);
 

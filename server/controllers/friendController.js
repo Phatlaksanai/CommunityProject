@@ -3,25 +3,30 @@ const db = require("../config/db");
 exports.getAllUserForAdd = async (req, res) => {
   const userId = req.params.userId;
   try {
-    // 1. ดึง ID ของคนที่เป็นเพื่อนกับเราแล้ว (ทั้งในฐานะผู้ส่งและผู้รับ)
+    // 1. ดึง ID ความสัมพันธ์ (Join ดูสถานะคนที่เราเป็นเพื่อนด้วย)
     const { data: friendshipData, error: friendshipError } = await db
       .from("friendships")
-      .select("requester_id, receiver_id")
+      .select(`
+        requester_id, 
+        receiver_id,
+        requester:requester_id(isdelete),
+        receiver:receiver_id(isdelete)
+      `)
       .or(`requester_id.eq.${userId},receiver_id.eq.${userId}`);
 
     if (friendshipError) throw friendshipError;
 
-    // 2. รวบรวม ID เพื่อนใส่ Array และรวม ID ตัวเราเองเข้าไปด้วย (เพื่อไม่ให้ดึงตัวเองมาแสดง)
     const friendIds = friendshipData.map((f) =>
       f.requester_id == userId ? f.receiver_id : f.requester_id,
     );
     const excludeIds = [...friendIds, userId];
 
-    // 3. ดึงข้อมูล User ทั้งหมด โดยยกเว้นคนที่มี ID อยู่ใน excludeIds
+    // 3. ดึงข้อมูล User โดยเลือกเฉพาะคนที่สถานะยังเป็น active เท่านั้น
     const { data, error } = await db
       .from("users")
       .select("*")
-      .not("user_id", "in", `(${excludeIds.join(",")})`) // ตัดรายชื่อเพื่อนและตัวเองออก
+      .not("user_id", "in", `(${excludeIds.join(",")})`) 
+      .eq("isdelete", "active") // กรองเฉพาะคนที่ยังไม่ลบบัญชี
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -37,38 +42,34 @@ exports.getFriendsByUserId = async (req, res) => {
   const userId = req.params.userId;
 
   try {
-    // ดึงข้อมูล friendship พร้อมกับข้อมูลของ requester (สมมติว่าเราเป็นคนรับ)
-    // หรือต้องเขียน Logic ให้ครอบคลุมทั้งสองฝั่ง
     const { data, error } = await db
       .from("friendships")
-      .select(
-        `
+      .select(`
         *,
-        requester:requester_id (user_id, name, username, profilePic),
-        receiver:receiver_id (user_id, name, username, profilePic)
-      `,
-      )
-      .or(`requester_id.eq.${userId},receiver_id.eq.${userId}`) // ใช้ .or แทน
-      .neq("status", "declined") // กรองเฉพาะที่ไม่ใช่ declined
-      .order("created_at", { ascending: false }); // เรียงจากใหม่ไปเก่า
+        requester:requester_id (user_id, name, username, profilePic, isdelete),
+        receiver:receiver_id (user_id, name, username, profilePic, isdelete)
+      `)
+      .or(`requester_id.eq.${userId},receiver_id.eq.${userId}`)
+      .neq("status", "declined")
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
 
-    // จัดระเบียบ Data: เลือกเอาข้อมูลเพื่อน (ที่ไม่ใช่ตัวเรา) ออกมาเป็น Array ของ User
-    const friendsList = data.map((item) => {
-      // 1. แยกข้อมูล User ออกมาก่อน
-      const friendInfo =
-        item.requester_id == userId ? item.receiver : item.requester;
+    const friendsList = data
+      .map((item) => {
+        const friendInfo = item.requester_id == userId ? item.receiver : item.requester;
+        if (!friendInfo) return null;
 
-      // 2. คืนค่าเป็น Object ใหม่ที่รวม (ข้อมูล User + ข้อมูลจากตาราง friendship)
-      return {
-        ...friendInfo, // กระจาย name, user_id, profilePic ออกมา
-        receiver_id: item.receiver_id, // เพิ่มค่า receiver_id จากตาราง friendships
-        status: item.status, // เพิ่มค่า status จากตาราง friendships
-        friendship_id: item.id, // เพิ่ม ID ของแถวความสัมพันธ์ (จำเป็นมากตอนกด Accept/Decline)
-        createdAt: item.created_at,
-      };
-    });
+        return {
+          ...friendInfo,
+          receiver_id: item.receiver_id,
+          status: item.status,
+          friendship_id: item.id,
+          createdAt: item.created_at,
+        };
+      })
+      // 💡 เพิ่มการคัดกรองตรงนี้: ถ้าเพื่อนคนนั้นลบบัญชีไปแล้ว (isdelete === 'deleted') ให้ตัดทิ้งทันทีคำขอจะหายไป
+      .filter(friend => friend !== null && friend.isdelete === 'active');
 
     return res.status(200).json(friendsList);
   } catch (err) {
