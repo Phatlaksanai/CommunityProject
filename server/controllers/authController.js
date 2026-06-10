@@ -513,6 +513,25 @@ exports.deleteAccount = async (req, res) => {
             
         if (updateError) throw updateError;
 
+        const { error: friendshipDeleteError } = await db
+            .from("friendships")
+            .delete()
+            .eq("status", "pending")
+            .or(`requester_id.eq.${user.user_id},receiver_id.eq.${user.user_id}`);
+
+        if (friendshipDeleteError) {
+            console.error("Clear Friendships Error:", friendshipDeleteError);
+        }
+
+        const { error: DeleteMemberError } = await db
+            .from("community_members")
+            .update({ status: 'banned' })
+            .eq('user_id', user.user_id);
+
+        if (DeleteMemberError) {
+            console.error("Delete Member Error:", DeleteMemberError);
+        }
+
         // (เลือกทำ) ลบแถว OTP นี้ทิ้งไปเลยเพื่อไม่ให้เอามาใช้ซ้ำได้อีก
         await db.from('otps').delete().eq('user_id', user.user_id);
 

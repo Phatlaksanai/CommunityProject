@@ -158,13 +158,13 @@
 
                         // จัด messageWrapper ให้เรียงซ้ายไปขวาตามปกติ
                         .messageWrapper {
-                            flex-direction: row; 
+                            flex-direction: row;
                         }
 
                         // 🟢 ดันข้อความสถานะ (Read/Sent) และเวลา ให้ "ชิดขวา"
                         .messageInfo {
-                            align-items: flex-end; 
-                            
+                            align-items: flex-end;
+
                             span {
                                 text-align: right; // บังคับตัวอักษรชิดขวา
                             }
@@ -196,10 +196,10 @@
                 display: flex;
                 gap: 10px;
                 background-color: themed("bgSoft"); // ใช้ธีมสีให้กลืนไปกับแชท
-                
+
                 .previewItem {
                     position: relative;
-                    
+
                     img {
                         width: 60px;
                         height: 60px;
@@ -212,7 +212,7 @@
                         position: absolute;
                         top: -5px;
                         right: -5px;
-                        background-color: rgba(0,0,0,0.6);
+                        background-color: rgba(0, 0, 0, 0.6);
                         color: white;
                         border: none;
                         border-radius: 50%;
@@ -223,12 +223,20 @@
                         justify-content: center;
                         cursor: pointer;
                         padding: 2px;
-                        
+
                         &:hover {
                             background-color: red;
                         }
                     }
                 }
+            }
+
+            .chatInputDisabled {
+                background-color: themed("bg");
+                padding: 15px;
+                text-Align: center;
+                color: themed("textColor");
+                font-Size: 14px;
             }
 
             .chatInput {
@@ -266,29 +274,30 @@
                     width: 200px;
                 }
             }
+
             .chatTextArea {
-        border: none;
-        width: 500px;
-        background-color: transparent;
-        color: themed("textColor");
-        resize: none; // ❌ ปิดไม่ให้ผู้ใช้ดึงมุมขยายขนาดกล่องได้
-        outline: none; // เอาขอบสีดำตอนกดคลิกออก
-        font-family: inherit; // ใช้ฟอนต์เดียวกับเว็บ
-        padding-top: 8px; // ดันข้อความลงมาให้ตรงกลางพอดี
-        
-        // ซ่อน Scrollbar ถ้าไม่อยากให้เห็น
-        &::-webkit-scrollbar {
-            display: none;
-        }
+                border: none;
+                width: 500px;
+                background-color: transparent;
+                color: themed("textColor");
+                resize: none; // ❌ ปิดไม่ให้ผู้ใช้ดึงมุมขยายขนาดกล่องได้
+                outline: none; // เอาขอบสีดำตอนกดคลิกออก
+                font-family: inherit; // ใช้ฟอนต์เดียวกับเว็บ
+                padding-top: 8px; // ดันข้อความลงมาให้ตรงกลางพอดี
 
-        @include mobile {
-            display: none;
-        }
+                // ซ่อน Scrollbar ถ้าไม่อยากให้เห็น
+                &::-webkit-scrollbar {
+                    display: none;
+                }
 
-        @include tablet {
-            width: 200px;
-        }
-    }
+                @include mobile {
+                    display: none;
+                }
+
+                @include tablet {
+                    width: 200px;
+                }
+            }
         }
     }
 }
