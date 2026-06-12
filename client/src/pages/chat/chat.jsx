@@ -1,8 +1,9 @@
 import LeftChat from "../../components/Left/leftChat/leftChat"
-import { useState, useEffect, useRef } from "react";
-import { Link, useParams, useLocation } from "react-router-dom";
+import {useContext, useState, useEffect, useRef } from "react";
+import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AuthContext } from "../../context/authContext";
 import dayjs from "dayjs";
 import { useQuery } from "@tanstack/react-query";
 
@@ -15,6 +16,8 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 const Chat = () => {
     const { id } = useParams();
     const location = useLocation();
+    const { currentUser } = useContext(AuthContext);
+    const navigate = useNavigate();
     const [currentChat, setCurrentChat] = useState(location.state?.selectedChat || null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
@@ -174,6 +177,28 @@ const Chat = () => {
                friend.name.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
+    const handleConversation = async (friend) => {
+        try {
+            const res = await makeRequest.post("/chats/createconversation", { user2Id: friend.user_id });
+
+            // จัดรูปแบบ Object ให้ตรงกับที่ระบบแชทต้องการ
+            const chatData = {
+                conversation_id: res.data.conversation_id,
+                partner_id: friend.user_id,
+                username: friend.username,
+                name: friend.name,
+                profilePic: friend.profilePic,
+            };
+
+            queryClient.invalidateQueries(["rightBar", currentUser?.user_id]);
+
+            setCurrentChat(chatData);
+            setSearchQuery("");
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     return (
 
         <div className="chat">
@@ -184,9 +209,9 @@ const Chat = () => {
                 <div className="search-container-local">
                     <div className="search-box-wrapper">
                         <SearchOutlinedIcon className="search-icon-inside" />
-                        <input 
-                            type="text" 
-                            placeholder="Search Friends" 
+                        <input
+                            type="text"
+                            placeholder="Search Friends"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="local-search-input"
@@ -196,8 +221,8 @@ const Chat = () => {
                     {/* แสดงผลลัพธ์รายชื่อเพื่อนที่ค้นเจอ */}
                     {searchQuery && filteredFriends?.length > 0 && (
                         <div className="search-dropdown-results">
-                            {filteredFriends.map((friend) => (
-                                <Link to={`/profile/${friend.user_id}`} className="search-hit-item" key={friend.user_id}>
+                            {filteredFriends?.map((friend) => (
+                                <div className="search-hit-item" key={friend.user_id} onClick={() => handleConversation(friend)} style={{ cursor: "pointer" }}>
                                     <div className="hit-content">
                                         <img src={friend.profilePic || defaultPic} className="hit-image" />
                                         <div className="hit-info">
@@ -205,11 +230,11 @@ const Chat = () => {
                                             <h4 className="hit-title">{friend.name || friend.username}</h4>
                                         </div>
                                     </div>
-                                </Link>
+                                </div>
                             ))}
                         </div>
                     )}
-                    
+
                     {searchQuery && filteredFriends?.length === 0 && (
                         <div className="search-dropdown-results">
                             <div className="search-hit-item" style={{ textAlign: "center", color: "gray" }}>
