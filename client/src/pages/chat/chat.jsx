@@ -1,14 +1,16 @@
 import LeftChat from "../../components/Left/leftChat/leftChat"
 import { useState, useEffect, useRef } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
+import { useQuery } from "@tanstack/react-query";
 
 import "./chat.scss"
 import ImageIcon from '@mui/icons-material/Image';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import CloseIcon from '@mui/icons-material/Close';
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 
 const Chat = () => {
     const { id } = useParams();
@@ -21,6 +23,8 @@ const Chat = () => {
     const [filePreviews, setFilePreviews] = useState([]);
     const [error, setError] = useState("");
 
+    const [searchQuery, setSearchQuery] = useState("");
+
     const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
     const queryClient = useQueryClient();
     const scrollRef = useRef();
@@ -31,6 +35,12 @@ const Chat = () => {
     //         setCurrentChatId(location.state.activeChatId);
     //     }
     // }, [location.state?.activeChatId]);
+
+    // ดึงรายชื่อเพื่อนทั้งหมด เพื่อเอามาใช้เสิร์ช
+    const { data: myFriends } = useQuery({
+        queryKey: ["friends", id],
+        queryFn: () => makeRequest.get(`/friends/${id}`).then((res) => res.data),
+    });
 
     useEffect(() => {
         const fetchMessages = async () => {
@@ -157,13 +167,58 @@ const Chat = () => {
         }
     };
 
+    // ฟังก์ชันกรองรายชื่อเพื่อนตามคำที่พิมพ์ค้นหา
+    const filteredFriends = myFriends?.filter(friend => {
+        if (!searchQuery) return false; // ถ้าไม่ได้พิมพ์อะไรเลย ก็ไม่ต้องโชว์
+        return friend.username.toLowerCase().includes(searchQuery.toLowerCase()) || 
+               friend.name.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+
     return (
 
         <div className="chat">
             <div className="Lchat">
-                <div className="search">
+                {/* <div className="search">
                     <input type="text" placeholder="Search..." />
+                </div> */}
+                <div className="search-container-local">
+                    <div className="search-box-wrapper">
+                        <SearchOutlinedIcon className="search-icon-inside" />
+                        <input 
+                            type="text" 
+                            placeholder="Search Friends" 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="local-search-input"
+                        />
+                    </div>
+
+                    {/* แสดงผลลัพธ์รายชื่อเพื่อนที่ค้นเจอ */}
+                    {searchQuery && filteredFriends?.length > 0 && (
+                        <div className="search-dropdown-results">
+                            {filteredFriends.map((friend) => (
+                                <Link to={`/profile/${friend.user_id}`} className="search-hit-item" key={friend.user_id}>
+                                    <div className="hit-content">
+                                        <img src={friend.profilePic || defaultPic} className="hit-image" />
+                                        <div className="hit-info">
+                                            <span className="badge user">FRIEND</span>
+                                            <h4 className="hit-title">{friend.name || friend.username}</h4>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+                    
+                    {searchQuery && filteredFriends?.length === 0 && (
+                        <div className="search-dropdown-results">
+                            <div className="search-hit-item" style={{ textAlign: "center", color: "gray" }}>
+                                No friends found
+                            </div>
+                        </div>
+                    )}
                 </div>
+
                 <LeftChat userId={id} currentChat={currentChat} setCurrentChat={setCurrentChat} />
             </div>
 
