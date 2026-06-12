@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const cloudinary = require("../config/cloudinary");
 const algoliaClient = require("../config/algolia");
 
 exports.getItems = async (req, res) => {
@@ -152,6 +153,7 @@ exports.addItem = async (req, res) => {
           objectID: `item_${data.item_id}`, // ใช้ prefix ไอเดีย item_ เพื่อแยกแยะฝั่งหน้าบ้าน
           title: data.modelName,            // แมปชื่อสินค้าเข้าช่อง title ตรงกลาง
           description: data.description,    // แมปคำอธิบายสินค้าเข้าช่อง description
+          img: data.img,                    // แมป URL รูปภาพเข้าช่อง img (ถ้ามี)
           type: 'item',                    // ระบุ type เป็นไอเทมเพื่อส่งหน้าบ้านไปถูกหน้ามาร์เก็ต
           targetId: data.item_id
         }
@@ -213,6 +215,7 @@ exports.updateItem = async (req, res) => {
                     objectID: `item_${itemId}`, // ต้องใช้รูปแบบไอดีเดียวกับตอนสร้าง (addItem) เพื่อให้มันบันทึกทับตัวเดิม
                     title: updateData.modelName || items.modelName, // ใช้ค่าใหม่ ถ้าไม่มีให้ใช้ค่าเดิมใน DB
                     description: updateData.description !== undefined ? updateData.description : items.description,
+                    img: updateData.img || items.img, // ใช้ค่าใหม่ ถ้าไม่มีให้ใช้ค่าเดิมใน DB
                     type: 'item',
                     targetId: itemId
                 }

@@ -138,6 +138,21 @@ exports.register = async (req, res) => {
 
         if (updateError) throw updateError;
 
+        try {
+            await algoliaClient.saveObject({
+                indexName: 'WebCommunity_Search', 
+                body: {
+                    objectID: `user_${user.user_id}`, // ใช้ prefix user_ นำหน้า
+                    title: username, // ผู้ใช้ใหม่ยังไม่มี DisplayName ให้เอา username ไปใช้ค้นหาก่อน
+                    img: null, // ยังไม่มีรูปโปรไฟล์
+                    type: 'user', // ระบุประเภทเป็น user
+                    targetId: user.user_id
+                }
+            });
+        } catch (algoliaErr) {
+            console.error("Algolia Insert User Warning:", algoliaErr);
+        }
+
         // (Optional) ลบ OTP ทิ้งหลังจากสมัครเสร็จเพื่อความสะอาด
         await db.from('otps').delete().eq('user_id', user.user_id);
 
@@ -308,7 +323,7 @@ exports.updateProfile = async (req, res) => {
     try {
         const { data: user, error } = await db
             .from("users")
-            .select("profile_public_id, cover_public_id")
+            .select("profile_public_id, cover_public_id, username, name, profilePic")
             .eq("user_id", userId)
             .maybeSingle();
         if (error) {
@@ -348,6 +363,25 @@ exports.updateProfile = async (req, res) => {
             .eq("user_id", userId);
 
         if (updateError) return res.status(500).json(updateError);
+
+        // ============================================================
+        // 🚀 [เพิ่มคำสั่ง Algolia v5] อัปเดตข้อมูลผู้ใช้บนคลังค้นหา
+        // ============================================================
+        try {
+            await algoliaClient.saveObject({
+                indexName: 'WebCommunity_Search',
+                body: {
+                    objectID: `user_${userId}`, // ทับ objectID เดิม
+                    // ถ้าตั้ง Display Name แล้วให้ใช้คู่กับ Username เพื่อให้เสิร์ชเจอทั้งสองแบบ
+                    title: updateData.name || user.name || user.username,
+                    img: updateData.profilePic || user.profilePic, // โยน URL รูปโปรไฟล์ล่าสุดเข้าไป
+                    type: 'user',
+                    targetId: userId
+                }
+            });
+        } catch (algoliaErr) {
+            console.error("Algolia Update Profile Warning:", algoliaErr);
+        }
 
         // เก็บ id เก่าไว้ก่อน
         const oldProfileId = user?.profile_public_id;

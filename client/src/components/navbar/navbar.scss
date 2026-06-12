@@ -131,7 +131,7 @@
           background-color: themed("bg");
           border: 1px solid themed("border");
           border-radius: 8px;
-          max-height: 280px;
+          max-height: 350px;
           overflow-y: auto;
           z-index: 1000;
           box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
@@ -180,9 +180,25 @@
 
             .hit-content {
               display: flex;
-              flex-direction: column;
-              gap: 3px;
+              flex-direction: row;
+              align-items: center;
+              gap: 12px;
 
+              // 🟢 สไตล์สำหรับรูปภาพ
+              .hit-image {
+                width: 40px;
+                height: 40px;
+                object-fit: cover;
+                border-radius: 50%; // ทำให้รูปกลมๆ ดูเหมือน Profile
+                flex-shrink: 0;     // ป้องกันไม่ให้รูปโดนบีบเบี้ยวเวลาจอมันแคบ
+                border: 1px solid themed("border");
+              }
+
+              .hit-info {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                overflow: hidden; // กันตัวอักษรทะลุกรอบ
               .badge {
                 align-self: flex-start;
                 font-size: 9px;
@@ -191,12 +207,13 @@
                 border-radius: 4px;
                 color: white;
 
-                &.community { background-color: #3f51b5; }
-                &.item { background-color: #ff9800; }
+                &.community { background-color: #ff9800; }
+                &.item { background-color: #f0544f; }
+                &.user { background-color: #3f51b5; }
               }
 
               .hit-title {
-                margin: 2px 0 0 0;
+                margin: 0;
                 font-size: 13px;
                 font-weight: 600;
               }
@@ -206,6 +223,7 @@
                 font-size: 11px;
                 color: gray;
               }
+            }
             }
           }
         }

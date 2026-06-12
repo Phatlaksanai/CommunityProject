@@ -44,6 +44,7 @@ exports.addCommunity = async (req, res) => {
           objectID: `commu_${newCommunity.communities_id}`, // ใช้รูปแบบ commu_รหัส เพื่อแยกหมวดหมู่
           title: newCommunity.name,
           description: newCommunity.description,
+          img: newCommunity.cover_img, // แมป URL รูปภาพเข้าช่อง img (ถ้ามี)
           type: 'community',
           targetId: newCommunity.communities_id
         }
@@ -194,6 +195,7 @@ exports.updateCommunity = async (req, res) => {
           objectID: `commu_${communityId}`, // อ้างอิง ID แถวเดิมให้ตรงกัน ระบบจะสลับข้อมูลไส้ในให้เองอัตโนมัติ
           title: name,
           description: description,
+          img: img, // แมป URL รูปภาพเข้าช่อง img (ถ้ามี)
           type: 'community',
           targetId: communityId
         }
