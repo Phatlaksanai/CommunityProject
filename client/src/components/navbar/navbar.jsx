@@ -23,17 +23,23 @@ import { searchClient } from "../../api/algoliaClient";
 // 1. วางตัวแสดงผลการ์ดค้นหาแต่ละแถวไว้ตรงนี้ (ก่อนตัว Navbar)
 // ============================================================
 const SearchHit = ({ hit }) => {
+  const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
   let targetLink = "/";
   // แมปปิ้งหน้าดีไซน์ปลายทางตามความเหมาะสมในโปรเจกต์ของคุณ
   if (hit.type === 'community') targetLink = `/descCommu/${hit.targetId}`;
   if (hit.type === 'item') targetLink = `/descItem/${hit.targetId}`;
+  if (hit.type === 'user') targetLink = `/profile/${hit.targetId}`;
 
   return (
     <Link to={targetLink} className="search-hit-item">
       <div className="hit-content">
-        <span className={`badge ${hit.type}`}>{hit.type.toUpperCase()}</span>
-        <h4 className="hit-title">{hit.title}</h4>
-        <p className="hit-desc">{hit.description?.substring(0, 50)}...</p>
+        <img src={hit.img || defaultPic} className="hit-image" />
+
+        <div className="hit-info">
+          <span className={`badge ${hit.type}`}>{hit.type.toUpperCase()}</span>
+          <h4 className="hit-title">{hit.title}</h4>
+          <p className="hit-desc">{hit.description ? hit.description.substring(0, 50) + "..." : null}</p>
+        </div>
       </div>
     </Link>
   );
@@ -60,7 +66,7 @@ const Navbar = () => {
 
       // เคลียร์ค่า currentUser ใน AuthContext ให้เป็น null ทันที
       setUser(null);
-      
+
       navigate("/");
 
     } catch (err) {
@@ -115,13 +121,13 @@ const Navbar = () => {
           <InstantSearch searchClient={searchClient} indexName="WebCommunity_Search">
             <div className="search-box-wrapper">
               <SearchOutlinedIcon className="search-icon-inside" />
-              <SearchBox 
-                placeholder="Search everything..." 
+              <SearchBox
+                placeholder="Search"
                 onFocus={() => setIsSearching(true)}
                 onBlur={() => setTimeout(() => setIsSearching(false), 300)} // หน่วงเวลาเล็กน้อยให้ Event คลิกไปหน้าอื่นทำงานเสร็จก่อนกล่องยุบ
               />
             </div>
-            
+
             {/* ดรอปดาวน์รายการผลลัพธ์ที่จะเด้งสไลด์ลงมาเมื่อมีการ Focus ที่กล่องข้อความ */}
             {isSearching && (
               <div className="search-dropdown-results">
