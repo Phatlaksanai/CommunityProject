@@ -3,11 +3,16 @@ import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlin
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import CloseIcon from '@mui/icons-material/Close';
+
 import { Link, useNavigate } from "react-router-dom";
 import Comments from "../../comments/comments";
-import { useState, useContext } from "react";
-import dayjs from "dayjs"; // moment to dayjs
-import relativeTime from "dayjs/plugin/relativeTime"; // โหลด Plugin "เมื่อสักครู่"
+import { useState, useContext, useEffect } from "react";
+import { createPortal } from "react-dom"; // นำเข้า Portal สำหรับทำ Lightbox
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
@@ -19,49 +24,70 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-const Post = ({ post, isDescCommu }) => {
+const Post = ({ post, isDescCommu, isDescProject }) => {
   const [commentOpen, setCommentOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
+  // --- [เพิ่มสเตตัสสำหรับ Lightbox] ---
+  const [activeImageIndex, setActiveImageIndex] = useState(null);
+  
+  // สร้าง Array สำหรับเก็บเฉพาะ URL ของรูปภาพ เพื่อเอาไว้ใช้ไล่ลำดับใน Lightbox
+  const imageList = post.imgs?.map((item) => item.img) || [];
+
   const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
+  // ล็อกการสกรอลล์หน้าจอเมื่อเปิด Lightbox
+  useEffect(() => {
+    if (activeImageIndex !== null) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [activeImageIndex]);
+
+  // ฟังก์ชันเลื่อนรูปซ้าย-ขวาใน Lightbox
+  const handlePrevImage = (e) => {
+    e.stopPropagation();
+    setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : imageList.length - 1));
+  };
+
+  const handleNextImage = (e) => {
+    e.stopPropagation();
+    setActiveImageIndex((prev) => (prev < imageList.length - 1 ? prev + 1 : 0));
+  };
+
   const { isLoading: commentLoading, data: commentCount } = useQuery({
-    queryKey: ["commentCount", post.post_id], // เปลี่ยน Key ให้ต่างจากตัวดึงคอมเมนต์จริง
-    queryFn: () =>
-      makeRequest.get(`/posts/comments/count/${post.post_id}`).then((res) => res.data),
+    queryKey: ["commentCount", post.post_id],
+    queryFn: () => makeRequest.get(`/posts/comments/count/${post.post_id}`).then((res) => res.data),
   });
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["likes", post.post_id],
-    queryFn: () => makeRequest.get(`/posts/likes/post/${post.post_id}`).then((res) => res.data), // ข้อที่ 1
+    queryFn: () => makeRequest.get(`/posts/likes/post/${post.post_id}`).then((res) => res.data),
   });
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async (liked) => {
       if (liked) {
-        // ถ้าเคย Like แล้ว -> ส่งคำสั่ง DELETE ไปถอน Like
         return await makeRequest.delete(`/posts/likes/post/${post.post_id}`);
       } else {
-        // ถ้ายังไม่เคย Like -> ส่งคำสั่ง POST ไปเพิ่ม Like
         return await makeRequest.post("/posts/likes", { post_id: post.post_id });
       }
     },
     onSuccess: () => {
-      // เมื่อทำงานสำเร็จ (ถอนหรือเพิ่มสำเร็จ)
-      // สั่งให้ "ป้ายชื่อ" ที่ชื่อ "likes" ของโพสต์นี้ หมดอายุ (Invalidate)
-      // เพื่อให้ useQuery (ในข้อ 1) ไปดึงข้อมูลใหม่มาอัปเดตหน้าจอทันที
       queryClient.invalidateQueries(["likes", post.post_id]);
     },
   });
 
   const handleLike = () => {
-    // ตรวจสอบว่าใน Array 'data' มี ID ของเรา (currentUser?.user_id) อยู่ไหม
-    // !! แปลงค่าให้เป็น true/false เสมอ ป้องกัน error ถ้า data เป็น null
     const isAlreadyLiked = !!data?.includes(currentUser?.user_id);
-    mutation.mutate(isAlreadyLiked); // ส่งสถานะปัจจุบัน (ไลก์แล้ว/ยังไม่ไลก์) เข้าไปใน mutation
+    mutation.mutate(isAlreadyLiked);
   };
 
   const deleteMutation = useMutation({
@@ -69,8 +95,6 @@ const Post = ({ post, isDescCommu }) => {
       return makeRequest.post(`/posts/delete/post/${post.post_id}`);
     },
     onSuccess: () => {
-      // เมื่อลบสำเร็จ สั่งให้รายการโพสต์ทั้งหมด (posts) รีเฟรชใหม่
-      // เพื่อให้โพสต์ที่ถูกลบหายไปจากหน้า Feed
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
@@ -81,6 +105,7 @@ const Post = ({ post, isDescCommu }) => {
 
   dayjs.extend(relativeTime);
 
+  console.log("Post:", post)
   return (
     <div className="post">
       <div className="container">
@@ -88,7 +113,7 @@ const Post = ({ post, isDescCommu }) => {
           <div className="userInfo" onClick={() => navigate(`/profile/${post.user_id}`)} style={{ cursor: "pointer" }}>
             <img src={post.profilePic || defaultPic} alt="" />
             <div className="details">
-                <span className="name">{post.name || post.username}</span>
+              <span className="name">{post.name || post.username}</span>
               <span className="date">{dayjs(post.created_at).fromNow()}</span>
             </div>
           </div>
@@ -97,6 +122,7 @@ const Post = ({ post, isDescCommu }) => {
             <button onClick={handleDelete}>delete</button>
           )}
         </div>
+        
         <div className="content">
           <p>{post.description}</p>
 
@@ -110,16 +136,20 @@ const Post = ({ post, isDescCommu }) => {
                 pagination={{ clickable: true }}
                 className="mySwiper"
               >
-                {/* ส่วนของรูปภาพ */}
+                {/* ส่วนของรูปภาพ (ผูก Event onClick เพื่อเปิด Lightbox) */}
                 {post.imgs?.map((item, index) => (
                   <SwiperSlide key={`img-${index}`}>
-                    <div className="postImage">
+                    <div 
+                      className="postImage" 
+                      onClick={() => setActiveImageIndex(index)} 
+                      style={{ cursor: "pointer" }}
+                    >
                       <img src={item.img} alt="" />
                     </div>
                   </SwiperSlide>
                 ))}
 
-                {/* ส่วนของโมเดล 3D */}
+                {/* ส่วนของโมเดล 3D (แยกทำงานอิสระตามเดิม ไม่โดนแทรกแซง) */}
                 {post.models?.map((item, index) => (
                   <SwiperSlide key={`model-${index}`}>
                     <div className="postModel">
@@ -130,28 +160,14 @@ const Post = ({ post, isDescCommu }) => {
               </Swiper>
             </div>
           )}
-          {/* {post.models?.map((item, index) => (
-            <ModelViewer key={index} modelUrl={item.model} />
-          ))} */}
-          {/* {models.length > 0 && models.map((modelUrl, index) => (
-            <div key={index} className="model-wrapper" style={{ marginTop: "20px" }}>
-              <div style={{ textAlign: "right", marginTop: "5px" }}>
-                <a href={modelUrl} download style={{ fontSize: "12px", color: "gray" }}>
-                  Download Model
-                </a>
-              </div>
-            </div>
-          ))} */}
         </div>
+
         <div className="info">
           <div className="item">
             {isLoading ? (
               "loading"
             ) : data?.includes(currentUser?.user_id) ? (
-              <FavoriteOutlinedIcon
-                style={{ color: "red" }}
-                onClick={handleLike}
-              />
+              <FavoriteOutlinedIcon style={{ color: "red" }} onClick={handleLike} />
             ) : (
               <FavoriteBorderOutlinedIcon onClick={handleLike} />
             )}
@@ -173,13 +189,56 @@ const Post = ({ post, isDescCommu }) => {
                   ? `${post.community_name.substring(0, 10)}...`
                   : post.community_name}
               </Link>
+            </div>
+          )}
 
+          {!isDescProject && post.project_name && (
+            <div className="postCommunityInfo">
+              <Link
+                className="community-link custom-tooltip"
+                data-tip={post.project_name}
+                to={`/descproject/${post.project_id}`}
+              >
+                Project : {post.project_name.length > 10
+                  ? `${post.project_name.substring(0, 10)}...`
+                  : post.project_name}
+              </Link>
             </div>
           )}
         </div>
         {commentOpen && <Comments postId={post.post_id} />}
-
       </div>
+
+      {/* --- LIGHTBOX PORTAL (ก๊อปปี้สไตล์และระบบมาจาก leftDC) --- */}
+      {activeImageIndex !== null && imageList.length > 0 && createPortal(
+        <div className="lightboxOverlay" onClick={() => setActiveImageIndex(null)}>
+          <button className="lightboxCloseBtn" onClick={() => setActiveImageIndex(null)}>
+            <CloseIcon fontSize="large" />
+          </button>
+
+          {/* แสดงปุ่มนำทางเฉพาะเมื่อรูปในโพสต์มีมากกว่า 1 รูป */}
+          {imageList.length > 1 && (
+            <button className="navBtn prev" onClick={handlePrevImage}>
+              <ArrowBackIosNewIcon />
+            </button>
+          )}
+
+          <div className="lightboxContent" onClick={(e) => e.stopPropagation()}>
+            <img src={imageList[activeImageIndex]} alt="Full view" />
+          </div>
+
+          {imageList.length > 1 && (
+            <button className="navBtn next" onClick={handleNextImage}>
+              <ArrowForwardIosIcon />
+            </button>
+          )}
+
+          <div className="imageCounter">
+            {activeImageIndex + 1} / {imageList.length}
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

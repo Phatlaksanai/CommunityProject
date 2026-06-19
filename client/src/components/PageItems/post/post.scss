@@ -42,6 +42,7 @@
             }
           }
         }
+
         button {
           position: absolute;
           top: 30px;
@@ -60,97 +61,101 @@
         overflow: hidden; // ตัดส่วนที่แผ่ออกไปทิ้ง
 
         p {
-          word-wrap: break-word;   // legacy
+          word-wrap: break-word; // legacy
           overflow-wrap: break-word; // standard
           word-break: break-word; // สำหรับ string ยาวติดกัน
-          white-space: pre-wrap;  // เคารพ \n และตัดบรรทัด
+          white-space: pre-wrap; // เคารพ \n และตัดบรรทัด
         }
 
         .postMediaSlider {
-        width: 100%;
-        max-width: 100%; // ห้ามกว้างกว่าแม่
-        border-radius: 10px;
-        overflow: hidden;
-        position: relative;
-        background-color: themed("bgSoft"); // ใช้สีพื้นหลังที่เหมาะสมจากธีม
-        
-        .postImage{
           width: 100%;
-          height: 100%;
-          max-height: 500px; // คุมความสูงให้เท่ากันหมดทุก Slide
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #b5b5b5; // พื้นหลังดำเวลาภาพไม่เต็ม
-        }
-
-        .postImage img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-
-        .swiper {
-          width: 100%;
-          max-width: 100%;
-          height: 500px;
-          // เพิ่มบรรทัดนี้เพื่อความชัวร์
-          display: block; 
+          max-width: 100%; // ห้ามกว้างกว่าแม่
+          border-radius: 10px;
           overflow: hidden;
-        }
-
-        .swiper-slide {
-          // บังคับให้ slide กว้างเท่ากับตัว swiper เป๊ะๆ
-          width: 100% !important; 
-          overflow: hidden;
-        }
-
-        .postModel {
-          width: 100%;
-          height: 100%; // ให้สูงเต็ม Swiper (500px)
-          display: block; // เปลี่ยนจาก flex เป็น block เพื่อความชัวร์ในการคุมขนาด
           position: relative;
+          background-color: themed("bgSoft"); // ใช้สีพื้นหลังที่เหมาะสมจากธีม
 
-          .model-viewer {
+          .postImage {
             width: 100%;
             height: 100%;
-            position: absolute; // ใช้ absolute เพื่อให้มันเกาะตามกรอบ postModel เป๊ะๆ
-            top: 0;
-            left: 0;
+            max-height: 500px; // คุมความสูงให้เท่ากันหมดทุก Slide
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #b5b5b5; // พื้นหลังดำเวลาภาพไม่เต็ม
+          }
 
-            .viewer-canvas {
-              width: 100% !important;
-              height: 100% !important;
+          .postImage img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+          }
+
+          .swiper {
+            width: 100%;
+            max-width: 100%;
+            height: 500px;
+            // เพิ่มบรรทัดนี้เพื่อความชัวร์
+            display: block;
+            overflow: hidden;
+          }
+
+          .swiper-slide {
+            // บังคับให้ slide กว้างเท่ากับตัว swiper เป๊ะๆ
+            width: 100% !important;
+            overflow: hidden;
+          }
+
+          .postModel {
+            width: 100%;
+            height: 100%; // ให้สูงเต็ม Swiper (500px)
+            display: block; // เปลี่ยนจาก flex เป็น block เพื่อความชัวร์ในการคุมขนาด
+            position: relative;
+
+            .model-viewer {
+              width: 100%;
+              height: 100%;
+              position: absolute; // ใช้ absolute เพื่อให้มันเกาะตามกรอบ postModel เป๊ะๆ
+              top: 0;
+              left: 0;
+
+              .viewer-canvas {
+                width: 100% !important;
+                height: 100% !important;
+              }
             }
           }
-        }
 
-        // ตกแต่งปุ่ม Navigation (ลูกศร)
-        .swiper-button-next, .swiper-button-prev {
-          color: white;
-          background-color: rgba(0, 0, 0, 0.3);
-          width: 35px;
-          height: 35px;
-          border-radius: 50%;
-          &::after {
-            font-size: 16px;
-            font-weight: bold;
-          }
-          &:hover {
-            background-color: rgba(0, 0, 0, 0.6);
-          }
-        }
+          // ตกแต่งปุ่ม Navigation (ลูกศร)
+          .swiper-button-next,
+          .swiper-button-prev {
+            color: white;
+            background-color: rgba(0, 0, 0, 0.3);
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
 
-        // ตกแต่ง Pagination (จุดไข่ปลา)
-        .swiper-pagination-bullet {
-          background: white;
-          opacity: 0.5;
+            &::after {
+              font-size: 16px;
+              font-weight: bold;
+            }
+
+            &:hover {
+              background-color: rgba(0, 0, 0, 0.6);
+            }
+          }
+
+          // ตกแต่ง Pagination (จุดไข่ปลา)
+          .swiper-pagination-bullet {
+            background: white;
+            opacity: 0.5;
+          }
+
+          .swiper-pagination-bullet-active {
+            opacity: 1;
+            background: #5271ff; // หรือสีหลักของเว็บคุณ
+          }
         }
-        .swiper-pagination-bullet-active {
-          opacity: 1;
-          background: #5271ff; // หรือสีหลักของเว็บคุณ
-        }
-      }
 
       }
 
@@ -190,7 +195,118 @@
           }
         }
       }
-      
+
     }
+
+    .lightboxOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.9); // พื้นหลังดำโปร่งแสงสะใจสไตล์โรงหนัง
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999; // ดันขึ้นมาให้อยู่เหนือ Swiper และ Navbar ทุกตัว
+      user-select: none;
+
+      .lightboxContent {
+        max-width: 85%;
+        max-height: 85%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        img {
+          max-width: 100%;
+          max-height: 85vh;
+          object-fit: contain;
+          border-radius: 4px;
+          box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+          animation: zoomIn 0.2s ease-out; // เพิ่มอนิเมชันตอนเปิดรูปนิดนึง
+        }
+      }
+
+      // สไตล์ปุ่มปิด (ขวาบน)
+      .lightboxCloseBtn {
+        position: absolute;
+        top: 25px;
+        right: 25px;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.75);
+        cursor: pointer;
+        transition: color 0.2s, transform 0.2s;
+        z-index: 10;
+
+        &:hover {
+          color: white;
+          transform: scale(1.1);
+        }
+      }
+
+      // สไตล์ปุ่มเลื่อน ซ้าย-ขวา
+      .navBtn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.2s;
+        z-index: 10;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        &:active {
+          transform: translateY(-50%) scale(0.95);
+        }
+
+        &.prev {
+          left: 30px;
+          padding-right: 4px; // ชดเชยไอคอนลูกศรเฉียงซ้ายให้ดูกึ่งกลาง
+        }
+
+        &.next {
+          right: 30px;
+        }
+      }
+
+      // ตัวเลขบอกตำแหน่งรูป (เช่น 1 / 3) ด้านล่าง
+      .imageCounter {
+        position: absolute;
+        bottom: 25px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 16px;
+        font-weight: 500;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 6px 16px;
+        border-radius: 20px;
+        letter-spacing: 1px;
+      }
+    }
+
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
 }

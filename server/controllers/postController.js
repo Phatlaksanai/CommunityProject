@@ -37,6 +37,11 @@ exports.getPosts = async (req, res) => {
             name, 
             cover_img,
             users(isdelete)
+          ),
+          projects(
+            project_id,
+            project_name,
+            users(isdelete)
           )
         `)
         .eq("status", "show")
@@ -93,6 +98,7 @@ exports.getPosts = async (req, res) => {
       profilePic: post.users?.profilePic || null,
       community_name: post.communities?.name || null,
       community_cover: post.communities?.cover_img || null,
+      project_name: post.projects?.project_name || null,
     }));
 
     return res.status(200).json(formatted);
