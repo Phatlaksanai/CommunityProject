@@ -20,8 +20,10 @@ npm install @supabase/supabase-js // server
 npm install swiper // client
 npm i react-intersection-observer // client
 
-npm install algoliasearch // server 🆕🆕🆕🆕
-npm install algoliasearch react-instantsearch // client 🆕🆕🆕🆕
+npm install algoliasearch // server
+npm install algoliasearch react-instantsearch // client 
+
+npm install stripe // server 🆕🆕🆕🆕
 
     เพิ่มลบ project ได้ และก็ลบรูปออกจาก cloud ด้วย
 

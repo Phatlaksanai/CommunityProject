@@ -13,11 +13,11 @@ const Setting = () => {
             <div className="add-item__form">
                 <h1 className="add-item__title">Settings</h1>
 
-                <div className="form-group">
+                {/* <div className="form-group">
                     <label htmlFor="itemName">Text Sizes</label>
                     <input type="text" id="itemName" placeholder="Text Size"
                         required />
-                </div>
+                </div> */}
 
                 <div className="btn-group">
                     <button type="button" className="Changepassword" onClick={() => navigate(`/setting/${id}/changepassword`)} style={{ cursor: "pointer" }}>Change Password</button>
