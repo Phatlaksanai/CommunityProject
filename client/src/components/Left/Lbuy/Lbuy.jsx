@@ -1,21 +1,36 @@
 import "./Lbuy.scss";
-import { useState } from "react";
+import { useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
 
 const Lbuy = () => {
+    const stripe = useStripe();
+    const elements = useElements();
+
+    const handleSubmit = async () => {
+
+        if(!stripe || !elements){
+            return;
+        }
+        const result = await stripe.confirmPayment({
+            elements,
+            confirmParams:{
+                return_url:"http://localhost:5173/payment-success"
+            }
+        });
+        if(result.error){
+            console.log(result.error.message);
+        }
+    };
 
     return (
         <div className="Lbuy">
             <div className="container">
                 <div className="item new-releases">
                     <div className="item payment">
-                        <img className="qr"
-                            src="https://cdn.vcgamers.com/news/wp-content/uploads/2023/02/PODUSZKA-ROBLOX-MAN-FACE-PREZENT.jpg"
-                            alt=""
-                        />
-                        <p className="expire">Expire at 10.26 PM</p>
-                        <span className="desc">Please complete your payment before clicking comfirm.</span>
+                        <PaymentElement />
+                        {/* <p className="expire">Expire at 10.26 PM</p>
+                        <span className="desc">Please complete your payment before clicking comfirm.</span> */}
                         <div className="confirmBox">
-                            <button>Confirm</button>
+                            <button onClick={handleSubmit}>Confirm</button>
                         </div>
                     </div>
 

@@ -39,10 +39,14 @@ const RightDI = ({ item }) => {
         </div>
         <div className="menu">
           <div className="buttons">
-              <button onClick={() => navigate("/buyitem")} style={{ cursor: "pointer" }}>Check Out</button>
+            <button onClick={() => navigate("/buyitem", {
+              state: {
+                item_id: item.item_id
+              }
+            })} style={{ cursor: "pointer" }}>Check Out</button>
           </div>
         </div>
-        
+
       </div>
     </div>
   );

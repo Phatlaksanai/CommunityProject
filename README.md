@@ -24,6 +24,7 @@ npm install algoliasearch // server
 npm install algoliasearch react-instantsearch // client 
 
 npm install stripe // server 🆕🆕🆕🆕
+npm install @stripe/react-stripe-js @stripe/stripe-js // client 🆕🆕🆕🆕
 
     เพิ่มลบ project ได้ และก็ลบรูปออกจาก cloud ด้วย
 

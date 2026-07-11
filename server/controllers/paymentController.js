@@ -2,33 +2,52 @@ const db = require("../config/db");
 const stripe = require("../config/stripe");
 
 exports.createPayment = async (req, res) => {
-  const { orderId } = req.body;
+  const { item_id } = req.body;
 
   try {
-    const { data: order, error } = await db // ดึง order
-      .from("orders")
-      .select()
-      .eq("order_id", orderId)
+    const { data: item, error } = await db // ดึง item
+      .from("items")
+      .select('*')
+      .eq("item_id", item_id)
       .single();
 
-    if(error || !order){
+    if(error || !item){
       return res.status(404).json({
-        error:"Order not found"
+        error:"Item not found"
       });
-    }
+   }
+
+   // 2. สร้าง Order
+   const {data:order ,error:orderError}=await db
+   .from("orders")
+   .insert({
+      user_id:req.user.user_id,
+      total_amount:item.price,
+      status:"pending"
+   })
+   .select()
+   .single();
+
+
+   if(orderError){
+      throw orderError;
+   }
 
     const amount = order.total_amount;
-
+    if(amount < 10){
+    return res.status(400).json({
+        error:"Minimum payment amount is 10 THB"
+    });
+    }
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount * 100,
       currency: "thb",
       payment_method_types: ["promptpay"],
     });
-
     const { data, error: updateError } = await db // อัปเดต order
       .from("orders")
       .update({ stripe_pi_id: paymentIntent.id })
-      .eq("order_id", orderId);
+      .eq("order_id", order.order_id);
 
     if (updateError) {
       console.error("Error updating order:", updateError);
@@ -36,9 +55,9 @@ exports.createPayment = async (req, res) => {
     }
 
     res.json({
-      client_secret: paymentIntent.client_secret,
-      payment_id: paymentIntent.id
-    });
+      orderId:order.order_id,
+      clientSecret:paymentIntent.client_secret
+   });
   } catch (error) {
     console.error("Error creating payment:", error);
     res.status(500).json({ error: "Failed to create payment" });
