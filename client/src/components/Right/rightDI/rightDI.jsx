@@ -1,10 +1,13 @@
 import "./rightDI.scss";
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../context/authContext";
+import { useContext } from "react";
 
 const RightDI = ({ item }) => {
   if (!item) return null;
   const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext);
 
   return (
     <div className="rightDI">
@@ -39,7 +42,7 @@ const RightDI = ({ item }) => {
         </div>
         <div className="menu">
           <div className="buttons">
-              <button onClick={() => navigate("/buyitem")} style={{ cursor: "pointer" }}>Check Out</button>
+              <button onClick={() => navigate(`/buyitem/${currentUser.user_id}`)} style={{ cursor: "pointer" }}>Check Out</button>
           </div>
         </div>
         

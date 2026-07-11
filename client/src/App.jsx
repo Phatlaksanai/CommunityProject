@@ -400,13 +400,13 @@ function App() {
       ]
     },
     {
-      path: "/buyitem",
+      path: "/buyitem/:id",
       element: (
         <LayoutNavbar />
       ),
       children: [
         {
-          path: "/buyitem",
+          index: true,
           element: <Buyitem />
         },
       ]
