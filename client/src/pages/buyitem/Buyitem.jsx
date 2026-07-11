@@ -8,13 +8,17 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import stripePromise from "../../api/stripe";
 
+import CloseIcon from '@mui/icons-material/Close';
+
+import { useNavigate } from "react-router-dom";
+
 const Buyitem = () => {
     const { state } = useLocation();
 
     const item_id = state?.item_id;
     const paymentCreated = useRef(false);
     const [payment, setPayment] = useState(null);
-
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (paymentCreated.current) return;
@@ -57,8 +61,35 @@ const Buyitem = () => {
                 )}
             </div>
 
-            <div className="Rbuyitem">
-                <Rbuy />
+            <div className="Rbuyitem" >
+                <div className="Rbuy">
+                    <div className="container">
+                        <div className="menu">
+                            <div className="header">
+                                <span>Order Summary</span>
+                                <CloseIcon onClick={() => navigate("/download")} style={{ cursor: "pointer" }} />
+                            </div>
+                            <br />
+                            <Rbuy />
+                            <br />
+                            <div className="row">
+                                <span>Subtotal</span> <span>฿500.00</span>
+                            </div>
+                            <div className="row">
+                                <span>Platform fee (3.5%)</span> <span>฿1000.00</span>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div className="menu">
+                            <span>Total Amount</span>
+                            <div className="buttons">
+                                <button>Buy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/* <Rbuy /> */}
             </div>
         </div>
     );

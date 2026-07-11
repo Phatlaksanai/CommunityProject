@@ -105,7 +105,6 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
 
   dayjs.extend(relativeTime);
 
-  console.log("Post:", post)
   return (
     <div className="post">
       <div className="container">
@@ -209,7 +208,7 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
         {commentOpen && <Comments postId={post.post_id} />}
       </div>
 
-      {/* --- LIGHTBOX PORTAL (ก๊อปปี้สไตล์และระบบมาจาก leftDC) --- */}
+      {/* Img full screen */}
       {activeImageIndex !== null && imageList.length > 0 && createPortal(
         <div className="lightboxOverlay" onClick={() => setActiveImageIndex(null)}>
           <button className="lightboxCloseBtn" onClick={() => setActiveImageIndex(null)}>
