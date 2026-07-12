@@ -304,13 +304,13 @@ function App() {
       ]
     },
     {
-      path: "/download",
+      path: "/download/:id",
       element: (
         <DescriptionDownload />
       ),
       children: [
         {
-          path: "/download",
+          index: true,
           element: <DescDownload />
         },
       ]

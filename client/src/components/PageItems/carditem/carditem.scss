@@ -1,0 +1,39 @@
+@use "../../../style.scss" as *;
+
+.carditem {
+  @include themify($themes) {
+    overflow: scroll;
+    background-color: themed("bg");
+    color: themed("textColor");
+    // border-radius: 10px;
+
+    @include mobile {
+      display: none;
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .item {
+      display: flex;
+      gap: 10px;
+
+      img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+      }
+
+      .info {
+        display: flex;
+        flex-direction: column; // ทำให้ price ลงล่าง
+      }
+
+      .price {
+        font-size: 14px;
+        opacity: 0.7;
+      }
+    }
+  }
+}

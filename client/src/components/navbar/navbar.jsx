@@ -130,7 +130,7 @@ const Navbar = () => {
           <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
         )}
         <AddShoppingCartIcon onClick={() => navigate("/market")} style={{ cursor: "pointer" }} />
-        <DownloadIcon onClick={() => navigate("/download")} style={{ cursor: "pointer" }} />
+        <DownloadIcon onClick={() => navigate(`/download/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
 
         {/* ============================================================ */}
         {/* โครงสร้างก้อนค้นหา Algolia เวอร์ชันเสถียรที่สุด ไร้อาการหลุดโฟกัส และไร้อาการแวบ */}
