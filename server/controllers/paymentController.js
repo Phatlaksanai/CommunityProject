@@ -164,5 +164,37 @@ exports.addItemToCart = async (req, res) => {
       success: false,
       error: "Failed to add item to cart",
     });
+exports.getCardItems = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Join ตาราง cart_items เข้ากับ carts (เช็ค userId) และ items (ดึงรายละเอียด)
+    const { data: cartItems, error } = await db
+      .from("cart_items")
+      .select(`
+        cart_items_id,
+        carts!inner ( user_id ),
+        items ( item_id, modelName, price, img )
+      `)
+      .eq("carts.user_id", userId);
+
+    if (error) {
+      throw error;
+    }
+
+    // จัดรูปทรงของ Data ใหม่ให้อยู่ในระดับเดียวกัน เพื่อให้ Frontend เรียกใช้ง่าย
+    const formattedData = cartItems.map(item => ({
+      cart_items_id: item.cart_items_id,
+      item_id: item.items.item_id,
+      modelName: item.items.modelName,
+      price: item.items.price,
+      img: item.items.img
+    }));
+
+    // ส่ง Array กลับไปโดยตรง เพื่อให้ data.map() ฝั่ง Frontend ทำงานได้
+    res.json(formattedData);
+  } catch (error) {
+    console.error("Error fetching cart items:", error);
+    res.status(500).json({ error: "Failed to fetch cards" });
   }
 };
