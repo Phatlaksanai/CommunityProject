@@ -164,6 +164,8 @@ exports.addItemToCart = async (req, res) => {
       success: false,
       error: "Failed to add item to cart",
     });
+  }
+};
 exports.getCardItems = async (req, res) => {
   const { userId } = req.params;
 

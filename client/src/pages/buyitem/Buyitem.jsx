@@ -21,7 +21,7 @@ const Buyitem = () => {
     const navigate = useNavigate();
     const [error, setError] = useState("");
 
-    const { isLoading, error, data: cartItems } = useQuery({
+    const { isLoading, error: cartItemsError, data: cartItems } = useQuery({
         queryKey: ["carditems", id ],
         queryFn: () => {
             return makeRequest.get(`/payments/carditems/${id}`).then(res => res.data);
@@ -89,7 +89,7 @@ const Buyitem = () => {
                             <br />
                             {isLoading ? (
                                 <span>Loading items...</span>
-                            ) : error ? (
+                            ) : cartItemsError ? (
                                 <span>Something went wrong!</span>
                             ) : (
                                 <CardItems items={cartItems} />
