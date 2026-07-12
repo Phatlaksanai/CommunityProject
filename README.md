@@ -61,6 +61,7 @@ Feature
 6.รายงาน
 
 ทดสอบระบบ
+จำลองการสอบ -เปลี่ยนระบบเป็นเข้าได้ทุกครั้งไม่ต้องจดจำผู้ใช้ เอา token ออก
 
 https://mui.com/material-ui/material-icons/
 

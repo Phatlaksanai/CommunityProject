@@ -19,6 +19,7 @@ const Buyitem = () => {
     const paymentCreated = useRef(false);
     const [payment, setPayment] = useState(null);
     const navigate = useNavigate();
+    const [error, setError] = useState("");
 
     useEffect(() => {
         if (paymentCreated.current) return;
@@ -33,10 +34,9 @@ const Buyitem = () => {
                         item_id: item_id
                     }
                 );
-                console.log(res.data.clientSecret);
                 setPayment(res.data);
             } catch (error) {
-                console.log(error);
+                setError(error.response.data.error);
             }
         };
 
@@ -59,6 +59,7 @@ const Buyitem = () => {
                         <Lbuy />
                     </Elements>
                 )}
+                {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
             </div>
 
             <div className="Rbuyitem" >

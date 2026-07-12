@@ -14,6 +14,7 @@ import DescProject from './pages/descProject/DescProject';
 import DescCommu from './pages/descCommu/DescCommu';
 import DescDownload from './pages/descDownload/DescDownload';
 import Buyitem from './pages/buyitem/Buyitem';
+import Cart from './pages/cart/Cart';
 import Profile from "./pages/profile/Profile";
 import ProfileItems from "./pages/profile/ProfileItems";
 import ProfileProjects from "./pages/profile/ProfileProjects";
@@ -408,6 +409,18 @@ function App() {
         {
           index: true,
           element: <Buyitem />
+        },
+      ]
+    },
+    {
+      path: "/cart/:id",
+      element: (
+        <LayoutNavbar />
+      ),
+      children: [
+        {
+          index: true,
+          element: <Cart />
         },
       ]
     },

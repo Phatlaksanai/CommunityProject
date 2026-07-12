@@ -125,6 +125,10 @@ exports.addItem = async (req, res) => {
     return res.status(400).json({ error: "Price must be number" });
   }
 
+  if (price < 10) {
+    return res.status(400).json({ error: "Price must be at least 10" });
+  }
+
   const { data, error } = await db
     .from("items")
     .insert([

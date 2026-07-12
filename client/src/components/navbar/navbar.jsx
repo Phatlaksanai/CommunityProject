@@ -154,7 +154,7 @@ const Navbar = () => {
       </div>
 
       <div className="right">
-        <ShoppingBasketIcon />
+        <ShoppingBasketIcon onClick={() => navigate(`/cart/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
         <PersonOutlinedIcon onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
         <EmailOutlinedIcon onClick={() => navigate(`/boxchat/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
         <div className="user">

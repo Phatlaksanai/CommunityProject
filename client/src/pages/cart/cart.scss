@@ -1,0 +1,99 @@
+@use "../../style.scss" as *;
+
+.cart {
+  @include themify($themes) {
+    background-color: themed("bgSoft");
+    min-height: 100vh;
+    padding: 20px;
+    padding-bottom: 100px; // เว้นที่ให้ปุ่ม Checkout
+
+    @include mobile {
+      padding: 10px;
+      padding-bottom: 90px;
+    }
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .cartItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px 30px;
+    border-radius: 10px;
+
+    @include themify($themes) {
+      background: themed("bg");
+    }
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      img {
+        width: 120px;
+        height: 90px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+
+      .info {
+        @include themify($themes) {
+            background: themed("bg");
+            h1 {
+                font-size: 22px;
+                margin-bottom: 5px;
+                color: themed("textColor");
+            }
+
+            p {
+                color: themed("textColor");
+            }
+        }
+      }
+    }
+
+    .delete {
+      border: none;
+      color: #f0544f;
+      height: 40px;
+      width: 40px;
+      cursor: pointer;
+    }
+  }
+
+  .checkoutBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+
+    padding: 15px 0;
+
+    @include themify($themes) {
+      background: themed("bg");
+      border-top: 1px solid themed("border");
+    }
+
+    button {
+      width: min(500px, 90%);
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      background: #5271ff;
+      color: white;
+      cursor: pointer;
+    }
+  }
+}
