@@ -41,8 +41,8 @@ const AddItem = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!/\.(glb|gltf)$/i.test(file.name)) {
-      setError("Please select a GLB or GLTF file");
+    if (!/\.(glb|zip)$/i.test(file.name)) {
+      setError("Please select a GLB or ZIP file");
       return;
     }
     if (file.size > MAX_MODEL_SIZE) {

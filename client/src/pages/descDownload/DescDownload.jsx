@@ -11,13 +11,17 @@ const DescDownload = () => {
             <div className="container">
                 <div className="Header">
                     <h2>Item</h2>
+                    <h2>Price</h2>
+                    <h2>Date</h2>
                     <h2>Download</h2>
                     <h2>Review</h2>
                 </div>
                 <hr />
                 <div className="content">
                     <h3>Balls</h3>
-                    <button>Download V10.1.0</button>
+                    <h3>฿ 200.00</h3>
+                    <h3>2024-06-10</h3>
+                    <button>Download</button>
                     <button className="review-btn">Review</button>
                 </div>
             </div>

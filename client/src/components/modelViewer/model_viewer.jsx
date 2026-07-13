@@ -266,7 +266,7 @@ const ModelViewer = ({ modelUrl }) => {
 
     /* ===== Load Model ===== */
     const ext = modelUrl.split(".").pop().toLowerCase();
-    if (ext === "glb" || ext === "gltf") {
+    if (ext === "glb") {
       const loader = new GLTFLoader();
       loader.load(modelUrl, (gltf) => {
         if (!isMounted) return;

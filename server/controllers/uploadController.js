@@ -10,7 +10,7 @@ const upload = multer({
 
 const isModelFile = (filename) => {
   const lower = filename.toLowerCase();
-  return lower.endsWith(".glb") || lower.endsWith(".gltf");
+  return lower.endsWith(".glb") || lower.endsWith(".zip");
 };
 
 // 2. สร้าง Helper Function สำหรับ Upload Stream
