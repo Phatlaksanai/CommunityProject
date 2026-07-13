@@ -30,11 +30,16 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
     }));
   };
 
+  const displayName = currentUser?.name || currentUser?.username || "Guest";
+  const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName;
+
   return (
     <div className="leftBarDownload">
       <div className="leftBarDownloadItem">
         <img src={currentUser?.profilePic || defaultPic} alt="profile" />
-        <span>{currentUser?.name || currentUser?.username || "Guest"}</span>
+        <span className="custom-tooltip" data-tip={displayName}>
+          {truncatedName}
+        </span>
         <button onClick={() => navigate("/additem")} style={{ cursor: "pointer" }}>Add Item</button>
       </div>
 

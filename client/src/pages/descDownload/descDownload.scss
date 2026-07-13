@@ -17,16 +17,17 @@
 
     .container {
       width: 100%;
-      max-width: 600px;
       margin: 0 auto;
       display: flex;
+      justify-content: center;
       flex-direction: column;
+      text-align: center;
       gap: 15px;
     }
 
     .Header, .content {
       display: grid;
-      grid-template-columns: 1fr 160px 100px; 
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr; 
       align-items: center;
       gap: 20px;
     }
@@ -67,12 +68,15 @@
         cursor: pointer;
         width: fit-content;
         transition: background-color 0.2s ease;
+        
+        
 
         &:hover {
           background-color: #4a62d6;
         }
       }
       .review-btn {
+
         background-color: themed("bgSoft");
         color: themed("textColor");
         
