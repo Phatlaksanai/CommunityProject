@@ -84,10 +84,11 @@ const EditItem = () => {
         const file = e.target.files[0];
         if (!file) return;
 
-        if (!/\.(glb|.zip)$/i.test(file.name)) {
+        if (!/\.(glb|zip)$/i.test(file.name)) {
             setError("Please select a GLB or ZIP file");
             return;
         }
+
         if (file.size > MAX_MODEL_SIZE) {
             setError("File size must be under 10MB");
             e.target.value = "";
@@ -173,7 +174,7 @@ const EditItem = () => {
                 finalGltf = res.url;
                 finalGltfPublicId = res.public_id;
             }
-
+            
             // 3. ส่งไปที่ API
             await makeRequest.put("/items/update-item", {
                 itemId: items?.item_id,
@@ -196,7 +197,7 @@ const EditItem = () => {
                 usdzPublicId: finalUsdzPublicId,
                 gltfPublicId: finalGltfPublicId,
             });
-console.log("Update item success");
+
             setSuccess("Update item success");
             navigate(`/profile/${currentUser.user_id}/items`);
         } catch (err) {
@@ -298,7 +299,7 @@ console.log("Update item success");
                     <div className="form-group">
                         <label>Zip File for Obj</label>
 
-                        <label htmlFor="model" className="file-input">
+                        <label htmlFor="obj" className="file-input">
                             {obj instanceof File ? obj.name : "Current model"}
                         </label>
 
@@ -314,7 +315,7 @@ console.log("Update item success");
                     <div className="form-group">
                         <label>Zip File for blend</label>
 
-                        <label htmlFor="model" className="file-input">
+                        <label htmlFor="blend" className="file-input">
                             {blend instanceof File ? blend.name : "Current model"}
                         </label>
 
@@ -330,7 +331,7 @@ console.log("Update item success");
                     <div className="form-group">
                         <label>Zip File for Fbx</label>
 
-                        <label htmlFor="model" className="file-input">
+                        <label htmlFor="fbx" className="file-input">
                             {fbx instanceof File ? fbx.name : "Current model"}
                         </label>
 
@@ -344,9 +345,25 @@ console.log("Update item success");
                     </div>
 
                     <div className="form-group">
+                        <label>Zip File for USDZ</label>
+
+                        <label htmlFor="usdz" className="file-input">
+                            {usdz instanceof File ? usdz.name : "Current model"}
+                        </label>
+
+                        <input
+                            type="file"
+                            id="usdz"
+                            accept=".zip"
+                            onChange={handleModelChange(setUsdz)}
+                            hidden
+                        />
+                    </div>
+
+                    <div className="form-group">
                         <label>Zip File for gltf</label>
 
-                        <label htmlFor="model" className="file-input">
+                        <label htmlFor="gltf" className="file-input">
                             {gltf instanceof File ? gltf.name : "Current model"}
                         </label>
 

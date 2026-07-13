@@ -180,7 +180,7 @@ exports.addItem = async (req, res) => {
 };
 
 exports.updateItem = async (req, res) => {
-  const { modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category, imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId } = req.body;
+  const { itemId ,modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category, imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId } = req.body;
 
   try {
     const { data: items, error } = await db
@@ -290,7 +290,6 @@ exports.updateItem = async (req, res) => {
     if (gltfPublicId && oldGltfId && oldGltfId !== gltfPublicId) {
       await cloudinary.uploader.destroy(oldGltfId);
     }
-
 
     return res.status(200).json({ success: true });
   } catch (err) {
