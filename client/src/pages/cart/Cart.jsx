@@ -1,34 +1,45 @@
 import "./cart.scss";
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { useQuery } from "@tanstack/react-query";
+import CardItems from "../../components/PageItems/cards/carditems"
+import { useParams, useNavigate } from "react-router-dom";
+import { makeRequest } from "../../api/axios";
+import { useContext } from "react";
+import { AuthContext } from "../../context/authContext";
 
 const Cart = () => {
-  return (
-    <div className="cart">
-      <div className="container">
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const { currentUser } = useContext(AuthContext);
 
-        <div className="cartItem">
-          <div className="left">
-            <img
-              src="https://i.pinimg.com/200x150/6d/69/ce/6d69ced1f99dd83942228425f0c20ec0.jpg"
-              alt=""
-            />
+    const { isLoading, error: cartItemsError, data: cartItems } = useQuery({
+        queryKey: ["cards", id],
+        queryFn: () => {
+            return makeRequest.get(`/payments/carditems/${id}`).then(res => res.data);
+        }
+    });
 
-            <div className="info">
-              <h1>Cart</h1>
-              <p>$2222</p>
+    const cartId = cartItems?.length ? cartItems[0].cart_id : null; // cartItems ถูกส่งกลับเป็น array ต้องวนหา cart_id
+
+    return (
+        <div className="cart">
+            <div className="container">
+
+                <div className="cartItem">
+                    <div className="left">
+                        <CardItems items={cartItems} isCart={true} />
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <DeleteForeverIcon className="delete" />
+            <div className="checkoutBar">
+                <button onClick={() => navigate((`/buyitem/${currentUser.user_id}`), {
+                    state: {
+                        cartId: cartId
+                    }
+                })} style={{ cursor: "pointer" }}>Check Out</button>
+            </div>
         </div>
-
-      </div>
-
-      <div className="checkoutBar">
-        <button>Check Out</button>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Cart;

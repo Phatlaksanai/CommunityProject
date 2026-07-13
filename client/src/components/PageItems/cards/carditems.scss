@@ -1,4 +1,9 @@
+@use "../../../style.scss" as *;
+
 .carditems {
-  display: grid;
-  gap: 10px;
+  @include themify($themes) {
+    color: themed("text-color");
+    display: grid;
+    gap: 10px;
+  }
 }

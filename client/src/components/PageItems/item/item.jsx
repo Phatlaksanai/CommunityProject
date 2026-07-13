@@ -24,7 +24,7 @@ const Item = ({ item, isProfile, isShop }) => {
       return;
     }
     try {
-      const res = await makeRequest.post("/payments/add-to-cart", {
+      const res = await makeRequest.post("/payments/addToCart", {
         item_id: item.item_id,
       });
       const data = res.data;

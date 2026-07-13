@@ -13,7 +13,7 @@ const Lbuy = () => {
         const result = await stripe.confirmPayment({
             elements,
             confirmParams:{
-                return_url:"http://localhost:5173/payment-success"
+                return_url:"http://localhost:5173/download"
             }
         });
         if(result.error){

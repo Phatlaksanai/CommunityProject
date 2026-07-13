@@ -14,8 +14,8 @@ import { useQuery } from "@tanstack/react-query";
 const Buyitem = () => {
     const { id } = useParams();
     const { state } = useLocation();
-
-    const item_id = state?.item_id;
+    
+    const cart_id = state?.cartId;
     const paymentCreated = useRef(false);
     const [payment, setPayment] = useState(null);
     const navigate = useNavigate();
@@ -45,9 +45,9 @@ const Buyitem = () => {
 
             try {
                 const res = await makeRequest.post(
-                    "/payments/create-payment",
+                    "/payments/createpayment",
                     {
-                        item_id: item_id
+                        cartId: cart_id
                     }
                 );
                 setPayment(res.data);
@@ -56,11 +56,11 @@ const Buyitem = () => {
             }
         };
 
-        if (item_id) {
+        if (cart_id) {
             createPayment();
         }
 
-    }, [item_id]);
+    }, [cart_id]);
 
     return (
         <div className="buyitem">
