@@ -1,9 +1,12 @@
 import "./Lbuy.scss";
 import { useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
+import { AuthContext } from "../../../context/authContext";
+import { useContext } from "react";
 
 const Lbuy = () => {
     const stripe = useStripe();
     const elements = useElements();
+    const { currentUser } = useContext(AuthContext);
 
     const handleSubmit = async () => {
 
@@ -13,7 +16,7 @@ const Lbuy = () => {
         const result = await stripe.confirmPayment({
             elements,
             confirmParams:{
-                return_url:"http://localhost:5173/download"
+                return_url:`http://localhost:5173/download/${currentUser.user_id}`
             }
         });
         if(result.error){

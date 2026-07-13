@@ -69,7 +69,7 @@ const LeftBar = () => {
             <StorefrontIcon />
             <span>Market</span>
           </div>
-          <div className="item" onClick={() => navigate("/download")} style={{ cursor: "pointer" }}>
+          <div className="item" onClick={() => navigate(`/download/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
             <DownloadIcon />
             <span>Download</span>
           </div>
