@@ -9,7 +9,7 @@ exports.createPayment = async (req, res) => {
       .from("cart_items")
       .select(`
         cart_items_id,
-        items(price),
+        items(price ,item_id ,user_id),
         carts!inner(cart_id,user_id)
       `)
       .eq("carts.cart_id", cartId)
@@ -18,7 +18,7 @@ exports.createPayment = async (req, res) => {
     if (error) {
       throw error;
     }
-
+    
     if (!cartItems || cartItems.length === 0) {
       return res.status(404).json({error: "Cart is empty"});
     }
@@ -43,6 +43,24 @@ exports.createPayment = async (req, res) => {
     if (orderError) {
       throw orderError;
     }
+
+    const orderItems = cartItems.map(cartItem => ({
+      order_id: order.order_id,
+      item_id: cartItem.items.item_id,
+      seller_id: cartItem.items.user_id,
+      platform_fee: platformFee,  
+      seller_net: subtotal,  
+      download_url: null,
+    }));
+
+    const { data: orderItemsData, error: orderItemsError } = await db
+      .from("order_items")
+      .insert(orderItems);
+
+    if (orderItemsError) {
+      throw orderItemsError;
+    }
+
 
     const amount = Math.round(order.total_amount * 100);
 
