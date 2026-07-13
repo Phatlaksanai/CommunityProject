@@ -272,23 +272,23 @@ exports.updateItem = async (req, res) => {
     }
 
     if (objPublicId && oldObjId && oldObjId !== objPublicId) {
-      await cloudinary.uploader.destroy(oldObjId);
+      await cloudinary.uploader.destroy(oldObjId, { resource_type: "raw" });
     }
 
     if (blendPublicId && oldBlendId && oldBlendId !== blendPublicId) {
-      await cloudinary.uploader.destroy(oldBlendId);
+      await cloudinary.uploader.destroy(oldBlendId, { resource_type: "raw" });
     }
 
     if (fbxPublicId && oldFbxId && oldFbxId !== fbxPublicId) {
-      await cloudinary.uploader.destroy(oldFbxId);
+      await cloudinary.uploader.destroy(oldFbxId, { resource_type: "raw" });
     }
 
     if (usdzPublicId && oldUsdzId && oldUsdzId !== usdzPublicId) {
-      await cloudinary.uploader.destroy(oldUsdzId);
+      await cloudinary.uploader.destroy(oldUsdzId, { resource_type: "raw" });
     }
 
     if (gltfPublicId && oldGltfId && oldGltfId !== gltfPublicId) {
-      await cloudinary.uploader.destroy(oldGltfId);
+      await cloudinary.uploader.destroy(oldGltfId, { resource_type: "raw" });
     }
 
     return res.status(200).json({ success: true });
