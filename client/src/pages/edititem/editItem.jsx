@@ -18,12 +18,22 @@ const EditItem = () => {
     const [img, setImg] = useState(null);
     const [model, setModel] = useState(null);
     const [category, setCategory] = useState("");
+    const [obj ,setObj] = useState(null);
+    const [blend ,setBlend] = useState(null);
+    const [fbx ,setFbx] = useState(null);
+    const [usdz ,setUsdz] = useState(null);
+    const [gltf ,setGltf] = useState(null);
 
     // message
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [imgPublicId, setImgPublicId] = useState(null);
     const [modelPublicId, setModelPublicId] = useState(null);
+    const [objPublicId, setObjPublicId] = useState(null);
+    const [blendPublicId, setBlendPublicId] = useState(null);
+    const [fbxPublicId, setFbxPublicId] = useState(null);
+    const [usdzPublicId, setUsdzPublicId] = useState(null);
+    const [gltfPublicId, setGltfPublicId] = useState(null);
 
     const { data: items } = useQuery({
         queryKey: ["item", item_id],
@@ -41,6 +51,16 @@ const EditItem = () => {
             setModel(items.model || null);
             setModelPublicId(items.model_public_id || null);
             setCategory(items.category || "");
+            setObj(items.obj || null);
+            setObjPublicId(items.obj_public_id || null);
+            setBlend(items.blend || null);
+            setBlendPublicId(items.blend_public_id || null);
+            setFbx(items.fbx || null);
+            setFbxPublicId(items.fbx_public_id || null);
+            setUsdz(items.usdz || null);
+            setUsdzPublicId(items.usdz_public_id || null);
+            setGltf(items.gltf || null);
+            setGltfPublicId(items.gltf_public_id || null);
         }
     }, [items]);
 
@@ -60,21 +80,20 @@ const EditItem = () => {
 
     const MAX_MODEL_SIZE = 10 * 1024 * 1024;
 
-    const handleModelChange = (e) => {
+    const handleModelChange = (setter) => (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        if (!/\.(glb|gltf)$/i.test(file.name)) {
-            setError("Please select a GLB or GLTF file");
+        if (!/\.(glb|.zip)$/i.test(file.name)) {
+            setError("Please select a GLB or ZIP file");
             return;
         }
         if (file.size > MAX_MODEL_SIZE) {
             setError("File size must be under 10MB");
-            setModel(null); // เคลียร์ของเก่า
             e.target.value = "";
             return;
         }
-        setModel(file);
+        setter(file);
         e.target.value = "";
         setError("");
     };
@@ -101,6 +120,16 @@ const EditItem = () => {
             let finalImgPublicId = imgPublicId;
             let finalModel = model;
             let finalModelPublicId = modelPublicId;
+            let finalObj = obj;
+            let finalObjPublicId = objPublicId;
+            let finalBlend = blend;
+            let finalBlendPublicId = blendPublicId;
+            let finalFbx = fbx;
+            let finalFbxPublicId = fbxPublicId;
+            let finalUsdz = usdz;
+            let finalUsdzPublicId = usdzPublicId;
+            let finalGltf = gltf;
+            let finalGltfPublicId = gltfPublicId;
 
             // 2. อัปโหลดเฉพาะเมื่อเป็นไฟล์ใหม่เท่านั้น (instanceof File)
             if (img instanceof File) {
@@ -115,6 +144,36 @@ const EditItem = () => {
                 finalModelPublicId = res.public_id;
             }
 
+            if (obj instanceof File) {
+                const res = await uploadFile(obj);
+                finalObj = res.url;
+                finalObjPublicId = res.public_id;
+            }
+
+            if (blend instanceof File) {
+                const res = await uploadFile(blend);
+                finalBlend = res.url;
+                finalBlendPublicId = res.public_id;
+            }
+
+            if (fbx instanceof File) {
+                const res = await uploadFile(fbx);
+                finalFbx = res.url;
+                finalFbxPublicId = res.public_id;
+            }
+
+            if (usdz instanceof File) {
+                const res = await uploadFile(usdz);
+                finalUsdz = res.url;
+                finalUsdzPublicId = res.public_id;
+            }
+
+            if (gltf instanceof File) {
+                const res = await uploadFile(gltf);
+                finalGltf = res.url;
+                finalGltfPublicId = res.public_id;
+            }
+
             // 3. ส่งไปที่ API
             await makeRequest.put("/items/update-item", {
                 itemId: items?.item_id,
@@ -124,15 +183,28 @@ const EditItem = () => {
                 category,
                 img: finalImg,
                 model: finalModel,
+                obj: finalObj,
+                blend: finalBlend,
+                fbx: finalFbx,
+                usdz: finalUsdz,
+                gltf: finalGltf,
                 imgPublicId: finalImgPublicId,
                 modelPublicId: finalModelPublicId,
+                objPublicId: finalObjPublicId,
+                blendPublicId: finalBlendPublicId,
+                fbxPublicId: finalFbxPublicId,
+                usdzPublicId: finalUsdzPublicId,
+                gltfPublicId: finalGltfPublicId,
             });
-
+console.log("Update item success");
             setSuccess("Update item success");
             navigate(`/profile/${currentUser.user_id}/items`);
         } catch (err) {
-            console.error(err);
-            setError("Failed to connect to server");
+            if (err.response && err.response.data && err.response.data.error) {
+                setError(err.response.data.error); // จะแสดง error จาก backend
+            } else {
+                setError("Failed to connect to server");
+            }
         }
     };
 
@@ -182,22 +254,6 @@ const EditItem = () => {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label>Model</label>
-
-                        <label htmlFor="model" className="file-input">
-                            {model instanceof File ? model.name : "Current model"}
-                        </label>
-
-                        <input
-                            type="file"
-                            id="model"
-                            accept=".glb,.gltf"
-                            onChange={handleModelChange}
-                            hidden
-                        />
-                    </div>
-
                     <div className="category">
                         <label htmlFor="category" className="category__title">
                             Category
@@ -219,6 +275,88 @@ const EditItem = () => {
                             <option value="Sports">Sports</option>
                             <option value="Food&Drink">Food & Drink</option>
                         </select>
+                    </div>
+
+                    <h4>Model Files</h4>
+
+                    <div className="form-group">
+                        <label>GLB for Web Page Rendering</label>
+
+                        <label htmlFor="model" className="file-input">
+                            {model instanceof File ? model.name : "Current model"}
+                        </label>
+
+                        <input
+                            type="file"
+                            id="model"
+                            accept=".glb"
+                            onChange={handleModelChange(setModel)}
+                            hidden
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Zip File for Obj</label>
+
+                        <label htmlFor="model" className="file-input">
+                            {obj instanceof File ? obj.name : "Current model"}
+                        </label>
+
+                        <input
+                            type="file"
+                            id="obj"
+                            accept=".zip"
+                            onChange={handleModelChange(setObj)}
+                            hidden
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Zip File for blend</label>
+
+                        <label htmlFor="model" className="file-input">
+                            {blend instanceof File ? blend.name : "Current model"}
+                        </label>
+
+                        <input
+                            type="file"
+                            id="blend"
+                            accept=".zip"
+                            onChange={handleModelChange(setBlend)}
+                            hidden
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Zip File for Fbx</label>
+
+                        <label htmlFor="model" className="file-input">
+                            {fbx instanceof File ? fbx.name : "Current model"}
+                        </label>
+
+                        <input
+                            type="file"
+                            id="fbx"
+                            accept=".zip"
+                            onChange={handleModelChange(setFbx)}
+                            hidden
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Zip File for gltf</label>
+
+                        <label htmlFor="model" className="file-input">
+                            {gltf instanceof File ? gltf.name : "Current model"}
+                        </label>
+
+                        <input
+                            type="file"
+                            id="gltf"
+                            accept=".zip"
+                            onChange={handleModelChange(setGltf)}
+                            hidden
+                        />
                     </div>
 
                     <input type="submit" value="Save Changes" className="add-item__submit" />

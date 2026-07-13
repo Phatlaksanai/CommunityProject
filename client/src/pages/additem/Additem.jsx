@@ -14,12 +14,22 @@ const AddItem = () => {
   const [img, setImg] = useState(null);
   const [model, setModel] = useState(null);
   const [category, setCategory] = useState("");
+  const [obj ,setObj] = useState(null);
+  const [blend ,setBlend] = useState(null);
+  const [fbx ,setFbx] = useState(null);
+  const [usdz ,setUsdz] = useState(null);
+  const [gltf ,setGltf] = useState(null);
 
   // message
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [imgPublicId, setImgPublicId] = useState(null);
   const [modelPublicId, setModelPublicId] = useState(null);
+  const [objPublicId, setObjPublicId] = useState(null);
+  const [blendPublicId, setBlendPublicId] = useState(null);
+  const [fbxPublicId, setFbxPublicId] = useState(null);
+  const [usdzPublicId, setUsdzPublicId] = useState(null);
+  const [gltfPublicId, setGltfPublicId] = useState(null);
 
   // ================= UPLOAD FILES TO CLOUDINARY =================
   const handleImageChange = (e) => {
@@ -37,24 +47,25 @@ const AddItem = () => {
 
   const MAX_MODEL_SIZE = 10 * 1024 * 1024;
 
-  const handleModelChange = (e) => {
+  const handleModelChange = (setter) => (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!/\.(glb|gltf)$/i.test(file.name)) {
-      setError("Please select a GLB or GLTF file");
+    if (!/\.(glb|zip)$/i.test(file.name)) {
+      setError("Please select a glb or zip model file");
       return;
     }
     if (file.size > MAX_MODEL_SIZE) {
       setError("File size must be under 10MB");
-      setModel(null); // เคลียร์ของเก่า
       e.target.value = "";
       return;
     }
-    setModel(file);
-    e.target.value = "";
+
+    setter(file);
     setError("");
+    e.target.value = "";
   };
+
   const uploadFile = async (file) => {
     if (!file || !(file instanceof File)) return null; // ถ้าไม่ใช่ไฟล์ ไม่ต้องอัปโหลด
     const formData = new FormData();
@@ -80,12 +91,27 @@ const AddItem = () => {
       return;
     }
 
+    if (!obj && !blend && !fbx && !usdz && !gltf) {
+      setError("Please upload zip model files");
+      return;
+    }
+
     try {
       const imgURL = await uploadFile(img);
       const modelURL = await uploadFile(model);
+      const objURL = await uploadFile(obj);
+      const blendURL = await uploadFile(blend);
+      const fbxURL = await uploadFile(fbx);
+      const usdzURL = await uploadFile(usdz);
+      const gltfURL = await uploadFile(gltf);
 
       if (!imgURL || !modelURL) {
         setError("Failed to upload file");
+        return;
+      }
+
+      if (!objURL && !blendURL && !fbxURL && !usdzURL && !gltfURL) {
+        setError("Failed to upload model files");
         return;
       }
 
@@ -98,6 +124,16 @@ const AddItem = () => {
         model: modelURL.url,
         imgPublicId: imgURL.public_id,
         modelPublicId: modelURL.public_id,
+        obj: objURL ? objURL.url : null,
+        blend: blendURL ? blendURL.url : null,
+        fbx: fbxURL ? fbxURL.url : null,
+        usdz: usdzURL ? usdzURL.url : null,
+        gltf: gltfURL ? gltfURL.url : null,
+        objPublicId: objURL ? objURL.public_id : null,
+        blendPublicId: blendURL ? blendURL.public_id : null,
+        fbxPublicId: fbxURL ? fbxURL.public_id : null,
+        usdzPublicId: usdzURL ? usdzURL.public_id : null,
+        gltfPublicId: gltfURL ? gltfURL.public_id : null,
       });
 
       setSuccess("add item success");
@@ -157,22 +193,6 @@ const AddItem = () => {
             />
           </div>
 
-          <div className="form-group">
-            <label>Model</label>
-
-            <label htmlFor="model" className="file-input">
-              {model ? model.name : "No file selected"}
-            </label>
-
-            <input
-              type="file"
-              id="model"
-              accept=".glb,.gltf"
-              onChange={handleModelChange}
-              hidden
-            />
-          </div>
-
           <div className="category">
             <label htmlFor="category" className="category__title">
               Category
@@ -194,6 +214,104 @@ const AddItem = () => {
               <option value="Sports">Sports</option>
               <option value="Food&Drink">Food & Drink</option>
             </select>
+          </div>
+
+          <h4>Model Files</h4>
+
+          <div className="form-group">
+            <label>GLB for Web Page Rendering</label>
+
+            <label htmlFor="model" className="file-input">
+              {model ? model.name : "No file selected"}
+            </label>
+
+            <input
+              type="file"
+              id="model"
+              accept=".glb"
+              onChange={handleModelChange(setModel)}
+              hidden
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Zip file for OBJ </label>
+
+            <label htmlFor="obj" className="file-input">
+              {obj ? obj.name : "No file selected"}
+            </label>
+
+            <input
+              type="file"
+              id="obj"
+              accept=".zip"
+              onChange={handleModelChange(setObj)}
+              hidden
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Zip file for BLEND</label>
+
+            <label htmlFor="blend" className="file-input">
+              {blend ? blend.name : "No file selected"}
+            </label>
+
+            <input
+              type="file"
+              id="blend"
+              accept=".zip"
+              onChange={handleModelChange(setBlend)}
+              hidden
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Zip file for FBX</label>
+
+            <label htmlFor="fbx" className="file-input">
+              {fbx ? fbx.name : "No file selected"}
+            </label>
+
+            <input
+              type="file"
+              id="fbx"
+              accept=".zip"
+              onChange={handleModelChange(setFbx)}
+              hidden
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Zip file for USDZ</label>
+
+            <label htmlFor="usdz" className="file-input">
+              {usdz ? usdz.name : "No file selected"}
+            </label>
+
+            <input
+              type="file"
+              id="usdz"
+              accept=".zip"
+              onChange={handleModelChange(setUsdz)}
+              hidden
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Zip file for GLTF</label>
+
+            <label htmlFor="gltf" className="file-input">
+              {gltf ? gltf.name : "No file selected"}
+            </label>
+
+            <input
+              type="file"
+              id="gltf"
+              accept=".zip"
+              onChange={handleModelChange(setGltf)}
+              hidden
+            />
           </div>
 
           <input type="submit" value="Submit" className="add-item__submit" />
