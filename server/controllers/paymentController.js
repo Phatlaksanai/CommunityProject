@@ -5,7 +5,7 @@ exports.createPayment = async (req, res) => {
   const { cartId } = req.body;
 
   try {
-    const { data: cartItems, error } = await db 
+    const { data: cartItems, error } = await db
       .from("cart_items")
       .select(`
         cart_items_id,
@@ -18,13 +18,13 @@ exports.createPayment = async (req, res) => {
     if (error) {
       throw error;
     }
-    
+
     if (!cartItems || cartItems.length === 0) {
-      return res.status(404).json({error: "Cart is empty"});
+      return res.status(404).json({ error: "Cart is empty" });
     }
 
-    const subtotal = cartItems.reduce((sum, cartItem) => sum + cartItem.items.price ,0); // นำ price ของทุกชิ้นมาบวกกัน
-    
+    const subtotal = cartItems.reduce((sum, cartItem) => sum + cartItem.items.price, 0); // นำ price ของทุกชิ้นมาบวกกัน
+
     const platformFee = subtotal * 0.035;
     const paymentFee = subtotal * 0.0165 + (subtotal * (0.0165 * 0.07));
     const totalAmount = subtotal + platformFee + paymentFee;
@@ -48,9 +48,8 @@ exports.createPayment = async (req, res) => {
       order_id: order.order_id,
       item_id: cartItem.items.item_id,
       seller_id: cartItem.items.user_id,
-      platform_fee: platformFee,  
-      seller_net: subtotal,  
-      download_url: null,
+      platform_fee: platformFee,
+      seller_net: subtotal,
     }));
 
     const { data: orderItemsData, error: orderItemsError } = await db
@@ -123,13 +122,13 @@ exports.addItemToCart = async (req, res) => {
       .eq("user_id", user_id)
       .single();
 
-      // ถ้ามี Cart และหมดอายุแล้ว
+    // ถ้ามี Cart และหมดอายุแล้ว
     if (cart && new Date(cart.cart_expire) < new Date()) {
       await db.from("carts")
-      .delete()
-      .eq("cart_id", cart.cart_id);
+        .delete()
+        .eq("cart_id", cart.cart_id);
 
-    return res.status(400).json({error: "Cart expired"});
+      return res.status(400).json({ error: "Cart expired" });
     }
 
     // ถ้ายังไม่มี Cart
@@ -322,4 +321,51 @@ exports.removeItemFromCart = async (req, res) => {
       error: "Failed to remove item from cart",
     });
   }
+};
+
+exports.stripeWebhook = async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+  } catch (err) {
+    console.error("Webhook signature verification failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === 'payment_intent.succeeded') {
+    const paymentIntent = event.data.object;
+
+    try {
+      // 1. ค้นหา Order
+      const { data: order, error: orderError } = await db
+        .from("orders")
+        .select("order_id")
+        .eq("stripe_pi_id", paymentIntent.id)
+        .single();
+
+      if (orderError || !order) {
+        throw new Error("Order not found for this PaymentIntent");
+      }
+
+      // 2. อัปเดตสถานะ Order เป็น 'completed'
+      const { error: updateOrderError } = await db
+        .from("orders")
+        .update({ status: "completed" })
+        .eq("order_id", order.order_id);
+
+      if (updateOrderError) throw updateOrderError;
+
+      console.log(`Payment successful and DB updated for Order ID: ${order.order_id}`);
+
+    } catch (dbError) {
+      console.error("Database update failed during webhook:", dbError);
+      return res.status(500).json({ error: "Failed to update DB" });
+    }
+  }
+
+  res.status(200).send();
 };

@@ -9,6 +9,8 @@ const cors = require("cors");
 
 dotenv.config({path: '../.env'})
 
+const paymentController = require('./controllers/paymentController');
+
 if (!process.env.JWT_SECRETKEY) {
   console.error("❌ JWT_SECRETKEY is not defined in .env");
   process.exit(1); // หยุดการทำงานทันที
@@ -29,11 +31,15 @@ if (!process.env.JWT_SECRETKEY) {
 //     console.log('connecting!');
 // });
 
-app.use(express.json());//new+++++
-app.use(express.urlencoded({extended:false}))
+
 
 app.use(cookieParser());
 app.use(cors({origin: ["http://localhost:5173","http://10.40.148.108:5173",],credentials: true, }));//new+++++
+
+app.post("/api/payments/webhook", express.raw({ type: 'application/json' }), paymentController.stripeWebhook);
+
+app.use(express.json());
+app.use(express.urlencoded({extended:false}))
 
 // app.use('/api', require('./routes/MyRouter'))  
 app.use("/api", require("./routes/authRoutes"));
