@@ -49,8 +49,7 @@ exports.createPayment = async (req, res) => {
       item_id: cartItem.items.item_id,
       seller_id: cartItem.items.user_id,
       platform_fee: platformFee,  
-      seller_net: subtotal,  
-      download_url: null,
+      seller_net: subtotal
     }));
 
     const { data: orderItemsData, error: orderItemsError } = await db
@@ -320,6 +319,125 @@ exports.removeItemFromCart = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Failed to remove item from cart",
+    });
+  }
+};
+
+exports.getDownloads = async (req, res) => {
+  try {
+
+    const { data, error } = await db
+      .from("order_items")
+      .select(`
+        order_item_id,
+
+        orders!inner(
+          status,
+          created_at,
+          user_id
+        ),
+
+        items(
+          modelName,
+          price
+        )
+      `)
+      .eq("orders.user_id", req.user.user_id)
+      .eq("orders.status", "completed");
+
+    if (error) throw error;
+
+    res.json(data);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Failed to load downloads"
+    });
+  }
+};
+
+exports.getDownloadFile = async (req, res) => {
+  const { orderItemId, type } = req.params;
+
+  try {
+    const { data, error } = await db
+      .from("order_items")
+      .select(`
+        order_item_id,
+
+        orders!inner(
+          user_id,
+          status
+        ),
+
+        items(
+          modelName,
+          obj,
+          fbx,
+          blend,
+          usdz,
+          gltf
+        )
+      `)
+      .eq("order_item_id", orderItemId)
+      .single();
+
+    if (error || !data) {
+      return res.status(404).json({
+        error: "Order item not found"
+      });
+    }
+
+    // ตรวจสอบว่าเป็นเจ้าของรายการซื้อ
+    if (data.orders.user_id !== req.user.user_id) {
+      return res.status(403).json({
+        error: "You do not have permission to download this file"
+      });
+    }
+
+    // ตรวจสอบว่าจ่ายเงินแล้ว
+    if (data.orders.status !== "completed") {
+      return res.status(403).json({
+        error: "Payment not completed"
+      });
+    }
+
+    // อนุญาตเฉพาะชนิดไฟล์ที่กำหนด
+    const allowTypes = ["obj", "fbx", "blend", "usdz", "gltf"];
+
+    if (!allowTypes.includes(type)) {
+      return res.status(400).json({
+        error: "Invalid file type"
+      });
+    }
+
+    const fileUrl = data.items[type];
+
+    if (!fileUrl) {
+      return res.status(404).json({
+        error: "File not found"
+      });
+    }
+
+    // const fileName = `${data.items.modelName}.zip`; // ตั้งชื่อไฟล์ดาวน์โหลดตาม modelName และนามสกุล
+
+    // const downloadUrl = fileUrl.replace( // เปลี่ยน URL ของไฟล์ให้เป็นลิงก์ดาวน์โหลด
+    //   "/upload/",
+    //   `/upload/fl_attachment:${fileName}/`
+    // );
+
+    // res.redirect(downloadUrl); // ส่งลิงก์ดาวน์โหลดไปยังผู้ใช้
+    const downloadUrl = fileUrl.replace(
+      "/raw/upload/",
+      "/raw/upload/fl_attachment/"
+    );
+
+    res.redirect(downloadUrl);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Server error"
     });
   }
 };

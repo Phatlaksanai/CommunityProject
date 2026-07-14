@@ -7,5 +7,7 @@ router.post("/createpayment", verifyToken, paymentController.createPayment);
 router.post("/addToCart", verifyToken, paymentController.addItemToCart);
 router.get("/carditems/:userId", verifyToken, paymentController.getCardItems);
 router.delete("/removeitem/:itemId", verifyToken, paymentController.removeItemFromCart);
+router.get("/downloads", verifyToken, paymentController.getDownloads);
+router.get("/download/:orderItemId/:type", verifyToken, paymentController.getDownloadFile);
 
 module.exports = router;

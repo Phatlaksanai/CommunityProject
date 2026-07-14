@@ -19,7 +19,7 @@ const streamUpload = (fileBuffer, folder, isModel, originalName) => {
     const uploadOptions = {
       folder: isModel ? `${folder}/models` : `${folder}/Pictures`,
       // แก้ตรงนี้: 3D Model ใน Cloudinary ควรใช้ "image" หรือ "auto"
-      resource_type: isModel ? "auto" : "image", 
+      resource_type: isModel ? "raw" : "image", 
       // ถ้าใช้ resource_type: "image" ไม่ต้องใส่ extension ใน public_id
       public_id: `${Date.now()}-${originalName.split('.')[0]}`,
       // ถ้าเป็นโมเดล ให้ระบุ format ชัดเจน
