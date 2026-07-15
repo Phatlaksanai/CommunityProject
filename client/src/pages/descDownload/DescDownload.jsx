@@ -44,14 +44,14 @@ const DescDownload = () => {
                                         [item.order_item_id]: e.target.value
                                     })
                                 }
-                            >
-                                <option disabled={!item.items.obj} value="obj">OBJ</option>
-                                <option disabled={!item.items.fbx} value="fbx">FBX</option>
-                                <option disabled={!item.items.blend} value="blend">BLEND</option>
-                                <option disabled={!item.items.usdz} value="usdz">USDZ</option>
-                                <option disabled={!item.items.gltf} value="gltf">GLTF</option>
+                            > 
+                                <option value="obj">OBJ</option>
+                                <option value="fbx">FBX</option>
+                                <option value="blend">BLEND</option>
+                                <option value="usdz">USDZ</option>
+                                <option value="gltf">GLTF</option>
                             </select>
-
+                                {/* disabled={!item.items.obj}  */}
                             <button onClick={() => handleDownload(item.order_item_id)}>Download</button>
                             <button className="review-btn" >Review</button>
                         </div>
