@@ -33,9 +33,14 @@ const Buyitem = () => {
         // นำ price ของทุกชิ้นมาบวกกัน
         subtotal = cartItems.reduce((sum, item) => sum + item.price, 0); 
     }
-    const platformFee = subtotal * 0.035; // คิด 3.5%
-    const paymentFee = subtotal * 0.0165 + (subtotal * (0.0165 * 0.07));
-    const totalAmount = subtotal + paymentFee + platformFee;
+
+    const platformFee = subtotal * 0.035; 
+    const netTarget = subtotal + platformFee; // ยอดสุทธิที่ต้องการให้เหลือหลังหัก Stripe
+    
+    const effectiveFeeRate = 0.0165 * (1 + 0.07); // 0.017655 (ค่าธรรมเนียม Stripe + VAT)
+    
+    const totalAmount = netTarget / (1 - effectiveFeeRate); // ยอดที่ต้องชาร์จจริง
+    const paymentFee = totalAmount - netTarget; // ค่าธรรมเนียม Stripe ที่แสดงให้ฝั่ง Client เห็น
 
     useEffect(() => {
         if (paymentCreated.current) return;
