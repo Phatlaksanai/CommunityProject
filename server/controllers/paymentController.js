@@ -26,8 +26,10 @@ exports.createPayment = async (req, res) => {
     const subtotal = cartItems.reduce((sum, cartItem) => sum + cartItem.items.price, 0); // นำ price ของทุกชิ้นมาบวกกัน
 
     const platformFee = subtotal * 0.035;
-    const paymentFee = subtotal * 0.0165 + (subtotal * (0.0165 * 0.07));
-    const totalAmount = subtotal + platformFee + paymentFee;
+    const netTarget = subtotal + platformFee;
+    const effectiveFeeRate = 0.0165 * (1 + 0.07);
+    const totalAmount = netTarget / (1 - effectiveFeeRate);
+    const paymentFee = totalAmount - netTarget;
 
     // 2. สร้าง Order
     const { data: order, error: orderError } = await db
