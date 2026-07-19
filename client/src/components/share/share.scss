@@ -83,146 +83,148 @@
     }
   }
 }
+
 .projectModal {
-      position: fixed;
-      // padding: 20px;
-      // border-radius: 20px;
-      // top: 50%;
-      // left: 50%;
-      // transform: translate(-50%, -50%);
-      // width: auto;
-      // height: auto;
-      top: 0;
+  position: fixed;
+  // padding: 20px;
+  // border-radius: 20px;
+  // top: 50%;
+  // left: 50%;
+  // transform: translate(-50%, -50%);
+  // width: auto;
+  // height: auto;
+  top: 0;
   left: 0;
-  width: 100vw; 
+  width: 100vw;
   height: 100vh;
-      background: rgba(0, 0, 0, 0.3);
-      // background-color: themed("bg");
+  background: rgba(0, 0, 0, 0.3);
+  // background-color: themed("bg");
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.projectModal .modalContainer {
+  @include themify($themes) {
+    background-color: themed("bg");
+    color: themed("textColor");
+    padding: 25px;
+    border-radius: 15px;
+    width: 450px; // ขยายความกว้างเล็กน้อยเพื่อให้ดูไม่อึดอัด
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
+
+    h3 {
+      margin-bottom: 5px;
     }
-      .projectModal .modalContainer {
-        @include themify($themes) {
-          background-color: themed("bg");
-          color: themed("textColor");
-          padding: 25px;
-          border-radius: 15px;
-          width: 450px; // ขยายความกว้างเล็กน้อยเพื่อให้ดูไม่อึดอัด
-          max-height: 80vh;
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      label {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      input[type="text"] {
+        padding: 10px;
+        border-radius: 15px;
+        border: 1px solid themed("border");
+        background-color: transparent;
+        color: themed("textColor");
+        outline: none;
+
+        &:focus {
+          border-color: #5271ff;
+        }
+      }
+
+      .post-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 10px;
+        max-height: 300px; // กำหนดความสูงเพื่อความสวยงาม
+        overflow-y: auto; // ให้ Scroll ได้ถ้าข้อมูลเยอะ
+        border: 1px solid themed("border");
+        border-radius: 8px;
+        padding: 10px;
+
+        // สไตล์สำหรับแต่ละ Project Item
+        .post-item {
           display: flex;
-          flex-direction: column;
-          gap: 15px;
-          box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
+          align-items: center;
+          gap: 12px;
+          padding: 8px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background 0.2s;
 
-          h3 {
-            margin-bottom: 5px;
+          &:hover {
+            background-color: rgba(82, 113, 255, 0.1); // สีจางๆ เวลากดเลือก
           }
 
-          .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-
-            label {
-              font-size: 14px;
-              font-weight: 500;
-            }
-
-            input[type="text"] {
-              padding: 10px;
-              border-radius: 15px;
-              border: 1px solid themed("border");
-              background-color: transparent;
-              color: themed("textColor");
-              outline: none;
-
-              &:focus {
-                border-color: #5271ff;
-              }
-            }
-
-            .post-list {
-              display: flex;
-              flex-direction: column;
-              gap: 8px;
-              margin-top: 10px;
-              max-height: 300px; // กำหนดความสูงเพื่อความสวยงาม
-              overflow-y: auto; // ให้ Scroll ได้ถ้าข้อมูลเยอะ
-              border: 1px solid themed("border");
-              border-radius: 8px;
-              padding: 10px;
-
-              // สไตล์สำหรับแต่ละ Project Item
-              .post-item {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 8px;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: background 0.2s;
-
-                &:hover {
-                  background-color: rgba(82, 113, 255, 0.1); // สีจางๆ เวลากดเลือก
-                }
-
-                input[type="radio"] {
-                  cursor: pointer;
-                  accent-color: #5271ff; // เปลี่ยนสีวงกลม radio ให้เข้ากับธีม
-                }
-
-                img {
-                  width: 50px;
-                  height: 50px;
-                  border-radius: 6px;
-                  object-fit: cover;
-                }
-
-                span {
-                  font-size: 14px;
-                  font-weight: 400;
-                  color: themed("textColor");
-                  // ป้องกันข้อความยาวเกินไป
-                  display: -webkit-box;
-                  -webkit-line-clamp: 1;
-                  -webkit-box-orient: vertical;
-                  overflow: hidden;
-                }
-              }
-            }
+          input[type="radio"] {
+            cursor: pointer;
+            accent-color: #5271ff; // เปลี่ยนสีวงกลม radio ให้เข้ากับธีม
           }
 
-          // ส่วนของปุ่มด้านล่าง
-          .modalButtons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 10px;
+          img {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            object-fit: cover;
+          }
 
-            button {
-              padding: 8px 20px;
-              border: none;
-              border-radius: 5px;
-              cursor: pointer;
-              font-weight: 500;
-
-              &.cancel {
-                background-color: #ff4d4d;
-                color: white;
-              }
-
-              &.confirm {
-                background-color: #5271ff;
-                color: white;
-              }
-
-              &:hover {
-                opacity: 0.8;
-              }
-            }
+          span {
+            font-size: 14px;
+            font-weight: 400;
+            color: themed("textColor");
+            // ป้องกันข้อความยาวเกินไป
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
           }
         }
       }
+    }
+
+    // ส่วนของปุ่มด้านล่าง
+    .modalButtons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+
+      button {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+
+        &.cancel {
+          background-color: #ff4d4d;
+          color: white;
+        }
+
+        &.confirm {
+          background-color: #5271ff;
+          color: white;
+        }
+
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+}

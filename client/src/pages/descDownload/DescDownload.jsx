@@ -8,10 +8,19 @@ const DescDownload = () => {
 
     const [downloads, setDownloads] = useState([]);
     const [fileTypes, setFileTypes] = useState({});
+    const [openReview, setOpenReview] = useState(false);
 
     useEffect(() => {
         makeRequest.get(`/payments/downloads`).then(res => setDownloads(res.data));
-    }, []);
+
+        if (openReview) {
+            document.body.style.overflow = "hidden";
+        }
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+
+    }, [openReview]);
 
     const handleDownload = async (orderItemId, type) => {
         try {
@@ -43,6 +52,7 @@ const DescDownload = () => {
                     <h2>Item</h2>
                     <h2>Price</h2>
                     <h2>Date</h2>
+                    <h2>Type</h2>
                     <h2>Download</h2>
                     <h2>Review</h2>
                 </div>
@@ -53,7 +63,7 @@ const DescDownload = () => {
                             <h3>{item.items.modelName}</h3>
                             <h3>฿{item.items.price}</h3>
                             <h3>{new Date(item.orders.created_at).toLocaleDateString()}</h3>
-                            <select
+                            <select className="file-type-select"
                                 value={fileTypes[item.order_item_id] || getDefaultFileType(item.items)}
                                 onChange={(e) =>
                                     setFileTypes({
@@ -77,6 +87,37 @@ const DescDownload = () => {
                     ))}
                 </div>
             </div>
+
+            {openReview && (
+                <div className="ReviewModal">
+                    <div className="modalContainer">
+                        <h3>Review</h3>
+                        <div className="form-group">
+                            <span>Point</span>
+                            <select className="file-type-select">
+                                <option >5</option>
+                                <option >4</option>
+                                <option >3</option>
+                                <option >2</option>
+                                <option >1</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <span>Description</span>
+                            <input type="text" id="description" placeholder="Description"
+                                required />
+                        </div>
+
+                        <div className="modalButtons">
+                            <button onClick={() => setOpenReview(false)}>Cancel</button>
+                            <button onClick={() => setOpenReview(false)}>Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }
