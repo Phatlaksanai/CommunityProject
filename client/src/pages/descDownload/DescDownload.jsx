@@ -48,23 +48,30 @@ const DescDownload = () => {
         if (items.gltf) return "gltf";
         return "";
     };
-    
+
     const handleSubmitReview = async () => {
         try {
-            const response = await makeRequest.post(`/items/review`, { 
+            const response = await makeRequest.post(`/items/review`, {
                 itemId: selectedItemId,
                 points: point,
                 description: description
             });
-            
-            console.log("Review Success:", response.data);
-            
+
+            // อัปเดต state downloads เพื่อให้ปุ่มของ item นี้กลายเป็น Complete ทันที
+            setDownloads(prevDownloads =>
+                prevDownloads.map(dl =>
+                    dl.items.item_id === selectedItemId
+                        ? { ...dl, is_reviewed: true }
+                        : dl
+                )
+            );
+
             // ส่งเสร็จแล้วให้เคลียร์ค่าและปิด Modal
             setOpenReview(false);
             setPoint(5);
             setDescription("");
             setSelectedItemId(null);
-            
+
         } catch (error) {
             console.error("Review error:", error);
         }
@@ -107,12 +114,18 @@ const DescDownload = () => {
                                 const typeToDownload = fileTypes[item.order_item_id] || getDefaultFileType(item.items); // ใช้ประเภทไฟล์ที่เลือกหรือประเภทเริ่มต้นถ้าไม่มีการเลือก
                                 handleDownload(item.order_item_id, typeToDownload);
                             }}>Download</button>
-                            <button className="review-btn" 
-                            onClick={() => {
-                                setSelectedItemId(item.items.item_id);
-                                setOpenReview(true);
-                            }}
-                            >Review</button>
+                            {item.is_reviewed ? (
+                                <span className="review-complete">Complete</span>
+                            ) : (
+                                <button className="review-btn"
+                                    onClick={() => {
+                                        setSelectedItemId(item.items.item_id);
+                                        setOpenReview(true);
+                                    }}
+                                >
+                                    Review
+                                </button>
+                            )}
                         </div>
                     ))}
                 </div>

@@ -327,18 +327,15 @@ exports.removeItemFromCart = async (req, res) => {
 
 exports.getDownloads = async (req, res) => {
   try {
-
     const { data, error } = await db
       .from("order_items")
       .select(`
         order_item_id,
-
         orders!inner(
           status,
           created_at,
           user_id
         ),
-
         items(
           item_id,
           modelName,
@@ -355,7 +352,28 @@ exports.getDownloads = async (req, res) => {
 
     if (error) throw error;
 
-    res.json(data);
+    // 1. ดึง item_id ทั้งหมดจาก data ที่ได้มา
+    const itemIds = data.map(d => d.items.item_id);
+
+    // 2. ค้นหาตาราง reviews ด้วย user_id ปัจจุบัน และ item_id ที่อยู่ในรายการดาวน์โหลด
+    const { data: reviewsData, error: reviewsError } = await db
+      .from("reviews")
+      .select("item_id")
+      .eq("user_id", req.user.user_id)
+      .in("item_id", itemIds);
+
+    if (reviewsError) throw reviewsError;
+
+    // 3. นำ item_id ที่เคยรีวิวแล้วมาเก็บใน Set 
+    const reviewedItemIds = new Set(reviewsData.map(r => r.item_id));
+
+    // 4. Map ค่า is_reviewed เพิ่มเข้าไปในชุดข้อมูลเดิม
+    const result = data.map(item => ({
+      ...item,
+      is_reviewed: reviewedItemIds.has(item.items.item_id)
+    }));
+
+    res.json(result);
 
   } catch (err) {
     console.error(err);
