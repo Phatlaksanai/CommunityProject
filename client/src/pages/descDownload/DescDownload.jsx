@@ -82,7 +82,9 @@ const DescDownload = () => {
                                 const typeToDownload = fileTypes[item.order_item_id] || getDefaultFileType(item.items); // ใช้ประเภทไฟล์ที่เลือกหรือประเภทเริ่มต้นถ้าไม่มีการเลือก
                                 handleDownload(item.order_item_id, typeToDownload);
                             }}>Download</button>
-                            <button className="review-btn" >Review</button>
+                            <button className="review-btn" onClick={() => setOpenReview(true)}>
+                                Review
+                            </button>
                         </div>
                     ))}
                 </div>
