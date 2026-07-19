@@ -8,7 +8,11 @@ const DescDownload = () => {
 
     const [downloads, setDownloads] = useState([]);
     const [fileTypes, setFileTypes] = useState({});
+
     const [openReview, setOpenReview] = useState(false);
+    const [selectedItemId, setSelectedItemId] = useState(null); // เก็บ item_id ของแถวที่กด
+    const [point, setPoint] = useState(5); // เก็บดาว (ค่าเริ่มต้น 5)
+    const [description, setDescription] = useState("");
 
     useEffect(() => {
         makeRequest.get(`/payments/downloads`).then(res => setDownloads(res.data));
@@ -43,6 +47,27 @@ const DescDownload = () => {
         if (items.usdz) return "usdz";
         if (items.gltf) return "gltf";
         return "";
+    };
+
+    const handleSubmitReview = async () => {
+        try {
+            const response = await makeRequest.post(`/items/review`, { 
+                item_id: selectedItemId,
+                points: point,
+                description: description
+            });
+            
+            console.log("Review Success:", response.data);
+            
+            // ส่งเสร็จแล้วให้เคลียร์ค่าและปิด Modal
+            setOpenReview(false);
+            setPoint(5);
+            setDescription("");
+            setSelectedItemId(null);
+            
+        } catch (error) {
+            console.error("Review error:", error);
+        }
     };
 
     return (
@@ -82,7 +107,12 @@ const DescDownload = () => {
                                 const typeToDownload = fileTypes[item.order_item_id] || getDefaultFileType(item.items); // ใช้ประเภทไฟล์ที่เลือกหรือประเภทเริ่มต้นถ้าไม่มีการเลือก
                                 handleDownload(item.order_item_id, typeToDownload);
                             }}>Download</button>
-                            <button className="review-btn" >Review</button>
+                            <button className="review-btn" 
+                            onClick={() => {
+                                setSelectedItemId(item.items.item_id);
+                                setOpenReview(true);
+                            }}
+                            >Review</button>
                         </div>
                     ))}
                 </div>
@@ -94,7 +124,10 @@ const DescDownload = () => {
                         <h3>Review</h3>
                         <div className="form-group">
                             <span>Point</span>
-                            <select className="file-type-select">
+                            <select className="file-type-select"
+                                value={point}
+                                onChange={(e) => setPoint(e.target.value)}
+                                required >
                                 <option >5</option>
                                 <option >4</option>
                                 <option >3</option>
@@ -106,12 +139,14 @@ const DescDownload = () => {
                         <div className="form-group">
                             <span>Description</span>
                             <input type="text" id="description" placeholder="Description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                                 required />
                         </div>
 
                         <div className="modalButtons">
                             <button onClick={() => setOpenReview(false)}>Cancel</button>
-                            <button onClick={() => setOpenReview(false)}>Confirm</button>
+                            <button onClick={handleSubmitReview}>Confirm</button>
                         </div>
 
                     </div>
