@@ -48,11 +48,11 @@ const DescDownload = () => {
         if (items.gltf) return "gltf";
         return "";
     };
-
+    
     const handleSubmitReview = async () => {
         try {
             const response = await makeRequest.post(`/items/review`, { 
-                item_id: selectedItemId,
+                itemId: selectedItemId,
                 points: point,
                 description: description
             });

@@ -340,7 +340,7 @@ exports.addReview = async (req, res) => {
       {
         user_id: userId,
         item_id: itemId,
-        description: description, 
+        review: description, 
         points: points
       }])
     .select()

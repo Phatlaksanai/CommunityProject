@@ -340,6 +340,7 @@ exports.getDownloads = async (req, res) => {
         ),
 
         items(
+          item_id,
           modelName,
           price,
           obj,
@@ -424,7 +425,7 @@ exports.getDownloadFile = async (req, res) => {
     if (!fileUrl) {return res.status(404).json({error: "File not found"});}
 
     return res.json({ downloadUrl: fileUrl });
-    
+
   } catch (err) {
     console.error(err);
     res.status(500).json({
