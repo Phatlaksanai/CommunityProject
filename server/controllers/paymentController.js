@@ -341,7 +341,12 @@ exports.getDownloads = async (req, res) => {
 
         items(
           modelName,
-          price
+          price,
+          obj,
+          fbx,
+          blend,
+          usdz,
+          gltf
         )
       `)
       .eq("orders.user_id", req.user.user_id)
@@ -416,26 +421,10 @@ exports.getDownloadFile = async (req, res) => {
 
     const fileUrl = data.items[type];
 
-    if (!fileUrl) {
-      return res.status(404).json({
-        error: "File not found"
-      });
-    }
+    if (!fileUrl) {return res.status(404).json({error: "File not found"});}
 
-    // const fileName = `${data.items.modelName}.zip`; // ตั้งชื่อไฟล์ดาวน์โหลดตาม modelName และนามสกุล
-
-    // const downloadUrl = fileUrl.replace( // เปลี่ยน URL ของไฟล์ให้เป็นลิงก์ดาวน์โหลด
-    //   "/upload/",
-    //   `/upload/fl_attachment:${fileName}/`
-    // );
-
-    // res.redirect(downloadUrl); // ส่งลิงก์ดาวน์โหลดไปยังผู้ใช้
-    const downloadUrl = fileUrl.replace(
-      "/raw/upload/",
-      "/raw/upload/fl_attachment/"
-    );
-
-    res.redirect(downloadUrl);
+    return res.json({ downloadUrl: fileUrl });
+    
   } catch (err) {
     console.error(err);
     res.status(500).json({

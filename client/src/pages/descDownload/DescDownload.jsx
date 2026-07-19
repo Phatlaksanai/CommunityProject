@@ -13,10 +13,27 @@ const DescDownload = () => {
         makeRequest.get(`/payments/downloads`).then(res => setDownloads(res.data));
     }, []);
 
-    const handleDownload = (orderItemId) => {
-        const type = fileTypes[orderItemId] || "obj";
+    const handleDownload = async (orderItemId, type) => {
+        try {
+            // 1. ส่ง Request ไปขอ URL พร้อม Cookie ยืนยันตัวตน
+            const response = await makeRequest.get(`/payments/download/${orderItemId}/${type}`);
 
-        window.open(`${makeRequest.defaults.baseURL}/payments/download/${orderItemId}/${type}`, "_blank");
+            // 2. ถ้ามี URL ส่งกลับมา ให้เบราว์เซอร์ดาวน์โหลดไฟล์นั้นเลย
+            if (response.data.downloadUrl) {
+                window.location.href = response.data.downloadUrl;
+            }
+        } catch (error) {
+            console.error("Download error:", error);
+        }
+    };
+
+    const getDefaultFileType = (items) => { // ฟังก์ชันนี้จะตรวจสอบว่ามีไฟล์ประเภทใดบ้างและเลือกประเภทแรกที่มีอยู่
+        if (items.obj) return "obj";
+        if (items.fbx) return "fbx";
+        if (items.blend) return "blend";
+        if (items.usdz) return "usdz";
+        if (items.gltf) return "gltf";
+        return "";
     };
 
     return (
@@ -37,22 +54,24 @@ const DescDownload = () => {
                             <h3>฿{item.items.price}</h3>
                             <h3>{new Date(item.orders.created_at).toLocaleDateString()}</h3>
                             <select
-                                value={fileTypes[item.order_item_id] || "obj"}
+                                value={fileTypes[item.order_item_id] || getDefaultFileType(item.items)}
                                 onChange={(e) =>
                                     setFileTypes({
                                         ...fileTypes,
                                         [item.order_item_id]: e.target.value
                                     })
                                 }
-                            > 
-                                <option value="obj">OBJ</option>
-                                <option value="fbx">FBX</option>
-                                <option value="blend">BLEND</option>
-                                <option value="usdz">USDZ</option>
-                                <option value="gltf">GLTF</option>
+                            >
+                                <option disabled={!item.items.obj} value="obj">OBJ</option>
+                                <option disabled={!item.items.fbx} value="fbx">FBX</option>
+                                <option disabled={!item.items.blend} value="blend">BLEND</option>
+                                <option disabled={!item.items.usdz} value="usdz">USDZ</option>
+                                <option disabled={!item.items.gltf} value="gltf">GLTF</option>
                             </select>
-                                {/* disabled={!item.items.obj}  */}
-                            <button onClick={() => handleDownload(item.order_item_id)}>Download</button>
+                            <button onClick={() => {
+                                const typeToDownload = fileTypes[item.order_item_id] || getDefaultFileType(item.items); // ใช้ประเภทไฟล์ที่เลือกหรือประเภทเริ่มต้นถ้าไม่มีการเลือก
+                                handleDownload(item.order_item_id, typeToDownload);
+                            }}>Download</button>
                             <button className="review-btn" >Review</button>
                         </div>
                     ))}
