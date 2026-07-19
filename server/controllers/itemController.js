@@ -349,3 +349,27 @@ exports.addReview = async (req, res) => {
   if (error) return res.status(500).json(error);
   return res.status(201).json(data);
 };
+
+exports.getReviewsByItemId = async (req, res) => {
+  const { itemId } = req.params;
+
+  try {
+    const { data, error } = await db
+      .from("reviews")
+      .select(`
+        *,
+        users (
+          username,
+          name,
+          profilePic
+        )
+      `)
+      .eq("item_id", itemId)
+      .order("created_at", { ascending: false });
+    
+    if (error) throw error;
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};

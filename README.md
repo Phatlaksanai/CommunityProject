@@ -3,6 +3,9 @@ Object 3D
 2.มีไฟล์แต่ดูไม่ได้ ต้องกดที่โปรไฟล์เจ้าของแล้วค่อยหาไฟล์เปิดดู
 2.1 upload เข้าโปรไฟล์ตัวเอง
 
+คำสั่ง Webhook
+stripe listen --forward-to localhost:8080/api/payments/webhook
+
 โหลดเพิ่มเติม
 npm install concurrently --save-dev // เพื่อ run front+back พร้อมกัน
 npm install cookie-parser //server

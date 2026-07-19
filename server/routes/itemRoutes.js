@@ -17,5 +17,6 @@ router.put("/update-item", verifyToken, itemController.updateItem);
 router.get("/project-edit/:projectId", verifyToken, itemController.getItemsForEditProject);
 
 router.post("/review", verifyToken, itemController.addReview);
+router.get("/reviews/:itemId", itemController.getReviewsByItemId);
 
 module.exports = router;

@@ -56,9 +56,6 @@ const DescDownload = () => {
                 points: point,
                 description: description
             });
-            
-            console.log("Review Success:", response.data);
-            
             // ส่งเสร็จแล้วให้เคลียร์ค่าและปิด Modal
             setOpenReview(false);
             setPoint(5);
