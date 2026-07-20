@@ -47,7 +47,7 @@ const LeftDI = ({ item }) => {
           <h2>Review</h2>
           {itemReviews.length > 0 ? (
             itemReviews.map((review) => (
-              <div key={review.item_id} className="user">
+              <div key={review.review_id} className="user">
                 <div className="userInfo">
                   <img
                     src={review.users.profilePic}

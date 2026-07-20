@@ -11,6 +11,7 @@ const RightDI = ({ item }) => {
   const { currentUser } = useContext(AuthContext);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [itemReviews, setItemReviews] = useState([]);
 
   const handleAddToCart = async () => {
     
@@ -44,14 +45,19 @@ const RightDI = ({ item }) => {
       }
     };
 
+    useEffect(() => {
+      makeRequest.get(`/items/reviews/${item.item_id}`).then(res => setItemReviews(res.data));
+    }, []);
+
+    const averageRating = itemReviews.length > 0 ? (itemReviews.reduce((sum, review) => sum + Number(review.points), 0) / itemReviews.length).toFixed(1) : "No reviews yet";
+    
   return (
     <div className="rightDI">
       <div className="container">
         <div className="menu">
           <h2>{item.modelName}</h2>
-          <h4>Taxes</h4>
-          <h4>5 ★ ★ ★ ★ ★ (1)</h4>
-
+          <h4>Category: {item.category}</h4>
+          <h4>{averageRating} ★ ★ ★ ★ ★ ( {itemReviews.length} )</h4>
         </div>
 
         <hr />{/* ส่วน 2 */}
