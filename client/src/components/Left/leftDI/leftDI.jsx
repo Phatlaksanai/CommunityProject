@@ -68,7 +68,7 @@ const LeftDI = ({ item }) => {
                     <span className="review-text">{review.review}</span>
                   </div>
                 </div>
-                <p>Rating: {review.points} / 5</p>
+                <p>Rating: {review.points} ★</p>
               </div>
             ))
           ) : (

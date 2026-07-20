@@ -57,7 +57,7 @@ const RightDI = ({ item }) => {
         <div className="menu">
           <h2>{item.modelName}</h2>
           <h4>Category: {item.category}</h4>
-          <h4>{averageRating} ★ ★ ★ ★ ★ ( {itemReviews.length} )</h4>
+          <h4>Rating: {averageRating} ★ ( Count: {itemReviews.length} )</h4>
         </div>
 
         <hr />{/* ส่วน 2 */}
