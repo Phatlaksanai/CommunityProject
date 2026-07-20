@@ -1,7 +1,7 @@
 import "./leftDI.scss";
 import ModelViewer from "../../modelViewer/model_viewer";
 import { useNavigate } from "react-router-dom";
-import { useState ,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { makeRequest } from "../../../api/axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -32,7 +32,7 @@ const LeftDI = ({ item }) => {
         <div className="item">
           <h2>Owner</h2>
           <div className="user">
-            <div className="userInfo" onClick={() => navigate(`/profile/${item.user_id}`)} style={{ cursor: "pointer" } }>
+            <div className="userInfo" onClick={() => navigate(`/profile/${item.user_id}`)} style={{ cursor: "pointer" }}>
               <img
                 src={item.profilePic}
                 alt=""
@@ -53,12 +53,22 @@ const LeftDI = ({ item }) => {
                     src={review.users.profilePic}
                     alt=""
                   />
-                  <div className="online" />
-                  <span>{review.users.name || review.users.username}</span>
+                  <div className="review-info" >
+                    <div className="inside">
+                      {(() => {
+                        const displayName = review.users.name || review.users.username;
+                        return (
+                          <span>
+                            {displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName}
+                          </span>
+                        );
+                      })()}
+                      <p className="date">{dayjs(review.created_at).fromNow()}</p>
+                    </div>
+                    <span className="review-text">{review.review}</span>
+                  </div>
                 </div>
-                <p>{review.review}</p>
                 <p>Rating: {review.points} / 5</p>
-                <span className="date">{dayjs(review.created_at).fromNow()}</span>
               </div>
             ))
           ) : (

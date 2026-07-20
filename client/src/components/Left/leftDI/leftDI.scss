@@ -9,10 +9,11 @@
     overflow: scroll;
     background-color: themed("bgSoft");
 
-    @include mobile{
+    @include mobile {
       display: none;
     }
-    @include tablet{
+
+    @include tablet {
       display: none;
     }
 
@@ -33,42 +34,65 @@
         border-radius: 10px;
 
         img {
-        width: 100%;
-        height: auto;
-        max-height: none;
-        object-fit: initial;
-        border-radius: 10px;
+          width: 100%;
+          height: auto;
+          max-height: none;
+          object-fit: initial;
+          border-radius: 10px;
         }
 
-        
+
 
         .user {
           display: flex;
-          align-items: center;
           justify-content: space-between;
           margin: 20px 0px;
+          gap: 20px;
+
+          p {
+            white-space: nowrap;
+          }
 
           .userInfo {
             display: flex;
-            align-items: center;
             gap: 10px;
             position: relative;
+
 
             img {
               width: 40px;
               height: 40px;
               border-radius: 50%;
               object-fit: cover;
-              
+
             }
 
             p {
               color: themed("textColorSoft");
+              font-size: 12px;
+              margin: 0px;
             }
 
             span {
               font-weight: 500;
               color: themed("textColor");
+            }
+
+            .review-info {
+              display: flex;
+              flex-direction: column;
+
+              .inside {
+                display: flex;
+                gap: 10px;
+              }
+
+              .review-text {
+                font-weight: 500;
+                color: themed("textColor");
+                word-break: break-all;
+                opacity: 0.7;
+              }
             }
           }
 
