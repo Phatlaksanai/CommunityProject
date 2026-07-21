@@ -1,0 +1,180 @@
+@use "../../../style.scss" as *;
+
+.rightBar {
+  @include themify($themes) {
+    flex: 3;
+    position: sticky;
+    top: 70px;
+    height: calc(100vh - 70px);
+    overflow: scroll;
+    background-color: themed("bgSoft");
+
+    @include mobile{
+      display: none;
+    }
+    @include tablet{
+      display: none;
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .container {
+      padding: 20px;
+
+      .item {
+        -webkit-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+        -moz-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+        box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: themed("bg");
+
+        span {
+          color: gray;
+        }
+
+        .load-more {
+          justify-content: center;
+          margin-top: 5px;
+          color: themed("textColorSoft");
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 8px 10px; // เพิ่ม padding ให้ดูโปร่งขึ้น
+          border-radius: 8px; // มนกำลังดี
+          cursor: pointer;
+          transition: all 0.2s ease;
+          background-color: transparent; // มั่นใจว่าไม่มีสีพื้นหลังแปลกๆ
+          box-shadow: none !important; // ปิดเงาที่ทำให้ดูเหมือนเฟดดำ
+
+          &:hover {
+            // "เปล่งแสง" หรือ Highlight เหมือนกันทุกตัว
+            background-color: themed("bgSoft");
+          }
+
+          img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+
+          span {
+            font-size: 13px;
+          }
+        }
+        .community-list-wrapper {
+          max-height: 188px;
+          overflow-y: auto;
+          // ลบเงาหรือ background แปลกๆ ออกจาก wrapper
+          background: transparent;
+
+          &::-webkit-scrollbar {
+            width: 4px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background-color: themed("border");
+            border-radius: 10px;
+          }
+        }
+        .user {
+          justify-content: space-between;
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          // justify-content: space-between;
+          margin: 20px 0px;
+          border-radius: 8px;
+          padding: 8px;
+
+          &:hover {
+            // "เปล่งแสง" หรือ Highlight เหมือนกันทุกตัว
+            background-color: themed("bgSoft");
+          }
+          .userInfo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+
+            img {
+              width: 40px;
+              height: 40px;
+              border-radius: 10px;
+              object-fit: cover;
+            }
+
+            .online {
+              width: 12px;
+              height: 12px;
+              border-radius: 50%;
+              // background-color: limegreen;
+              position: absolute;
+              top: 0;
+              left: 30px;
+            }
+
+            p {
+              color: themed("textColorSoft");
+            }
+
+            span {
+              font-weight: 500;
+              color: themed("textColor");
+            }
+          }
+
+          .buttons {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+
+            button {
+              border: none;
+              padding: 5px;
+              color: white;
+              cursor: pointer;
+              border-radius: 6px;
+              padding: 4px 12px;
+
+              &:first-child {
+                background-color: #5271ff;
+              }
+
+              &:last-child {
+                background-color: #f0544f;
+              }
+            }
+          }
+        }
+      }
+
+      .new-releases {
+        .user {
+          align-items: flex-start;
+          justify-content: left !important;
+        .userInfo {
+          img {
+            width: 100px; 
+            height: 100px;
+          }
+        }
+        .buttons {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 2px;
+
+        span {
+          font-size: 14px;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+    }
+  }
+}

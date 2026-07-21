@@ -1,11 +1,12 @@
+import User from "../../components/statistic/users/users"
 import "./home.scss"
 
 const Home = () => {
   return (
     <div className="home">
-      <h1>Hello home</h1>
+      <User />
     </div>
   )
 }
 
-export default Home;
+export default Home

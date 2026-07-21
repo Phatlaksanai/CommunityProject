@@ -4,7 +4,10 @@ import { Routes, Route } from "react-router-dom";
 
 import Home from "./pages/home/Home";
 import Login from './pages/login/Login'
+
 import Navbar from "./components/navbar/navbar";
+import LeftBar from "./components/Left/leftbar/leftbar";
+import RightBar from "./components/Right/rightbar/rightbar";
 
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 import { useContext } from "react";
@@ -12,15 +15,18 @@ import { DarkModeContext } from "./context/darkModeContext";
 
 function App() {
   const { darkMode } = useContext(DarkModeContext);
-  const currentUser = true; // สถานะผู้ใช้ false วาปหน้าไม่ได้ true วาปหน้าได้
+  const currentUser = true;
 
   const Layout = () => {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        <Navbar />
         <div style={{ display: "flex" }}>
+          <LeftBar />
           <div style={{ flex: 6 }}>
             <Outlet />
           </div>
+          <RightBar />
         </div>
       </div>
     )
@@ -48,6 +54,10 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
+      element: <Login />
+    },
+    {
+      path: "/dashboard",
       element: (
         <ProtectedRoute>
           <Layout />
@@ -55,19 +65,13 @@ function App() {
       ),
       children: [
         {
-          path: "/",
-          element: <Login />
+          path: "/dashboard",
+          element: <Home />
         }
       ],
     },
-    {
-      path: "/dashboard",
-      element: <Home />,
-    },
   ]);
-  //ระบบใหม่++++++++++++++++++++++
 
-  //----------------------------------------------------------------------------Naw refash ไม่หาย
   const [user, setUser] = useState(() => {
     try {
       const savedUser = localStorage.getItem("user");
