@@ -10,13 +10,13 @@ stripe listen --forward-to localhost:8080/api/payments/webhook
 npm install concurrently --save-dev // เพื่อ run front+back พร้อมกัน
 npm install cookie-parser //server
 npm install jsonwebtoken //server
-npm install axios //client
+npm install axios //client + admin
 npm install cors //server
-npm install dayjs //server + client
-npm install @mui/icons-material @mui/material @emotion/styled @emotion/react // client 
+npm install dayjs //server + client + admin
+npm install @mui/icons-material @mui/material @emotion/styled @emotion/react // client + admin
 
-npm install -D sass // client 
-npm install @tanstack/react-query // client 
+npm install -D sass // client  + admin
+npm install @tanstack/react-query // client  + admin
 npm install cloudinary multer // server 
 npm install three // client 
 npm install @supabase/supabase-js // server
