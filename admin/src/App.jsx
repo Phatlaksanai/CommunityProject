@@ -32,11 +32,10 @@ function App() {
       </div>
     )
   }
-  
   const LayoutNavbar = () => {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
-        {/* <Navbar /> */}
+        <Navbar />
         <div style={{ display: "flex" }}>
           <div style={{ flex: 6 }}>
             <Outlet />
