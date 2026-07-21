@@ -71,7 +71,7 @@ const Login = () => {
           setError(data.error || "OTP sending failed");
         }
       } catch (err) {
-        setError("Connect to server failed");
+        setError(err.response?.data?.error || "Connect to server failed");
       } finally {
         setOtpLoading(false);
       }
