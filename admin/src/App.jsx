@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
-import Home from "./pages/home/Home1";
-import Login from './pages/login/Login1'
-import Register from './pages/register/Register1'
+import Home from "./pages/home/Home";
+import Login from './pages/login/Login'
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 
-import Navbar from "./components/navbar/navbar";
+// import Navbar from "./components/navbar/navbar";
 
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
@@ -33,6 +32,19 @@ function App() {
       </div>
     )
   }
+  
+  const LayoutNavbar = () => {
+    return (
+      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        {/* <Navbar /> */}
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 6 }}>
+            <Outlet />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
@@ -55,10 +67,6 @@ function App() {
           element: <Home />
         }
       ],
-    },
-    {
-      path: "/register",
-      element: <Register />
     },
     {
       path: "/login",
