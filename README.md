@@ -7,6 +7,7 @@ Object 3D
 stripe listen --forward-to localhost:8080/api/payments/webhook
 
 โหลดเพิ่มเติม
+npm install react-router-dom // client + admin
 npm install concurrently --save-dev // เพื่อ run front+back พร้อมกัน
 npm install cookie-parser //server
 npm install jsonwebtoken //server

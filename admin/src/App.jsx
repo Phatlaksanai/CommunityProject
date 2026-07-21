@@ -1,18 +1,14 @@
+import "./style.scss";
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Home from "./pages/home/Home";
 import Login from './pages/login/Login'
+import Navbar from "./components/navbar/navbar";
+
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
-
-// import Navbar from "./components/navbar/navbar";
-
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
-
-import "./style.scss";
-
-
 
 function App() {
   const { darkMode } = useContext(DarkModeContext);
@@ -21,13 +17,10 @@ function App() {
   const Layout = () => {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
-        <Navbar />
         <div style={{ display: "flex" }}>
-          <LeftBar />
           <div style={{ flex: 6 }}>
             <Outlet />
           </div>
-          <RightBar />
         </div>
       </div>
     )
@@ -47,7 +40,7 @@ function App() {
 
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
-      return <Navigate to="/login" />
+      return <Navigate to="/" />
     }
     return children;
   }
@@ -63,13 +56,13 @@ function App() {
       children: [
         {
           path: "/",
-          element: <Home />
+          element: <Login />
         }
       ],
     },
     {
-      path: "/login",
-      element: <Login />,
+      path: "/dashboard",
+      element: <Home />,
     },
   ]);
   //ระบบใหม่++++++++++++++++++++++
