@@ -9,15 +9,15 @@ const Item = () => {
     const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
 
-    const { isLoading, error, data = [] } = useQuery({
-        queryKey: ["todayUsers", userId],
-        queryFn: () => {
-            return makeRequest.get(`/statistics/user`).then(res => res.data);
-        }
-    });
+    // const { isLoading, error, data = [] } = useQuery({
+    //     queryKey: ["todayUsers", userId],
+    //     queryFn: () => {
+    //         return makeRequest.get(`/statistics/user`).then(res => res.data);
+    //     }
+    // });
 
-    if (isLoading) return "Loading items...";
-    if (error) return "Something went wrong!";
+    // if (isLoading) return "Loading items...";
+    // if (error) return "Something went wrong!";
 
     useEffect(() => {
 
