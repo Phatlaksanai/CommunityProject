@@ -11,11 +11,12 @@ import RightBar from "./components/Right/rightbar/rightbar";
 
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 import { useContext } from "react";
+import { AuthContext } from "./context/authContext";
 import { DarkModeContext } from "./context/darkModeContext";
 
 function App() {
   const { darkMode } = useContext(DarkModeContext);
-  const currentUser = true;
+  const { currentUser } = useContext(AuthContext);
 
   const Layout = () => {
     return (
