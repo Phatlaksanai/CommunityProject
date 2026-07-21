@@ -41,16 +41,11 @@ const Login = () => {
         <div className="left">
           <h1>PM.</h1>
           <p>
-            There is a lot of fun. Community game development platform. Join us
-            now!
+            Welcome, Admin. We trust your integrity. Please ensure all actions align with our core values and compliance guidelines.
           </p>
-          <span>Don't you have an account?</span>
-          <Link to="/register">
-            <button>Register</button>
-          </Link>
         </div>
         <div className="right">
-          <h1>Login</h1>
+          <h1>Admin Login</h1>
           {error && (
             <div style={{ color: "red", marginBottom: 10 }}>{error}</div>
           )}
@@ -75,9 +70,6 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <Link to="/resetpassword" className="forgot">
-              forgot password
-            </Link>
             <button type="submit" className="login-btn">login</button>
           </form>
         </div>
