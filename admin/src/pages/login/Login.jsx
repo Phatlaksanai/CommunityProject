@@ -1,27 +1,41 @@
-import { useContext, useState } from "react";
+import { useContext, useState ,useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { makeRequest } from "../../api/axios";
 import "./login.scss";
 
 const Login = () => {
-
   const navigate = useNavigate()
   const { setUser } = useContext(AuthContext); // ใช้ context ตรง ๆ
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const [otp, setOtp] = useState("");
+  const [otpCooldown, setOtpCooldown] = useState(0);
+  const [otpLoading, setOtpLoading] = useState(false);
+
+  useEffect(() => {
+    if (otpCooldown <= 0) return;
+
+    const timer = setInterval(() => {
+      setOtpCooldown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [otpCooldown]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
     try {
-      const res = await makeRequest.post("/login", {
-        username,
+      const res = await makeRequest.post("/admin/login-admin", {
+        email,
         password,
+        otp
       });
       const data = res.data;
       // Backend ส่งของ user data มาให้
@@ -35,6 +49,34 @@ const Login = () => {
     }
   };
 
+  const sendOTP = async () => {
+      if (otpCooldown > 0) return;
+      setError("");
+      setSuccess("");
+      setOtpLoading(true);
+  
+      if (!email.trim()) {
+        setError("Please enter your email before requesting OTP");
+        setOtpLoading(false);
+        return;
+      }
+  
+      try {
+        const res = await makeRequest.post("/admin/send-otp", { email });
+        const data = res.data;
+        if (data.success) {
+          setSuccess("Send OTP Successfully");
+          setOtpCooldown(8);
+        } else {
+          setError(data.error || "OTP sending failed");
+        }
+      } catch (err) {
+        setError("Connect to server failed");
+      } finally {
+        setOtpLoading(false);
+      }
+    };
+
   return (
     <div className="login">
       <div className="card">
@@ -44,10 +86,6 @@ const Login = () => {
             There is a lot of fun. Community game development platform. Join us
             now!
           </p>
-          <span>Don't you have an account?</span>
-          <Link to="/register">
-            <button>Register</button>
-          </Link>
         </div>
         <div className="right">
           <h1>Login</h1>
@@ -61,10 +99,10 @@ const Login = () => {
           <form onSubmit={handleLogin} className="form-login">
             <input
               type="text"
-              value={username}
-              placeholder="Username"
-              name="username"
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              placeholder="Email"
+              name="email"
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
             <input
@@ -75,10 +113,24 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <Link to="/resetpassword" className="forgot">
-              forgot password
-            </Link>
-            <button type="submit" className="login-btn">login</button>
+            <input
+              type="otp"
+              value={otp}
+              placeholder="OTP"
+              name="otp"
+              onChange={(e) => setOtp(e.target.value)}
+              required
+            />
+            <div style={{ display: "flex", gap: "10px" }}>
+                <button
+                    type="button"
+                    onClick={sendOTP}
+                    disabled={otpCooldown > 0 || otpLoading}
+                >
+                    {otpCooldown > 0 ? `Resend OTP (${otpCooldown} s)` : "OTP"}
+                </button>
+                <button type="submit" className="login-btn">login</button>
+            </div>
           </form>
         </div>
       </div>
