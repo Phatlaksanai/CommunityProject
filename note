@@ -65,3 +65,7 @@ create type isdelete as enum (
   'active',
   'deleted'
 );
+
+create type role as enum (
+  'admin'
+);

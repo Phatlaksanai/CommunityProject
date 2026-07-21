@@ -34,7 +34,7 @@ if (!process.env.JWT_SECRETKEY) {
 
 
 app.use(cookieParser());
-app.use(cors({origin: ["http://localhost:5173","http://10.40.148.108:5173",],credentials: true, }));//new+++++
+app.use(cors({origin: ["http://localhost:5173","http://localhost:5174"],credentials: true, }));//new+++++
 
 app.post("/api/payments/webhook", express.raw({ type: 'application/json' }), paymentController.stripeWebhook);
 
@@ -51,6 +51,8 @@ app.use("/api/upload", require("./routes/uploadRoutes"));
 app.use("/api/friends", require("./routes/friendRoutes"));
 app.use("/api/chats", require("./routes/chatRoutes"));
 app.use("/api/payments", require("./routes/paymentRoutes"));
+
+app.use("/api/admin", require("./AdminRoutes/authRoutes"));
 app.use(express.static(path.join(__dirname, 'public')))
 
 // ===== SERVE REACT =====
