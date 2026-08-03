@@ -3,15 +3,21 @@ const cloudinary = require("../config/cloudinary");
 const algoliaClient = require("../config/algolia");
 
 exports.getItems = async (req, res) => {
-  const { category, date } = req.query;
+  const { category_id, date } = req.query;
 
-  let query = db.from("items").select("*");
+  let query = db.from("items")
+  .select(`*,
+      categories(
+        category_id,
+        type
+      )`
+  );
 
   // ✅ filter category
-  if (category) {
+  if (category_id) {
     // ถ้าเลือกหลาย category → เป็น array
-    const categories = Array.isArray(category) ? category : [category];
-    query = query.in("category", categories);
+    const categoryIds = Array.isArray(category_id) ? category_id : [category_id];
+    query = query.in("category_id", categoryIds);
   }
 
   // ✅ filter date
@@ -115,7 +121,7 @@ exports.getItemsByUserId = async (req, res) => {
 };
 
 exports.addItem = async (req, res) => {
-  const { modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category, imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId } = req.body;
+  const { modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category_id, imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId } = req.body;
 
   if (!modelName || !price) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -143,7 +149,7 @@ exports.addItem = async (req, res) => {
         fbx: fbx || null,
         usdz: usdz || null,
         gltf: gltf || null,
-        category: category || null,
+        category_id: category_id || null,
         user_id: req.user.user_id,
         img_public_id: imgPublicId || null,
         model_public_id: modelPublicId || null,
@@ -180,7 +186,7 @@ exports.addItem = async (req, res) => {
 };
 
 exports.updateItem = async (req, res) => {
-  const { itemId ,modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category, imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId } = req.body;
+  const { itemId ,modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category_id, imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId } = req.body;
 
   try {
     const { data: items, error } = await db
@@ -205,7 +211,7 @@ exports.updateItem = async (req, res) => {
     if (modelName && modelName.trim() !== "") updateData.modelName = modelName;
     if (description && description.trim() !== "") updateData.description = description;
     if (price && !isNaN(price)) updateData.price = parseFloat(price);
-    if (category && category.trim() !== "") updateData.category = category;
+    if (category_id) updateData.category_id = category_id;
 
     // ส่วนของรูปภาพ (ใช้ logic เดิมของคุณ)
     if (img) updateData.img = img;
@@ -372,4 +378,16 @@ exports.getReviewsByItemId = async (req, res) => {
   } catch (err) {
     return res.status(500).json(err);
   }
+};
+
+exports.getCategories = async (req, res) => {
+  const { data ,error } = await db
+    .from("categories")
+    .select("*")
+    .order("type");
+
+  if (error)
+    return res.status(500).json(error);
+
+  res.status(200).json(data);
 };

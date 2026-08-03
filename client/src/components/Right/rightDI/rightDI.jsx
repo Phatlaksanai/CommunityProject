@@ -2,8 +2,9 @@ import "./rightDI.scss";
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/authContext";
-import { useContext ,useState ,useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { makeRequest } from "../../../api/axios";
+import { useQuery } from "@tanstack/react-query";
 
 const RightDI = ({ item }) => {
   if (!item) return null;
@@ -14,49 +15,59 @@ const RightDI = ({ item }) => {
   const [itemReviews, setItemReviews] = useState([]);
 
   const handleAddToCart = async () => {
-    
-      if (!currentUser) {
-        setError("Please log in to add items to your cart.");
-        return;
-      }
-      if (item.user_id === currentUser.user_id) {
-        setError("You cannot add your own item to the cart.");
-        return;
-      }
-      
-      try {
-        const res = await makeRequest.post("/payments/addToCart", {
-          item_id: item.item_id,
-        });
-        const data = res.data;
-  
-        if (data.success) {
-          setSuccess("Add to cart success");
-          navigate(`/cart/${currentUser.user_id}`)
-        } else {
-          setError(data.error || "Failed to add item to cart");
-        }
-      } catch (err) {
-        if (err.response && err.response.data && err.response.data.error) {
-          setError(err.response.data.error);
-        } else {
-          setError("Failed to connect to server");
-        }
-      }
-    };
 
-    useEffect(() => {
-      makeRequest.get(`/items/reviews/${item.item_id}`).then(res => setItemReviews(res.data));
-    }, []);
+    if (!currentUser) {
+      setError("Please log in to add items to your cart.");
+      return;
+    }
+    if (item.user_id === currentUser.user_id) {
+      setError("You cannot add your own item to the cart.");
+      return;
+    }
 
-    const averageRating = itemReviews.length > 0 ? (itemReviews.reduce((sum, review) => sum + Number(review.points), 0) / itemReviews.length).toFixed(1) : "No reviews yet";
-    
+    try {
+      const res = await makeRequest.post("/payments/addToCart", {
+        item_id: item.item_id,
+      });
+      const data = res.data;
+
+      if (data.success) {
+        setSuccess("Add to cart success");
+        navigate(`/cart/${currentUser.user_id}`)
+      } else {
+        setError(data.error || "Failed to add item to cart");
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Failed to connect to server");
+      }
+    }
+  };
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () =>
+      makeRequest.get(`/items/categories`).then((res) => res.data),
+  });
+  useEffect(() => {
+    makeRequest.get(`/items/reviews/${item.item_id}`).then(res => setItemReviews(res.data));
+  }, []);
+
+  const averageRating = itemReviews.length > 0 ? (itemReviews.reduce((sum, review) => sum + Number(review.points), 0) / itemReviews.length).toFixed(1) : "No reviews yet";
+
+  const currentCategory = categories.find( // หา category_id ที่ตรงกับ item_id โดยไม่ต้องใช้ .map 
+    (category) => category.category_id === item.category_id
+  );
   return (
     <div className="rightDI">
       <div className="container">
         <div className="menu">
           <h2>{item.modelName}</h2>
-          <h4>Category: {item.category}</h4>
+          {currentCategory && (
+            <h4>Category: {currentCategory.type}</h4>
+          )}
           <h4>Rating: {averageRating} ★ ( Count: {itemReviews.length} )</h4>
         </div>
 

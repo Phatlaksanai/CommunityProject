@@ -7,14 +7,7 @@ import "./market.scss"
 
 const Market = () => {
   const [filters, setFilters] = useState({
-    category: {
-      Vehicles: false,
-      Characters: false,
-      Furniture: false,
-      Sports: false,
-      "Food&Drink": false,
-      Electronics: false,
-    },
+    categories: [],
     date: "AllTime",
   });
   return (

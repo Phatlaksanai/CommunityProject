@@ -17,7 +17,7 @@ const EditItem = () => {
     const [price, setPrice] = useState("");
     const [img, setImg] = useState(null);
     const [model, setModel] = useState(null);
-    const [category, setCategory] = useState("");
+    const [categoryId, setCategoryId] = useState("");
     const [obj ,setObj] = useState(null);
     const [blend ,setBlend] = useState(null);
     const [fbx ,setFbx] = useState(null);
@@ -41,6 +41,11 @@ const EditItem = () => {
             makeRequest.get(`/items/${item_id}`).then(res => res.data),
     });
 
+    const { data: categories } = useQuery({
+        queryKey:["categories"],
+        queryFn:()=>makeRequest.get("/items/categories").then(r=>r.data)
+    });
+
     useEffect(() => {
         if (items) {
             setModelName(items.modelName || "");
@@ -50,7 +55,7 @@ const EditItem = () => {
             setImgPublicId(items.img_public_id || null);
             setModel(items.model || null);
             setModelPublicId(items.model_public_id || null);
-            setCategory(items.category || "");
+            setCategoryId(items.category_id || "");
             setObj(items.obj || null);
             setObjPublicId(items.obj_public_id || null);
             setBlend(items.blend || null);
@@ -181,7 +186,7 @@ const EditItem = () => {
                 modelName,
                 description,
                 price,
-                category,
+                category_id: categoryId,
                 img: finalImg,
                 model: finalModel,
                 obj: finalObj,
@@ -208,7 +213,6 @@ const EditItem = () => {
             }
         }
     };
-
 
     return (
         <div className="edit-item">
@@ -263,18 +267,17 @@ const EditItem = () => {
                         <select
                             id="category"
                             className="category__select"
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
+                            value={categoryId}
+                            onChange={(e) => setCategoryId(Number(e.target.value))}
                         >
-                            <option value="" disabled>
+                            {/* <option value="" disabled>
                                 Select Category
-                            </option>
-                            <option value="Vehicles">Vehicles</option>
-                            <option value="Electronics">Electronics</option>
-                            <option value="Characters">Characters</option>
-                            <option value="Furniture">Furniture</option>
-                            <option value="Sports">Sports</option>
-                            <option value="Food&Drink">Food & Drink</option>
+                            </option> */}
+                            {categories?.map((category) => (
+                                <option key={category.category_id} value={category.category_id}>
+                                    {category.type}
+                                </option>
+                            ))}
                         </select>
                     </div>
 

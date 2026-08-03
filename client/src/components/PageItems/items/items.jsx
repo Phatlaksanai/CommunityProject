@@ -9,23 +9,18 @@ const Items = ({ userId, filters ,isProfile, isShop}) => {
     queryFn: () => {
       const query = new URLSearchParams();
 
-      Object.keys(filters?.category || {}).forEach((key) => {
-        if (filters.category[key]) {
-          query.append("category", key);
-        }
-      });
-
-      query.append("date", filters?.date || "AllTime");
-
-      if (userId) {
-        return makeRequest
-          .get(`/items/user/${userId}?${query.toString()}`)
-          .then((res) => res.data);
+      if (filters.categories?.length > 0) {
+        filters.categories.forEach((id) => {
+          query.append("category_id", id);
+        });
       }
 
-      return makeRequest
-        .get(`/items?${query.toString()}`)
-        .then((res) => res.data);
+      query.append("date", filters?.date || "AllTime");
+      if (userId) {
+        return makeRequest.get(`/items/user/${userId}?${query.toString()}`).then((res) => res.data);
+      }
+
+      return makeRequest.get(`/items?${query.toString()}`).then((res) => res.data);
     },
   });
 

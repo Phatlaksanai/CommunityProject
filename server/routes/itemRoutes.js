@@ -9,6 +9,7 @@ router.get("/project/:id", itemController.getItemsByProjectId);
 router.get("/user/:id/available", itemController.getItemsByUserIdAvailable);
 router.get("/user/:id", itemController.getItemsByUserId);
 
+router.get("/categories", itemController.getCategories);
 router.get("/:id", itemController.getItemsById);
 
 router.post("/additem", verifyToken, itemController.addItem);

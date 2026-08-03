@@ -67,6 +67,8 @@ Feature
 ทดสอบระบบ
 จำลองการสอบ -เปลี่ยนระบบเป็นเข้าได้ทุกครั้งไม่ต้องจดจำผู้ใช้ เอา token ออก
 
+แก้ category
+
 https://mui.com/material-ui/material-icons/
 
 ```

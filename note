@@ -69,3 +69,7 @@ create type isdelete as enum (
 create type role as enum (
   'admin'
 );
+
+create type report_type as enum (
+  'copyright' ,'inappropriate' ,'spam' ,'scam' ,'other' 
+);

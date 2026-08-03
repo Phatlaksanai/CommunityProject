@@ -2,6 +2,8 @@ import "./leftbarDL.scss";
 import { AuthContext } from "../../../context/authContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { makeRequest } from "../../../api/axios";
 
 const LeftBarDownload = ({ filters = {}, setFilters }) => {
   const { currentUser } = useContext(AuthContext);
@@ -14,15 +16,27 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
     ThisDay: "This day",
   };
 
-  const handleChange = (group, name) => {
-    setFilters((prev) => ({
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () =>
+      makeRequest.get("/items/categories").then((res) => res.data),
+  });
+  const handleChange = (id) => {
+    setFilters((prev) => {
+      const categories = prev.categories || [];
+      const exists = prev.categories.includes(id);
+
+      const newFilters = {
       ...prev,
-      [group]: {
-        ...prev[group],
-        [name]: !prev[group][name],
-      },
-    }));
+      categories: exists
+        ? categories.filter((c) => c !== id)
+        : [...categories, id],
+    };
+
+    return newFilters;
+    });
   };
+
   const handleDateChange = (value) => {
     setFilters((prev) => ({
       ...prev,
@@ -47,15 +61,14 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
       <hr />
       <form>
         <p>Category</p>
-        {Object.keys(filters.category || {}).map((item) => (
-          <div key={item}>
+        {categories.map((category) => (
+          <div key={category.category_id}>
             <input
               type="checkbox"
-              id={item}
-              checked={filters.category[item]}
-              onChange={() => handleChange("category", item)}
+              checked={filters.categories?.includes(category.category_id) || false }
+              onChange={() => handleChange(category.category_id)}
             />
-            <label htmlFor={item}>{item}</label>
+            <p>{category.type}</p>
           </div>
         ))}
         <hr />

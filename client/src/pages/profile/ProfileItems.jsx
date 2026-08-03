@@ -4,10 +4,15 @@ import ScrollToTop from "../../ScrollToTop";
 
 const ProfileItems = () => {
   const { id } = useParams(); 
+  const defaultFilters = { // กำหนดค่าเริ่มต้นของ filters ส่งไปยัง Items component
+    categories: [],
+    date: "AllTime",
+  };
+
   return (
     <div className="profile">
       <ScrollToTop />
-      <Items userId={id} isProfile={true}/>
+      <Items userId={id} isProfile={true} filters={defaultFilters}/>
     </div>
   );
 };
