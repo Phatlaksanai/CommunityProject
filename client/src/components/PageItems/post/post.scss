@@ -47,12 +47,19 @@
           position: absolute;
           top: 30px;
           right: 0;
+          border-radius: 5px;
           border: none;
           background-color: #f0544f;
           padding: 5px;
           cursor: pointer;
           color: white;
+
+          display: flex;
+          align-Items: center;
+          justify-Content: center;
+          gap: 5px;
         }
+
       }
 
       .content {

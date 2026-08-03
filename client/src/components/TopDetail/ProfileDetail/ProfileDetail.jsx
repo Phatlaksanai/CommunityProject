@@ -4,7 +4,10 @@ import { useContext, useState, useEffect } from "react";
 import { NavLink, useParams, useNavigate } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import { makeRequest } from "../../../api/axios";
+
+import ReportModal from "../../report/ReportModal";
 
 
 const ProfileDetail = () => {
@@ -13,6 +16,8 @@ const ProfileDetail = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
+
+  const [openReport, setOpenReport] = useState(false);
 
   const [error, setError] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -233,8 +238,10 @@ const ProfileDetail = () => {
                   <div className="actions">
                     <button className="followBtn" onClick={() => handleConversation(userData)} style={{ cursor: "pointer" }}>Message</button>
                   </div>
+                  <ReportProblemIcon style={{ cursor: "pointer" }} onClick={() => setOpenReport(true)} />
                 </>
               )}
+
 
             </div>
             <span className="handle">@{userData?.username}</span>
@@ -289,6 +296,12 @@ const ProfileDetail = () => {
           </div>
         )}
       </div>
+      <ReportModal
+        isOpen={openReport}
+        onClose={() => setOpenReport(false)}
+        targetId={id}
+        entityType="user"
+      />
     </div>
   );
 };

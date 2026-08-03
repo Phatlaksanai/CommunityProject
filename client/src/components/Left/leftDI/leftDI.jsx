@@ -1,7 +1,12 @@
 import "./leftDI.scss";
 import ModelViewer from "../../modelViewer/model_viewer";
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { AuthContext } from "../../../context/authContext";
+
+import ReportModal from "../../report/ReportModal";
+
+import { useState, useContext, useEffect } from "react";
 import { makeRequest } from "../../../api/axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -9,6 +14,8 @@ import relativeTime from "dayjs/plugin/relativeTime";
 const LeftDI = ({ item }) => {
   const navigate = useNavigate();
   const [itemReviews, setItemReviews] = useState([]);
+  const { currentUser } = useContext(AuthContext);
+  const [openReport, setOpenReport] = useState(false);
 
   useEffect(() => {
     makeRequest.get(`/items/reviews/${item.item_id}`).then(res => setItemReviews(res.data));
@@ -25,7 +32,12 @@ const LeftDI = ({ item }) => {
           {item.model && <ModelViewer modelUrl={item.model} />}
         </div>
         <div className="item">
-          <h2>Description</h2>
+          <div className="user">
+            <h2>Description</h2>
+            {item.user_id !== currentUser?.user_id && (
+              <ReportProblemIcon style={{ cursor: "pointer"}} onClick={() => setOpenReport(true)} />
+            )}
+          </div>
           <span>{item.description}</span>
         </div>
 
@@ -76,6 +88,12 @@ const LeftDI = ({ item }) => {
           )}
         </div>
       </div>
+      <ReportModal
+        isOpen={openReport}
+        onClose={() => setOpenReport(false)}
+        targetId={item.item_id}
+        entityType="item"
+      />
     </div>
   );
 };

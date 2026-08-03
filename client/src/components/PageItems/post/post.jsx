@@ -6,6 +6,10 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import DeleteIcon from '@mui/icons-material/Delete';
+
+import ReportModal from "../../report/ReportModal";
 
 import { Link, useNavigate } from "react-router-dom";
 import Comments from "../../comments/comments";
@@ -28,6 +32,8 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
   const [commentOpen, setCommentOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+  const [openReport, setOpenReport] = useState(false);
 
   // --- [เพิ่มสเตตัสสำหรับ Lightbox] ---
   const [activeImageIndex, setActiveImageIndex] = useState(null);
@@ -118,7 +124,16 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
           </div>
           <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} />
           {menuOpen && post.user_id === currentUser?.user_id && (
-            <button onClick={handleDelete}>delete</button>
+            <button onClick={handleDelete}>
+              <DeleteIcon />
+              Delete
+            </button>
+          )}
+          {menuOpen && post.user_id !== currentUser?.user_id && (
+            <button onClick={() => setOpenReport(true)}>
+              <ReportProblemIcon />
+              Report
+            </button>
           )}
         </div>
         
@@ -238,6 +253,12 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
         </div>,
         document.body
       )}
+      <ReportModal
+        isOpen={openReport}
+        onClose={() => setOpenReport(false)}
+        targetId={post.post_id}
+        entityType="post"
+      />
     </div>
   );
 };

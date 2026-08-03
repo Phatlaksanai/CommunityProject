@@ -4,14 +4,21 @@ import { useContext, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import SettingsIcon from '@mui/icons-material/Settings';
 import BlockIcon from '@mui/icons-material/Block';
+
 import dayjs from "dayjs";
+
+import ReportModal from "../../report/ReportModal";
 
 const CommuDetail = () => {
   const { currentUser } = useContext(AuthContext);
   const { id } = useParams();
   const navigate = useNavigate();
+  const [openReport, setOpenReport] = useState(false);
+
   const queryClient = useQueryClient();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
@@ -53,7 +60,7 @@ const CommuDetail = () => {
       <div className="container">
         <div className="cover">
           <img
-            src={community?.cover_img|| defaultPic}
+            src={community?.cover_img || defaultPic}
             alt="cover"
             className="coverImg"
           />
@@ -74,28 +81,37 @@ const CommuDetail = () => {
           <div className="rightSide">
             {community?.user_id === currentUser?.user_id ? (
               <>
-                <SettingsIcon 
-                  className="iconBtn settingBtn" 
-                  onClick={() => navigate(`/editcommu/${community?.communities_id}`)} 
-                  style={{ cursor:"pointer"}}
+                <SettingsIcon
+                  className="iconBtn settingBtn"
+                  onClick={() => navigate(`/editcommu/${community?.communities_id}`)}
+                  style={{ cursor: "pointer" }}
                 />
-                <BlockIcon 
-                  className="iconBtn blockBtn" 
-                  onClick={() => navigate(`/banmember/${community?.communities_id}`)} 
-                  style={{ cursor:"pointer"}}
+                <BlockIcon
+                  className="iconBtn blockBtn"
+                  onClick={() => navigate(`/banmember/${community?.communities_id}`)}
+                  style={{ cursor: "pointer" }}
                 />
               </>
             ) : (
-              <button 
-                className="followBtn" 
+              <button
+                className="followBtn"
                 onClick={handleFollow} style={{ backgroundColor: isFollowing ? "#bababa" : "#5271ff" }}
               >
                 {isFollowing ? "Following" : "Follow"}
               </button>
             )}
+            {community?.user_id !== currentUser?.user_id && (
+              <ReportProblemIcon style={{ cursor: "pointer", marginTop: "5px" }} onClick={() => setOpenReport(true)} />
+            )}
           </div>
         </div>
       </div>
+      <ReportModal
+        isOpen={openReport}
+        onClose={() => setOpenReport(false)}
+        targetId={community?.communities_id}
+        entityType="community"
+      />
     </div>
   );
 };

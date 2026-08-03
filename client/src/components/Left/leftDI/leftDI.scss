@@ -46,11 +46,16 @@
         .user {
           display: flex;
           justify-content: space-between;
+          align-items: center;
           margin: 20px 0px;
           gap: 20px;
 
           p {
             white-space: nowrap;
+          }
+
+          h2 {
+            margin: 0px;
           }
 
           .userInfo {
