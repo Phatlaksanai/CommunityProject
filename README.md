@@ -67,7 +67,8 @@ Feature
 ทดสอบระบบ
 จำลองการสอบ -เปลี่ยนระบบเป็นเข้าได้ทุกครั้งไม่ต้องจดจำผู้ใช้ เอา token ออก
 
-แก้ category
+เพิ่ม status ตาราง reports 
+report เสร็จไม่ลบ แต่เปลี่ยนสถานะเป็น completed, pending, cancelled
 
 https://mui.com/material-ui/material-icons/
 
