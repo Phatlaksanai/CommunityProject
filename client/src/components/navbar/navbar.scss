@@ -23,13 +23,13 @@
       .Logo::first-letter {
         font-size: 2em;
         font-style: italic;
+        color: themed("logo");
       }
 
       .Logo {
         font-optical-sizing: auto;
         font-weight: 400;
         font-family: "Jaro", sans-serif;
-        text-shadow: #000000 2px 2px 4px;
         color: #ffffff;
         display: block;
         margin: 0;
