@@ -54,6 +54,7 @@ app.use("/api/payments", require("./routes/paymentRoutes"));
 app.use("/api/reports", require("./routes/reportRoutes"));
 
 app.use("/api/admin", require("./AdminRoutes/authRoutes"));
+app.use("/api/admin/dashboard", require("./AdminRoutes/dashboardRoutes"));
 app.use(express.static(path.join(__dirname, 'public')))
 
 // ===== SERVE REACT =====

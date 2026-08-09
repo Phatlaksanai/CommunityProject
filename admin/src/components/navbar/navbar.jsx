@@ -1,24 +1,10 @@
 import "./navbar.scss";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
-import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import DownloadIcon from '@mui/icons-material/Download';
-import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useContext } from "react";
-import { DarkModeContext } from "../../context/darkModeContext";
+import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
-import { makeRequest } from "../../api/axios";
 
 const Navbar = () => {
-  const { toggle, darkMode } = useContext(DarkModeContext);
-  const { currentUser, setUser } = useContext(AuthContext);
-  const [error, setError] = useState("");
-
+  const { currentUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
   const navigate = useNavigate();
 
@@ -53,25 +39,15 @@ const Navbar = () => {
         <Link to="/" style={{ textDecoration: "none" }}>
           <h1 className="Logo">PM</h1>
         </Link>
-        <HomeOutlinedIcon onClick={() => navigate("/")} style={{ cursor: "pointer" }} />
-        {darkMode ? (
-          <WbSunnyOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
-        ) : (
-          <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
-        )}
-        <AddShoppingCartIcon onClick={() => navigate("/market")} style={{ cursor: "pointer" }} />
-        <DownloadIcon onClick={() => navigate(`/download/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
       </div>
 
       <div className="right">
-        <ShoppingBasketIcon onClick={() => navigate(`/cart/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
-        <PersonOutlinedIcon onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
-        <EmailOutlinedIcon onClick={() => navigate(`/boxchat/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
           <span className="custom-tooltip" data-tip={displayName}>
             {truncatedName}
           </span>
+          <span>id: {currentUser?.user_id}</span>
           {!currentUser && <button onClick={handleLogin}>Login</button>}
           {currentUser && <button onClick={handleLogout}>Logout</button>}
         </div>

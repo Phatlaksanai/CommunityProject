@@ -22,7 +22,8 @@ npm install cloudinary multer // server
 npm install three // client 
 npm install @supabase/supabase-js // server
 npm install swiper // client
-npm i react-intersection-observer // client
+npm install react-intersection-observer // client
+npm install recharts // admin
 
 npm install algoliasearch // server
 npm install algoliasearch react-instantsearch // client 

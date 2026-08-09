@@ -1,4 +1,4 @@
-import User from "../../components/statistic/users/users"
+import User from "../../components/statistic/dashboard/dashboard"
 import "./home.scss"
 
 const Home = () => {
