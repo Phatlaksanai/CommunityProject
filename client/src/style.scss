@@ -52,12 +52,13 @@ body {
 }
 
 $themes: (
-  light: (textColor: #000,
-    bg: white,
+  light: (textColor: #1E5042,
+    bg: #FDFAF4,
     logo: darkblue,
-    bgSoft: #f6f3f3,
+    bgSoft: #F6F2E9,
     textColorSoft: #555,
     border: lightgray,
+    logoM: #C0903B,
   ),
   dark: (textColor: whitesmoke,
     bg: #222,
@@ -65,6 +66,7 @@ $themes: (
     bgSoft: #333,
     textColorSoft: lightgray,
     border: #444,
+    logoM: white,
   ),
 );
 
