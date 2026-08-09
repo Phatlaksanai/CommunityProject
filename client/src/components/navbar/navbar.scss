@@ -260,10 +260,11 @@
 
         button {
           border-radius: 6px;
-          background-color: themed("textColor");
+          background-color: themed("buttonBg");
           padding: 5px 10px;
           cursor: pointer;
-          color: themed("bg");
+          border: none;
+          color: white;
         }
       }
     }

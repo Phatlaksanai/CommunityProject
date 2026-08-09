@@ -181,7 +181,7 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
             {isLoading ? (
               "loading"
             ) : data?.includes(currentUser?.user_id) ? (
-              <FavoriteOutlinedIcon style={{ color: "red" }} onClick={handleLike} />
+              <FavoriteOutlinedIcon style={{ color: '#A0C46E' }} onClick={handleLike} />
             ) : (
               <FavoriteBorderOutlinedIcon onClick={handleLike} />
             )}

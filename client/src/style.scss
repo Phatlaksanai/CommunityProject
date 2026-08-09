@@ -54,11 +54,14 @@ body {
 $themes: (
   light: (textColor: #1E5042,
     bg: #FDFAF4,
-    logo: darkblue,
+    logo: #1E5042,
     bgSoft: #F6F2E9,
-    textColorSoft: #555,
+    textColorSoft: #1E5042,
     border: lightgray,
     logoM: #C0903B,
+    buttonBg: #1E5042,
+    bg3D: #a3bd9f,
+    Abg3D: #84bb7d,
   ),
   dark: (textColor: #9C9C9E,
     bg: #121417,
@@ -67,6 +70,9 @@ $themes: (
     textColorSoft: white,
     border: #444,
     logoM: white,
+    buttonBg: #3F5428,
+    bg3D: #1B1C20,
+    Abg3D: #3d3e48,
   ),
 );
 

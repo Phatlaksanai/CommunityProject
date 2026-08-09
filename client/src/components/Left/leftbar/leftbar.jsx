@@ -53,9 +53,9 @@ const LeftBar = () => {
         <div className="menu">
           <div className="user">
             <img src={currentUser?.profilePic || defaultPic} alt="" />
-            <span className="custom-tooltip" data-tip={displayName}>
+            <p className="custom-tooltip" data-tip={displayName}>
               {truncatedName}
-            </span>
+            </p>
           </div>
           <div className="item" onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
             <PeopleIcon />
@@ -113,7 +113,8 @@ const LeftBar = () => {
 
         <hr />
         <div className="menu">
-          <span>Other</span>
+          <div className="menu-header"><span>Other</span></div>
+          
           <div className="item" onClick={() => navigate(`/setting/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
             <SettingsIcon />
             <span>Settings</span>

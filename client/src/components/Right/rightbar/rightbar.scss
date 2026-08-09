@@ -9,10 +9,11 @@
     overflow: scroll;
     background-color: themed("bgSoft");
 
-    @include mobile{
+    @include mobile {
       display: none;
     }
-    @include tablet{
+
+    @include tablet {
       display: none;
     }
 
@@ -32,7 +33,13 @@
         background-color: themed("bg");
 
         span {
-          color: gray;
+          color: themed("textColor");
+        }
+
+        p {
+          margin-bottom: 10px;
+          color: themed("textColorSoft");
+          font-weight: 600;
         }
 
         .load-more {
@@ -65,7 +72,10 @@
           span {
             font-size: 13px;
           }
+
+
         }
+
         .community-list-wrapper {
           max-height: 188px;
           overflow-y: auto;
@@ -81,6 +91,7 @@
             border-radius: 10px;
           }
         }
+
         .user {
           justify-content: space-between;
           display: flex;
@@ -95,6 +106,7 @@
             // "เปล่งแสง" หรือ Highlight เหมือนกันทุกตัว
             background-color: themed("bgSoft");
           }
+
           .userInfo {
             display: flex;
             align-items: center;
@@ -124,7 +136,7 @@
 
             span {
               font-weight: 500;
-              color: themed("textColor");
+              color: themed("textColorSoft");
             }
           }
 
@@ -157,24 +169,21 @@
         .user {
           align-items: flex-start;
           justify-content: left !important;
-        .userInfo {
-          img {
-            width: 100px; 
-            height: 100px;
+
+          .userInfo {
+            img {
+              width: 100px;
+              height: 100px;
+            }
+          }
+
+          .buttons {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
           }
         }
-        .buttons {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 2px;
-
-        span {
-          font-size: 14px;
-          font-weight: 500;
-        }
       }
-    }
-  }
     }
   }
 }

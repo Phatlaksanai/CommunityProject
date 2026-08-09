@@ -39,7 +39,7 @@
           margin-bottom: 5px;
 
           span {
-            font-weight: 500;
+            font-weight: 600;
             color: themed("textColorSoft");
           }
 
@@ -47,7 +47,7 @@
             padding: 4px 12px;
             border-radius: 6px;
             cursor: pointer;
-            background-color: themed("textColor");
+            background-color: themed("buttonBg");
             color: white;
             border: none;
             font-size: 12px;
@@ -98,7 +98,14 @@
 
           span {
             font-size: 14px;
+            color: themed("textColor");
+          }
+
+          p {
+            font-size: 16px;
+            font-weight: 600;
             color: themed("textColorSoft");
+            margin: 0; // ลบ margin ของ p เพื่อให้จัดกึ่งกลางกับไอคอน
           }
         }
 

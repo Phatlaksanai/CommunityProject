@@ -78,7 +78,7 @@ const RightBar = () => {
       <div className="container">
         {/* Section: New Releases */}
         <div className="item new-releases">
-          <span>New Releases</span>
+          <p>New Releases</p>
           {error ? "Something went wrong" : isLoading ? "Loading..." :
             latestItems?.map((item) => (
               <div className="user" key={item.item_id} onClick={() => navigate(`/descitem/${item.item_id}`)} style={{ cursor: "pointer" }}>
@@ -96,7 +96,7 @@ const RightBar = () => {
 
         {/* Section: Friend Requests */}
         <div className="item">
-          <span>Friend Requests</span>
+          <p>Friend Requests</p>
           <div className="community-list-wrapper">
             {displayedFriendRequests?.map((user) => {
               // เนื่องจาก Backend ส่ง Array ของ User มาแล้ว ใช้ user ได้เลย
@@ -139,7 +139,7 @@ const RightBar = () => {
 
         {/* Section: Contacts */}
         <div className="item">
-          <span>Contacts</span>
+          <p>Contacts</p>
           {contacts?.map((contact) => {
             const displayName2 = contact?.name || contact?.username || "Unknown User";
             const truncatedName2 = displayName2.length > 15 ? `${displayName2.substring(0, 15)}...` : displayName2;

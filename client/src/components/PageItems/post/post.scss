@@ -34,7 +34,8 @@
             flex-direction: column;
 
             .name {
-              font-weight: 500;
+              font-weight: 600;
+              color: themed("textColorSoft");
             }
 
             .date {
@@ -72,6 +73,7 @@
           overflow-wrap: break-word; // standard
           word-break: break-word; // สำหรับ string ยาวติดกัน
           white-space: pre-wrap; // เคารพ \n และตัดบรรทัด
+          color: themed("textColorSoft");
         }
 
         .postMediaSlider {
@@ -89,7 +91,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #b5b5b5; // พื้นหลังดำเวลาภาพไม่เต็ม
+            background-color: themed("bg3D");
           }
 
           .postImage img {
@@ -125,6 +127,7 @@
               position: absolute; // ใช้ absolute เพื่อให้มันเกาะตามกรอบ postModel เป๊ะๆ
               top: 0;
               left: 0;
+              background-color: themed("bg3D");
 
               .viewer-canvas {
                 width: 100% !important;
@@ -176,6 +179,7 @@
           gap: 10px;
           cursor: pointer;
           font-size: 14px;
+          color: themed("textColor");
         }
 
         .postCommunityInfo {

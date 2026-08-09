@@ -3,11 +3,11 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import ForumIcon from '@mui/icons-material/Forum';
+import PeopleIcon from '@mui/icons-material/People';
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import DownloadIcon from '@mui/icons-material/Download';
-import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
 import { DarkModeContext } from "../../context/darkModeContext";
@@ -129,7 +129,7 @@ const Navbar = () => {
         ) : (
           <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
         )}
-        <AddShoppingCartIcon onClick={() => navigate("/market")} style={{ cursor: "pointer" }} />
+        <StorefrontIcon onClick={() => navigate("/market")} style={{ cursor: "pointer" }} />
         <DownloadIcon onClick={() => navigate(`/download/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
 
         {/* ============================================================ */}
@@ -154,9 +154,9 @@ const Navbar = () => {
       </div>
 
       <div className="right">
-        <ShoppingBasketIcon onClick={() => navigate(`/cart/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
-        <PersonOutlinedIcon onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
-        <EmailOutlinedIcon onClick={() => navigate(`/boxchat/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
+        <AddShoppingCartIcon onClick={() => navigate(`/cart/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
+        <PeopleIcon onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
+        <ForumIcon onClick={() => navigate(`/boxchat/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
           <span className="custom-tooltip" data-tip={displayName}>
