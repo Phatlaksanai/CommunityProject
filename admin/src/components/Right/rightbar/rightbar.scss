@@ -2,12 +2,14 @@
 
 .rightBar {
   @include themify($themes) {
-    flex: 3;
+    flex: 2;
+    max-width: 350px;
+    margin-left: auto;
     position: sticky;
     top: 70px;
     height: calc(100vh - 70px);
     overflow: scroll;
-    background-color: themed("bgSoft");
+    background-color: #0a0803;
 
     @include mobile{
       display: none;
@@ -21,160 +23,150 @@
     }
 
     .container {
-      padding: 20px;
 
       .item {
-        -webkit-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
-        -moz-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
-        box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
-        padding: 20px;
+        background-color: #090F16; 
+        border: 2px solid #161B20; 
+        border-radius: 12px;
+        box-shadow: none; 
+        padding: 24px;
         margin-bottom: 20px;
-        background-color: themed("bg");
+        margin-top: 30px;
 
-        span {
-          color: gray;
+        .box-title {
+          color: #fff;
+          font-size: 16px;
+          font-weight: 600;
+          display: block;
+          margin-bottom: 15px;
         }
 
-        .load-more {
-          justify-content: center;
-          margin-top: 5px;
-          color: themed("textColorSoft");
-          font-weight: 500;
+        .reports-list {
           display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 8px 10px; // เพิ่ม padding ให้ดูโปร่งขึ้น
-          border-radius: 8px; // มนกำลังดี
-          cursor: pointer;
-          transition: all 0.2s ease;
-          background-color: transparent; // มั่นใจว่าไม่มีสีพื้นหลังแปลกๆ
-          box-shadow: none !important; // ปิดเงาที่ทำให้ดูเหมือนเฟดดำ
+          flex-direction: column;
+          gap: 10px;
 
-          &:hover {
-            // "เปล่งแสง" หรือ Highlight เหมือนกันทุกตัว
-            background-color: themed("bgSoft");
-          }
+          .report-item {
+            display: flex;
+            justify-content: space-between; // ผลักให้ซ้าย-ขวา ห่างกันสุด
+            align-items: center;
+            padding: 12px 10px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
 
-          img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-          }
+            &:hover {
+              background-color: #161B20;
+            }
 
-          span {
-            font-size: 13px;
+            .report-left {
+              display: flex;
+              align-items: center;
+              gap: 15px;
+
+              .icon {
+                color: #E76D09; // สีไอคอนสีส้ม
+                font-size: 22px;
+              }
+
+              span {
+                color: #FFFFFF;
+                font-size: 14px;
+                font-weight: 500;
+                text-transform: capitalize;
+              }
+            }
+
+            .report-count {
+              color: #E76D09; // ตัวเลขสีส้ม
+              font-size: 15px;
+              font-weight: 600;
+            }
           }
         }
-        .community-list-wrapper {
-          max-height: 188px;
-          overflow-y: auto;
-          // ลบเงาหรือ background แปลกๆ ออกจาก wrapper
-          background: transparent;
-
-          &::-webkit-scrollbar {
-            width: 4px;
-          }
-
-          &::-webkit-scrollbar-thumb {
-            background-color: themed("border");
-            border-radius: 10px;
-          }
-        }
+      }
+      .new-releases {
         .user {
-          justify-content: space-between;
           display: flex;
+          justify-content: space-between;
           align-items: center;
-          gap: 20px;
-          // justify-content: space-between;
-          margin: 20px 0px;
+          margin: 15px 0px;
           border-radius: 8px;
           padding: 8px;
+          transition: background-color 0.2s ease;
+          cursor: pointer;
 
           &:hover {
-            // "เปล่งแสง" หรือ Highlight เหมือนกันทุกตัว
-            background-color: themed("bgSoft");
+            background-color: #161B20;
           }
+
           .userInfo {
             display: flex;
             align-items: center;
-            gap: 20px;
-            position: relative;
-
+            
             img {
-              width: 40px;
-              height: 40px;
-              border-radius: 10px;
+              width: 50px; 
+              height: 50px;
+              border-radius: 8px;
               object-fit: cover;
-            }
-
-            .online {
-              width: 12px;
-              height: 12px;
-              border-radius: 50%;
-              // background-color: limegreen;
-              position: absolute;
-              top: 0;
-              left: 30px;
-            }
-
-            p {
-              color: themed("textColorSoft");
-            }
-
-            span {
-              font-weight: 500;
-              color: themed("textColor");
             }
           }
 
           .buttons {
             display: flex;
+            flex-direction: column;
             align-items: flex-start;
-            gap: 10px;
+            gap: 4px;
+            flex: 1;
+            padding-left: 15px; // ดันข้อความให้ห่างจากรูปนิดนึง
 
-            button {
-              border: none;
-              padding: 5px;
-              color: white;
-              cursor: pointer;
-              border-radius: 6px;
+            span {
+              font-size: 13px;
+              font-weight: 500;
+              color: #A0AEC0; // สีเทา
+            }
+            span:first-child { 
+              color: #FFFFFF; // Order ID เป็นสีขาว
+              font-size: 15px;
+            }
+          }
+
+          .price {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; // ชิดขวา
+            gap: 8px;
+
+            > span {
+              color: #FFFFFF;
+              font-weight: 600;
+              font-size: 14px;
+            }
+
+            .status {
               padding: 4px 12px;
+              border-radius: 6px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
 
-              &:first-child {
-                background-color: #5271ff;
+              span {
+                font-size: 11px;
+                font-weight: 600;
+                color: #ffffff;
+                text-transform: capitalize;
               }
 
-              &:last-child {
-                background-color: #f0544f;
+              &.completed {
+                background-color: #35955C;
+              }
+              &.pending {
+                background-color: #E76D09;
               }
             }
           }
         }
       }
-
-      .new-releases {
-        .user {
-          align-items: flex-start;
-          justify-content: left !important;
-        .userInfo {
-          img {
-            width: 100px; 
-            height: 100px;
-          }
-        }
-        .buttons {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 2px;
-
-        span {
-          font-size: 14px;
-          font-weight: 500;
-        }
-      }
-    }
-  }
+  
     }
   }
 }

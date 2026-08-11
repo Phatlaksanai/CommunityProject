@@ -8,10 +8,9 @@
     justify-content: space-between;
     padding: 10px 20px;
     height: 50px;
-    border-bottom: 1px solid themed("border");
     position: sticky;
     top: 0;
-    background-color: themed("bg");
+    background-color: #03060A;
     color: themed("textColor");
     z-index: 999;
 
@@ -244,8 +243,15 @@
       .user {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 20px;
         font-weight: 500;
+
+        .user-info {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 2px;
+        }
 
         @include tablet {
           display: none;
@@ -260,10 +266,11 @@
 
         button {
           border-radius: 6px;
-          background-color: themed("textColor");
+          background-color: #E76D09;
           padding: 5px 10px;
           cursor: pointer;
-          color: themed("bg");
+          color: #FFFFFF;
+          border: none;
         }
       }
     }

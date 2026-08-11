@@ -73,3 +73,48 @@ create type role as enum (
 create type report_type as enum (
   'copyright' ,'inappropriate' ,'spam' ,'scam' ,'other' 
 );
+
+// Query สถิติ/กราฟ
+
+🔎🔎 หน้า dashboard
+// 4 ช่อง
+CREATE OR REPLACE FUNCTION get_dashboard_summary()
+RETURNS TABLE (
+  total_revenue numeric,
+  total_users bigint,
+  total_assets bigint,
+  total_communities bigint
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    -- เชื่อมตารางเพื่อกรองเอาเฉพาะยอดรวมที่ status = 'completed'
+    COALESCE((
+      SELECT SUM(oi.platform_fee) 
+      FROM public.order_items oi
+      JOIN public.orders o ON oi.order_id = o.order_id
+      WHERE o.status = 'completed'
+    ), 0) AS total_revenue,
+    
+    (SELECT COUNT(*) FROM public.users) AS total_users,
+    (SELECT COUNT(*) FROM public.items) AS total_assets,
+    (SELECT COUNT(*) FROM public.communities) AS total_communities;
+END;
+$$ LANGUAGE plpgsql;
+
+// กราฟสัปดาห์
+CREATE OR REPLACE FUNCTION get_weekly_sales()
+RETURNS TABLE (sale_date text, revenue numeric) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    to_char(o.created_at, 'DD/MM') AS sale_date, 
+    COALESCE(SUM(oi.platform_fee), 0) AS revenue 
+  FROM public.order_items oi
+  JOIN public.orders o ON oi.order_id = o.order_id 
+  WHERE o.created_at >= (now() - interval '1 year') // ตอนนี้ใช้ 1 ปีแทนไปก่อน (7 days)
+    AND o.status = 'completed' -- กรองเฉพาะออเดอร์ที่ status เป็น completed
+  GROUP BY to_char(o.created_at, 'DD/MM'), date_trunc('day', o.created_at)
+  ORDER BY date_trunc('day', o.created_at) ASC;
+END;
+$$ LANGUAGE plpgsql;

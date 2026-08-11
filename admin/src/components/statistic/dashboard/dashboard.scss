@@ -2,50 +2,121 @@
 
 .dashboard {
     @include themify($themes) {
-        -webkit-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-        -moz-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-        box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-        //border-radius: 20px;
-        background-color: themed("bgsoft");
+        background-color: #060A0E;
         color: themed("textColor");
+        min-height: 100vh;
+        padding-bottom: 40px;
 
         .container {
-            .content {
-                padding: 20px;
-                margin-bottom: 20px;
-                background-color: themed("bg");
+            max-width: 1400px;
+            margin: 0 auto;
 
-                img {
-                    width: 100%;
-                    height: 250px;
-                    object-fit: cover;
-                    display: block;
+            // ส่วนหัว Welcome back
+            .header-title {
+                margin-bottom: 30px;
+                
+                h1 {
+                    margin: 0;
+                    font-size: 28px;
+                    font-weight: 600;
+                }
+                
+                p {
+                    margin-top: 8px;
+                    color: #A0AEC0;
+                    font-size: 15px;
+                }
+            }
+            // จัดเรียงกล่องสรุป 4 ใบ
+            .dashboard-cards {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+
+                // Responsive สำหรับจอเล็ก
+                @media (max-width: 1024px) {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+                @media (max-width: 600px) {
+                    grid-template-columns: 1fr;
                 }
 
-
-                .desc {
-                    padding: 0px 10px;
-
-                    p {
-                        margin: 0;
-                        display: -webkit-box;
-                        -webkit-line-clamp: 2; // จำกัด 2 บรรทัด
-                        -webkit-box-orient: vertical;
-                        overflow: hidden;
-                        word-break: break-word; // ตัดคำยาว ๆ
-                        line-height: 1.4em;
-                        max-height: calc(1.4em * 2); // ป้องกันกรอบขยาย
-                    }
-                }
-
-                .price {
-                    padding: 0px 10px;
+                // สไตล์ของกล่องแต่ละใบ
+                .summary-card {
+                    background-color: #090F16; 
+                    border: 2px solid #161B20; 
+                    border-radius: 12px;
+                    padding: 24px;
                     display: flex;
+                    flex-direction: column;
                     justify-content: space-between;
 
-                    p {
-                        margin: 5px 0px;
+                    .card-info {
+                        display: flex;
+                        align-items: center; // จัดไอคอนกับตัวหนังสือให้อยู่กึ่งกลางแนวตั้ง
+                        gap: 16px; // ระยะห่างระหว่างไอคอนกับฝั่งข้อความ
+
+                        .icon {
+                            font-size: 36px;
+                            width: 36px;
+                            height: 36px;
+                        }
+
+                        .text-info {
+                            display: flex;
+                            flex-direction: column; // ให้ข้อความเรียงบน-ล่าง
+
+                            h3 {
+                                font-size: 14px;
+                                font-weight: 600;
+                                color: #A0AEC0;
+                                margin: 0 0 8px 0;
+                            }
+                            
+                            h2 {
+                                font-size: 28px;
+                                font-weight: 700;
+                                margin: 0;
+                                color: #fff;
+                            }
+                        }
                     }
+                    .card-footer {
+                        margin-top: 20px;
+                        font-size: 13px;
+                        color: #718096; // สีข้อความเปรียบเทียบ
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+
+                        .trend {
+                            font-weight: 600;
+                            
+                            &.up {
+                                color: #F6AD55; // สีส้มเปอร์เซ็นต์
+                            }
+                        }
+                    }
+                }
+            }
+            // สไตล์ของกล่องกราฟด้านล่าง
+            .chart-container {
+                background-color: #090F16;
+                border: 2px solid #161B20;
+                border-radius: 12px;
+                padding: 24px;
+                margin-top: 30px; // ระยะห่างจากกล่อง 4 ใบด้านบน
+
+                .chart-title {
+                    font-size: 20px;
+                    font-weight: 600;
+                    margin: 0 0 40px 0;
+                    color: #fff;
+                }
+                
+                // ปรับแต่ง Custom Tooltip ของ Recharts ไม่ให้มีเส้นขอบรบกวนเวลาโฟกัส
+                .recharts-tooltip-wrapper {
+                    outline: none;
                 }
             }
         }

@@ -44,10 +44,12 @@ const Navbar = () => {
       <div className="right">
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
-          <span className="custom-tooltip" data-tip={displayName}>
-            {truncatedName}
-          </span>
-          <span>id: {currentUser?.user_id}</span>
+          <div className="user-info">
+            <span className="custom-tooltip" data-tip={displayName}>
+              {truncatedName}
+            </span>
+            <span>id: {currentUser?.user_id}</span>
+          </div>
           {!currentUser && <button onClick={handleLogin}>Login</button>}
           {currentUser && <button onClick={handleLogout}>Logout</button>}
         </div>

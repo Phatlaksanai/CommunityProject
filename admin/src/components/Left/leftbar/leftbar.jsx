@@ -32,7 +32,7 @@ const LeftBar = () => {
         <div className="menu">
           <div className="item" onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
             <ArchiveIcon />
-            <span>Content & Assets</span>
+            <span>Content <br /> & Assets</span>
           </div>
         </div>
 

@@ -2,11 +2,12 @@
 
 .leftBar {
   @include themify($themes) {
-    flex: 2;
+    width: 100px; 
+    flex-shrink: 0;
     position: sticky;
     top: 70px;
     height: calc(100vh - 70px);
-    background-color: themed("bg");
+    background-color: #03060A;
     color: themed("textColor");
 
     @include mobile {
@@ -18,7 +19,7 @@
     }
 
     .container {
-      padding: 20px;
+      padding: 20px 10px;
 
       hr {
         margin: 20px 0px;
@@ -75,6 +76,7 @@
         .user,
         .load-more {
           display: flex;
+          flex-direction: column;
           align-items: center;
           gap: 12px;
           padding: 8px 10px; // เพิ่ม padding ให้ดูโปร่งขึ้น
