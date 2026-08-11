@@ -4,7 +4,7 @@
   @include themify($themes) {
     -webkit-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
     -moz-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-    box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
+    box-shadow: 0px 0px 25px -10px themed("border");
     //border-radius: 20px;
     background-color: themed("bg");
     color: themed("textColor");
@@ -12,6 +12,7 @@
     .container {
       .content {
         min-height: 250px;
+
         img {
           width: 100%;
           height: 250px;
@@ -22,92 +23,94 @@
 
       .desc {
         padding: 0px 10px;
-         p {
-            margin: 0;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;      // จำกัด 2 บรรทัด
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            word-break: break-word;     // ตัดคำยาว ๆ
-            line-height: 1.4em;
-            max-height: calc(1.4em * 2); // ป้องกันกรอบขยาย
+
+        p {
+          margin: 0;
+          display: -webkit-box;
+          -webkit-line-clamp: 2; // จำกัด 2 บรรทัด
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          word-break: break-word; // ตัดคำยาว ๆ
+          line-height: 1.4em;
+          max-height: calc(1.4em * 2); // ป้องกันกรอบขยาย
+          color: themed("textColorSoft");
+          font-weight: 600;
         }
       }
-      .price{
+
+      .price {
         padding: 0px 10px;
         display: flex;
         justify-content: space-between;
-        p{margin: 5px 0px;}
+        color: themed("logo");
+
+        p {
+          margin: 5px 0px;
+          color: themed("textColorSoft");
+        }
       }
     }
 
     .popupError {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
 
-  padding: 18px 30px;
-  border-radius: 12px;
+      padding: 18px 30px;
+      border-radius: 12px;
 
-  background: themed("bg");
-  color: themed("textColor");
-  border: 1px solid #f0544f;
+      background: #C0903B;
+      color: white;
 
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
 
-  font-size: 16px;
-  font-weight: 500;
-  text-align: center;
+      z-index: 9999;
 
-  z-index: 9999;
-
-  animation: popupFade 1s ease forwards;
-}
+      animation: popupFade 3s ease forwards;
+    }
 
     .popupSuccess {
       position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
 
-  padding: 18px 30px;
-  border-radius: 12px;
+      padding: 18px 30px;
+      border-radius: 12px;
 
-  background: themed("bg");
-  color: themed("textColor");
-  border: 1px solid #5271ff;
+      background: themed("buttonBg");
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      z-index: 9999;
 
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
-
-  font-size: 16px;
-  font-weight: 500;
-  text-align: center;
-
-  z-index: 9999;
-
-  animation: popupFade 1s ease forwards;
+      animation: popupFade 3s ease forwards;
     }
   }
+
   @keyframes popupFade {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -45%) scale(.9);
-  }
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -45%) scale(.9);
+    }
 
-  15% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+    15% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
 
-  80% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+    80% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
 
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -55%) scale(.95);
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -55%) scale(.95);
+    }
   }
-}
 }

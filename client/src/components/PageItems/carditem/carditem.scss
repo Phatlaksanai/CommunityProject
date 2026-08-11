@@ -3,9 +3,6 @@
 .carditem {
   @include themify($themes) {
     overflow: scroll;
-    background-color: themed("bg");
-    color: themed("textColor");
-    // border-radius: 10px;
 
     @include mobile {
       display: none;
@@ -29,11 +26,15 @@
         display: flex;
         flex-direction: column; // ทำให้ price ลงล่าง
         align-self: center;
-      }
 
-      .price {
-        font-size: 14px;
-        opacity: 0.7;
+        span {
+          font-size: 16px;
+          color: themed("textColorSoft");
+        }
+        p {
+          font-size: 14px;
+          color: themed("textColor");
+        }
       }
 
       .bin {

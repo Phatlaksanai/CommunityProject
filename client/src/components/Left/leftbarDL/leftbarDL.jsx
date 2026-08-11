@@ -27,13 +27,13 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
       const exists = prev.categories.includes(id);
 
       const newFilters = {
-      ...prev,
-      categories: exists
-        ? categories.filter((c) => c !== id)
-        : [...categories, id],
-    };
+        ...prev,
+        categories: exists
+          ? categories.filter((c) => c !== id)
+          : [...categories, id],
+      };
 
-    return newFilters;
+      return newFilters;
     });
   };
 
@@ -65,10 +65,11 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
           <div key={category.category_id}>
             <input
               type="checkbox"
-              checked={filters.categories?.includes(category.category_id) || false }
+              className="custom-checkbox"
+              checked={filters.categories?.includes(category.category_id) || false}
               onChange={() => handleChange(category.category_id)}
             />
-            <p>{category.type}</p>
+            <span>{category.type}</span>
           </div>
         ))}
         <hr />
@@ -77,6 +78,7 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
           <div key={item}>
             <input
               type="radio"
+              className="custom-radio"
               id={item}
               name="date"
               checked={filters.date === item}

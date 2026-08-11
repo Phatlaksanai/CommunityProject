@@ -18,9 +18,7 @@ const Friends = ({ userId, isfriend }) => {
   return (
   <div className="friends-container">
 
-    <h3 style={{ color: "white", marginBottom: "20px" }}>
-      All Friends({data.length})
-    </h3>
+    <h3>All Friends({data.length})</h3>
 
     <div className="friends">
       {data.map((user) => (  // วนลูปแสดงข้อมูลจริงจาก Database

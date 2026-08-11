@@ -93,8 +93,8 @@ const DescDownload = () => {
                     {downloads.map(item => (
                         <div className="row" key={item.order_item_id}>
                             <h3>{item.items.modelName}</h3>
-                            <h3>฿{item.items.price}</h3>
-                            <h3>{new Date(item.orders.created_at).toLocaleDateString()}</h3>
+                            <span>฿{item.items.price}</span>
+                            <span>{new Date(item.orders.created_at).toLocaleDateString()}</span>
                             <select className="file-type-select"
                                 value={fileTypes[item.order_item_id] || getDefaultFileType(item.items)}
                                 onChange={(e) =>

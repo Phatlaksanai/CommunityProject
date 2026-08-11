@@ -74,16 +74,14 @@ const LeftChat = ({ userId, currentChat, setCurrentChat }) => {
 
                                         <div className="details">
 
-                                            <span className="lastMessage">
+                                            <p className="lastMessage">
                                                 {chat?.last_message && (chat.last_message.length > 35)
                                                     ? `${(chat?.last_message).substring(0, 35)}...`
                                                     : chat?.last_message || "Started a conversation"}
-                                            </span>
+                                            </p>
 
                                             {chat?.last_message &&
-                                                <span style={{ fontSize: "12px", color: "gray", marginLeft: "10px" }}>
-                                                    {dayjs(chat?.updated_at).fromNow()}
-                                                </span>
+                                                <span>{dayjs(chat?.updated_at).fromNow()}</span>
                                             }
 
                                         </div>
@@ -98,7 +96,7 @@ const LeftChat = ({ userId, currentChat, setCurrentChat }) => {
             ))}
 
             {/* 4. จุดล่างสุดที่ใช้ตรวจจับการเลื่อน */}
-            <div ref={ref} style={{ padding: "10px", textAlign: "center", fontSize: "12px", color: "gray" }}>
+            <div ref={ref} style={{ padding: "10px", textAlign: "center", fontSize: "12px", color: "gray" , fontWeight: "bold"}}>
                 {isFetchingNextPage
                     ? "Loading more..."
                     : hasNextPage

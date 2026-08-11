@@ -131,7 +131,7 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
           )}
           {menuOpen && post.user_id !== currentUser?.user_id && (
             <button onClick={() => setOpenReport(true)}>
-              <ReportProblemIcon />
+              <ReportProblemIcon style={{ width: "15px", height: "15px" }} />
               Report
             </button>
           )}

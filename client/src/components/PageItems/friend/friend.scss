@@ -30,9 +30,13 @@
             }
 
             .desc {
+                p {
+                    color: themed("textColor");
+                    margin: 0;
+                }
 
-                p,
                 h3 {
+                    color: themed("textColorSoft");
                     margin: 0;
                 }
             }
@@ -44,10 +48,12 @@
 
             border-radius: 6px;
             color: #fff;
-            background-color: #5271ff;
+            background-color: #A0C46E;
             padding: 10px 30px;
+            border: none;
         }
     }
+
     .actions {
         display: flex;
         align-items: center;

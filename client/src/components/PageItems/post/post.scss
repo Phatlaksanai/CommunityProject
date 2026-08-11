@@ -4,7 +4,7 @@
   @include themify($themes) {
     -webkit-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
     -moz-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-    box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
+    box-shadow: 0px 0px 25px -10px themed("border");
     border-radius: 20px;
     background-color: themed("bg");
     color: themed("textColor");
@@ -50,7 +50,7 @@
           right: 0;
           border-radius: 5px;
           border: none;
-          background-color: #f0544f;
+          background-color: #C0903B;
           padding: 5px;
           cursor: pointer;
           color: white;

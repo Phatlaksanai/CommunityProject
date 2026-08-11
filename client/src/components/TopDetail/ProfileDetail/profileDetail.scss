@@ -112,10 +112,12 @@
             h1 {
               font-size: 26px;
               font-weight: bold;
+              color: themed("textColorSoft");
               margin: 0;
             }
 
             .actions {
+
               .followBtn {
                 padding: 8px 18px;
                 border: none;

@@ -80,7 +80,7 @@ const Friend = ({ user, isfriend }) => {
             return (
                 <button onClick={handleCancelFriend}
                     disabled={cancelMutation.isLoading}
-                    style={{ backgroundColor: "#ccc", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
+                    style={{ backgroundColor: "#A0C46E", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
                 >
                     Cancel Request
                 </button>
@@ -90,7 +90,7 @@ const Friend = ({ user, isfriend }) => {
             return (
                 <button onClick={handleCancelFriend}
                     disabled={cancelMutation.isLoading}
-                    style={{ backgroundColor: "#ccc", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
+                    style={{ backgroundColor: "#A0C46E", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
                 >
                     Decline Request
                 </button>
@@ -103,7 +103,7 @@ const Friend = ({ user, isfriend }) => {
                     onClick={handleCancelFriend}
                     disabled={cancelMutation.isLoading}
                     style={{ 
-                        backgroundColor: "#f0544f", 
+                        backgroundColor: "#C0903B", 
                         color: "white", 
                         cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" 
                     }}

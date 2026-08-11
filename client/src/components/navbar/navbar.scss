@@ -141,12 +141,15 @@
           &::-webkit-scrollbar {
             width: 6px;
           }
+
           &::-webkit-scrollbar-track {
             background: transparent;
           }
+
           &::-webkit-scrollbar-thumb {
             background-color: rgba(128, 128, 128, 0.3);
             border-radius: 4px;
+
             &:hover {
               background-color: rgba(128, 128, 128, 0.5);
             }
@@ -192,7 +195,7 @@
                 height: 40px;
                 object-fit: cover;
                 border-radius: 50%; // ทำให้รูปกลมๆ ดูเหมือน Profile
-                flex-shrink: 0;     // ป้องกันไม่ให้รูปโดนบีบเบี้ยวเวลาจอมันแคบ
+                flex-shrink: 0; // ป้องกันไม่ให้รูปโดนบีบเบี้ยวเวลาจอมันแคบ
                 border: 1px solid themed("border");
               }
 
@@ -201,31 +204,40 @@
                 flex-direction: column;
                 gap: 4px;
                 overflow: hidden; // กันตัวอักษรทะลุกรอบ
-              .badge {
-                align-self: flex-start;
-                font-size: 9px;
-                font-weight: bold;
-                padding: 2px 6px;
-                border-radius: 4px;
-                color: white;
 
-                &.community { background-color: #ff9800; }
-                &.item { background-color: #f0544f; }
-                &.user { background-color: #3f51b5; }
-              }
+                .badge {
+                  align-self: flex-start;
+                  font-size: 9px;
+                  font-weight: bold;
+                  padding: 2px 6px;
+                  border-radius: 4px;
+                  color: white;
 
-              .hit-title {
-                margin: 0;
-                font-size: 13px;
-                font-weight: 600;
-              }
+                  &.community {
+                    background-color: #ff9800;
+                  }
 
-              .hit-desc {
-                margin: 0;
-                font-size: 11px;
-                color: gray;
+                  &.item {
+                    background-color: #f0544f;
+                  }
+
+                  &.user {
+                    background-color: #3f51b5;
+                  }
+                }
+
+                .hit-title {
+                  margin: 0;
+                  font-size: 13px;
+                  font-weight: 600;
+                }
+
+                .hit-desc {
+                  margin: 0;
+                  font-size: 11px;
+                  color: gray;
+                }
               }
-            }
             }
           }
         }
@@ -265,6 +277,12 @@
           cursor: pointer;
           border: none;
           color: white;
+        }
+
+        span {
+          font-size: 16px;
+          font-weight: 600;
+          color: themed("textColorSoft");
         }
       }
     }

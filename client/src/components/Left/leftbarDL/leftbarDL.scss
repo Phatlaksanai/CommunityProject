@@ -8,13 +8,15 @@
     overflow: scroll;
     background-color: themed("bg");
     color: themed("textColor");
-    width: 250px; 
+    width: 250px;
     flex: none;
+
     .error {
       color: red;
       margin-top: 10px;
       font-size: 14px;
     }
+
     @include mobile {
       display: none;
     }
@@ -27,11 +29,13 @@
 
     h3 {
       font-size: 16px;
+      color: themed("textColorSoft");
+      font-weight: 600;
       margin-bottom: 10px;
     }
 
     hr {
-      margin: 15px 0;
+      margin: 0px;
       border: none;
       height: 0.5px;
       background-color: themed("border");
@@ -53,16 +57,18 @@
 
       span {
         font-size: 14px;
-        font-weight: 500;
-      }  
+        color: themed("textColorSoft");
+        font-weight: 600;
+      }
+
       button {
         padding: 7px 20px;
         border-radius: 6px;
         margin-left: auto;
-        background-color: #555;
+        background-color: themed("buttonBg");
         color: white;
         border: none;
-      } 
+      }
     }
 
     /* filter section */
@@ -72,9 +78,15 @@
       gap: 10px;
 
       p {
-        font-size: 13px;
-        font-weight: 500;
-        margin-bottom: 5px;
+        font-size: 14px;
+        color: themed("textColorSoft");
+        font-weight: 600;
+        margin: 0px;
+      }
+
+      span {
+        font-size: 14px;
+        color: themed("textColor");
       }
 
       div {
@@ -93,5 +105,43 @@
         }
       }
     }
+
+    /* ล้างค่า Default ของเบราว์เซอร์และกำหนดขนาด/ขอบเขตตั้งต้น */
+    .custom-checkbox,
+    .custom-radio {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ccc;
+      /* สีของเส้นขอบตอนที่ยังไม่ถูกเลือก */
+      background-color: transparent;
+      outline: none;
+      cursor: pointer;
+      display: inline-block;
+      vertical-align: middle;
+      position: relative;
+      /* ระยะห่างระหว่างปุ่มกับข้อความ */
+    }
+
+    /* Checkbox กำหนดให้เป็นสี่เหลี่ยมขอบมน */
+    .custom-checkbox {
+      border-radius: 4px;
+    }
+
+    /* Radio กำหนดให้เป็นวงกลม */
+    .custom-radio {
+      border-radius: 50%;
+    }
+
+    /* สไตล์เมื่อเกิดเหตุการณ์ (State) checked */
+    .custom-checkbox:checked,
+    .custom-radio:checked {
+      background-color: #A0C46E;
+      /* สีพื้นหลังตอนถูกเลือก สามารถเปลี่ยนสีได้ */
+      border-color: #A0C46E;
+    }
+    
+
   }
 }

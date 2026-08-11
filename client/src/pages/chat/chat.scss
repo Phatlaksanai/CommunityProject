@@ -170,6 +170,7 @@
 
                     span {
                         font-weight: bold;
+                        color: themed("textColorSoft");
                     }
                 }
             }
@@ -232,8 +233,8 @@
 
                     p {
                         padding: 10px 15px;
-                        background-color: rgb(171, 171, 171); // สีพื้นหลังของเพื่อน
-                        color: themed("textColor");
+                        background-color: #A0C46E; // สีพื้นหลังของเพื่อน
+                        color: white;
                         border-radius: 0px 15px 15px 15px; // ทำมุมเหลี่ยมด้านซ้ายบน (หางจุก)
                         margin: 0;
                         word-wrap: break-word; // ถ้าพิมพ์ติดกันยาวๆ ให้ตัดขึ้นบรรทัดใหม่
@@ -275,7 +276,7 @@
                         // สีและรูปร่างกล่องข้อความฝั่งเรา
                         .messageContent {
                             p {
-                                background-color: #0084ff; // สีฟ้าน้ำทะเล
+                                background-color: #6a9043; // สีฟ้าน้ำทะเล
                                 color: white;
                                 border-radius: 15px 0px 15px 15px; // หางจุกด้านขวาบน
                             }
@@ -343,6 +344,7 @@
 
             .chatInput {
                 color: gray;
+                font-weight: bold;
                 display: flex;
                 align-items: center;
                 justify-content: center;

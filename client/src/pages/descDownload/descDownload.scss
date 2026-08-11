@@ -32,10 +32,9 @@
     }
 
     .Header {
-      font-weight: bold;
-
       h2 {
         margin: 0;
+        color: themed("textColorSoft");
         font-size: 18px;
       }
     }
@@ -52,7 +51,8 @@
       h3 {
         margin: 0;
         font-size: 15px;
-        font-weight: 500;
+        font-weight: bold;
+        color: themed("textColorSoft");
       }
 
       button {
@@ -73,24 +73,29 @@
         font-size: 14px;
         font-weight: 600;
 
-        background: #5B73E8;
+        background: themed("buttonBg");
         color: white;
 
         transition: .2s;
 
         &:hover {
-          background: #4760d7;
+          background: themed("AbuttonBg");
         }
       }
 
       .review-btn {
-        background: themed("bgSoft");
-        color: themed("textColor");
+        background: themed("buttonBg");
+        color: white;
 
         &:hover {
-          background: #666;
-          color: white;
+          background: themed("AbuttonBg");
         }
+      }
+
+      .review-complete{
+        color: themed("textColorSoft");
+        font-size: 15px;
+        font-weight: bold;
       }
     }
 

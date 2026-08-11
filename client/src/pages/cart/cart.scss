@@ -45,23 +45,24 @@
 
       .info {
         @include themify($themes) {
-            background: themed("bg");
-            h1 {
-                font-size: 22px;
-                margin-bottom: 5px;
-                color: themed("textColor");
-            }
+          background: themed("bg");
 
-            p {
-                color: themed("textColor");
-            }
+          h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: themed("textColor");
+          }
+
+          p {
+            color: themed("textColor");
+          }
         }
       }
     }
 
     .delete {
       border: none;
-      color: #f0544f;
+      color: #C0903B;
       height: 40px;
       width: 40px;
       cursor: pointer;
@@ -82,18 +83,21 @@
     @include themify($themes) {
       background: themed("bg");
       border-top: 1px solid themed("border");
+
+      button {
+        width: min(500px, 90%);
+        padding: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+        border-radius: 10px;
+        background: themed("buttonBg");
+        color: white;
+        cursor: pointer;
+      }
+
     }
 
-    button {
-      width: min(500px, 90%);
-      padding: 15px;
-      font-size: 18px;
-      font-weight: bold;
-      border: none;
-      border-radius: 10px;
-      background: #5271ff;
-      color: white;
-      cursor: pointer;
-    }
+
   }
 }

@@ -80,7 +80,7 @@ const ProfileDetail = () => {
             className="followBtn"
             onClick={() => addMutation.mutate()}
             disabled={addMutation.isLoading}
-            style={{ backgroundColor: "#5271ff", cursor: addMutation.isLoading ? "not-allowed" : "pointer" }}
+            style={{ backgroundColor: "#A0C46E", cursor: addMutation.isLoading ? "not-allowed" : "pointer", color: "white" }}
           >
             Add Friend
           </button>
@@ -96,7 +96,7 @@ const ProfileDetail = () => {
             className="followBtn"
             onClick={() => cancelMutation.mutate()}
             disabled={cancelMutation.isLoading}
-            style={{ backgroundColor: "#ccc", color: "black", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
+            style={{ backgroundColor: "#C0903B", color: "white", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
           >
             Cancel Request
           </button>
@@ -112,7 +112,7 @@ const ProfileDetail = () => {
             className="followBtn"
             onClick={() => cancelMutation.mutate()} // สามารถใช้ API ปฏิเสธคำขอได้ถ้าต้องการแยก
             disabled={cancelMutation.isLoading}
-            style={{ backgroundColor: "#ccc", color: "black", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
+            style={{ backgroundColor: "#C0903B", color: "white", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
           >
             Decline Request
           </button>
@@ -128,9 +128,12 @@ const ProfileDetail = () => {
             className="followBtn"
             onClick={() => cancelMutation.mutate()}
             disabled={cancelMutation.isLoading}
-            style={{ backgroundColor: "#bababa", color: "black", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
+            style={{ backgroundColor: "#C0903B", color: "white", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
           >
             Unfriend
+          </button>
+          <button className="followBtn" onClick={() => handleConversation(userData)} style={{ cursor: "pointer", marginLeft: "15px", backgroundColor: "#6A9043", color: "white" }}>
+            Message
           </button>
         </div>
       );
@@ -230,15 +233,12 @@ const ProfileDetail = () => {
 
               {isOwner ? (
                 <div className="actions">
-                  <button className="followBtn" onClick={() => navigate(`/editprofile/${userData?.user_id}`)} style={{ cursor: "pointer" }}>Edit Profile</button>
+                  <button className="followBtn" onClick={() => navigate(`/editprofile/${userData?.user_id}`)} style={{ cursor: "pointer" , backgroundColor: "#A0C46E", color: "white" }}>Edit Profile</button>
                 </div>
               ) : (
                 <>
                   {renderFriendButton()}
-                  <div className="actions">
-                    <button className="followBtn" onClick={() => handleConversation(userData)} style={{ cursor: "pointer" }}>Message</button>
-                  </div>
-                  <ReportProblemIcon style={{ cursor: "pointer" }} onClick={() => setOpenReport(true)} />
+                  <ReportProblemIcon style={{ cursor: "pointer", color: "red" }} onClick={() => setOpenReport(true)} />
                 </>
               )}
 
@@ -248,7 +248,7 @@ const ProfileDetail = () => {
             <span className="handle">
               {shortDesc}
               <span
-                style={{ cursor: "pointer", marginLeft: "5px" }}
+                style={{ cursor: "pointer", marginLeft: "5px" , fontWeight: "bold", color: "#6A9043"}}
                 onClick={() => setOpenModal(true)}
               >
                 ...more

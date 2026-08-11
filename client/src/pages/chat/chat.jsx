@@ -237,7 +237,7 @@ const Chat = () => {
 
                     {searchQuery && filteredFriends?.length === 0 && (
                         <div className="search-dropdown-results">
-                            <div className="search-hit-item" style={{ textAlign: "center", color: "gray" }}>
+                            <div className="search-hit-item" style={{ textAlign: "center", color: "gray" , fontWeight: "bold" }}>
                                 No friends found
                             </div>
                         </div>
@@ -344,7 +344,7 @@ const Chat = () => {
                                 style={{ display: "none" }}
                             />
                             <label htmlFor="chatImageInput">
-                                <ImageIcon style={{ cursor: "pointer" }} />
+                                <ImageIcon style={{ cursor: "pointer" , color: "#6A9043"}} />
                             </label>
                             <div className="search">
                                 <textarea
@@ -357,7 +357,7 @@ const Chat = () => {
                                     className="chatTextArea"
                                 />
                             </div>
-                            <ThumbUpAltIcon onClick={handleLikeSubmit} style={{ cursor: "pointer" }} />
+                            <ThumbUpAltIcon onClick={handleLikeSubmit} style={{ cursor: "pointer" , color: "#A0C46E"}} />
                         </div>
                     )
                 ) : null}

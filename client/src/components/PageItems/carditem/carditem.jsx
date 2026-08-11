@@ -30,7 +30,7 @@ const CardItem = ({ card, isCart }) => {
         )}
         <img src={card.img} alt="" />
         <div className="info">
-          <span>{card.modelName}</span> <span>฿ {card.price}</span>
+          <span>{card.modelName}</span> <p>฿ {card.price}</p>
         </div>
       </div>
     </div>

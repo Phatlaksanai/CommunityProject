@@ -2,8 +2,9 @@
 
 .carditems {
   @include themify($themes) {
-    color: themed("text-color");
+    color: themed("textColor");
     display: grid;
+    font-weight: bold;
     gap: 10px;
   }
 }

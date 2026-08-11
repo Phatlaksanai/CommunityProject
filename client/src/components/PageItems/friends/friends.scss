@@ -1,5 +1,21 @@
-.friends {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); // 5 column
-  gap: 10px;
+@use "../../../style.scss" as *;
+
+.friends-container {
+  @include themify($themes) {
+    background-color: themed("bgSoft");
+    color: themed("textColor");
+
+    h3 {
+      color: themed("textColorSoft");
+      margin-Bottom: 20px;
+    }
+
+    .friends {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); // 5 column
+      gap: 10px;
+    }
+
+  }
+
 }
