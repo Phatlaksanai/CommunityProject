@@ -4,6 +4,9 @@ import { useContext, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -18,6 +21,7 @@ const CommuDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [openReport, setOpenReport] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const queryClient = useQueryClient();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
@@ -79,29 +83,40 @@ const CommuDetail = () => {
           </div>
 
           <div className="rightSide">
-            {community?.user_id === currentUser?.user_id ? (
-              <>
-                <SettingsIcon
-                  className="iconBtn settingBtn"
-                  onClick={() => navigate(`/editcommu/${community?.communities_id}`)}
-                  style={{ cursor: "pointer" }}
-                />
-                <BlockIcon
-                  className="iconBtn blockBtn"
-                  onClick={() => navigate(`/banmember/${community?.communities_id}`)}
-                  style={{ cursor: "pointer" }}
-                />
-              </>
-            ) : (
-              <button
-                className="followBtn"
-                onClick={handleFollow} style={{ backgroundColor: isFollowing ? "#bababa" : "#5271ff" }}
-              >
-                {isFollowing ? "Following" : "Follow"}
-              </button>
-            )}
-            {community?.user_id !== currentUser?.user_id && (
-              <ReportProblemIcon style={{ cursor: "pointer", marginTop: "5px" }} onClick={() => setOpenReport(true)} />
+            <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} style={{ cursor: "pointer" }} />
+
+            {menuOpen && (
+              community?.user_id === currentUser?.user_id ? (
+                // ส่วนของเจ้าของโพสต์ (Owner)
+                <div className="moreMenu">
+                  <button onClick={() => navigate(`/editcommu/${community?.communities_id}`)} style={{ cursor: "pointer" }}>
+                    <SettingsIcon style={{ width: "15px", height: "15px" }} />
+                    Settings
+                  </button>
+                  <button onClick={() => navigate(`/banmember/${community?.communities_id}`)} style={{  backgroundColor: "#C0903B", cursor: "pointer" }}>
+                    <BlockIcon style={{ width: "15px", height: "15px" }} />
+                    Ban Member
+                  </button>
+                </div>
+              ) : (
+                // ส่วนของคนดูทั่วไป (Visitor)
+                <div className="moreMenu">
+                  <button
+                    className="followBtn"
+                    onClick={handleFollow}
+                    style={{ backgroundColor: isFollowing ? "#C0903B" : "#A0C46E", cursor: "pointer" }}
+                  >
+                    
+                    {isFollowing ? <GroupRemoveIcon style={{ width: "15px", height: "15px" }} /> : <GroupAddIcon style={{ width: "15px", height: "15px" }} />}
+                    {isFollowing ? "Unfollow" : "Follow"}
+                  </button>
+
+                  <button onClick={() => setOpenReport(true)} style={{ backgroundColor: "#C0903B", cursor: "pointer" }}>
+                    <ReportProblemIcon style={{ width: "15px", height: "15px" }} />
+                    Report
+                  </button>
+                </div>
+              )
             )}
           </div>
         </div>

@@ -7,7 +7,7 @@
     justify-content: center;
     align-items: center;
     background-color: themed("bg");
-    color: themed("textColor");
+    color: themed("textSoft");
 
     &__form {
       width: 100%;
@@ -126,7 +126,7 @@
       cursor: pointer;
       font-size: 15px;
       font-weight: 600;
-      background-color: #5271ff;
+      background-color: #A0C46E;
       color: #FFFFFF;
       transition: transform 0.15s ease;
 
@@ -142,8 +142,8 @@
       cursor: pointer;
       font-size: 15px;
       font-weight: 600;
-      background-color: #f0544f;
-      color: #000000;
+      background-color: #C0903B;
+      color: white;
       transition: transform 0.15s ease;
 
       &:hover {

@@ -85,19 +85,23 @@
 
       .profileHeader {
         display: flex;
-        justify-content: space-between; /* ดันซ้าย-ขวาออกจากกัน */
+        justify-content: space-between;
+        /* ดันซ้าย-ขวาออกจากกัน */
         align-items: stretch;
-        padding: 20px 10%; /* จัด padding ซ้ายขวาให้สวยงาม */
+        padding: 20px 10%;
+        /* จัด padding ซ้ายขวาให้สวยงาม */
 
         /* กลุ่มฝั่งซ้าย */
         .leftSide {
           display: flex;
           flex-direction: column;
-          gap: 8px; /* ระยะห่างบรรทัด */
+          gap: 8px;
+          /* ระยะห่างบรรทัด */
 
           h1 {
             font-size: 26px;
             font-weight: bold;
+            color: themed("textColorSoft");
             word-break: break-all;
             margin: 0;
           }
@@ -110,14 +114,14 @@
 
           .statsRow {
             display: flex;
-            flex-direction: column; 
-            align-items: flex-start; 
-            gap: 8px; 
-            margin-top: auto; 
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: auto;
             padding-top: 16px;
             font-size: 14px;
-            font-weight: 500;
-            color: gray;
+            font-weight: bold;
+            color: themed("textColorSoft");
 
             p {
               margin: 0;
@@ -130,31 +134,32 @@
           display: flex;
           margin-left: 20px;
           gap: 12px;
+          position: relative;
 
-          .iconBtn {
-            font-size: 28px; 
-            opacity: 0.7;
-            transition: 0.2s ease-in-out;
-          }
+          .moreMenu {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 30px;
+            right: 0;
+            margin-top: 8px;
+            z-index: 10;
+            gap: 3px;
 
-          .blockBtn {
-            color: #ff4d4f; 
-            margin-bottom: 26px;
+
+            button {
+              padding: 8px 18px;
+              max-height: 35px;
+              border: none;
+
+              /* จัดระเบียบไอคอนกับข้อความในปุ่มให้สวยขึ้น */
+              display: flex;
+              align-items: center;
+              gap: 5px;
+              color: white;
+              background-color: themed("buttonBg");
+            }
           }
-          .followBtn {
-            padding: 8px 18px;
-            max-height: 35px;
-            border-radius: 20px;
-            border: none;
-            background-color: #5271ff; // เปลี่ยนสีตามสถานะ
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-          
-          &.following {
-              background-color: #888; 
-          }
-        }
         }
       }
 

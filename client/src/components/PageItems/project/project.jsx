@@ -5,18 +5,16 @@ import { useState } from "react";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { AuthContext } from "../../../context/authContext";
 import { useContext } from "react";
+import img from "../../../assets/DefaultProject.jpg";
 
 const Project = ({ project, isProfile }) => {
-
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
   return (
     <div className="project">
       <div className="container" onClick={() => navigate(`/descproject/${project.project_id}`)} style={{ cursor: "pointer" }}>
         <div className="content" >
-          <img src={project.img} alt="" onError={(e) => {
-            e.currentTarget.src = "https://placehold.co/600x400/457EC3/FFFFFF?text=Project";
-          }} />
+          <img src={project.img || img} alt="" />
         </div>
       </div>
       <div className="desc">
@@ -27,7 +25,7 @@ const Project = ({ project, isProfile }) => {
       <div className="price">
         <p>{dayjs(project.created_at).format("D MMM YYYY")}</p>
         {isProfile && project.user_id === currentUser.user_id && (
-          <SettingsIcon onClick={() => navigate(`/editproject/${project.project_id}`)} style={{ cursor: "pointer" }} />
+          <SettingsIcon onClick={() => navigate(`/editproject/${project.project_id}`)} style={{ cursor: "pointer" , color: "#A0C46E"}} />
         )}
       </div>
     </div>

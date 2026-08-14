@@ -9,9 +9,17 @@
     overflow: scroll;
     background-color: themed("bgSoft");
 
-    @include mobile { display: none; }
-    @include tablet { display: none; }
-    &::-webkit-scrollbar { display: none; }
+    @include mobile {
+      display: none;
+    }
+
+    @include tablet {
+      display: none;
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     .container {
       padding: 20px;
@@ -34,27 +42,28 @@
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           // 🌟 ล็อกขนาดความสูงของแถว Grid ให้สัมพันธ์กับความกว้าง (ทำทรงจัตุรัสแต่แรก)
-          grid-auto-rows: 1fr; 
+          grid-auto-rows: 1fr;
           gap: 8px;
           max-width: 400px;
           width: 100%;
-          
+
           // สถานะปกติ: ล็อกกล่องไม่ให้ยืด และซ่อนส่วนที่เกิน
           max-height: none;
           overflow: hidden;
 
           // สถานะเมื่อกดปุ่ม View All: บล็อกความสูงเพื่อสร้างช่องสกรอลล์ดูภาพแนวตั้งด้านใน
           &.expanded {
-            max-height: 400px; 
+            max-height: 400px;
             overflow-y: auto;
             padding-right: 6px;
-            
+
             // 🌟 บังคับว่าแถวที่เพิ่มขึ้นมาใหม่จากการสกรอลล์ ให้ใช้ขนาดดั้งเดิม ห้ามหดตัวแชร์พื้นที่กัน
-            grid-auto-rows: min-content; 
+            grid-auto-rows: min-content;
 
             &::-webkit-scrollbar {
               width: 5px;
             }
+
             &::-webkit-scrollbar-thumb {
               background: themed("textColor");
               border-radius: 4px;
@@ -64,7 +73,7 @@
           // กล่องใส่รูปรายชิ้น: บังคับล็อกสัดส่วนและมิติตารางให้นิ่งสนิท ไม่บิดเบี้ยว
           .img {
             width: 100%;
-            min-width: 0; 
+            min-width: 0;
             height: unset; // 🌟 เคลียร์ค่า height เดิมออก เพื่อเปิดทางให้ aspect-ratio ทำงานเต็มที่
             aspect-ratio: 1 / 1; // บังคับโครงสร้างทรงจัตุรัสเท่ากันทุกกล่อง
             border-radius: 5px;
@@ -72,18 +81,20 @@
             overflow: hidden;
             cursor: pointer;
             transition: opacity 0.2s;
-            
-            // 🌟 ป้องกันไม่ให้โดนแรงบีบแนวตั้งจากกล่องสกรอลล์ทำให้รูปหดตัวเบียดกัน
-            flex-shrink: 0; 
 
-            &:hover { opacity: 0.85; }
+            // 🌟 ป้องกันไม่ให้โดนแรงบีบแนวตั้งจากกล่องสกรอลล์ทำให้รูปหดตัวเบียดกัน
+            flex-shrink: 0;
+
+            &:hover {
+              opacity: 0.85;
+            }
 
             &.empty-slot {
               border: 1px dashed themed("border");
               display: flex;
               align-items: center;
               justify-content: center;
-              
+
               &.main-empty {
                 grid-column: span 2;
                 aspect-ratio: unset;
@@ -109,10 +120,31 @@
           }
         }
 
+        h2 {
+          margin: 10px 0px;
+          color: themed("textColorSoft");
+        }
+
+        
+
+          button {
+            border: none;
+            padding: 5px;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            background-color: themed("buttonBg");
+          }
+        F
+
         .top {
-          h2 { margin: 10px 0px; }
+          h2 {
+            margin: 10px 0px;
+          }
+
           align-items: center;
           gap: 20px;
+
           img {
             width: 150px;
             height: 150px;
@@ -160,7 +192,11 @@
               border-radius: 50%;
               object-fit: cover;
             }
-            p { color: themed("textColorSoft"); }
+
+            p {
+              color: themed("textColorSoft");
+            }
+
             span {
               font-weight: 500;
               color: themed("textColor");
@@ -171,6 +207,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+
             button {
               border: none;
               padding: 5px;
@@ -207,7 +244,10 @@
     color: #ffffff;
     cursor: pointer;
     opacity: 0.7;
-    &:hover { opacity: 1; }
+
+    &:hover {
+      opacity: 1;
+    }
   }
 
   .navBtn {
@@ -225,9 +265,17 @@
     align-items: center;
     justify-content: center;
 
-    &:hover { background: rgba(255, 255, 255, 0.25); }
-    &.prev { left: 30px; }
-    &.next { right: 30px; }
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    &.prev {
+      left: 30px;
+    }
+
+    &.next {
+      right: 30px;
+    }
   }
 
   .lightboxContent {
@@ -236,6 +284,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
     img {
       max-width: 100%;
       max-height: 85vh;

@@ -2,11 +2,11 @@ import "./projectDetail.scss";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
+import img from "../../../assets/DefaultProject.jpg";
 import dayjs from "dayjs";
 
 const ProjectDetail = () => {
   const { id } = useParams();
-  const defaultPic = "https://placehold.co/600x400/457EC3/FFFFFF?text=Project";
   const [Project, setProject] = useState(null);
   useEffect(() => {
     if (!id) return;
@@ -22,7 +22,6 @@ const ProjectDetail = () => {
 
     fetchProject();
   }, [id]);
-
   const displayName = Project?.project_name || "Project Name";
   const truncatedName = displayName.length > 40 ? `${displayName.substring(0, 40)}...` : displayName;
 
@@ -31,10 +30,10 @@ const ProjectDetail = () => {
       <div className="container">
         <div
           className="cover"
-          style={{ "--cover-image": `url(${Project?.img || defaultPic})` }}
+          style={{ "--cover-image": `url(${Project?.img || img})` }}
         >
           <img
-            src={Project?.img || defaultPic}
+            src={Project?.img || img}
             alt="cover"
             className="coverImg"
           />

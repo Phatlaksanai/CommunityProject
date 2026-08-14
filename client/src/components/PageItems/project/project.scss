@@ -30,6 +30,7 @@
         padding: 0px 15px;
         h3{
           white-space: nowrap;
+          color: themed("textColorSoft");
           max-width: 0;
           margin: 0px;
         }
@@ -49,6 +50,7 @@
         display: flex;
         justify-content: space-between;
         p{margin: 5px 0px;}
+        color: themed("textColorSoft");
       }
   }
 }

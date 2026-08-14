@@ -70,6 +70,12 @@
 
         .projectInfo {
 
+          p{
+            font-size: 14px;
+            font-weight: bold;
+            color: themed("textColorSoft");
+          }
+
           .nameRow {
             display: flex;
             align-items: center;
@@ -78,6 +84,7 @@
 
             h1 {
               font-size: 26px;
+              color: themed("textColorSoft");
               font-weight: bold;
               word-break: break-all;
               margin: 0;

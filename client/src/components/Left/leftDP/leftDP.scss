@@ -34,11 +34,17 @@
         border-radius: 10px;
         display: flex;
         flex-direction: column;
+        color: themed("textColorSoft");
+
+        p {
+          margin-top: 0;
+        }
 
         .top {
           h2 {
             margin: 10px 0px;
           }
+
 
           align-items: center;
           gap: 20px;
@@ -67,7 +73,7 @@
           padding: 10px 50px;
           border: none;
           border-radius: 8px;
-          background: linear-gradient(135deg, #5271ff, #3558e0);
+          background-color: #A7D129;
           color: white;
           font-weight: 600;
           cursor: pointer;

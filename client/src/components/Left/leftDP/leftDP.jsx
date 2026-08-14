@@ -36,16 +36,16 @@ const LeftDP = ({ project }) => {
           items.map(item => (
             <div className="item" key={item.item_id}>
               <div className="top">
-                  {item.model && <ModelViewer modelUrl={item.model} />}
-                  {/* <img src={item.img} alt="" /> */}
-                  <p>Neme : {item.modelName}</p>
-                  <p>Description : {item.description}</p>
-                  <p>Price : {item.price}</p>
-                  <span>
-                    Created At :{" "}
-                    {dayjs(item.created_at)
-                      .format("D MMM YYYY")}
-                  </span>
+                {item.model && <ModelViewer modelUrl={item.model} />}
+                {/* <img src={item.img} alt="" /> */}
+                <p><strong>Name :</strong> {item.modelName}</p>
+                <p><strong>Description :</strong> {item.description}</p>
+                <p><strong>Price :</strong> {item.price}</p>
+                <span>
+                  <strong>Created At :</strong> {" "}
+                  {dayjs(item.created_at)
+                    .format("D MMM YYYY")}
+                </span>
               </div>
               <button className="buy-button" onClick={() => navigate(`/descitem/${item.item_id}`)}>Buy</button>
             </div>
@@ -54,33 +54,35 @@ const LeftDP = ({ project }) => {
         {/* ===== STATS (แสดงเสมอ แม้ไม่มี item) ===== */}
         <div className="item">
           <h2>Project Stats</h2>
-          <p>Development Duration</p>
+          <p><strong>Development Duration</strong></p>
 
           <p>
-            first post :{" "}
+            <strong>First Post :</strong> {" "}
             {firstPost
               ? dayjs(firstPost.created_at).format("D MMM YYYY")
               : "-"}
           </p>
 
           <p>
-            last post :{" "}
+            <strong>Last Post :</strong> {" "}
             {lastPost
               ? dayjs(lastPost.created_at).format("D MMM YYYY")
               : "-"}
           </p>
 
           <p>
-            duration :{" "}
+            <strong>Duration :</strong> {" "}
             {firstPost && lastPost
               ? dayjs(lastPost.created_at).diff(
-                  dayjs(firstPost.created_at),
-                  "day"
-                ) + " days"
+                dayjs(firstPost.created_at),
+                "day"
+              ) + " days"
               : "-"}
           </p>
 
-          <p>all posts : {posts.length}</p>
+          <p>
+            <strong>All Posts :</strong> {posts.length}
+          </p>
 
         </div>
 

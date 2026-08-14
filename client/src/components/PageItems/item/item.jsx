@@ -65,8 +65,8 @@ const Item = ({ item, isProfile, isShop }) => {
         </div>
         <div className="price">
           <p>$ {item.price}</p>
-          {isShop && (<ControlPointIcon onClick={handleAddToCart} style={{ cursor: "pointer" }} />)}
-          {isProfile && item.user_id === currentUser.user_id && (<SettingsIcon onClick={() => navigate(`/edititem/${item?.item_id}`)} style={{ cursor: "pointer" }} />)}
+          {isShop && (<ControlPointIcon onClick={handleAddToCart} style={{ cursor: "pointer" , color: "#A0C46E"}} />)}
+          {isProfile && item.user_id === currentUser.user_id && (<SettingsIcon onClick={() => navigate(`/edititem/${item?.item_id}`)} style={{ cursor: "pointer" , color: "#A0C46E"}} />)}
         </div>
         {error && <div className="popupError">{error}</div>}
         {success && <div className="popupSuccess">{success}</div>}

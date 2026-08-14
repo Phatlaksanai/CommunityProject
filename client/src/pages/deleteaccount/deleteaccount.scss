@@ -7,7 +7,7 @@
     justify-content: center;
     align-items: center;
     background-color: themed("bg");
-    color: themed("textColor");
+    color: themed("textSoft");
 
     &__form {
       width: 100%;
@@ -69,11 +69,11 @@
         }
 
         .error-msg {
-          color: #f0544f;
+          color: #C0903B;
         }
 
         .success-msg {
-          color: #2ec4b6; 
+          color: #A0C46E; 
         }
     }
 
@@ -126,7 +126,7 @@
       cursor: pointer;
       font-size: 15px;
       font-weight: 600;
-      background-color: #f0544f;;
+      background-color: #C0903B;;
       color: #FFFFFF;
       transition: transform 0.15s ease;
 
