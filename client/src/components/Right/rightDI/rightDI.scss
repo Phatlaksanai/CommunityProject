@@ -8,7 +8,7 @@
     height: calc(100vh - 70px);
     overflow: scroll;
     background-color: themed("bg");
-    color: themed("textColor");
+    color: themed("textColorSoft");
     border-radius: 10px;
 
     @include mobile{

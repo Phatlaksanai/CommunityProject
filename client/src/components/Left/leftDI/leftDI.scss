@@ -33,6 +33,11 @@
         background-color: themed("bg");
         border-radius: 10px;
 
+        h2 {
+          color: themed("textColorSoft");
+          margin: 0px;
+        }
+
         img {
           width: 100%;
           height: auto;
@@ -54,9 +59,7 @@
             white-space: nowrap;
           }
 
-          h2 {
-            margin: 0px;
-          }
+
 
           .userInfo {
             display: flex;

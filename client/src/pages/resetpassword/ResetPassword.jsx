@@ -94,7 +94,7 @@ const ResetPassword = () => {
     }
   };
   return (
-    <div className="login">
+    <div className="resetpassword">
       <div className="card">
         <div className="left">
           <h1>PM.</h1>

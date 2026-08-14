@@ -1,6 +1,6 @@
 .login {
   height: 100vh;
-  background-color: #868686;
+  background-color: #A0C46E;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +15,7 @@
 
     .left {
       flex: 1;
-      background: linear-gradient(#333, rgb(43, 58, 75, 0.5)),
+      background: linear-gradient(#3F5428, hsla(89, 35%, 24%, 0.16)),
         url("https://images.pexels.com/photos/461049/pexels-photo-461049.jpeg")
           center;
       background-size: cover;
@@ -79,7 +79,7 @@
           width: 50%;
           padding: 10px;
           border: none;
-          background-color: #333;
+          background-color: #597b2a;
           color: white;
           font-weight: bold;
           cursor: pointer;

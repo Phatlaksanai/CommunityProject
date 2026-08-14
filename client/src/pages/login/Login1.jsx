@@ -43,8 +43,7 @@ const Login = () => {
         <div className="left">
           <h1>PM.</h1>
           <p>
-            There is a lot of fun. Community game development platform. Join us
-            now!
+            Ready for your next project? Log in to connect with fellow developers and showcase your latest work.
           </p>
           <span>Don't you have an account?</span>
           <Link to="/register">

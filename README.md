@@ -73,8 +73,64 @@ report เสร็จไม่ลบ แต่เปลี่ยนสถาน
 
 https://mui.com/material-ui/material-icons/
 
+
 ```
 CommunityProject
+├─ admin
+│  ├─ eslint.config.js
+│  ├─ index.html
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ public
+│  │  ├─ favicon.svg
+│  │  └─ icons.svg
+│  ├─ README.md
+│  ├─ src
+│  │  ├─ api
+│  │  │  └─ axios.js
+│  │  ├─ App.jsx
+│  │  ├─ assets
+│  │  │  ├─ hero.png
+│  │  │  ├─ react.svg
+│  │  │  └─ vite.svg
+│  │  ├─ components
+│  │  │  ├─ Left
+│  │  │  │  └─ leftbar
+│  │  │  │     ├─ leftbar.jsx
+│  │  │  │     └─ leftbar.scss
+│  │  │  ├─ navbar
+│  │  │  │  ├─ navbar.jsx
+│  │  │  │  └─ navbar.scss
+│  │  │  ├─ Right
+│  │  │  │  ├─ donutChart
+│  │  │  │  │  ├─ donutChart.jsx
+│  │  │  │  │  └─ donutChart.scss
+│  │  │  │  └─ rightbar
+│  │  │  │     ├─ rightbar.jsx
+│  │  │  │     └─ rightbar.scss
+│  │  │  └─ statistic
+│  │  │     ├─ dashboard
+│  │  │     │  ├─ dashboard.jsx
+│  │  │     │  └─ dashboard.scss
+│  │  │     └─ userStats
+│  │  │        ├─ UserStats.jsx
+│  │  │        └─ userStats.scss
+│  │  ├─ context
+│  │  │  ├─ authContext.jsx
+│  │  │  └─ darkModeContext.jsx
+│  │  ├─ main.jsx
+│  │  ├─ pages
+│  │  │  ├─ home
+│  │  │  │  ├─ Home.jsx
+│  │  │  │  └─ home.scss
+│  │  │  ├─ login
+│  │  │  │  ├─ Login.jsx
+│  │  │  │  └─ login.scss
+│  │  │  └─ user
+│  │  │     ├─ User.jsx
+│  │  │     └─ user.scss
+│  │  └─ style.scss
+│  └─ vite.config.js
 ├─ client
 │  ├─ eslint.config.js
 │  ├─ index.html
@@ -86,10 +142,13 @@ CommunityProject
 │  ├─ src
 │  │  ├─ 404.jsx
 │  │  ├─ api
-│  │  │  └─ axios.js
+│  │  │  ├─ algoliaClient.js
+│  │  │  ├─ axios.js
+│  │  │  └─ stripe.js
 │  │  ├─ App.jsx
 │  │  ├─ assets
 │  │  │  ├─ 1.png
+│  │  │  ├─ DefaultProject.jpg
 │  │  │  └─ react.svg
 │  │  ├─ components
 │  │  │  ├─ comments
@@ -127,6 +186,12 @@ CommunityProject
 │  │  │  │  ├─ addfriends
 │  │  │  │  │  ├─ addfriends.jsx
 │  │  │  │  │  └─ addfriends.scss
+│  │  │  │  ├─ carditem
+│  │  │  │  │  ├─ carditem.jsx
+│  │  │  │  │  └─ carditem.scss
+│  │  │  │  ├─ cards
+│  │  │  │  │  ├─ carditems.jsx
+│  │  │  │  │  └─ carditems.scss
 │  │  │  │  ├─ friend
 │  │  │  │  │  ├─ friend.jsx
 │  │  │  │  │  └─ friend.scss
@@ -151,10 +216,9 @@ CommunityProject
 │  │  │  │  └─ projects
 │  │  │  │     ├─ projects.jsx
 │  │  │  │     └─ projects.scss
+│  │  │  ├─ report
+│  │  │  │  └─ ReportModal.jsx
 │  │  │  ├─ Right
-│  │  │  │  ├─ Rbuy
-│  │  │  │  │  ├─ Rbuy.jsx
-│  │  │  │  │  └─ Rbuy.scss
 │  │  │  │  ├─ rightbar
 │  │  │  │  │  ├─ rightbar.jsx
 │  │  │  │  │  └─ rightbar.scss
@@ -201,6 +265,9 @@ CommunityProject
 │  │  │  ├─ buyitem
 │  │  │  │  ├─ Buyitem.jsx
 │  │  │  │  └─ buyitem.scss
+│  │  │  ├─ cart
+│  │  │  │  ├─ Cart.jsx
+│  │  │  │  └─ cart.scss
 │  │  │  ├─ changepassword
 │  │  │  │  ├─ ChangePassword.jsx
 │  │  │  │  └─ changepassword.scss
@@ -272,17 +339,29 @@ CommunityProject
 ├─ README.md
 ├─ report.html
 ├─ server
+│  ├─ AdminControllers
+│  │  ├─ authController.js
+│  │  ├─ dashboardController.js
+│  │  └─ userController.js
+│  ├─ AdminRoutes
+│  │  ├─ authRoutes.js
+│  │  ├─ dashboardRoutes.js
+│  │  └─ userRoutes.js
 │  ├─ config
+│  │  ├─ algolia.js
 │  │  ├─ cloudinary.js
-│  │  └─ db.js
+│  │  ├─ db.js
+│  │  └─ stripe.js
 │  ├─ controllers
 │  │  ├─ authController.js
 │  │  ├─ chatController.js
 │  │  ├─ commuController.js
 │  │  ├─ friendController.js
 │  │  ├─ itemController.js
+│  │  ├─ paymentController.js
 │  │  ├─ postController.js
 │  │  ├─ projectController.js
+│  │  ├─ reportController.js
 │  │  └─ uploadController.js
 │  ├─ middleware
 │  │  └─ verifyToken.js
@@ -295,8 +374,10 @@ CommunityProject
 │  │  ├─ commuRoutes.js
 │  │  ├─ friendRoutes.js
 │  │  ├─ itemRoutes.js
+│  │  ├─ paymentRoutes.js
 │  │  ├─ postRoutes.js
 │  │  ├─ projectRoutes.js
+│  │  ├─ reportRoutes.js
 │  │  └─ uploadRoutes.js
 │  └─ server.js
 └─ upload.html
