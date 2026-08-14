@@ -1,0 +1,26 @@
+@use "../../style.scss" as *;
+
+.userPage{
+    display: flex;
+
+  @include themify($themes) {
+    padding: 20px 30px;
+    background-color: #060A0E;
+    min-height: 100vh;
+
+    @include mobile {
+      padding: 10px;
+    }
+
+    @include tablet{
+      padding: 20px;
+    }
+  }
+  .left{
+    flex: 2.5;
+  }
+  .right{
+    flex: 1;
+    min-width: 0;
+  }
+ }

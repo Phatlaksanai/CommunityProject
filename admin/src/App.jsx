@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Home from "./pages/home/Home";
-import Login from './pages/login/Login'
+import Login from "./pages/login/Login";
+import User from "./pages/user/User";
 
 import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/Left/leftbar/leftbar";
 import RightBar from "./components/Right/rightbar/rightbar";
+import DonutChart from "./components/Right/donutChart/donutChart";
 
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 import { useContext } from "react";
@@ -18,7 +20,7 @@ function App() {
   const { darkMode } = useContext(DarkModeContext);
   const { currentUser } = useContext(AuthContext);
 
-  const Layout = () => {
+  const LayoutDashboard = () => {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
@@ -32,11 +34,12 @@ function App() {
       </div>
     )
   }
-  const LayoutNavbar = () => {
+  const Layout = () => {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
         <div style={{ display: "flex" }}>
+          <LeftBar />
           <div style={{ flex: 6 }}>
             <Outlet />
           </div>
@@ -61,7 +64,7 @@ function App() {
       path: "/dashboard",
       element: (
         <ProtectedRoute>
-          <Layout />
+          <LayoutDashboard />
         </ProtectedRoute>
       ),
       children: [
@@ -70,6 +73,18 @@ function App() {
           element: <Home />
         }
       ],
+    },
+    {
+      path: "/users",
+      element: (
+        <Layout />
+      ),
+      children: [
+        {
+          path: "/users",
+          element: <User />
+        },
+      ]
     },
   ]);
 

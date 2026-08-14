@@ -118,3 +118,25 @@ BEGIN
   ORDER BY date_trunc('day', o.created_at) ASC;
 END;
 $$ LANGUAGE plpgsql;
+
+
+🔎🔎 หน้า users
+// Donut Chart
+CREATE OR REPLACE FUNCTION get_yearly_user_stats()
+RETURNS TABLE (
+    year double precision, 
+    total bigint
+) 
+LANGUAGE sql
+AS $$
+    SELECT 
+        EXTRACT(YEAR FROM created_at) AS year, 
+        COUNT(user_id) AS total 
+    FROM users 
+    WHERE EXTRACT(YEAR FROM created_at) IN (
+        EXTRACT(YEAR FROM CURRENT_DATE), 
+        EXTRACT(YEAR FROM CURRENT_DATE) - 1
+    )
+    GROUP BY EXTRACT(YEAR FROM created_at)
+    ORDER BY year DESC;
+$$;

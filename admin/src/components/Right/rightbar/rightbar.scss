@@ -54,10 +54,6 @@
             border-radius: 8px;
             transition: background-color 0.2s ease;
 
-            &:hover {
-              background-color: #161B20;
-            }
-
             .report-left {
               display: flex;
               align-items: center;
@@ -93,11 +89,6 @@
           border-radius: 8px;
           padding: 8px;
           transition: background-color 0.2s ease;
-          cursor: pointer;
-
-          &:hover {
-            background-color: #161B20;
-          }
 
           .userInfo {
             display: flex;

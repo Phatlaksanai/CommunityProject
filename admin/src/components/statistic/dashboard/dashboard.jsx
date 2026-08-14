@@ -1,8 +1,6 @@
 import "./dashboard.scss";
-import "dayjs/locale/th";
 import { useContext } from "react";
 import { AuthContext } from "../../../context/authContext";
-import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import { useQuery } from "@tanstack/react-query";
 import HomeFilledIcon from '@mui/icons-material/HomeFilled';
@@ -13,7 +11,6 @@ import ViewInArIcon from '@mui/icons-material/ViewInAr';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const Dashboard = () => {
-    const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
 
     const { isLoading: summaryLoading, data: summaryData, isError: isSummaryError, } = useQuery({

@@ -16,14 +16,14 @@ const LeftBar = () => {
     <div className="leftBar">
       <div className="container">
         <div className="menu">
-          <div className="item" onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
+          <div className="item" onClick={() => navigate(`/dashboard`)} style={{ cursor: "pointer" }}>
             <HomeFilledIcon />
             <span>Home</span>
           </div>
         </div>
 
         <div className="menu">
-          <div className="item" onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
+          <div className="item" onClick={() => navigate(`/users`)} style={{ cursor: "pointer" }}>
             <PermIdentityIcon />
             <span>Users</span>
           </div>
