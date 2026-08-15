@@ -30,6 +30,7 @@
       color: themed("textColorSoft");
     }
   }
+}
 
   .model-viewer {
     position: relative;
@@ -47,16 +48,14 @@
       top: 10px;
       right: 10px;
       padding: 5px 12px;
-
-      background: rgba(0, 0, 0, 0.6);
+      background-color: themed("buttonBg");
       color: #fff;
       border: none;
       border-radius: 6px;
       cursor: pointer;
 
       &:hover {
-        background: rgba(0, 0, 0, 0.8);
+        background: themed("AbuttonBg");
       }
     }
   }
-}

@@ -41,7 +41,7 @@ const LeftDI = ({ item }) => {
           <p>Textures / Materials: [1] มี [ ] ไม่มี</p>
           <p>Rigged: [1] มีกระดูก [ ] ไม่มี</p>
           <p>UV Mapped: [1] กางแล้ว [ ] ยังไม่กาง</p>
-          
+
         </div>
         <div className="box">
           <p>New Releases</p>
@@ -62,7 +62,9 @@ const LeftDI = ({ item }) => {
       </div>
       <div className="container">
         <div className="item">
-          {item.model && <ModelViewer modelUrl={item.model} />}
+          <div className="model">
+            {item.model && <ModelViewer modelUrl={item.model} />}
+          </div>
         </div>
         <div className="item">
           <div className="user">
