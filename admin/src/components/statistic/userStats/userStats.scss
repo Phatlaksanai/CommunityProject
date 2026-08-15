@@ -5,7 +5,7 @@
         background-color: #060A0E;
         color: themed("textColor");
         min-height: 100vh;
-        padding-bottom: 40px;
+        padding: 20px 10px 20px 25px;
 
         .container {
             max-width: 1400px;
@@ -236,15 +236,6 @@
                   font-size: 13px;
                   font-weight: 500;
 
-                  &.action-icon {
-                    color: #A0AEC0;
-                    cursor: pointer;
-
-                    &:hover {
-                      color: #fff;
-                    }
-                  }
-
                   &.no-data {
                     color: #4A5568;
                     padding: 30px;
@@ -257,4 +248,127 @@
       }
         }
     }
+
+    // เพิ่มลูกเล่นให้รู้ว่าแถวตารางคลิกได้
+        .clickable-row {
+          cursor: pointer;
+          &:hover {
+            background-color: #111820; 
+          }
+        }
+
+        // ==========================================
+        // Modal / Pop-up Styles
+        // ==========================================
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+
+            .modal-content {
+                background-color: #090F16;
+                border: 1px solid #161B20;
+                border-radius: 12px;
+                padding: 30px;
+                width: 100%;
+                max-width: 650px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+
+                h2 {
+                    margin: 0 0 25px 0;
+                    color: #fff;
+                    font-size: 20px;
+                }
+
+                .form-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+
+                    @media (max-width: 600px) {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .input-group {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+
+                        &.full-width {
+                            grid-column: span 2; /* บังคับให้ขยายกินพื้นที่ 2 คอลัมน์เต็ม */
+                            
+                            @media (max-width: 600px) {
+                                grid-column: span 1; /* ถ้าจอเล็กให้เหลือ 1 คอลัมน์ปกติ */
+                            }
+                        }
+                        
+                        label {
+                            color: #A0AEC0;
+                            font-size: 13px;
+                            font-weight: 600;
+                        }
+
+                        input, textarea {
+                            background-color: #0D131A;
+                            // สีขอบตามที่ระบุ
+                            border: 1px solid #B87333; 
+                            border-radius: 6px;
+                            padding: 10px 12px;
+                            color: #fff;
+                            font-size: 14px;
+                            outline: none;
+                            transition: box-shadow 0.2s ease;
+                            font-family: inherit;
+                        }
+                        textarea {
+                            resize: vertical; // ให้ผู้ใช้ลากขยายกล่องข้อความในแนวตั้งได้
+                            min-height: 80px;
+                        }
+                    }
+                }
+
+                .modal-actions {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 15px;
+                    padding-top: 30px;
+                    border-top: 1px solid #161B20;
+
+                    button {
+                        padding: 10px 24px;
+                        border-radius: 6px;
+                        font-weight: 600;
+                        font-size: 14px;
+                        cursor: pointer;
+                        border: none;
+                        color: #fff;
+                        transition: opacity 0.2s ease;
+
+                        &:hover:not(:disabled) {
+                            opacity: 0.8;
+                        }
+
+                        &:disabled {
+                            cursor: not-allowed;
+                            opacity: 0.5;
+                        }
+
+                        &.btn-cancel {
+                            background-color: #6A7575; 
+                        }
+
+                        &.btn-update {
+                            background-color: #B87333; 
+                        }
+                    }
+                }
+            }
+        }
  }
