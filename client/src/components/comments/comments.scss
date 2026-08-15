@@ -8,138 +8,149 @@
       border-radius: 50%;
       object-fit: cover;
     }
+
     .preview img {
-  width: 50px;
-  height: 50px;
-  border-radius: 10px;   // 🔥 ทำให้ไม่เหลี่ยม
-  object-fit: cover;     // 🔥 ไม่ยืดภาพ
-} 
-    .write{
+      width: 50px;
+      height: 50px;
+      border-radius: 10px; // 🔥 ทำให้ไม่เหลี่ยม
+      object-fit: cover; // 🔥 ไม่ยืดภาพ
+    }
+
+    .write {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
+      gap: 10px;
       margin: 20px 0px;
 
-      input{
-        flex:5;
+      input {
+        flex: 5;
         padding: 10px;
         border: 1px solid themed("border");
         background-color: transparent;
         color: themed("textColor");
       }
 
-      button{
+      button {
         border: none;
-        background-color: #5271ff;
+        background-color: themed("buttonBg");
         color: white;
         padding: 10px;
         cursor: pointer;
         border-radius: 3px;
       }
     }
+
     .noComment {
-  min-height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: gray;
-  font-size: 20px;
-}
-.box-comment {
-  height: auto;
-  max-height: 400px;
-  overflow-y: auto;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: gray;
+      font-size: 20px;
+    }
 
-  /* Chrome / Edge / Safari */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
+    .box-comment {
+      height: auto;
+      max-height: 400px;
+      overflow-y: auto;
 
-  &::-webkit-scrollbar-track {
-    background: transparent; // 🔥 เอากล่องขาวออก
-  }
+      /* Chrome / Edge / Safari */
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
 
-  &::-webkit-scrollbar-thumb {
-    background: #bbb; // ตัวเลื่อนสีเทา
-    border-radius: 10px;
-  }
+      &::-webkit-scrollbar-track {
+        background: transparent; // 🔥 เอากล่องขาวออก
+      }
 
-  &::-webkit-scrollbar-thumb:hover {
-    background: #999;
-  }
+      &::-webkit-scrollbar-thumb {
+        background: #bbb; // ตัวเลื่อนสีเทา
+        border-radius: 10px;
+      }
 
-  /* Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: #bbb transparent; // 🔥 ไม่มีพื้นหลัง
-}
+      &::-webkit-scrollbar-thumb:hover {
+        background: #999;
+      }
+
+      /* Firefox */
+      scrollbar-width: thin;
+      scrollbar-color: #bbb transparent; // 🔥 ไม่มีพื้นหลัง
+    }
+
     .comment {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin: 20px 0;
-}
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 20px 0;
+    }
 
-/* รูปโปรไฟล์ */
-.comment > img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
+    /* รูปโปรไฟล์ */
+    .comment>img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      margin-top: 10px;
+    }
 
-/* กล่องกลาง */
-.content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.info {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.top {
-  display: flex;
-  justify-content: space-between; // 🔥 ซ้าย-ขวา
-  align-items: center;
-}
-.name {
-  font-weight: 500;
-}
+    /* กล่องกลาง */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
 
-/* ชื่อ + เวลา อยู่บรรทัดเดียว */
-.info span {
-  font-weight: 500;
-}
+    .info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
 
-/* ข้อความ */
-.info p {
-  margin: 3px 0;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  color: themed("textColorSoft");
-}
+    .top {
+      display: flex;
+      color: themed("textSoft");
+      font-weight: bold;
+      justify-content: space-between; // 🔥 ซ้าย-ขวา
+      align-items: center;
+    }
 
-/* รูปใน comment */
-.info img {
-  width: 100%;
-  max-width: 300px;
-  height: 100%;
-  max-height: 300px;
-  border-radius: 10px;
-  margin-top: 5px;
-}
+    .name {
+      font-weight: 500;
+    }
 
-/* เวลา */
-.date {
-  font-size: 12px;
-  color: gray;
-  white-space: nowrap;
-  padding: 0px 10px;
-}
+    /* ชื่อ + เวลา อยู่บรรทัดเดียว */
+    .info span {
+      font-weight: 500;
+    }
+
+    /* ข้อความ */
+    .info p {
+      margin: 3px 0;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      color: themed("textColorSoft");
+    }
+
+    /* รูปใน comment */
+    .info img {
+      width: 100%;
+      max-width: 300px;
+      height: 100%;
+      max-height: 300px;
+      border-radius: 10px;
+      margin-top: 5px;
+    }
+
+    /* เวลา */
+    .date {
+      font-size: 12px;
+      color: themed("textSoft");
+      white-space: nowrap;
+      padding: 0px 10px;
+    }
   }
 }
