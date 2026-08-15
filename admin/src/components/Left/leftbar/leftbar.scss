@@ -79,12 +79,14 @@
           flex-direction: column;
           align-items: center;
           gap: 12px;
-          padding: 8px 10px; // เพิ่ม padding ให้ดูโปร่งขึ้น
-          border-radius: 8px; // มนกำลังดี
+          padding: 10px 10px; // เพิ่ม padding ให้ดูโปร่งขึ้น
+          border-radius: 20px; // มนกำลังดี
           cursor: pointer;
           transition: all 0.2s ease;
           background-color: transparent; // มั่นใจว่าไม่มีสีพื้นหลังแปลกๆ
           box-shadow: none !important; // ปิดเงาที่ทำให้ดูเหมือนเฟดดำ
+          position: relative; // สำคัญ: เพื่อใช้จัดวางขีดสีส้มด้านขวา
+          overflow: hidden; // กันขีดส้มล้นกรอบมน
 
           &:hover {
             // "เปล่งแสง" หรือ Highlight เหมือนกันทุกตัว
@@ -100,6 +102,23 @@
 
           span {
             font-size: 14px;
+          }
+
+          &.active {
+            background-color: #4A2E1B; // สีพื้นหลังน้ำตาล
+
+            // ขีดสีส้มด้านขวา
+            &::after {
+              content: "";
+              position: absolute;
+              right: 0;
+              top: 50%;
+              transform: translateY(-50%);
+              height: 40px; // ความยาวของขีด
+              width: 4px; // ความหนาของขีด
+              background-color: #B87333; // สีส้มของขีด
+              border-radius: 4px 0 0 4px; // ให้มุมด้านซ้ายของขีดมนนิดๆ
+            }
           }
         }
 
