@@ -8,18 +8,26 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
 
-const LeftDC = ({ project, commuId }) => {
+const LeftDC = ({ project, commuId, isProfile, userId }) => {
   const navigate = useNavigate();
 
   // State สำหรับคุมการเปิดขยายรูปภาพภายในกล่องแกลลอรี่ฝั่งซ้าย
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   // State สำหรับเก็บ Index ของรูปที่กำลังกดดูขนาดเต็ม (Lightbox)
   const [activeImageIndex, setActiveImageIndex] = useState(null);
-
+  
   const { data: latestImages = [], error, isLoading } = useQuery({
-    queryKey: ["commuImages", commuId],
-    queryFn: () => makeRequest.get(`/communities/${commuId}/images`).then(res => res.data)
+    queryKey: isProfile ? ["userImages", userId] : ["commuImages", commuId],
+    queryFn: () => {
+      const endpoint = isProfile 
+        ? `/posts/user/${userId}/images` 
+        : `/communities/${commuId}/images`;
+        
+      return makeRequest.get(endpoint).then(res => res.data);
+    },
+    // ป้องกันไม่ให้ Query ทำงานถ้า ID ยังไม่มีค่า (เป็น Optional แต่แนะนำให้ใส่)
+    enabled: isProfile ? !!userId : !!commuId,
   });
 
   // ล็อกไม่ให้หน้าจอหลักขยับสกรอลล์เวลาเปิดดูรูปใหญ่เต็มจอ
@@ -56,7 +64,7 @@ const LeftDC = ({ project, commuId }) => {
       <div className="container">
         <div className="item">
           <h2>Gallery ({latestImages.length})</h2>
-          
+
           {/* เปิดระบบ Scroll แนวตั้งเฉพาะตอนที่เปิดสถานะ expanded เท่านั้น */}
           <div className={`img-container ${isExpanded ? "expanded" : ""}`}>
             {isLoading ? (
@@ -88,8 +96,8 @@ const LeftDC = ({ project, commuId }) => {
 
           {/* ปุ่มสลับสถานะ: แสดงเมื่อรูปภาพทั้งหมดในระบบมีมากกว่า 4 รูปขึ้นไป */}
           {!isLoading && latestImages.length > 4 && (
-            <button 
-              className="view-all-btn" 
+            <button
+              className="view-all-btn"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? "Show Less" : "View All"}

@@ -12,6 +12,7 @@ router.post("/addpost", verifyToken, postController.addPost);
 router.get("/project-edit/:projectId", verifyToken, postController.getPostsForEditProject);
 router.post("/addcomment", verifyToken, postController.addComment);
 router.get("/comments/:id", postController.getCommentsByPostId);
+router.get("/user/:id/images", verifyToken, postController.getLatestUserImages);
 
 // 1. ดึงข้อมูล Like (GET /api/posts/likes/post/:post_id)
 router.get("/likes/post/:post_id", postController.getLikes);

@@ -544,3 +544,29 @@ exports.deletePost = async (req, res) => {
   if (error) return res.status(500).json(error);
   return res.status(200).json("Post has been deleted.");
 };
+
+exports.getLatestUserImages = async (req, res) => {
+  const userId = req.user.user_id;
+
+  try {
+    const { data, error } = await db
+      .from("imgs")
+      .select(`
+        img,
+        posts!inner(user_id, created_at, status)
+      `)
+      .eq("posts.user_id", userId)
+      .eq("posts.status", "show")
+      .order("posts(created_at)", { ascending: false })
+
+    if (error) throw error;
+
+    // แปลงข้อมูลให้เหลือแค่ array ของ URL รูปภาพเพื่อให้ใช้ง่ายขึ้น
+    const images = data.map(item => item.img);
+
+    return res.status(200).json(images);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+};

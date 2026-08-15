@@ -3,6 +3,7 @@ import ModelViewer from "../../modelViewer/model_viewer";
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/authContext";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import ReportModal from "../../report/ReportModal";
 
@@ -21,12 +22,44 @@ const LeftDI = ({ item }) => {
     makeRequest.get(`/items/reviews/${item.item_id}`).then(res => setItemReviews(res.data));
   }, []);
 
+  const { isLoading, error, data: latestItems } = useQuery({
+    queryKey: ["latestItems"],
+    queryFn: () => makeRequest.get("/items/latest").then((res) => res.data),
+  });
+
   if (!item) return null;
 
   dayjs.extend(relativeTime);
 
   return (
     <div className="leftDI">
+      <div className="L">
+        <div className="box">
+          <h2>Info : {item.modelName}</h2>
+          <p>File Formats: [1]glb [0]blaen X ...</p>
+          <p>Polygon Count: 9,220</p>
+          <p>Textures / Materials: [1] มี [ ] ไม่มี</p>
+          <p>Rigged: [1] มีกระดูก [ ] ไม่มี</p>
+          <p>UV Mapped: [1] กางแล้ว [ ] ยังไม่กาง</p>
+          
+        </div>
+        <div className="box">
+          <p>New Releases</p>
+          {error ? "Something went wrong" : isLoading ? "Loading..." :
+            latestItems?.map((item) => (
+              <div className="user" key={item.item_id} onClick={() => navigate(`/descitem/${item.item_id}`)} style={{ cursor: "pointer" }}>
+                <div className="userInfo">
+                  <img src={item.img} alt="" />
+                </div>
+                <div className="buttons">
+                  <p>{item.modelName}</p>
+                  <span>{item.description}</span>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
       <div className="container">
         <div className="item">
           {item.model && <ModelViewer modelUrl={item.model} />}
@@ -35,7 +68,7 @@ const LeftDI = ({ item }) => {
           <div className="user">
             <h2>Description</h2>
             {item.user_id !== currentUser?.user_id && (
-              <ReportProblemIcon style={{ cursor: "pointer"}} onClick={() => setOpenReport(true)} />
+              <ReportProblemIcon style={{ cursor: "pointer" }} onClick={() => setOpenReport(true)} />
             )}
           </div>
           <span>{item.description}</span>

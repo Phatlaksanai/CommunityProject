@@ -1,4 +1,5 @@
 import Posts from "../../components/PageItems/posts/posts"
+import LeftDC from "../../components/Left/leftDC/leftDC"
 import { useParams } from "react-router-dom";
 import ScrollToTop from "../../ScrollToTop";
 import "./profile.scss"
@@ -8,7 +9,15 @@ const Profile = () => {
   return (
     <div className="profile">
       <ScrollToTop />
-      <Posts userId={id}/>
+      <div className="all">
+        <div className="L">
+          <Posts userId={id} />
+        </div>
+        <div className="R">
+          <LeftDC userId={id} isProfile={true} />
+        </div>
+      </div>
+
     </div>
   )
 }

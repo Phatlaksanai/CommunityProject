@@ -10,8 +10,21 @@
       padding: 10px;
     }
 
-    @include tablet{
+    @include tablet {
       padding: 20px;
     }
+
+    .all {
+      display: flex;
+
+      .L {
+        flex: 2;
+      }
+
+      .R {
+        flex: 1;
+      }
+    }
+
   }
- }
+}
