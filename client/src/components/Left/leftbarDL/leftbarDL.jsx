@@ -15,6 +15,8 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
     ThisWeek: "This week",
     ThisDay: "This day",
   };
+  const [success, setSuccess] = useState("")
+  const [error, setError] = useState("")
 
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -44,6 +46,41 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
     }));
   };
 
+  const handleAddItemClick = async () => {
+    if (!currentUser) return;
+
+    try {
+      const res = await makeRequest.get(`/payments/check-stripe/${currentUser.user_id}`);
+      const data = res.data;
+      if (data.isSetupComplete) {
+        navigate("/additem");
+      }
+      // ถ้ามีบัญชีแล้ว แต่ยังกรอกข้อมูลกับ Stripe ไม่เสร็จ (มี URL ส่งกลับมา)
+      else if (data.url) {
+        window.location.href = data.url;
+      }
+      else {
+        try {
+          const onboardRes = await makeRequest.post("/payments/create-stripe-account", {
+            userId: currentUser.user_id,
+            email: currentUser.email
+          });
+
+          // เด้งไปหน้า Stripe Onboarding
+          if (onboardRes.data.url) {
+            window.location.href = onboardRes.data.url;
+          }
+        } catch (onboardErr) {
+          console.error("Error creating Stripe account:", onboardErr);
+          setError("Failed to setup Stripe account. Please try again.");
+        }
+      }
+    } catch (err) {
+      console.error("Error checking Stripe Connect status:", err);
+      setError("Error checking account status");
+    }
+  };
+
   const displayName = currentUser?.name || currentUser?.username || "Guest";
   const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName;
 
@@ -54,7 +91,7 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
         <span className="custom-tooltip" data-tip={displayName}>
           {truncatedName}
         </span>
-        <button onClick={() => navigate("/additem")} style={{ cursor: "pointer" }}>Add Item</button>
+        <button onClick={handleAddItemClick} style={{ cursor: "pointer" }}>Add Item</button>
       </div>
 
       <h3>Detailed search</h3>
@@ -88,6 +125,9 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
           </div>
         ))}
       </form>
+      <br></br>
+      {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
+      {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
     </div>
   );
 };

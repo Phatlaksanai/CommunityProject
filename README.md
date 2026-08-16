@@ -73,7 +73,7 @@ report เสร็จไม่ลบ แต่เปลี่ยนสถาน
 
 https://mui.com/material-ui/material-icons/
 
-
+ลบ user ตอนที่สมัครไม่เสร็จแล้วทิ้งเมลค้างไว้
 ```
 CommunityProject
 ├─ admin

@@ -9,5 +9,7 @@ router.get("/carditems/:userId", verifyToken, paymentController.getCardItems);
 router.delete("/removeitem/:itemId", verifyToken, paymentController.removeItemFromCart);
 router.get("/downloads", verifyToken, paymentController.getDownloads);
 router.get("/download/:orderItemId/:type", verifyToken, paymentController.getDownloadFile);
+router.get("/check-stripe/:userId", verifyToken, paymentController.CheckStripeId);
+router.post("/create-stripe-account", verifyToken, paymentController.CreateStripeAccount);
 
 module.exports = router;
