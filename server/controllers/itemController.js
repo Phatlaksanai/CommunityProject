@@ -121,7 +121,11 @@ exports.getItemsByUserId = async (req, res) => {
 };
 
 exports.addItem = async (req, res) => {
-  const { modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category_id, imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId } = req.body;
+  const { 
+    modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category_id, 
+    imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId,
+    polygon_count, has_textures, is_rigged, is_uv_mapped // เพิ่มฟิลด์ใหม่
+  } = req.body;
 
   if (!modelName || !price) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -158,6 +162,10 @@ exports.addItem = async (req, res) => {
         fbx_public_id: fbxPublicId || null,
         usdz_public_id: usdzPublicId || null,
         gltf_public_id: gltfPublicId || null,
+        polygon_count: polygon_count ? parseInt(polygon_count) : 0, // เพิ่มฟิลด์ใหม่
+        has_textures: has_textures || false,                        // เพิ่มฟิลด์ใหม่
+        is_rigged: is_rigged || false,                              // เพิ่มฟิลด์ใหม่
+        is_uv_mapped: is_uv_mapped || false
       }])
     .select()
     .single();
@@ -186,7 +194,11 @@ exports.addItem = async (req, res) => {
 };
 
 exports.updateItem = async (req, res) => {
-  const { itemId ,modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category_id, imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId } = req.body;
+  const { 
+    itemId ,modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category_id, 
+    imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId,
+    polygon_count, has_textures, is_rigged, is_uv_mapped // เพิ่มฟิลด์ใหม่
+  } = req.body;
 
   try {
     const { data: items, error } = await db
@@ -228,6 +240,11 @@ exports.updateItem = async (req, res) => {
     if (fbxPublicId) updateData.fbx_public_id = fbxPublicId;
     if (usdzPublicId) updateData.usdz_public_id = usdzPublicId;
     if (gltfPublicId) updateData.gltf_public_id = gltfPublicId;
+
+    if (polygon_count !== undefined) updateData.polygon_count = parseInt(polygon_count) || 0;
+    if (has_textures !== undefined) updateData.has_textures = has_textures;
+    if (is_rigged !== undefined) updateData.is_rigged = is_rigged;
+    if (is_uv_mapped !== undefined) updateData.is_uv_mapped = is_uv_mapped;
 
     // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
     if (Object.keys(updateData).length === 0) {

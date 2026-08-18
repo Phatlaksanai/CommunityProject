@@ -1,6 +1,7 @@
 import "./addItem.scss";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";//-------------------------------------
+import { Link, useNavigate } from "react-router-dom";
+//-------------------------------------
 import { makeRequest } from "../../api/axios";
 import { useQuery } from "@tanstack/react-query";
 
@@ -15,27 +16,33 @@ const AddItem = () => {
   const [img, setImg] = useState(null);
   const [model, setModel] = useState(null);
   const [categoryId, setCategoryId] = useState("");
-  const [obj ,setObj] = useState(null);
-  const [blend ,setBlend] = useState(null);
-  const [fbx ,setFbx] = useState(null);
-  const [usdz ,setUsdz] = useState(null);
-  const [gltf ,setGltf] = useState(null);
+  const [obj, setObj] = useState(null);
+  const [blend, setBlend] = useState(null);
+  const [fbx, setFbx] = useState(null);
+  const [usdz, setUsdz] = useState(null);
+  const [gltf, setGltf] = useState(null);
+  const [polygonCount, setPolygonCount] = useState("");
+  const [hasTextures, setHasTextures] = useState(false);
+  const [isRigged, setIsRigged] = useState(false);
+  const [isUvMapped, setIsUvMapped] = useState(false);
+
+  // เพิ่ม State ควบคุมการแสดงผล Checkbox
+  const [formats, setFormats] = useState({
+    obj: false,
+    blend: false,
+    fbx: false,
+    usdz: false,
+    gltf: false,
+  });
 
   // message
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [imgPublicId, setImgPublicId] = useState(null);
-  const [modelPublicId, setModelPublicId] = useState(null);
-  const [objPublicId, setObjPublicId] = useState(null);
-  const [blendPublicId, setBlendPublicId] = useState(null);
-  const [fbxPublicId, setFbxPublicId] = useState(null);
-  const [usdzPublicId, setUsdzPublicId] = useState(null);
-  const [gltfPublicId, setGltfPublicId] = useState(null);
 
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: () =>
-    makeRequest.get("/items/categories").then((res) => res.data),
+      makeRequest.get("/items/categories").then((res) => res.data),
   });
 
   // ================= UPLOAD FILES TO CLOUDINARY =================
@@ -48,7 +55,8 @@ const AddItem = () => {
       return;
     }
 
-    setImg(file); e.target.value = "";
+    setImg(file);
+    e.target.value = "";
     setError("");
   };
 
@@ -73,15 +81,29 @@ const AddItem = () => {
     e.target.value = "";
   };
 
+  // ฟังก์ชันจัดการเมื่อ Checkbox เปลี่ยนแปลงค่า
+  const handleFormatChange = (e) => {
+    const { name, checked } = e.target;
+    setFormats((prev) => ({ ...prev, [name]: checked }));
+
+    // ล้างค่าไฟล์ออกหากยกเลิกการเลือก Checkbox ป้องกันบั๊กการอัปโหลดไฟล์ที่ถูกซ่อนไว้
+    if (!checked) {
+      if (name === "obj") setObj(null);
+      if (name === "blend") setBlend(null);
+      if (name === "fbx") setFbx(null);
+      if (name === "usdz") setUsdz(null);
+      if (name === "gltf") setGltf(null);
+    }
+  };
+
   const uploadFile = async (file) => {
-    if (!file || !(file instanceof File)) return null; // ถ้าไม่ใช่ไฟล์ ไม่ต้องอัปโหลด
+    if (!file || !(file instanceof File)) return null;
     const formData = new FormData();
     formData.append("file", file);
 
     const res = await makeRequest.post("/upload/item", formData);
-    return res.data; // คาดหวัง { url: "...", public_id: "..." }
+    return res.data;
   };
-
 
   const handleAdditem = async (e) => {
     e.preventDefault();
@@ -141,19 +163,22 @@ const AddItem = () => {
         fbxPublicId: fbxURL ? fbxURL.public_id : null,
         usdzPublicId: usdzURL ? usdzURL.public_id : null,
         gltfPublicId: gltfURL ? gltfURL.public_id : null,
+        polygon_count: parseInt(polygonCount) || 0,
+        has_textures: hasTextures,
+        is_rigged: isRigged,
+        is_uv_mapped: isUvMapped,
       });
 
       setSuccess("add item success");
       navigate("/market");
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error); // จะแสดง error จาก backend
+        setError(err.response.data.error);
       } else {
         setError("Failed to connect to server");
       }
     }
   };
-
 
   return (
     <div className="add-item">
@@ -185,12 +210,41 @@ const AddItem = () => {
           </div>
 
           <div className="form-group">
-            <label>Image</label>
+            <label htmlFor="polygonCount">Polygon Count</label>
+            <input type="number" id="polygonCount" placeholder="0"
+              value={polygonCount}
+              onChange={(e) => setPolygonCount(e.target.value)}
+              min="0"
+            />
+          </div>
 
+          {/* เพิ่มส่วน Properties */}
+          <div className="format-selection">
+            <label className="format-selection__title">Model Properties</label>
+            <div className="checkbox-container">
+              <label className="custom-checkbox">
+                <input type="checkbox" checked={hasTextures} onChange={(e) => setHasTextures(e.target.checked)} />
+                <span className="box"></span>
+                Has Textures
+              </label>
+              <label className="custom-checkbox">
+                <input type="checkbox" checked={isRigged} onChange={(e) => setIsRigged(e.target.checked)} />
+                <span className="box"></span>
+                Is Rigged
+              </label>
+              <label className="custom-checkbox">
+                <input type="checkbox" checked={isUvMapped} onChange={(e) => setIsUvMapped(e.target.checked)} />
+                <span className="box"></span>
+                Is UV Mapped
+              </label>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Image</label>
             <label htmlFor="image" className="file-input">
               {img ? img.name : "No file selected"}
             </label>
-
             <input
               type="file"
               id="image"
@@ -204,7 +258,6 @@ const AddItem = () => {
             <label htmlFor="category" className="category__title">
               Category
             </label>
-
             <select
               id="category"
               className="category__select"
@@ -226,11 +279,9 @@ const AddItem = () => {
 
           <div className="form-group">
             <label>GLB for Web Page Rendering</label>
-
             <label htmlFor="model" className="file-input">
               {model ? model.name : "No file selected"}
             </label>
-
             <input
               type="file"
               id="model"
@@ -240,85 +291,68 @@ const AddItem = () => {
             />
           </div>
 
-          <div className="form-group">
-            <label>Zip file for OBJ </label>
-
-            <label htmlFor="obj" className="file-input">
-              {obj ? obj.name : "No file selected"}
-            </label>
-
-            <input
-              type="file"
-              id="obj"
-              accept=".zip"
-              onChange={handleModelChange(setObj)}
-              hidden
-            />
+          {/* สร้าง Checkbox สำหรับให้เลือก Format */}
+          <div className="format-selection">
+            <label className="format-selection__title">Select Downloadable Formats</label>
+            <div className="checkbox-container">
+              <label><input type="checkbox" name="obj" checked={formats.obj} onChange={handleFormatChange} /> OBJ</label>
+              <label><input type="checkbox" name="blend" checked={formats.blend} onChange={handleFormatChange} /> BLEND</label>
+              <label><input type="checkbox" name="fbx" checked={formats.fbx} onChange={handleFormatChange} /> FBX</label>
+              <label><input type="checkbox" name="usdz" checked={formats.usdz} onChange={handleFormatChange} /> USDZ</label>
+              <label><input type="checkbox" name="gltf" checked={formats.gltf} onChange={handleFormatChange} /> GLTF</label>
+            </div>
           </div>
 
-          <div className="form-group">
-            <label>Zip file for BLEND</label>
+          {/* แสดงช่องอัปโหลดเฉพาะเมื่อ Checkbox ถูกเลือก */}
+          {formats.obj && (
+            <div className="form-group">
+              <label>Zip file for OBJ</label>
+              <label htmlFor="obj" className="file-input">
+                {obj ? obj.name : "No file selected"}
+              </label>
+              <input type="file" id="obj" accept=".zip" onChange={handleModelChange(setObj)} hidden />
+            </div>
+          )}
 
-            <label htmlFor="blend" className="file-input">
-              {blend ? blend.name : "No file selected"}
-            </label>
+          {formats.blend && (
+            <div className="form-group">
+              <label>Zip file for BLEND</label>
+              <label htmlFor="blend" className="file-input">
+                {blend ? blend.name : "No file selected"}
+              </label>
+              <input type="file" id="blend" accept=".zip" onChange={handleModelChange(setBlend)} hidden />
+            </div>
+          )}
 
-            <input
-              type="file"
-              id="blend"
-              accept=".zip"
-              onChange={handleModelChange(setBlend)}
-              hidden
-            />
-          </div>
+          {formats.fbx && (
+            <div className="form-group">
+              <label>Zip file for FBX</label>
+              <label htmlFor="fbx" className="file-input">
+                {fbx ? fbx.name : "No file selected"}
+              </label>
+              <input type="file" id="fbx" accept=".zip" onChange={handleModelChange(setFbx)} hidden />
+            </div>
+          )}
 
-          <div className="form-group">
-            <label>Zip file for FBX</label>
+          {formats.usdz && (
+            <div className="form-group">
+              <label>Zip file for USDZ</label>
+              <label htmlFor="usdz" className="file-input">
+                {usdz ? usdz.name : "No file selected"}
+              </label>
+              <input type="file" id="usdz" accept=".zip" onChange={handleModelChange(setUsdz)} hidden />
+            </div>
+          )}
 
-            <label htmlFor="fbx" className="file-input">
-              {fbx ? fbx.name : "No file selected"}
-            </label>
-
-            <input
-              type="file"
-              id="fbx"
-              accept=".zip"
-              onChange={handleModelChange(setFbx)}
-              hidden
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Zip file for USDZ</label>
-
-            <label htmlFor="usdz" className="file-input">
-              {usdz ? usdz.name : "No file selected"}
-            </label>
-
-            <input
-              type="file"
-              id="usdz"
-              accept=".zip"
-              onChange={handleModelChange(setUsdz)}
-              hidden
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Zip file for GLTF</label>
-
-            <label htmlFor="gltf" className="file-input">
-              {gltf ? gltf.name : "No file selected"}
-            </label>
-
-            <input
-              type="file"
-              id="gltf"
-              accept=".zip"
-              onChange={handleModelChange(setGltf)}
-              hidden
-            />
-          </div>
+          {formats.gltf && (
+            <div className="form-group">
+              <label>Zip file for GLTF</label>
+              <label htmlFor="gltf" className="file-input">
+                {gltf ? gltf.name : "No file selected"}
+              </label>
+              <input type="file" id="gltf" accept=".zip" onChange={handleModelChange(setGltf)} hidden />
+            </div>
+          )}
 
           <input type="submit" value="Submit" className="add-item__submit" />
           {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
