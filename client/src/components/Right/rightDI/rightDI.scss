@@ -11,7 +11,7 @@
     color: themed("textColorSoft");
     border-radius: 10px;
 
-    @include mobile{
+    @include mobile {
       display: none;
     }
 
@@ -21,7 +21,7 @@
 
     .container {
       padding: 20px;
-      
+
 
       hr {
         margin: 20px 0px;
@@ -35,48 +35,57 @@
         flex-direction: column;
         gap: 10px;
 
-        h2, h3, h4, h5 {
+        h2 {
           margin: 0px;
         }
 
-        .buttons {
-            display: flex;
-            align-items: center;
-            
-            button {
-              border: none;
-              flex: 1;
-              padding: 20px 0;
-              color: white;
-              font-size: 15px;
-              cursor: pointer;
-              background-color: themed("buttonBg");
-              border-radius: 10px;
-            }
+        h3,
+        h4,
+        h5 {
+          font-weight: 500;
+          margin: 0px;
         }
-          
+
+
+        .buttons {
+          display: flex;
+          align-items: center;
+
+          button {
+            border: none;
+            flex: 1;
+            padding: 20px 0;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            background-color: themed("buttonBg");
+            border-radius: 10px;
+          }
+        }
+
       }
 
       .text {
-          display: flex;
-          flex-direction: column;
-          margin: 20px 0px;
-          h3 {
-            margin: 0;
-          }
+        display: flex;
+        flex-direction: column;
+        margin: 20px 0px;
 
-          .info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-          }
-          
-          .row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
+        h3 {
+          margin: 0;
+        }
+
+        .info {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          position: relative;
+        }
+
+        .row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
       }
     }
   }

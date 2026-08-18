@@ -5,6 +5,7 @@ const { verifyToken } = require("../middleware/verifyToken");
 
 router.get("/", itemController.getItems);
 router.get("/latest", itemController.getLatestItems);
+router.get("/category/:categoryId", itemController.getItemsByCategory);
 router.get("/project/:id", itemController.getItemsByProjectId);
 router.get("/user/:id/available", itemController.getItemsByUserIdAvailable);
 router.get("/user/:id", itemController.getItemsByUserId);

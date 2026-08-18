@@ -22,36 +22,54 @@ const LeftDI = ({ item }) => {
     makeRequest.get(`/items/reviews/${item.item_id}`).then(res => setItemReviews(res.data));
   }, []);
 
-  const { isLoading, error, data: latestItems } = useQuery({
-    queryKey: ["latestItems"],
-    queryFn: () => makeRequest.get("/items/latest").then((res) => res.data),
+  const { isLoading, error, data: relatedItems } = useQuery({
+    queryKey: ["relatedItems", "category", item.category_id],
+    // สมมติว่าหลังบ้านมี route หน้าตาประมาณ /items/category/:categoryId
+    queryFn: () => makeRequest.get(`/items/category/${item.category_id}?limit=5`).then((res) => res.data),
+    enabled: !!item.category_id,
   });
 
   if (!item) return null;
 
   dayjs.extend(relativeTime);
 
+  const renderFormat = (formatValue, formatName) => {
+    return formatValue ? ` ${formatName} ` : null;
+  };
+
   return (
     <div className="leftDI">
       <div className="L">
         <div className="box">
           <h2>Info : {item.modelName}</h2>
-          <p>File Formats: [1]glb [0]blaen X ...</p>
-          <p>Polygon Count: 9,220</p>
-          <p>Textures / Materials: [1] มี [ ] ไม่มี</p>
-          <p>Rigged: [1] มีกระดูก [ ] ไม่มี</p>
-          <p>UV Mapped: [1] กางแล้ว [ ] ยังไม่กาง</p>
+
+          {/* อัปเดตส่วน File Formats ให้เช็คจากไฟล์ที่มีจริง */}
+          <p>
+            File Formats:
+            {renderFormat(item.model, 'GLB')}
+            {renderFormat(item.obj, 'OBJ')}
+            {renderFormat(item.blend, 'BLEND')}
+            {renderFormat(item.fbx, 'FBX')}
+            {renderFormat(item.usdz, 'USDZ')}
+            {renderFormat(item.gltf, 'GLTF')}
+          </p>
+
+          {/* อัปเดตค่า Properties */}
+          <p>Polygon Count: {item.polygon_count?.toLocaleString() || 0}</p>
+          <p>Textures / Materials: {item.has_textures ? "Yes" : "No"}</p>
+          <p>Rigged: {item.is_rigged ? "Yes" : "No"}</p>
+          <p>UV Mapped: {item.is_uv_mapped ? "Yes" : "No"}</p>
 
         </div>
         <div className="box">
-          <p>New Releases</p>
+          <h2>New Releases</h2>
           {error ? "Something went wrong" : isLoading ? "Loading..." :
-            latestItems?.map((item) => (
+            relatedItems?.filter(related => related.item_id !== item.item_id).map((item) => (
               <div className="user" key={item.item_id} onClick={() => navigate(`/descitem/${item.item_id}`)} style={{ cursor: "pointer" }}>
                 <div className="userInfo">
                   <img src={item.img} alt="" />
                 </div>
-                <div className="buttons">
+                <div className="text">
                   <p>{item.modelName}</p>
                   <span>{item.description}</span>
                 </div>

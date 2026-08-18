@@ -349,6 +349,31 @@ exports.getLatestItems = async (req, res) => {
   }
 };
 
+exports.getItemsByCategory = async (req, res) => {
+  const { categoryId } = req.params; // รับค่า :categoryId จาก path
+  const { limit } = req.query;       // รับค่า ?limit=5 จาก query
+
+  // กำหนดจำนวน limit (ถ้าไม่ส่งมาให้ค่าเริ่มต้นเป็น 10)
+  const parsedLimit = parseInt(limit) || 10;
+
+  try {
+    const { data, error } = await db
+      .from("items")
+      .select("item_id, modelName, description, img, price, user_id") // เลือกเฉพาะฟิลด์ที่ใช้แสดงใน Card
+      .eq("category_id", categoryId)
+      .order("created_at", { ascending: false }) // เรียงตามเวลาสร้าง ล่าสุดขึ้นก่อน
+      .limit(parsedLimit);
+
+    if (error) {
+      return res.status(500).json(error);
+    }
+
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
 exports.addReview = async (req, res) => {
   const userId = req.user.user_id;
   const { itemId, description, points } = req.body;

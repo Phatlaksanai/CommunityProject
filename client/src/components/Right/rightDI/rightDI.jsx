@@ -77,11 +77,6 @@ const RightDI = ({ item }) => {
             <h3>price</h3>
             <p>{item.price} $</p>
           </div>
-
-          <div className="row">
-            <h3>Sale discount</h3>
-            <p>None</p>
-          </div>
         </div>
 
 
