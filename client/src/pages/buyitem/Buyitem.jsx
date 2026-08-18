@@ -16,6 +16,8 @@ const Buyitem = () => {
     const { state } = useLocation();
     
     const cart_id = state?.cartId;
+    const selectedSeller = state?.selectedSeller;
+
     const paymentCreated = useRef(false);
     const [payment, setPayment] = useState(null);
     const navigate = useNavigate();
@@ -28,10 +30,13 @@ const Buyitem = () => {
         }
     });
 
+    // กรองสินค้าให้เหลือเฉพาะของคนขายที่ถูกเลือก
+    const filteredItems = cartItems ? cartItems.filter(item => item.username === selectedSeller) : [];
+
     let subtotal = 0;
-    if (cartItems) {
-        // นำ price ของทุกชิ้นมาบวกกัน
-        subtotal = cartItems.reduce((sum, item) => sum + item.price, 0); 
+    if (filteredItems.length > 0) {
+        // นำ price ของเฉพาะชิ้นที่กรองแล้วมาบวกกัน
+        subtotal = filteredItems.reduce((sum, item) => sum + item.price, 0); 
     }
 
     const platformFee = subtotal * 0.035; 
@@ -52,7 +57,9 @@ const Buyitem = () => {
                 const res = await makeRequest.post(
                     "/payments/createpayment",
                     {
-                        cartId: cart_id
+                        cartId: cart_id,
+                        sellerUsername: selectedSeller,
+                        userId: id
                     }
                 );
                 setPayment(res.data);
@@ -61,11 +68,11 @@ const Buyitem = () => {
             }
         };
 
-        if (cart_id) {
+        if (cart_id && selectedSeller) {
             createPayment();
         }
 
-    }, [cart_id]);
+    }, [cart_id, selectedSeller, id]);
 
     return (
         <div className="buyitem">
@@ -97,7 +104,7 @@ const Buyitem = () => {
                             ) : cartItemsError ? (
                                 <span>Something went wrong!</span>
                             ) : (
-                                <CardItems items={cartItems} />
+                                <CardItems items={filteredItems} />
                             )}
                             <br />
                             <div className="row">

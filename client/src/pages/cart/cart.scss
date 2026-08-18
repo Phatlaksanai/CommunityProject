@@ -3,101 +3,170 @@
 .cart {
   @include themify($themes) {
     background-color: themed("bgSoft");
-    min-height: 100vh;
+    height: calc(100vh - 111px);
     padding: 20px;
-    padding-bottom: 100px; // เว้นที่ให้ปุ่ม Checkout
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
 
     @include mobile {
       padding: 10px;
-      padding-bottom: 90px;
     }
   }
 
   .container {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    flex-direction: row; // แบ่งซ้ายขวา
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    height: 80vh; // ล็อกความสูงของกล่อง เพื่อให้เกิด Scrollbar ด้านใน
+
+    @include mobile {
+      flex-direction: column;
+      height: auto;
+    }
   }
 
-  .cartItem {
+  .leftPane {
+    flex: 1;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    padding: 15px 30px;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
     border-radius: 10px;
+    overflow-y: auto; // สร้าง Scrollbar ฝั่งซ้าย
 
     @include themify($themes) {
       background: themed("bg");
+      border: 1px solid themed("border");
     }
 
-    .left {
+    .sellerProfile {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 15px;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 8px;
+      transition: background 0.2s ease;
 
-      img {
-        width: 120px;
-        height: 90px;
-        object-fit: cover;
-        border-radius: 8px;
+      &:hover {
+        @include themify($themes) {
+          background: themed("bgSoft");
+        }
       }
 
-      .info {
+      input[type="radio"] {
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+        accent-color: #2e69ff;
+      }
+
+      img {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+
+      span {
+        font-weight: bold;
+        font-size: 16px;
         @include themify($themes) {
-          background: themed("bg");
-
-          h1 {
-            font-size: 22px;
-            margin-bottom: 5px;
-            color: themed("textColor");
-          }
-
-          p {
-            color: themed("textColor");
-          }
+          color: themed("textColor");
         }
       }
     }
-
-    .delete {
-      border: none;
-      color: #C0903B;
-      height: 40px;
-      width: 40px;
-      cursor: pointer;
-    }
   }
 
-  .checkoutBar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-
+  .rightPane {
+    flex: 2;
     display: flex;
-    justify-content: center;
-
-    padding: 15px 0;
+    flex-direction: column; // ดันสินค้าขึ้นบน ดันปุ่มลงล่าง
+    border-radius: 10px;
+    overflow: hidden; // ซ่อนส่วนเกินไม่ให้ทะลุกรอบ
 
     @include themify($themes) {
       background: themed("bg");
-      border-top: 1px solid themed("border");
+      border: 1px solid themed("border");
+    }
+
+    .cartItemWrapper {
+      flex: 1; // กินพื้นที่ส่วนที่เหลือทั้งหมด
+      padding: 20px;
+      overflow-y: auto; // สร้าง Scrollbar ฝั่งขวา
+    }
+
+    .cartItem {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+
+      .left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        img {
+          width: 120px;
+          height: 90px;
+          object-fit: cover;
+          border-radius: 8px;
+        }
+
+        .info {
+          h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            @include themify($themes) {
+              color: themed("textColor");
+            }
+          }
+
+          p {
+            @include themify($themes) {
+              color: themed("textColor");
+            }
+          }
+        }
+      }
+
+      .delete {
+        border: none;
+        color: #C0903B;
+        height: 40px;
+        width: 40px;
+        cursor: pointer;
+      }
+    }
+
+    .checkoutBar {
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+
+      @include themify($themes) {
+        border-top: 1px solid themed("border");
+        background: themed("bg");
+      }
 
       button {
-        width: min(500px, 90%);
+        width: 100%; // ให้ปุ่มกว้างเต็มกล่องฝั่งขวา
         padding: 15px;
         font-size: 18px;
         font-weight: bold;
         border: none;
         border-radius: 10px;
-        background: themed("buttonBg");
-        color: white;
         cursor: pointer;
+
+        @include themify($themes) {
+          background: themed("buttonBg");
+          color: white;
+        }
       }
-
     }
-
-
   }
 }
