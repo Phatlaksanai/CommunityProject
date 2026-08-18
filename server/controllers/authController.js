@@ -168,6 +168,19 @@ exports.register = async (req, res) => {
 exports.sendOtpRegister = async (req, res) => {
     try {
         const { email } = req.body;
+
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        
+        const { error: cleanupError } = await db
+            .from('users')
+            .delete()
+            .is('username', null)         // เช็คว่ายังสมัครไม่เสร็จ (ไม่มี username)
+            .lt('created_at', oneHourAgo); // เช็คว่าสร้างมานานกว่า 1 ชั่วโมงแล้ว
+
+        if (cleanupError) {
+            console.error("Cleanup incomplete users error:", cleanupError);
+        }
+        
         // --- 1. จัดการตาราง 'users' ---
         // ใช้ upsert เพื่อสร้าง user เปล่าๆ ถ้ายังไม่มี หรือดึงข้อมูลถ้ามีอยู่แล้ว
         const { data: user, error: userError } = await db
