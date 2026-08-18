@@ -7,11 +7,13 @@ exports.createPayment = async (req, res) => {
   try {
     const { data: cartItems, error } = await db
       .from("cart_items")
-      .select(`
+      .select(
+        `
         cart_items_id,
         items(price ,item_id ,user_id),
         carts!inner(cart_id,user_id)
-      `)
+      `,
+      )
       .eq("carts.cart_id", cartId)
       .eq("carts.user_id", req.user.user_id);
 
@@ -57,7 +59,7 @@ exports.createPayment = async (req, res) => {
       throw orderError;
     }
 
-    const orderItems = cartItems.map(cartItem => ({
+    const orderItems = cartItems.map((cartItem) => ({
       order_id: order.order_id,
       item_id: cartItem.items.item_id,
       seller_id: cartItem.items.user_id,
@@ -159,9 +161,7 @@ exports.addItemToCart = async (req, res) => {
 
     // ถ้ามี Cart และหมดอายุแล้ว
     if (cart && new Date(cart.cart_expire) < new Date()) {
-      await db.from("carts")
-        .delete()
-        .eq("cart_id", cart.cart_id);
+      await db.from("carts").delete().eq("cart_id", cart.cart_id);
 
       return res.status(400).json({ error: "Cart expired" });
     }
@@ -231,7 +231,6 @@ exports.addItemToCart = async (req, res) => {
       message: "Item added to cart successfully",
       cartItem,
     });
-
   } catch (error) {
     console.error("Error adding item to cart:", error);
     res.status(500).json({
@@ -248,12 +247,14 @@ exports.getCardItems = async (req, res) => {
     // Join ตาราง cart_items เข้ากับ carts (เช็ค userId) และ items (ดึงรายละเอียด)
     const { data: cartItems, error } = await db
       .from("cart_items")
-      .select(`
+      .select(
+        `
         cart_items_id,
         cart_id,
         carts!inner ( user_id ),
         items ( item_id, modelName, price, img )
-      `)
+      `,
+      )
       .eq("carts.user_id", userId);
 
     if (error) {
@@ -261,13 +262,13 @@ exports.getCardItems = async (req, res) => {
     }
 
     // จัดรูปทรงของ Data ใหม่ให้อยู่ในระดับเดียวกัน เพื่อให้ Frontend เรียกใช้ง่าย
-    const formattedData = cartItems.map(item => ({
+    const formattedData = cartItems.map((item) => ({
       cart_items_id: item.cart_items_id,
       cart_id: item.cart_id,
       item_id: item.items.item_id,
       modelName: item.items.modelName,
       price: item.items.price,
-      img: item.items.img
+      img: item.items.img,
     }));
 
     // ส่ง Array กลับไปโดยตรง เพื่อให้ data.map() ฝั่ง Frontend ทำงานได้
@@ -348,7 +349,6 @@ exports.removeItemFromCart = async (req, res) => {
       success: true,
       message: "Item removed from cart successfully",
     });
-
   } catch (error) {
     console.error("Error removing item from cart:", error);
     res.status(500).json({
@@ -362,7 +362,8 @@ exports.getDownloads = async (req, res) => {
   try {
     const { data, error } = await db
       .from("order_items")
-      .select(`
+      .select(
+        `
         order_item_id,
         orders!inner(
           status,
@@ -379,14 +380,15 @@ exports.getDownloads = async (req, res) => {
           usdz,
           gltf
         )
-      `)
+      `,
+      )
       .eq("orders.user_id", req.user.user_id)
       .eq("orders.status", "completed");
 
     if (error) throw error;
 
     // 1. ดึง item_id ทั้งหมดจาก data ที่ได้มา
-    const itemIds = data.map(d => d.items.item_id);
+    const itemIds = data.map((d) => d.items.item_id);
 
     // 2. ค้นหาตาราง reviews ด้วย user_id ปัจจุบัน และ item_id ที่อยู่ในรายการดาวน์โหลด
     const { data: reviewsData, error: reviewsError } = await db
@@ -397,21 +399,20 @@ exports.getDownloads = async (req, res) => {
 
     if (reviewsError) throw reviewsError;
 
-    // 3. นำ item_id ที่เคยรีวิวแล้วมาเก็บใน Set 
-    const reviewedItemIds = new Set(reviewsData.map(r => r.item_id));
+    // 3. นำ item_id ที่เคยรีวิวแล้วมาเก็บใน Set
+    const reviewedItemIds = new Set(reviewsData.map((r) => r.item_id));
 
     // 4. Map ค่า is_reviewed เพิ่มเข้าไปในชุดข้อมูลเดิม
-    const result = data.map(item => ({
+    const result = data.map((item) => ({
       ...item,
-      is_reviewed: reviewedItemIds.has(item.items.item_id)
+      is_reviewed: reviewedItemIds.has(item.items.item_id),
     }));
 
     res.json(result);
-
   } catch (err) {
     console.error(err);
     res.status(500).json({
-      error: "Failed to load downloads"
+      error: "Failed to load downloads",
     });
   }
 };
@@ -422,7 +423,8 @@ exports.getDownloadFile = async (req, res) => {
   try {
     const { data, error } = await db
       .from("order_items")
-      .select(`
+      .select(
+        `
         order_item_id,
 
         orders!inner(
@@ -438,27 +440,28 @@ exports.getDownloadFile = async (req, res) => {
           usdz,
           gltf
         )
-      `)
+      `,
+      )
       .eq("order_item_id", orderItemId)
       .single();
 
     if (error || !data) {
       return res.status(404).json({
-        error: "Order item not found"
+        error: "Order item not found",
       });
     }
 
     // ตรวจสอบว่าเป็นเจ้าของรายการซื้อ
     if (data.orders.user_id !== req.user.user_id) {
       return res.status(403).json({
-        error: "You do not have permission to download this file"
+        error: "You do not have permission to download this file",
       });
     }
 
     // ตรวจสอบว่าจ่ายเงินแล้ว
     if (data.orders.status !== "completed") {
       return res.status(403).json({
-        error: "Payment not completed"
+        error: "Payment not completed",
       });
     }
 
@@ -467,7 +470,7 @@ exports.getDownloadFile = async (req, res) => {
 
     if (!allowTypes.includes(type)) {
       return res.status(400).json({
-        error: "Invalid file type"
+        error: "Invalid file type",
       });
     }
 
@@ -476,17 +479,16 @@ exports.getDownloadFile = async (req, res) => {
     if (!fileUrl) { return res.status(404).json({ error: "File not found" }); }
 
     return res.json({ downloadUrl: fileUrl });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({
-      error: "Server error"
+      error: "Server error",
     });
   }
 };
 
 exports.stripeWebhook = async (req, res) => {
-  const sig = req.headers['stripe-signature'];
+  const sig = req.headers["stripe-signature"];
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   let event;
@@ -498,7 +500,7 @@ exports.stripeWebhook = async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  if (event.type === 'payment_intent.succeeded') {
+  if (event.type === "payment_intent.succeeded") {
     const paymentIntent = event.data.object;
 
     try {
@@ -521,8 +523,9 @@ exports.stripeWebhook = async (req, res) => {
 
       if (updateOrderError) throw updateOrderError;
 
-      console.log(`Payment successful and DB updated for Order ID: ${order.order_id}`);
-
+      console.log(
+        `Payment successful and DB updated for Order ID: ${order.order_id}`,
+      );
     } catch (dbError) {
       console.error("Database update failed during webhook:", dbError);
       return res.status(500).json({ error: "Failed to update DB" });
@@ -547,4 +550,78 @@ exports.stripeWebhook = async (req, res) => {
   }
 
   res.status(200).send();
+};
+
+exports.CheckStripeId = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const { data, error } = await db
+      .from("users")
+      .select("stripe_connect_id")
+      .eq("user_id", userId)
+      .single();
+
+    if (error || !data)
+      return res.status(404).json({ error: "User not found" });
+
+    // ถ้ายังไม่มี ID ในฐานข้อมูลเลย
+    if (!data.stripe_connect_id) {
+      return res.status(200).json({ isSetupComplete: false, url: null });
+    }
+
+    // ถ้ามี ID แล้ว ให้ไปเช็คสถานะกับ Stripe ว่ากรอกข้อมูลเสร็จหรือยัง
+    const account = await stripe.accounts.retrieve(data.stripe_connect_id);
+
+    // เช็คว่า details_submitted เป็น true หรือยัง (แปลว่ากรอกฟอร์มครบไหม)
+    if (account.details_submitted) {
+      return res.status(200).json({ isSetupComplete: true });
+    } else {
+      // ถ้ามี ID แต่กรอกฟอร์มไม่ครบ ให้สร้างลิงก์ให้ไปทำต่อจากจุดเดิม
+      const accountLink = await stripe.accountLinks.create({
+        account: data.stripe_connect_id,
+        refresh_url: "http://localhost:5173/market",
+        return_url: "http://localhost:5173/market",
+        type: "account_onboarding",
+      });
+      return res.status(200).json({ isSetupComplete: false, url: accountLink.url });
+    }
+  } catch (err) {
+    console.error("Server Error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.CreateStripeAccount = async (req, res) => {
+  const { userId, email } = req.body;
+
+  try {
+    const account = await stripe.accounts.create({
+      type: "standard",
+      email: email,
+    });
+
+    const { error } = await db
+      .from("users")
+      .update({ stripe_connect_id: account.id })
+      .eq("user_id", userId);
+
+    if (error) {
+      console.error("Supabase Update Error:", error);
+      return res.status(500).json({ error: "Failed to update database" });
+    }
+
+    // ใช้ AccountLinks (V1) สร้าง URL เพื่อให้ Frontend พาเด้งไปได้
+    const accountLink = await stripe.accountLinks.create({
+      account: account.id,
+      refresh_url: "http://localhost:5173/market",
+      return_url: "http://localhost:5173/market",
+      type: "account_onboarding",
+    });
+
+    return res.status(200).json({ url: accountLink.url });
+  } catch (err) {
+    console.error("Stripe/Server Error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 };
