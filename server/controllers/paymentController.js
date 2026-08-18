@@ -2,7 +2,7 @@ const db = require("../config/db");
 const stripe = require("../config/stripe");
 
 exports.createPayment = async (req, res) => {
-  const { cartId, sellerUsername } = req.body;
+  const { cartId, sellerUsername, userId } = req.body;
 
   try {
     const { data: cartItems, error } = await db
@@ -10,13 +10,13 @@ exports.createPayment = async (req, res) => {
       .select(
         `
         cart_items_id,
-        items(price ,item_id ,user_id, users!inner ( username ) ),
+        items!inner(price ,item_id ,user_id, users!inner ( username ) ),
         carts!inner(cart_id, user_id)
       `,
       )
       .eq("carts.cart_id", cartId)
-      .eq("carts.user_id", req.user.user_id)
-      .eq("items.users.username", sellerUsername);;
+      .eq("carts.user_id", userId)
+      .eq("items.users.username", sellerUsername);
 
     if (error) {
       throw error;
@@ -43,13 +43,13 @@ exports.createPayment = async (req, res) => {
     const netTarget = subtotal + platformFee;
     const effectiveFeeRate = 0.0165 * (1 + 0.07);
     const totalAmount = netTarget / (1 - effectiveFeeRate);
-    const paymentFee = totalAmount - netTarget;
+    // const paymentFee = totalAmount - netTarget;
 
     // 2. สร้าง Order
     const { data: order, error: orderError } = await db
       .from("orders")
       .insert({
-        user_id: req.user.user_id,
+        user_id: userId,
         total_amount: totalAmount,
         status: "pending",
       })
@@ -515,7 +515,7 @@ exports.stripeWebhook = async (req, res) => {
       // 1. ค้นหา Order จาก stripe_pi_id
       const { data: order, error: orderError } = await db
         .from("orders")
-        .select("order_id")
+        .select("order_id, user_id")
         .eq("stripe_pi_id", paymentIntent.id)
         .single();
 
@@ -530,6 +530,42 @@ exports.stripeWebhook = async (req, res) => {
         .eq("order_id", order.order_id);
 
       if (updateOrderError) throw updateOrderError;
+
+      // 3.1 ดึง item_id เฉพาะชิ้นที่เพิ่งจ่ายเงินสำเร็จจากตาราง order_items
+      const { data: orderItems, error: itemsError } = await db
+        .from("order_items")
+        .select("item_id")
+        .eq("order_id", order.order_id);
+
+      if (!itemsError && orderItems && orderItems.length > 0) {
+        const purchasedItemIds = orderItems.map(item => item.item_id);
+
+        // 3.2 หา cart_id ประจำตัวของ user คนนี้
+        const { data: cart } = await db
+          .from("carts")
+          .select("cart_id")
+          .eq("user_id", order.user_id)
+          .single();
+
+        if (cart) {
+          // 3.3 ลบ "เฉพาะสินค้าที่ซื้อสำเร็จ" ออกจากตะกร้า
+          await db
+            .from("cart_items")
+            .delete()
+            .eq("cart_id", cart.cart_id)
+            .in("item_id", purchasedItemIds);
+
+          // 3.4 เช็คว่าถ้าลบแล้วตะกร้าว่างเปล่า ไม่มีของร้านอื่นเหลืออยู่ ให้ลบตัวตะกร้าทิ้งไปด้วย
+          const { data: remainItems } = await db
+            .from("cart_items")
+            .select("cart_items_id")
+            .eq("cart_id", cart.cart_id);
+
+          if (!remainItems || remainItems.length === 0) {
+            await db.from("carts").delete().eq("cart_id", cart.cart_id);
+          }
+        }
+      }
 
       console.log(
         `Payment successful and DB updated for Order ID: ${order.order_id}`,
