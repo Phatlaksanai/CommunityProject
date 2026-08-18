@@ -2,7 +2,7 @@ const db = require("../config/db");
 const stripe = require("../config/stripe");
 
 exports.createPayment = async (req, res) => {
-  const { cartId } = req.body;
+  const { cartId, sellerUsername } = req.body;
 
   try {
     const { data: cartItems, error } = await db
@@ -10,12 +10,13 @@ exports.createPayment = async (req, res) => {
       .select(
         `
         cart_items_id,
-        items(price ,item_id ,user_id),
-        carts!inner(cart_id,user_id)
+        items(price ,item_id ,user_id, users!inner ( username ) ),
+        carts!inner(cart_id, user_id)
       `,
       )
       .eq("carts.cart_id", cartId)
-      .eq("carts.user_id", req.user.user_id);
+      .eq("carts.user_id", req.user.user_id)
+      .eq("items.users.username", sellerUsername);;
 
     if (error) {
       throw error;
@@ -51,13 +52,18 @@ exports.createPayment = async (req, res) => {
       throw orderError;
     }
 
-    const orderItems = cartItems.map((cartItem) => ({
-      order_id: order.order_id,
-      item_id: cartItem.items.item_id,
-      seller_id: cartItem.items.user_id,
-      platform_fee: platformFee,
-      seller_net: subtotal,
-    }));
+    const orderItems = cartItems.map((cartItem) => {
+      const itemPrice = cartItem.items.price;
+      const itemPlatformFee = itemPrice * 0.035;
+
+      return {
+        order_id: order.order_id,
+        item_id: cartItem.items.item_id,
+        seller_id: cartItem.items.user_id,
+        platform_fee: itemPlatformFee, // ค่าธรรมเนียมเฉพาะของสินค้านี้
+        seller_net: itemPrice, // รายได้เฉพาะชิ้นนี้
+      };
+    });
 
     const { data: orderItemsData, error: orderItemsError } = await db
       .from("order_items")
@@ -221,8 +227,7 @@ exports.getCardItems = async (req, res) => {
         cart_items_id,
         cart_id,
         carts!inner ( user_id ),
-        items ( item_id, modelName, price, img )
-      `,
+        items ( item_id, modelName, price, img, users ( username, name, profilePic ) )`,
       )
       .eq("carts.user_id", userId);
 
@@ -238,6 +243,9 @@ exports.getCardItems = async (req, res) => {
       modelName: item.items.modelName,
       price: item.items.price,
       img: item.items.img,
+      username: item.items.users?.username,
+      name: item.items.users?.name,
+      profilePic: item.items.users?.profilePic,
     }));
 
     // ส่ง Array กลับไปโดยตรง เพื่อให้ data.map() ฝั่ง Frontend ทำงานได้
