@@ -13,7 +13,7 @@ exports.createPayment = async (req, res) => {
         carts!inner(cart_id,user_id)
       `)
       .eq("carts.cart_id", cartId)
-      .eq("carts.user_id", req.user.user_id)
+      .eq("carts.user_id", req.user.user_id);
 
     if (error) {
       throw error;
@@ -23,7 +23,18 @@ exports.createPayment = async (req, res) => {
       return res.status(404).json({ error: "Cart is empty" });
     }
 
-    const subtotal = cartItems.reduce((sum, cartItem) => sum + cartItem.items.price, 0); // นำ price ของทุกชิ้นมาบวกกัน
+    // [เพิ่มเติม] ตรวจสอบว่าสินค้าในตะกร้ามาจากร้านเดียวกันทั้งหมดหรือไม่ 
+    // เพราะ Destination Charge รองรับการโอนเข้า 1 ปลายทางต่อ 1 PaymentIntent
+    const firstSellerId = cartItems[0].items.user_id;
+    const isSameSeller = cartItems.every(item => item.items.user_id === firstSellerId);
+
+    if (!isSameSeller) {
+      return res.status(400).json({
+        error: "Destination Charge requires all items in the cart to be from the same store. Please checkout store by store."
+      });
+    }
+
+    const subtotal = cartItems.reduce((sum, cartItem) => sum + cartItem.items.price, 0);
 
     const platformFee = subtotal * 0.035;
     const netTarget = subtotal + platformFee;
@@ -62,7 +73,6 @@ exports.createPayment = async (req, res) => {
       throw orderItemsError;
     }
 
-
     const amount = Math.round(order.total_amount * 100);
 
     if (amount < 10) {
@@ -70,12 +80,35 @@ exports.createPayment = async (req, res) => {
         error: "Minimum payment amount is 10 THB",
       });
     }
+
+    // --- ส่วนที่ 1: ดึง stripe_connect_id ของร้านค้านั้น ---
+    const { data: sellerData, error: sellerError } = await db
+      .from("users")
+      .select("stripe_connect_id")
+      .eq("user_id", firstSellerId)
+      .single();
+
+    if (sellerError || !sellerData?.stripe_connect_id) {
+      return res.status(400).json({ error: "Seller Stripe Connect ID not found" });
+    }
+
+    // คำนวณค่าธรรมเนียมแพลตฟอร์มที่จะหักไว้ (หน่วยเป็นสตางค์)
+    const netAmountCents = Math.round(subtotal * 100);
+    const applicationFeeAmount = amount - netAmountCents;
+
+    // --- ส่วนที่ 2: สร้าง PaymentIntent แบบ Destination Charge ---
+    // --- ส่วนที่ 2: สร้าง PaymentIntent แบบ Destination Charge ---
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: "thb",
       payment_method_types: ["promptpay"],
+      application_fee_amount: applicationFeeAmount, // ยอดเงินที่หักเข้า Platform
+      transfer_data: {
+        destination: sellerData.stripe_connect_id, // ยอดที่เหลือโอนเข้าบัญชีร้านค้านี้อัตโนมัติ
+      },
     });
-    const { data, error: updateError } = await db // อัปเดต order
+
+    const { data, error: updateError } = await db
       .from("orders")
       .update({ stripe_pi_id: paymentIntent.id })
       .eq("order_id", order.order_id);
@@ -440,7 +473,7 @@ exports.getDownloadFile = async (req, res) => {
 
     const fileUrl = data.items[type];
 
-    if (!fileUrl) {return res.status(404).json({error: "File not found"});}
+    if (!fileUrl) { return res.status(404).json({ error: "File not found" }); }
 
     return res.json({ downloadUrl: fileUrl });
 
@@ -469,7 +502,7 @@ exports.stripeWebhook = async (req, res) => {
     const paymentIntent = event.data.object;
 
     try {
-      // 1. ค้นหา Order
+      // 1. ค้นหา Order จาก stripe_pi_id
       const { data: order, error: orderError } = await db
         .from("orders")
         .select("order_id")
@@ -493,6 +526,23 @@ exports.stripeWebhook = async (req, res) => {
     } catch (dbError) {
       console.error("Database update failed during webhook:", dbError);
       return res.status(500).json({ error: "Failed to update DB" });
+    }
+  }
+
+  else if (event.type === 'payment_intent.payment_failed' || event.type === 'payment_intent.canceled') {
+    const paymentIntent = event.data.object;
+
+    try {
+      const { error: updateOrderError } = await db
+        .from("orders")
+        .update({ status: "failed" }) // เปลี่ยนสถานะเป็น failed
+        .eq("stripe_pi_id", paymentIntent.id);
+
+      if (updateOrderError) throw updateOrderError;
+
+      console.log(`Payment failed/canceled for PaymentIntent: ${paymentIntent.id}`);
+    } catch (dbError) {
+      console.error("Database update failed during webhook (failed payment):", dbError);
     }
   }
 
