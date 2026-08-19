@@ -19,26 +19,34 @@ body {
 .custom-tooltip::after {
   content: attr(data-tip);
   position: absolute;
-  top: 120%; 
+  top: 120%;
   left: 50%;
   transform: translateX(-50%);
 
   /* --- จุดที่ต้องแก้เพื่อให้กล่องไม่ตัดและตัดคำสวยงาม --- */
-  white-space: normal;       /* ยอมให้ขึ้นบรรทัดใหม่ได้ */
-  width: max-content;        /* กว้างตามเนื้อหา */
-  max-width: 200px;          /* จำกัดความกว้างสูงสุด (ปรับเพิ่ม/ลดได้ตามชอบ) */
-  word-break: break-all;     /* ถ้าเป็นตัวอักษรติดกันยาวๆ (แบบ สสสสส) ให้ตัดลงบรรทัดใหม่ */
-  line-height: 1.4;          /* เพิ่มระยะบรรทัดให้อ่านง่ายขึ้น */
-  text-align: center;        /* จัดข้อความให้อยู่กลางกล่อง */
+  white-space: normal;
+  /* ยอมให้ขึ้นบรรทัดใหม่ได้ */
+  width: max-content;
+  /* กว้างตามเนื้อหา */
+  max-width: 200px;
+  /* จำกัดความกว้างสูงสุด (ปรับเพิ่ม/ลดได้ตามชอบ) */
+  word-break: break-all;
+  /* ถ้าเป็นตัวอักษรติดกันยาวๆ (แบบ สสสสส) ให้ตัดลงบรรทัดใหม่ */
+  line-height: 1.4;
+  /* เพิ่มระยะบรรทัดให้อ่านง่ายขึ้น */
+  text-align: center;
+  /* จัดข้อความให้อยู่กลางกล่อง */
   /* ---------------------------------------------- */
 
   background-color: #e0e0e0;
   color: #333;
-  padding: 6px 10px;         /* เพิ่มพื้นที่ข้างในหน่อย */
+  padding: 6px 10px;
+  /* เพิ่มพื้นที่ข้างในหน่อย */
   border-radius: 6px;
   font-size: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  z-index: 1000;             /* เพื่อให้มั่นใจว่าลอยทับทุกอย่าง */
+  z-index: 1000;
+  /* เพื่อให้มั่นใจว่าลอยทับทุกอย่าง */
 
   visibility: hidden;
   opacity: 0;
@@ -49,6 +57,41 @@ body {
 .custom-tooltip:hover::after {
   visibility: visible;
   opacity: 1;
+}
+
+.custom-checkbox,
+.custom-radio {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ccc;
+  /* สีของเส้นขอบตอนที่ยังไม่ถูกเลือก */
+  background-color: transparent;
+  outline: none;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  /* ระยะห่างระหว่างปุ่มกับข้อความ */
+}
+
+/* Checkbox กำหนดให้เป็นสี่เหลี่ยมขอบมน */
+.custom-checkbox {
+  border-radius: 4px;
+}
+
+/* Radio กำหนดให้เป็นวงกลม */
+.custom-radio {
+  border-radius: 50%;
+}
+
+/* สไตล์เมื่อเกิดเหตุการณ์ (State) checked */
+.custom-checkbox:checked,
+.custom-radio:checked {
+  background-color: #A0C46E;
+  /* สีพื้นหลังตอนถูกเลือก สามารถเปลี่ยนสีได้ */
+  border-color: #A0C46E;
 }
 
 $themes: (

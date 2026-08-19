@@ -52,8 +52,8 @@ const LeftBar = () => {
       <div className="container">
         <div className="menu">
           <div className="user">
-            <img src={currentUser?.profilePic || defaultPic} alt="" />
-            <p className="custom-tooltip" data-tip={displayName}>
+            <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)}/>
+            <p className="custom-tooltip" data-tip={displayName} onClick={() => navigate(`/profile/${currentUser?.user_id}`)}>
               {truncatedName}
             </p>
           </div>

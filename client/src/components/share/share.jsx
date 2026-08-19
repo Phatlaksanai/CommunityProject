@@ -8,6 +8,7 @@ import { AuthContext } from "../../context/authContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import { useQuery } from "@tanstack/react-query"; // เพิ่ม useQuery
+import { backdropClasses } from "@mui/material/Backdrop";
 
 const Share = ({ isDescCommu, commuId }) => {
   const [desc, setDesc] = useState("");
@@ -253,6 +254,7 @@ const Share = ({ isDescCommu, commuId }) => {
                       <label key={project.project_id} className="post-item">
                         <input
                           type="radio"
+                          className="custom-radio"
                           name="selectedProject"
                           checked={selectedProject === project.project_id}
                           onChange={() => setSelectedProject(project.project_id)}
@@ -268,7 +270,7 @@ const Share = ({ isDescCommu, commuId }) => {
               {/* ปุ่มควบคุมด้านล่าง */}
               <div className="modalButtons">
                 <button onClick={() => setOpenProjectModal(false)}>Cancel</button>
-                <button onClick={() => setOpenProjectModal(false)}>Confirm</button>
+                <button onClick={() => setOpenProjectModal(false)} style={{backgroundColor: "#A0C46E"}}>Confirm</button>
               </div>
 
             </div>

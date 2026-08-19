@@ -124,13 +124,6 @@
           font-size: 13px;
           cursor: pointer;
           color: themed("textSoft");
-
-          input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-            accent-color: themed("button");
-          }
         }
       }
     }

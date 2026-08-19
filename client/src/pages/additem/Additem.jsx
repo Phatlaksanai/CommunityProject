@@ -222,18 +222,18 @@ const AddItem = () => {
           <div className="format-selection">
             <label className="format-selection__title">Model Properties</label>
             <div className="checkbox-container">
-              <label className="custom-checkbox">
-                <input type="checkbox" checked={hasTextures} onChange={(e) => setHasTextures(e.target.checked)} />
+              <label>
+                <input type="checkbox" className="custom-checkbox" checked={hasTextures} onChange={(e) => setHasTextures(e.target.checked)} />
                 <span className="box"></span>
                 Has Textures
               </label>
-              <label className="custom-checkbox">
-                <input type="checkbox" checked={isRigged} onChange={(e) => setIsRigged(e.target.checked)} />
+              <label>
+                <input type="checkbox" className="custom-checkbox" checked={isRigged} onChange={(e) => setIsRigged(e.target.checked)} />
                 <span className="box"></span>
                 Is Rigged
               </label>
-              <label className="custom-checkbox">
-                <input type="checkbox" checked={isUvMapped} onChange={(e) => setIsUvMapped(e.target.checked)} />
+              <label >
+                <input type="checkbox" className="custom-checkbox" checked={isUvMapped} onChange={(e) => setIsUvMapped(e.target.checked)} />
                 <span className="box"></span>
                 Is UV Mapped
               </label>
@@ -295,11 +295,11 @@ const AddItem = () => {
           <div className="format-selection">
             <label className="format-selection__title">Select Downloadable Formats</label>
             <div className="checkbox-container">
-              <label><input type="checkbox" name="obj" checked={formats.obj} onChange={handleFormatChange} /> OBJ</label>
-              <label><input type="checkbox" name="blend" checked={formats.blend} onChange={handleFormatChange} /> BLEND</label>
-              <label><input type="checkbox" name="fbx" checked={formats.fbx} onChange={handleFormatChange} /> FBX</label>
-              <label><input type="checkbox" name="usdz" checked={formats.usdz} onChange={handleFormatChange} /> USDZ</label>
-              <label><input type="checkbox" name="gltf" checked={formats.gltf} onChange={handleFormatChange} /> GLTF</label>
+              <label><input type="checkbox" className="custom-checkbox" name="obj" checked={formats.obj} onChange={handleFormatChange} /> OBJ</label>
+              <label><input type="checkbox" className="custom-checkbox" name="blend" checked={formats.blend} onChange={handleFormatChange} /> BLEND</label>
+              <label><input type="checkbox" className="custom-checkbox" name="fbx" checked={formats.fbx} onChange={handleFormatChange} /> FBX</label>
+              <label><input type="checkbox" className="custom-checkbox" name="usdz" checked={formats.usdz} onChange={handleFormatChange} /> USDZ</label>
+              <label><input type="checkbox" className="custom-checkbox" name="gltf" checked={formats.gltf} onChange={handleFormatChange} /> GLTF</label>
             </div>
           </div>
 

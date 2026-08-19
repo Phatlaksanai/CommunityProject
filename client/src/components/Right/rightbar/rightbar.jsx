@@ -109,10 +109,11 @@ const RightBar = () => {
                     <img
                       src={user.profilePic || defaultPic}
                       alt=""
+                      onClick={() => navigate(`/profile/${user?.user_id}`)}
                       onError={(e) => { e.currentTarget.src = defaultPic; }}
                     />
                     <p>
-                      <span className="custom-tooltip" data-tip={displayName}>
+                      <span className="custom-tooltip" data-tip={displayName} onClick={() => navigate(`/profile/${user?.user_id}`)}>
                         {truncatedName}
                       </span>
                     </p>

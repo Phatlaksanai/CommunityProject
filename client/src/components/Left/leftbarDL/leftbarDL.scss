@@ -106,42 +106,5 @@
       }
     }
 
-    /* ล้างค่า Default ของเบราว์เซอร์และกำหนดขนาด/ขอบเขตตั้งต้น */
-    .custom-checkbox,
-    .custom-radio {
-      appearance: none;
-      -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
-      border: 2px solid #ccc;
-      /* สีของเส้นขอบตอนที่ยังไม่ถูกเลือก */
-      background-color: transparent;
-      outline: none;
-      cursor: pointer;
-      display: inline-block;
-      vertical-align: middle;
-      position: relative;
-      /* ระยะห่างระหว่างปุ่มกับข้อความ */
-    }
-
-    /* Checkbox กำหนดให้เป็นสี่เหลี่ยมขอบมน */
-    .custom-checkbox {
-      border-radius: 4px;
-    }
-
-    /* Radio กำหนดให้เป็นวงกลม */
-    .custom-radio {
-      border-radius: 50%;
-    }
-
-    /* สไตล์เมื่อเกิดเหตุการณ์ (State) checked */
-    .custom-checkbox:checked,
-    .custom-radio:checked {
-      background-color: #A0C46E;
-      /* สีพื้นหลังตอนถูกเลือก สามารถเปลี่ยนสีได้ */
-      border-color: #A0C46E;
-    }
-    
-
   }
 }

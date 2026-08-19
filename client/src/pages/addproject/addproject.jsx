@@ -161,6 +161,7 @@ const AddProject = () => {
                   <label key={post.post_id} className="post-item">
                     <input
                       type="checkbox"
+                      className="custom-checkbox"
                       checked={selectedPosts.includes(post.post_id)}
                       onChange={() => {
                         setSelectedPosts(prev =>
@@ -168,13 +169,6 @@ const AddProject = () => {
                             ? prev.filter(id => id !== post.post_id)
                             : [...prev, post.post_id]
                         );
-                      }}
-                    />
-                    <img
-                      src={post.img}
-                      alt=""
-                      onError={(e) => {
-                        e.currentTarget.src = "https://placehold.co/600x400/457EC3/FFFFFF?text=Project"
                       }}
                     />
                     <span>{post.description}</span>
@@ -199,6 +193,7 @@ const AddProject = () => {
                   <label key={item.item_id} className="post-item">
                     <input
                       type="radio"
+                      className="custom-radio"
                       name="selectedItem"
                       checked={selectedItem === item.item_id}
                       onChange={() => setSelectedItem(item.item_id)}

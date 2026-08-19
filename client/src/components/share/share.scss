@@ -110,7 +110,7 @@
 .projectModal .modalContainer {
   @include themify($themes) {
     background-color: themed("bg");
-    color: themed("textColor");
+    color: themed("textColorSoft");
     padding: 25px;
     border-radius: 15px;
     width: 450px; // ขยายความกว้างเล็กน้อยเพื่อให้ดูไม่อึดอัด
@@ -174,7 +174,7 @@
 
           input[type="radio"] {
             cursor: pointer;
-            accent-color: #5271ff; // เปลี่ยนสีวงกลม radio ให้เข้ากับธีม
+            flex-shrink: 0;
           }
 
           img {
@@ -193,6 +193,7 @@
             -webkit-line-clamp: 1;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            word-break: break-all;
           }
         }
       }
@@ -211,16 +212,8 @@
         border-radius: 5px;
         cursor: pointer;
         font-weight: 500;
-
-        &.cancel {
-          background-color: #ff4d4d;
-          color: white;
-        }
-
-        &.confirm {
-          background-color: #5271ff;
-          color: white;
-        }
+        background-color: #b9b9bc;
+        color: white;
 
         &:hover {
           opacity: 0.8;

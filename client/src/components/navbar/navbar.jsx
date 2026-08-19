@@ -1,22 +1,22 @@
 import "./navbar.scss";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ForumIcon from '@mui/icons-material/Forum';
 import PeopleIcon from '@mui/icons-material/People';
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import DownloadIcon from '@mui/icons-material/Download';
 import StorefrontIcon from '@mui/icons-material/Storefront';
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
-import { DarkModeContext } from "../../context/darkModeContext";
 import { AuthContext } from "../../context/authContext";
 import { makeRequest } from "../../api/axios";
+import ReportModal from "../report/ReportModal";
 
 // 🚀 [ปรับการ Import: เอา Hits ออก แล้วนำ useHits กับ useSearchBox มาจัดการเอง]
 import { InstantSearch, SearchBox, useSearchBox, useHits } from 'react-instantsearch';
 import { searchClient } from "../../api/algoliaClient";
+import { div } from "three/src/nodes/TSL.js";
 
 // ============================================================
 // 1. คอมโพเนนต์ดรอปดาวน์เวอร์ชัน Custom (แก้บั๊กแวบ 0.2 วิ แบบเบ็ดเสร็จ)
@@ -82,9 +82,10 @@ const SearchHit = ({ hit }) => {
 };
 
 const Navbar = () => {
-  const { toggle, darkMode } = useContext(DarkModeContext);
   const { currentUser, setUser } = useContext(AuthContext);
   const [error, setError] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [openReport, setOpenReport] = useState(false);
 
   // สถานะคุม เปิด/ปิด ดรอปดาวน์ผลลัพธ์เมื่อมีการ Focus กล่องพิมพ์
   const [isSearching, setIsSearching] = useState(false);
@@ -124,11 +125,7 @@ const Navbar = () => {
           <h1 className="Logo">PM</h1>
         </Link>
         <HomeOutlinedIcon onClick={() => navigate("/")} style={{ cursor: "pointer" }} />
-        {darkMode ? (
-          <WbSunnyOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
-        ) : (
-          <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
-        )}
+
         <StorefrontIcon onClick={() => navigate("/market")} style={{ cursor: "pointer" }} />
         <DownloadIcon onClick={() => navigate(`/download/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
 
@@ -163,9 +160,25 @@ const Navbar = () => {
             {truncatedName}
           </span>
           {!currentUser && <button onClick={handleLogin}>Login</button>}
-          {currentUser && <button onClick={handleLogout}>Logout</button>}
+          {currentUser &&
+            <div>
+              <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} style={{ cursor: "pointer" }} />
+              {menuOpen && (
+                <div className="moreMenu">
+                  <button onClick={() => setOpenReport(true)}>report</button>
+                  <button onClick={handleLogout}>Logout</button>
+                </div>
+              )}
+              
+            </div>
+          }
         </div>
       </div>
+      <ReportModal
+        isOpen={openReport}
+        onClose={() => setOpenReport(false)}
+        navbar={true}
+      />
     </div>
   );
 };

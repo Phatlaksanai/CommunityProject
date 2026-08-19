@@ -95,6 +95,7 @@ const BanMember = () => {
                   <label key={member.user_id} className="community-item">
                     <input
                       type="checkbox"
+                      className='custom-checkbox'
                       checked={selectedUsers.includes(member.user_id)}
                       onChange={() => {
                         setSelectedUsers(prev =>

@@ -546,7 +546,7 @@ exports.deletePost = async (req, res) => {
 };
 
 exports.getLatestUserImages = async (req, res) => {
-  const userId = req.user.user_id;
+  const { id } = req.params;
 
   try {
     const { data, error } = await db
@@ -555,7 +555,7 @@ exports.getLatestUserImages = async (req, res) => {
         img,
         posts!inner(user_id, created_at, status)
       `)
-      .eq("posts.user_id", userId)
+      .eq("posts.user_id", id)
       .eq("posts.status", "show")
       .order("posts(created_at)", { ascending: false })
 

@@ -75,6 +75,7 @@ const Cart = () => {
                             >
                                 <input
                                     type="radio"
+                                    className="custom-radio"
                                     checked={selectedSeller === seller.username}
                                     readOnly
                                 />

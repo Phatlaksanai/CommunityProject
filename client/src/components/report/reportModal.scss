@@ -1,0 +1,95 @@
+@use "../../style.scss" as *;
+
+.ReportModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    // background-color: themed("bg");
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.ReportModal .modalContainer {
+    @include themify($themes) {
+        background-color: themed("bg");
+        color: themed("textSoft");
+        padding: 25px;
+        border-radius: 15px;
+        width: 450px; // ขยายความกว้างเล็กน้อยเพื่อให้ดูไม่อึดอัด
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
+
+        h3 {
+            margin-bottom: 5px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+
+            label {
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            input[type="text"] {
+                padding: 10px;
+                border-radius: 15px;
+                border: 1px solid themed("border");
+                background-color: transparent;
+                color: themed("textColor");
+                outline: none;
+
+                &:focus {
+                    border-color: themed("textColor");
+                }
+            }
+
+            .file-type-select {
+                padding: 5px;
+                border-radius: 10px;
+                border: 1px solid themed("border");
+                background-color: themed("bg");
+                color: themed("textColor");
+                font-size: 14px;
+                cursor: pointer;
+
+                &:focus {
+                    outline: none;
+                    border-color: rgb(150, 150, 150);
+                }
+            }
+        }
+
+        // ส่วนของปุ่มด้านล่าง
+        .modalButtons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+
+            button {
+                padding: 8px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: 500;
+                background-color: #b9b9bc;
+                color: white;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
+        }
+    }
+}

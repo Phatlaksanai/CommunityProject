@@ -270,19 +270,40 @@
           object-fit: cover;
         }
 
-        button {
-          border-radius: 6px;
-          background-color: themed("buttonBg");
-          padding: 5px 10px;
-          cursor: pointer;
-          border: none;
-          color: white;
-        }
-
         span {
           font-size: 16px;
           font-weight: 600;
           color: themed("textColorSoft");
+        }
+
+        .moreMenu {
+          display: flex;
+          flex-direction: column;
+          position: absolute;
+          top: 30px;
+          right: 30px;
+          margin-top: 30px;
+          z-index: 10;
+          gap: 3px;
+
+
+          button {
+            padding: 8px 18px;
+            max-height: 35px;
+            border: none;
+            cursor: pointer;
+
+            /* จัดระเบียบไอคอนกับข้อความในปุ่มให้สวยขึ้น */
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: white;
+            background-color: #A0C46E;
+
+            &:hover {
+              opacity: 0.8;
+            }
+          }
         }
       }
     }

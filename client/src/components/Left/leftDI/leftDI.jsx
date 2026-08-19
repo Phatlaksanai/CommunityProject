@@ -116,6 +116,8 @@ const LeftDI = ({ item }) => {
                 <div className="userInfo">
                   <img
                     src={review.users.profilePic}
+                    onClick={() => navigate(`/profile/${review?.user_id}`)}
+                    style={{cursor: "pointer"}}
                     alt=""
                   />
                   <div className="review-info" >
@@ -123,7 +125,7 @@ const LeftDI = ({ item }) => {
                       {(() => {
                         const displayName = review.users.name || review.users.username;
                         return (
-                          <span>
+                          <span onClick={() => navigate(`/profile/${review?.user_id}`)} style={{cursor: "pointer"}}>
                             {displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName}
                           </span>
                         );

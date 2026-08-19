@@ -173,6 +173,7 @@ const EditProject = () => {
                   <label key={post.post_id} className="post-item">
                     <input
                       type="checkbox"
+                      className="custom-checkbox"
                       checked={selectedPosts.includes(post.post_id)}
                       onChange={() => {
                         setSelectedPosts(prev =>
@@ -182,7 +183,6 @@ const EditProject = () => {
                         );
                       }}
                     />
-                    <img src={post.img} alt="" onError={(e) => e.currentTarget.src = "https://placehold.co/100"} />
                     <span>{post.description}</span>
                   </label>
                 ))}
@@ -192,6 +192,12 @@ const EditProject = () => {
           {/* ส่วนของ Items */}
           <div className="form-group">
             <label>Related Items</label>
+            <input
+              type="text"
+              placeholder="Search Items"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
             <div className="post-list">
               {items
                 .filter(item => item.modelName.toLowerCase().includes(search.toLowerCase()))
@@ -199,6 +205,7 @@ const EditProject = () => {
                   <label key={item.item_id} className="post-item">
                     <input
                       type="radio"
+                      className="custom-radio"
                       name="selectedItem"
                       checked={selectedItem === item.item_id}
                       onChange={() => setSelectedItem(item.item_id)}
@@ -211,8 +218,8 @@ const EditProject = () => {
           </div>
 
           <input type="submit" value="Save Changes" className="add-item__submit" />
-          {error && <span style={{ color: "red" , margin: "0px 10px" }}>{error}</span>}
-          {success && <span style={{ color: "green" , margin: "0px 10px" }}>{success}</span>}
+          {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
+          {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
         </form>
       </div>
     </div>
