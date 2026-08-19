@@ -41,9 +41,7 @@ const Dashboard = () => {
                     <p>Here’s what’s happening with your marketplace today.</p>
                 </div>
 
-                {/* กลุ่มกล่องสรุปข้อมูล */}
                 <div className="dashboard-cards">
-                    {/* Total Revenue */}
                     <div className="summary-card">
                         <div className="card-info">
                             <PaidIcon className="icon" style={{ color: "#E76D09" }} />
@@ -55,11 +53,13 @@ const Dashboard = () => {
                         </div>
 
                         <div className="card-footer">
-                            <span className="trend up">▲ 20.2%</span> vs May 13 - May 19
+                            <span className={`trend ${summaryData?.revenue_change >= 0 ? 'up' : 'down'}`}>
+                                {summaryData?.revenue_change >= 0 ? '▲' : '▼'} {Math.abs(summaryData?.revenue_change || 0)}%
+                            </span>
+                            vs Last 7 days
                         </div>
                     </div>
 
-                    {/* Total User */}
                     <div className="summary-card">
                         <div className="card-info">
                             <PersonIcon className="icon" style={{ color: "#163574" }} />
@@ -71,11 +71,13 @@ const Dashboard = () => {
                         </div>
 
                         <div className="card-footer">
-                            <span className="trend up">▲ 10.2%</span> vs May 13 - May 19
+                            <span className={`trend ${summaryData?.users_change >= 0 ? 'up' : 'down'}`}>
+                                {summaryData?.users_change >= 0 ? '▲' : '▼'} {Math.abs(summaryData?.users_change || 0)}%
+                            </span>
+                            vs Last 7 days
                         </div>
                     </div>
 
-                    {/* Total Asset */}
                     <div className="summary-card">
                         <div className="card-info">
                             <ViewInArIcon className="icon" style={{ color: "#358E10" }} />
@@ -86,11 +88,13 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <div className="card-footer">
-                            <span className="trend up">▲ 17.2%</span> vs May 13 - May 19
+                            <span className={`trend ${summaryData?.assets_change >= 0 ? 'up' : 'down'}`}>
+                                {summaryData?.assets_change >= 0 ? '▲' : '▼'} {Math.abs(summaryData?.assets_change || 0)}%
+                            </span>
+                            vs Last 7 days
                         </div>
                     </div>
 
-                    {/* Total Community */}
                     <div className="summary-card">
                         <div className="card-info">
                             <PeopleIcon className="icon" style={{ color: "#E76D09" }} />
@@ -101,12 +105,14 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <div className="card-footer">
-                            <span className="trend up">▲ 7.2%</span> vs May 13 - May 19
+                            <span className={`trend ${summaryData?.communities_change >= 0 ? 'up' : 'down'}`}>
+                                {summaryData?.communities_change >= 0 ? '▲' : '▼'} {Math.abs(summaryData?.communities_change || 0)}%
+                            </span>
+                            vs Last 7 days
                         </div>
                     </div>
                 </div>
 
-                {/* กราฟ Revenue Overview */}
                 <div className="chart-container">
                     <h3 className="chart-title">Revenue Overview</h3>
                     <div style={{ width: "100%", height: 350 }}>
@@ -136,7 +142,7 @@ const Dashboard = () => {
                                 {/* กล่องข้อความเมื่อเอาเมาส์ชี้ */}
                                 <Tooltip
                                     contentStyle={{ backgroundColor: '#1A202C', borderColor: '#2D3748', color: '#fff', borderRadius: '8px' }}
-                                    itemStyle={{ color: '#F6AD55' }}
+                                    itemStyle={{ color: '#E76D09' }}
                                     formatter={(value) => [`฿ ${formatNumber(value)}`, "Revenue"]}
                                 />
 
@@ -144,9 +150,9 @@ const Dashboard = () => {
                                 <Line
                                     type="monotone"
                                     dataKey="revenue"
-                                    stroke="#F6AD55"
+                                    stroke="#E76D09"
                                     strokeWidth={3}
-                                    dot={{ r: 4, fill: "#F6AD55", strokeWidth: 2, stroke: "#13151A" }}
+                                    dot={{ r: 4, fill: "#E76D09", strokeWidth: 2, stroke: "#13151A" }}
                                     activeDot={{ r: 6 }}
                                 />
                             </LineChart>

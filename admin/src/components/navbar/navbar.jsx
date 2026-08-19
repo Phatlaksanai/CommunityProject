@@ -2,9 +2,10 @@ import "./navbar.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
+import { makeRequest } from "../../api/axios";
 
 const Navbar = () => {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, setUser } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
   const navigate = useNavigate();
 
@@ -43,7 +44,7 @@ const Navbar = () => {
 
       <div className="right">
         <div className="user">
-          <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
+          <img src={currentUser?.profilePic || defaultPic} alt="" />
           <div className="user-info">
             <span className="custom-tooltip" data-tip={displayName}>
               {truncatedName}

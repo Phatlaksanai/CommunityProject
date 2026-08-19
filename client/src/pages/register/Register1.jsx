@@ -40,6 +40,15 @@ const Register = () => {
       setError("Passwords are not same");
       return;
     }
+    if (password.length < 10 || password.length > 20) {
+      setError("Password must be between 10 and 20 characters");
+      return;
+    }
+
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$/.test(password)) {
+      setError("Password must contain at least one uppercase letter, one lowercase letter, and one special character");
+      return;
+    }
     setError("");
     setStep(2);
   };

@@ -75,30 +75,63 @@ create type report_type as enum (
 );
 
 // Query สถิติ/กราฟ
-
 🔎🔎 หน้า dashboard
 // 4 ช่อง
-CREATE OR REPLACE FUNCTION get_dashboard_summary()
+CREATE OR REPLACE FUNCTION get_dashboard_summary() -- หลักการคำนวณคือ: ((ยอดสัปดาห์นี้ - ยอดสัปดาห์ก่อน) / ยอดสัปดาห์ก่อน) * 100
 RETURNS TABLE (
   total_revenue numeric,
   total_users bigint,
   total_assets bigint,
-  total_communities bigint
+  total_communities bigint,
+  revenue_change numeric,
+  users_change numeric,
+  assets_change numeric,
+  communities_change numeric
 ) AS $$
 BEGIN
   RETURN QUERY
+  WITH 
+  -- 1. ยอดรวมทั้งหมด (All-time)
+  all_time AS (
+    SELECT 
+      COALESCE((SELECT SUM(oi.platform_fee) FROM public.order_items oi JOIN public.orders o ON oi.order_id = o.order_id WHERE o.status = 'completed'), 0) AS revenue,
+      (SELECT COUNT(*) FROM public.users) AS users,
+      (SELECT COUNT(*) FROM public.items) AS assets,
+      (SELECT COUNT(*) FROM public.communities) AS communities
+  ),
+  -- 2. ยอดของ 7 วันล่าสุด (Current Period)
+  current_period AS (
+    SELECT 
+      COALESCE((SELECT SUM(oi.platform_fee) FROM public.order_items oi JOIN public.orders o ON oi.order_id = o.order_id WHERE o.status = 'completed' AND o.created_at >= NOW() - INTERVAL '7 days'), 0) AS revenue,
+      (SELECT COUNT(*) FROM public.users WHERE created_at >= NOW() - INTERVAL '7 days') AS users,
+      (SELECT COUNT(*) FROM public.items WHERE created_at >= NOW() - INTERVAL '7 days') AS assets,
+      (SELECT COUNT(*) FROM public.communities WHERE created_at >= NOW() - INTERVAL '7 days') AS communities
+  ),
+  -- 3. ยอดของ 7 วันก่อนหน้า (Previous Period: วันที่ 8 ถึง 14 ย้อนหลัง)
+  previous_period AS (
+    SELECT 
+      COALESCE((SELECT SUM(oi.platform_fee) FROM public.order_items oi JOIN public.orders o ON oi.order_id = o.order_id WHERE o.status = 'completed' AND o.created_at >= NOW() - INTERVAL '14 days' AND o.created_at < NOW() - INTERVAL '7 days'), 0) AS revenue,
+      (SELECT COUNT(*) FROM public.users WHERE created_at >= NOW() - INTERVAL '14 days' AND created_at < NOW() - INTERVAL '7 days') AS users,
+      (SELECT COUNT(*) FROM public.items WHERE created_at >= NOW() - INTERVAL '14 days' AND created_at < NOW() - INTERVAL '7 days') AS assets,
+      (SELECT COUNT(*) FROM public.communities WHERE created_at >= NOW() - INTERVAL '14 days' AND created_at < NOW() - INTERVAL '7 days') AS communities
+  )
+  -- 4. คำนวณผลลัพธ์และเปอร์เซ็นต์
   SELECT 
-    -- เชื่อมตารางเพื่อกรองเอาเฉพาะยอดรวมที่ status = 'completed'
-    COALESCE((
-      SELECT SUM(oi.platform_fee) 
-      FROM public.order_items oi
-      JOIN public.orders o ON oi.order_id = o.order_id
-      WHERE o.status = 'completed'
-    ), 0) AS total_revenue,
+    all_time.revenue AS total_revenue,
+    all_time.users AS total_users,
+    all_time.assets AS total_assets,
+    all_time.communities AS total_communities,
     
-    (SELECT COUNT(*) FROM public.users) AS total_users,
-    (SELECT COUNT(*) FROM public.items) AS total_assets,
-    (SELECT COUNT(*) FROM public.communities) AS total_communities;
+    -- สูตรหา % การเปลี่ยนแปลง
+    ROUND(COALESCE(NULLIF(current_period.revenue - previous_period.revenue, 0) / NULLIF(previous_period.revenue, 0) * 100, CASE WHEN current_period.revenue > 0 THEN 100 ELSE 0 END), 1) AS revenue_change,
+    
+    ROUND(COALESCE(NULLIF(current_period.users - previous_period.users, 0)::numeric / NULLIF(previous_period.users, 0) * 100, CASE WHEN current_period.users > 0 THEN 100 ELSE 0 END), 1) AS users_change,
+    
+    ROUND(COALESCE(NULLIF(current_period.assets - previous_period.assets, 0)::numeric / NULLIF(previous_period.assets, 0) * 100, CASE WHEN current_period.assets > 0 THEN 100 ELSE 0 END), 1) AS assets_change,
+    
+    ROUND(COALESCE(NULLIF(current_period.communities - previous_period.communities, 0)::numeric / NULLIF(previous_period.communities, 0) * 100, CASE WHEN current_period.communities > 0 THEN 100 ELSE 0 END), 1) AS communities_change
+    
+  FROM all_time, current_period, previous_period;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -121,7 +154,62 @@ $$ LANGUAGE plpgsql;
 
 
 🔎🔎 หน้า users
-// Donut Chart
+// 4 ช่อง
+CREATE OR REPLACE FUNCTION get_users_summary()
+RETURNS TABLE (
+  total_users bigint,
+  users_today bigint,
+  users_this_month bigint,
+  users_this_year bigint
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    -- 1. ผู้ใช้ทั้งหมด
+    (SELECT COUNT(*) FROM public.users) AS total_users,
+    
+    -- 2. ผู้ใช้ที่สมัครวันนี้ (ใช้วันที่ปัจจุบัน)
+    (SELECT COUNT(*) FROM public.users WHERE DATE(created_at) = CURRENT_DATE) AS users_today,
+    
+    -- 3. ผู้ใช้ที่สมัครเดือนนี้ (เดือนและปีตรงกับปัจจุบัน)
+    (SELECT COUNT(*) FROM public.users WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS users_this_month,
+    
+    -- 4. ผู้ใช้ที่สมัครปีนี้
+    (SELECT COUNT(*) FROM public.users WHERE EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS users_this_year;
+END;
+$$ LANGUAGE plpgsql;
+
+// กราฟสัปดาห์
+CREATE OR REPLACE FUNCTION get_weekly_users_chart()
+RETURNS TABLE (
+  day_name text,
+  user_count bigint
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH current_week_days AS (
+    -- สร้างวันที่ตั้งแต่วันจันทร์ (0) ถึง วันอาทิตย์ (6) ของสัปดาห์ปัจจุบัน
+    -- DATE_TRUNC('week', CURRENT_DATE) จะดึงวันที่ของ "วันจันทร์" ในสัปดาห์นี้มาเสมอ
+    SELECT (DATE_TRUNC('week', CURRENT_DATE) + (i || ' days')::interval)::date AS report_date
+    FROM generate_series(0, 6) AS i
+  )
+  SELECT 
+    -- แปลงวันที่ให้เป็นชื่อย่อ เช่น Mon, Tue, Wed
+    TO_CHAR(cwd.report_date, 'Dy') AS day_name, 
+    
+    -- นับจำนวนคนที่สมัครในวันนั้นๆ (ถ้าไม่มีคนสมัคร จะได้ค่า 0 กลับไป)
+    COUNT(u.created_at) AS user_count
+    
+  FROM current_week_days cwd
+  -- ใช้ LEFT JOIN เพื่อรักษาข้อมูลวันที่ (cwd) เอาไว้เสมอ แม้ในตาราง users (u) จะไม่มีข้อมูลในวันนั้นก็ตาม
+  LEFT JOIN public.users u ON DATE(u.created_at) = cwd.report_date
+  
+  GROUP BY cwd.report_date, day_name
+  ORDER BY cwd.report_date ASC;
+END;
+$$ LANGUAGE plpgsql;
+
+// Donut Chart 1️⃣
 CREATE OR REPLACE FUNCTION get_yearly_user_stats()
 RETURNS TABLE (
     year double precision, 
@@ -139,4 +227,28 @@ AS $$
     )
     GROUP BY EXTRACT(YEAR FROM created_at)
     ORDER BY year DESC;
+$$;
+
+// Donut Chart 2️⃣
+CREATE OR REPLACE FUNCTION get_user_roles_proportion()
+RETURNS TABLE (
+  role_name text,
+  total bigint
+) 
+LANGUAGE sql
+AS $$
+  SELECT 
+    -- สร้างเงื่อนไขเช็คสถานะของผู้ใช้
+    CASE 
+      WHEN role::text = 'admin' THEN 'Admin'
+      WHEN stripe_connect_id IS NOT NULL AND stripe_connect_id <> '' THEN 'Seller'
+      ELSE 'User'
+    END AS role_name,
+    
+    -- นับจำนวนผู้ใช้ในแต่ละกลุ่ม
+    COUNT(user_id) AS total
+    
+  FROM public.users
+  GROUP BY 1 -- หมายถึงให้จัดกลุ่มตามคอลัมน์ที่ 1 (role_name)
+  ORDER BY total DESC; -- เรียงลำดับจากกลุ่มที่มีคนเยอะสุดไปน้อยสุด
 $$;
