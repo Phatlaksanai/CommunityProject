@@ -123,9 +123,6 @@ const Buyitem = () => {
                              <div className="row">
                                 <span>Total Amount</span> <span>฿{totalAmount.toFixed(2)}</span>
                             </div>
-                            <div className="buttons">
-                                <button onClick={() => navigate(`/download/${id}`)} style={{ cursor: "pointer" }}>Buy</button>
-                            </div>
                         </div>
                     </div>
                 </div>
