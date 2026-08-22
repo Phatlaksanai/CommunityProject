@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PersonIcon from '@mui/icons-material/Person';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SystemUpdateAltOutlinedIcon from '@mui/icons-material/SystemUpdateAltOutlined';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const UserStats = () => {
@@ -129,7 +130,17 @@ const UserStats = () => {
     };
 
     const handleUpdate = () => {
-        updateMutation.mutate(formData);
+
+        //  แปลงค่าสตริงว่าง "" ให้กลายเป็น null ก่อนส่งไปที่ Backend
+        const formattedRole = (!formData.role || formData.role === "NULL") ? null : formData.role;
+
+        const payload = {
+            ...formData,
+            role: formattedRole
+        };
+
+
+        updateMutation.mutate(payload);
     };
 
     const handleAddAdminChange = (e) => {
@@ -328,11 +339,23 @@ const UserStats = () => {
                             </div>
                             <div className="input-group">
                                 <label>Role</label>
-                                <input type="text" name="role" value={formData.role} onChange={handleChange} placeholder="null" />
+                                <div className="select-wrapper">
+                                    <select name="role" value={formData.role} onChange={handleChange}>
+                                        <option value="NULL">NULL</option>
+                                        <option value="admin">admin</option>
+                                    </select>
+                                    <ArrowDropDownIcon className="dropdown-icon" />
+                                </div>
                             </div>
                             <div className="input-group">
                                 <label>Is Delete</label>
-                                <input type="text" name="isdelete" value={formData.isdelete} onChange={handleChange} />
+                                <div className="select-wrapper">
+                                    <select name="isdelete" value={formData.isdelete || ""} onChange={handleChange}>
+                                        <option value="active">active</option>
+                                        <option value="deleted">deleted</option>
+                                    </select>
+                                    <ArrowDropDownIcon className="dropdown-icon" />
+                                </div>
                             </div>
                             <div className="input-group full-width">
                                 <label>Description</label>
@@ -362,7 +385,7 @@ const UserStats = () => {
 
             {isAddAdminOpen && (
                 <div className="modal-overlay">
-                    <div className="modal-content">
+                    <div className="modal-content add-admin-modal">
                         <h2>Add Admin</h2>
                         <div className="form-grid add-admin-form">
                             <div className="input-group">

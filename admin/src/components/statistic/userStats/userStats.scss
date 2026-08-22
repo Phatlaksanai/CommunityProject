@@ -274,8 +274,12 @@
                 border-radius: 12px;
                 padding: 30px;
                 width: 100%;
-                max-width: 450px;
+                max-width: 650px;
                 box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+
+                &.add-admin-modal {
+                  max-width: 450px;
+                }
 
                 h2 {
                     margin: 0 0 25px 0;
@@ -327,6 +331,32 @@
                             resize: vertical; // ให้ผู้ใช้ลากขยายกล่องข้อความในแนวตั้งได้
                             min-height: 80px;
                         }
+
+                        .select-wrapper {
+                          position: relative;
+                          display: flex;
+                          align-items: center;
+
+                        select {
+                          width: 100%;
+                          background-color: #0D131A;
+                          border: 1px solid #B87333;
+                          border-radius: 6px;
+                          padding: 10px 12px;
+                          color: #fff;
+                          font-size: 14px;
+                          outline: none;
+                          appearance: none;
+                          cursor: pointer;
+                        }
+
+                        .dropdown-icon {
+                          position: absolute;
+                          right: 10px;
+                          color: #E48500;
+                          pointer-events: none; // ให้เมาส์คลิกผ่านไอคอนไปโดน select ได้
+                        }
+                      } 
                     }
                 }
 
