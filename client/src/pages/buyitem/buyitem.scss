@@ -74,22 +74,6 @@
             margin: 0px;
           }
 
-          .buttons {
-            display: flex;
-            align-items: center;
-
-            button {
-              border: none;
-              flex: 1;
-              padding: 20px 0;
-              color: white;
-              font-size: 15px;
-              cursor: pointer;
-              background-color: themed("buttonBg");
-              border-radius: 10px;
-            }
-          }
-
           .row {
             display: flex;
             justify-content: space-between; // แยกซ้าย-ขวา
