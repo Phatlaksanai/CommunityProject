@@ -161,7 +161,7 @@ const Navbar = () => {
           </span>
           {!currentUser && <button onClick={handleLogin}>Login</button>}
           {currentUser &&
-            <div>
+            <div className="more-container">
               <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} style={{ cursor: "pointer" }} />
               {menuOpen && (
                 <div className="moreMenu">
@@ -169,16 +169,16 @@ const Navbar = () => {
                   <button onClick={handleLogout}>Logout</button>
                 </div>
               )}
-              
+
             </div>
           }
         </div>
+        <ReportModal
+          isOpen={openReport}
+          onClose={() => setOpenReport(false)}
+          navbar={true}
+        />
       </div>
-      <ReportModal
-        isOpen={openReport}
-        onClose={() => setOpenReport(false)}
-        navbar={true}
-      />
     </div>
   );
 };

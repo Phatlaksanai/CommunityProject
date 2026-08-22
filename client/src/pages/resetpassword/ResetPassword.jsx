@@ -99,10 +99,9 @@ const ResetPassword = () => {
         <div className="left">
           <h1>PM.</h1>
           <p>
-            There is a lot of fun. Community game development platform. Join us
-            now!
+            Join our community of creators! Whether you're developing games or crafting 3D models, this is the perfect place to unleash your creativity.
           </p>
-          <span>Don't you have an account?</span>
+          <span>Join us now!</span>
           <Link to="/login">
             <button>Login</button>
           </Link>

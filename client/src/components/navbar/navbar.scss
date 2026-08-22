@@ -39,6 +39,8 @@
       .search-container-algolia {
         position: relative;
         width: 500px;
+        max-width: 500px;
+        flex: 1;
 
         @include tablet {
           width: 200px;
@@ -305,6 +307,16 @@
             }
           }
         }
+
+        .custom-tooltip::after {
+          left: auto;
+          /* ยกเลิกค่า left เดิม */
+          transform: none;
+          /* ยกเลิกการดึงกึ่งกลาง */
+          right: 0;
+          /* บังคับชิดขวาเพื่อไม่ให้ล้นจอ */
+        }
+
       }
     }
   }
