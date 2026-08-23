@@ -495,7 +495,7 @@ exports.getDownloadFile = async (req, res) => {
   }
 };
 
-exports.stripeWebhook = async (req, res) => {
+exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โดยอัตโนมัติจากฝั่ง Stripe"
   const sig = req.headers["stripe-signature"];
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -530,6 +530,32 @@ exports.stripeWebhook = async (req, res) => {
         .eq("order_id", order.order_id);
 
       if (updateOrderError) throw updateOrderError;
+
+      // เช็คสถานะ completed แล้วเพิ่มข้อมูลลง transactions
+      // 3. ดึงรายการสินค้าในออร์เดอร์นี้
+      const { data: items, error: itemsErr } = await db
+        .from("order_items")
+        .select("order_item_id, seller_net")
+        .eq("order_id", order.order_id);
+
+      if (!itemsErr && items && items.length > 0) {
+        const transactions = items.map((item) => ({
+          user_id: order.user_id,
+          order_item_id: item.order_item_id,
+          amount: item.seller_net,
+          created_at: new Date(),
+          transaction_type: "sale",
+        }));
+
+        const { error: insertErr } = await db
+          .from("transactions")
+          .insert(transactions);
+
+        if (insertErr) {
+          console.error("Failed to insert transactions:", insertErr);
+          throw insertErr;
+        }
+      }
 
       // 3.1 ดึง item_id เฉพาะชิ้นที่เพิ่งจ่ายเงินสำเร็จจากตาราง order_items
       const { data: orderItems, error: itemsError } = await db
