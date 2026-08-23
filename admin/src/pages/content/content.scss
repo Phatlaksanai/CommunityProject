@@ -1,6 +1,6 @@
 @use "../../style.scss" as *;
 
-.userPage{
+.contentPage{
     display: flex;
 
   @include themify($themes) {
@@ -14,5 +14,12 @@
     @include tablet{
       padding: 20px;
     }
+  }
+  .left{
+    flex: 2.5;
+  }
+  .right{
+    flex: 1;
+    min-width: 0;
   }
  }

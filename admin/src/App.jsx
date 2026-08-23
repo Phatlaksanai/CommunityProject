@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 import User from "./pages/user/User";
+import Content from "./pages/content/Content";
 
 import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/Left/leftbar/leftbar";
@@ -83,6 +84,18 @@ function App() {
         {
           path: "/users",
           element: <User />
+        },
+      ]
+    },
+    {
+      path: "/content&assets",
+      element: (
+        <Layout />
+      ),
+      children: [
+        {
+          path: "/content&assets",
+          element: <Content />
         },
       ]
     },

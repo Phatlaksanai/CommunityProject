@@ -1,4 +1,4 @@
-import "./userStats.scss"
+import "./contentStats.scss"
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
 import { useNavigate } from "react-router-dom";
@@ -8,10 +8,9 @@ import PersonIcon from '@mui/icons-material/Person';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SystemUpdateAltOutlinedIcon from '@mui/icons-material/SystemUpdateAltOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import DonutChart from "../../Right/donutChart/donutChart"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-const UserStats = () => {
+const ContentStats = () => {
     const navigate = useNavigate();
     const { currentUser, setUser } = useContext(AuthContext);
     const [searchTerm, setSearchTerm] = useState("");
@@ -46,37 +45,6 @@ const UserStats = () => {
     const { isLoading: usertableLoading, isError: usertableError, data: usertable } = useQuery({
         queryKey: ["getUsersTable"],
         queryFn: () => makeRequest.get("/admin/users/usersTable").then(res => res.data)
-    });
-
-    const { isLoading: userRegistrationsLoading, isError: userRegistrationsError, data: userRegistrations } = useQuery({
-        queryKey: ["userRegistrations"],
-        queryFn: () => makeRequest.get("/admin/users/userRegistrations").then(res => res.data)
-    });
-
-    const { isLoading: roleLoading, isError: roleError, data: roleData } = useQuery({
-        queryKey: ["userRolesProportion"],
-        queryFn: () => makeRequest.get("/admin/users/RoleUsers").then(res => res.data)
-    });
-
-    // คำนวณหาปีเพื่อใช้ทำหัวข้อกราฟ
-    const currentYear = new Date().getFullYear();
-    const previousYear = currentYear - 1;
-
-    const formattedUserRegistrations = userRegistrations?.map((entry) => {
-        let cellColor = "#D9D9D9";
-        if (entry.name.includes(currentYear.toString())) cellColor = "#FF928A";
-        else if (entry.name.includes(previousYear.toString())) cellColor = "#8979FF";
-
-        return { ...entry, fill: cellColor }; // แนบสีเข้าไปใน object ข้อมูล
-    });
-
-    const formattedRoleData = roleData?.map((entry) => {
-        let cellColor = "#D9D9D9";
-        if (entry.name.includes("User")) cellColor = "#FF928A";
-        else if (entry.name.includes("Seller")) cellColor = "#D9D9D9";
-        else if (entry.name.includes("Admin")) cellColor = "#74BD6E";
-
-        return { ...entry, fill: cellColor };
     });
 
     const updateMutation = useMutation({
@@ -200,11 +168,11 @@ const UserStats = () => {
         addAdminMutation.mutate(newAdminData);
     };
 
-    if (summaryLoading || chartLoading || usertableLoading || userRegistrationsLoading || roleLoading) return <div className="loading">Loading dashboard...</div>;
-    if (isSummaryError || isChartError || usertableError || userRegistrationsError || roleError) return <div className="error">Error loading dashboard data.</div>;
+    if (summaryLoading || chartLoading || usertableLoading) return <div className="loading">Loading dashboard...</div>;
+    if (isSummaryError || isChartError || usertableError) return <div className="error">Error loading dashboard data.</div>;
 
     return (
-        <div className="userstats">
+        <div className="contentStats">
             <div className="container">
                 <div className="header-title">
                     <h1>Users</h1>
@@ -299,28 +267,6 @@ const UserStats = () => {
                             </ResponsiveContainer>
                         </div>
                     </div>
-                </div>
-
-                <div className="donut-charts-section" style={{ display: 'flex', gap: '20px', marginTop: '40px' }}>
-
-                    {/* กราฟที่ 1: User Registrations */}
-                    <div style={{ flex: 1 }}>
-                        <DonutChart
-                            data={formattedUserRegistrations}
-                            title={`User Registrations: ${previousYear} vs ${currentYear}`}
-                            tooltipLabel="Registered"
-                        />
-                    </div>
-
-                    {/* กราฟที่ 2: User Roles */}
-                    <div style={{ flex: 1 }}>
-                        <DonutChart
-                            data={formattedRoleData}
-                            title="User Roles Proportion"
-                            tooltipLabel="Total"
-                        />
-                    </div>
-
                 </div>
 
                 <div className="user-table-section" style={{ marginTop: '40px' }}>
@@ -488,4 +434,4 @@ const UserStats = () => {
     )
 }
 
-export default UserStats
+export default ContentStats
