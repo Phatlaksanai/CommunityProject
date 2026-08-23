@@ -51,6 +51,7 @@ app.use("/api/upload", require("./routes/uploadRoutes"));
 app.use("/api/friends", require("./routes/friendRoutes"));
 app.use("/api/chats", require("./routes/chatRoutes"));
 app.use("/api/payments", require("./routes/paymentRoutes"));
+app.use("/api/transections", require("./routes/transectionRoutes"));
 app.use("/api/reports", require("./routes/reportRoutes"));
 
 app.use("/api/admin", require("./AdminRoutes/authRoutes"));

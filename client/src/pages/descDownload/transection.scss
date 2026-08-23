@@ -1,0 +1,59 @@
+@use "../../style.scss" as *;
+
+.transection {
+    @include themify($themes) {
+        padding: 50px 15%;
+        background-color: themed("bg");
+        min-height: 100vh;
+        color: themed("textColor");
+
+        @include mobile {
+            padding: 10px;
+        }
+
+        @include tablet {
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .Header,
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            justify-items: center;
+            align-items: center;
+            gap: 20px;
+            padding: 18px 10px;
+        }
+
+        .Header {
+            h2 {
+                margin: 0;
+                color: themed("textColorSoft");
+                font-size: 18px;
+            }
+        }
+
+        hr {
+            border: 0;
+            border-bottom: 1px solid #666;
+            margin: 0;
+        }
+
+        .row {
+            border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+
+            h3 {
+                margin: 0;
+                font-size: 15px;
+                font-weight: bold;
+                color: themed("textColorSoft");
+            }
+        }
+    }
+}

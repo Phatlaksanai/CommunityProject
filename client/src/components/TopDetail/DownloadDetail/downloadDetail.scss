@@ -11,9 +11,11 @@
     &::-webkit-scrollbar {
       display: none;
     }
+
     .container {
       padding: 0;
     }
+
     .Header {
       padding: 40px 60px;
       display: flex;
@@ -32,6 +34,36 @@
         font-size: 14px;
         font-weight: 600;
         color: themed("textColorSoft");
+      }
+
+      .btntabs {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+
+        span {
+          cursor: pointer;
+          font-size: 14px;
+          padding-bottom: 8px;
+        }
+
+        .active {
+          font-weight: bold;
+          border-bottom: 2px solid themed("textColor");
+        }
+
+        button {
+          padding: 10px 18px;
+          border-radius: 6px;
+          background-color: #555;
+          color: white;
+          border: none;
+        }
+      }
+
+      .btntabs a {
+        text-decoration: none; // ❌ เอาเส้นใต้ออก
+        color: inherit; // ❌ เอาสีม่วงออก (ใช้สีปกติแทน)
       }
     }
   }

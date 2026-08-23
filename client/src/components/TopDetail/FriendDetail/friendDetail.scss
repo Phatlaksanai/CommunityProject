@@ -97,36 +97,36 @@
         }
 
         .btntabs {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 150px;
-        padding: 15px 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 150px;
+          padding: 15px 20px;
 
-        span {
-          cursor: pointer;
-          font-size: 14px;
-          padding-bottom: 8px;
+          span {
+            cursor: pointer;
+            font-size: 14px;
+            padding-bottom: 8px;
+          }
+
+          .active {
+            font-weight: bold;
+            border-bottom: 2px solid themed("textColor");
+          }
+
+          button {
+            padding: 10px 18px;
+            border-radius: 6px;
+            background-color: #555;
+            color: white;
+            border: none;
+          }
         }
 
-        .active {
-          font-weight: bold;
-          border-bottom: 2px solid themed("textColor");
+        .btntabs a {
+          text-decoration: none; // ❌ เอาเส้นใต้ออก
+          color: inherit; // ❌ เอาสีม่วงออก (ใช้สีปกติแทน)
         }
-
-        button {
-          padding: 10px 18px;
-          border-radius: 6px;
-          background-color: #555;
-          color: white;
-          border: none;
-        }
-      }
-
-      .btntabs a {
-        text-decoration: none; // ❌ เอาเส้นใต้ออก
-        color: inherit; // ❌ เอาสีม่วงออก (ใช้สีปกติแทน)
-      }
       }
 
       /* ===== TABS ===== */
