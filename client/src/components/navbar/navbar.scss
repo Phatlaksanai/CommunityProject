@@ -317,6 +317,16 @@
           /* บังคับชิดขวาเพื่อไม่ให้ล้นจอ */
         }
 
+        .NameAndBalance {
+          display: flex;
+          flex-direction: column;
+
+          p {
+            margin: 0;
+            font-weight: 500;
+          }
+        }
+
       }
     }
   }

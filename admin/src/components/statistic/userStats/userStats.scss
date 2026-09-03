@@ -1,123 +1,125 @@
 @use "../../../style.scss" as *;
 
-.userstats{
+.userstats {
   @include themify($themes) {
-        background-color: #060A0E;
-        color: themed("textColor");
-        min-height: 100vh;
-        padding: 20px 10px 20px 25px;
+    background-color: #060A0E;
+    color: themed("textColor");
+    min-height: 100vh;
+    padding: 20px 10px 20px 25px;
+    display: flex;
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
+    .L {
+      flex: 2;
+      max-width: 1400px;
+      margin: 0 auto;
 
-            // ส่วนหัว Welcome back
-            .header-title {
-                margin-bottom: 30px;
-                
-                h1 {
-                    margin: 0;
-                    font-size: 28px;
-                    font-weight: 600;
-                }
-                
-                p {
-                    margin-top: 8px;
-                    color: #A0AEC0;
-                    font-size: 15px;
-                }
+      // ส่วนหัว Welcome back
+      .header-title {
+        margin-bottom: 30px;
+
+        h1 {
+          margin: 0;
+          font-size: 28px;
+          font-weight: 600;
+        }
+
+        p {
+          margin-top: 8px;
+          color: #A0AEC0;
+          font-size: 15px;
+        }
+      }
+
+      .top-overview-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr; // แบ่งหน้าจอเป็น 50:50
+        gap: 20px;
+        margin-bottom: 40px;
+
+        // Responsive: ถ้าจอเล็กให้กราฟตกลงมาอยู่ด้านล่าง
+        @media (max-width: 1024px) {
+          grid-template-columns: 1fr;
+        }
+
+        // ฝั่งซ้าย: จัดเรียงกล่องสรุป 4 ใบ แบบ 2x2
+        .dashboard-cards {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 20px;
+
+          @media (max-width: 600px) {
+            grid-template-columns: 1fr;
+          }
+
+          .summary-card {
+            background-color: #090F16;
+            border: 2px solid #161B20;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            .card-header {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+
+              .icon {
+                font-size: 24px; // ปรับขนาดไอคอนให้สมส่วนตามรูป
+                width: 24px;
+                height: 24px;
+              }
+
+              h3 {
+                font-size: 17px;
+                font-weight: 600;
+                color: #fff; // สีขาวตามรูปตัวอย่าง
+                margin: 0;
+              }
             }
 
-            .top-overview-section {
-                display: grid;
-                grid-template-columns: 1fr 1fr; // แบ่งหน้าจอเป็น 50:50
-                gap: 20px;
-                margin-bottom: 40px;
+            // ส่วนตัวเลข อยู่กึ่งกลางกล่อง
+            .card-value {
+              display: flex;
+              justify-content: center; // จัดให้อยู่กึ่งกลางแนวนอน
+              align-items: center; // จัดให้อยู่กึ่งกลางแนวตั้ง
+              flex: 1;
 
-                // Responsive: ถ้าจอเล็กให้กราฟตกลงมาอยู่ด้านล่าง
-                @media (max-width: 1024px) {
-                    grid-template-columns: 1fr;
-                }
-
-                // ฝั่งซ้าย: จัดเรียงกล่องสรุป 4 ใบ แบบ 2x2
-                .dashboard-cards {
-                    display: grid;
-                    grid-template-columns: repeat(2, 1fr);
-                    gap: 20px;
-
-                    @media (max-width: 600px) {
-                        grid-template-columns: 1fr;
-                    }
-
-                    .summary-card {
-                        background-color: #090F16; 
-                        border: 2px solid #161B20; 
-                        border-radius: 12px;
-                        padding: 24px;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-
-                        .card-header {
-                          display: flex;
-                          align-items: center; 
-                          gap: 12px; 
-
-                        .icon {
-                          font-size: 24px; // ปรับขนาดไอคอนให้สมส่วนตามรูป
-                          width: 24px;
-                          height: 24px;
-                        }
-
-                        h3 {
-                          font-size: 17px;
-                          font-weight: 600;
-                          color: #fff; // สีขาวตามรูปตัวอย่าง
-                          margin: 0;
-                        }
-                      }
-
-                      // ส่วนตัวเลข อยู่กึ่งกลางกล่อง
-                      .card-value {
-                        display: flex;
-                        justify-content: center; // จัดให้อยู่กึ่งกลางแนวนอน
-                        align-items: center;    // จัดให้อยู่กึ่งกลางแนวตั้ง
-                        flex: 1;
-
-                        h2 {
-                          font-size: 32px;
-                          font-weight: 700;
-                          margin: 0;
-                          color: #fff;
-                        }
-                      }
-                    }
-                }
-
-                // ฝั่งขวา: สไตล์ของกล่องกราฟ
-                .chart-container {
-                    background-color: #090F16;
-                    border: 2px solid #161B20;
-                    border-radius: 12px;
-                    padding: 24px;
-                    display: flex;
-                    flex-direction: column;
-                    
-                    .chart-title {
-                        font-size: 18px;
-                        font-weight: 600;
-                        margin: 0 0 20px 0;
-                        color: #fff;
-                    }
-                    
-                    .recharts-tooltip-wrapper {
-                        outline: none;
-                    }
-                }
+              h2 {
+                font-size: 32px;
+                font-weight: 700;
+                margin: 0;
+                color: #fff;
+              }
             }
+          }
+        }
 
-            .user-table-section {
-        
+        // ฝั่งขวา: สไตล์ของกล่องกราฟ
+        .chart-container {
+          background-color: #090F16;
+          border: 2px solid #161B20;
+          border-radius: 12px;
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+
+          .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+            color: #fff;
+          }
+
+          .recharts-tooltip-wrapper {
+            outline: none;
+          }
+        }
+      }
+
+      .user-table-section {
+
         // 2.1 กล่องค้นหา
         .search-section {
           margin-bottom: 30px;
@@ -202,7 +204,7 @@
             thead {
               tr {
                 border-bottom: 1px solid #161B20;
-                
+
                 th {
                   padding: 16px 10px;
                   color: #FFFFFF;
@@ -221,7 +223,7 @@
                 &:hover {
                   background-color: #111820; // ไฮไลท์เมื่อชี้เมาส์
                 }
-                
+
                 &:last-child {
                   border-bottom: none;
                 }
@@ -241,164 +243,174 @@
             }
           }
         }
-            }
-        }
+      }
     }
 
-    // เพิ่มลูกเล่นให้รู้ว่าแถวตารางคลิกได้
-        .clickable-row {
-          cursor: pointer;
-          &:hover {
-            background-color: #111820; 
+    .R {
+      flex: 1;
+      flex-direction: column;
+    }
+  }
+
+  // เพิ่มลูกเล่นให้รู้ว่าแถวตารางคลิกได้
+  .clickable-row {
+    cursor: pointer;
+
+    &:hover {
+      background-color: #111820;
+    }
+  }
+
+  // ==========================================
+  // Modal / Pop-up Styles
+  // ==========================================
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+
+    .modal-content {
+      background-color: #090F16;
+      border: 1px solid #161B20;
+      border-radius: 12px;
+      padding: 30px;
+      width: 100%;
+      max-width: 650px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+
+      &.add-admin-modal {
+        max-width: 450px;
+      }
+
+      h2 {
+        margin: 0 0 25px 0;
+        color: #fff;
+        font-size: 20px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+
+        @media (max-width: 600px) {
+          grid-template-columns: 1fr;
+        }
+
+        .input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+
+          &.full-width {
+            grid-column: span 2;
+            /* บังคับให้ขยายกินพื้นที่ 2 คอลัมน์เต็ม */
+
+            @media (max-width: 600px) {
+              grid-column: span 1;
+              /* ถ้าจอเล็กให้เหลือ 1 คอลัมน์ปกติ */
+            }
+          }
+
+          label {
+            color: #A0AEC0;
+            font-size: 13px;
+            font-weight: 600;
+          }
+
+          input,
+          textarea {
+            background-color: #0D131A;
+            // สีขอบตามที่ระบุ
+            border: 1px solid #B87333;
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: box-shadow 0.2s ease;
+            font-family: inherit;
+          }
+
+          textarea {
+            resize: vertical; // ให้ผู้ใช้ลากขยายกล่องข้อความในแนวตั้งได้
+            min-height: 80px;
+          }
+
+          .select-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+
+            select {
+              width: 100%;
+              background-color: #0D131A;
+              border: 1px solid #B87333;
+              border-radius: 6px;
+              padding: 10px 12px;
+              color: #fff;
+              font-size: 14px;
+              outline: none;
+              appearance: none;
+              cursor: pointer;
+            }
+
+            .dropdown-icon {
+              position: absolute;
+              right: 10px;
+              color: #E48500;
+              pointer-events: none; // ให้เมาส์คลิกผ่านไอคอนไปโดน select ได้
+            }
           }
         }
+      }
 
-        // ==========================================
-        // Modal / Pop-up Styles
-        // ==========================================
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+      .form-grid.add-admin-form {
+        grid-template-columns: 1fr;
+      }
 
-            .modal-content {
-                background-color: #090F16;
-                border: 1px solid #161B20;
-                border-radius: 12px;
-                padding: 30px;
-                width: 100%;
-                max-width: 650px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        padding-top: 30px;
+        border-top: 1px solid #161B20;
 
-                &.add-admin-modal {
-                  max-width: 450px;
-                }
+        button {
+          padding: 10px 24px;
+          border-radius: 6px;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          border: none;
+          color: #fff;
+          transition: opacity 0.2s ease;
 
-                h2 {
-                    margin: 0 0 25px 0;
-                    color: #fff;
-                    font-size: 20px;
-                }
+          &:hover:not(:disabled) {
+            opacity: 0.8;
+          }
 
-                .form-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 20px;
+          &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+          }
 
-                    @media (max-width: 600px) {
-                        grid-template-columns: 1fr;
-                    }
+          &.btn-cancel {
+            background-color: #6A7575;
+          }
 
-                    .input-group {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 8px;
-
-                        &.full-width {
-                            grid-column: span 2; /* บังคับให้ขยายกินพื้นที่ 2 คอลัมน์เต็ม */
-                            
-                            @media (max-width: 600px) {
-                                grid-column: span 1; /* ถ้าจอเล็กให้เหลือ 1 คอลัมน์ปกติ */
-                            }
-                        }
-                        
-                        label {
-                            color: #A0AEC0;
-                            font-size: 13px;
-                            font-weight: 600;
-                        }
-
-                        input, textarea {
-                            background-color: #0D131A;
-                            // สีขอบตามที่ระบุ
-                            border: 1px solid #B87333; 
-                            border-radius: 6px;
-                            padding: 10px 12px;
-                            color: #fff;
-                            font-size: 14px;
-                            outline: none;
-                            transition: box-shadow 0.2s ease;
-                            font-family: inherit;
-                        }
-                        textarea {
-                            resize: vertical; // ให้ผู้ใช้ลากขยายกล่องข้อความในแนวตั้งได้
-                            min-height: 80px;
-                        }
-
-                        .select-wrapper {
-                          position: relative;
-                          display: flex;
-                          align-items: center;
-
-                        select {
-                          width: 100%;
-                          background-color: #0D131A;
-                          border: 1px solid #B87333;
-                          border-radius: 6px;
-                          padding: 10px 12px;
-                          color: #fff;
-                          font-size: 14px;
-                          outline: none;
-                          appearance: none;
-                          cursor: pointer;
-                        }
-
-                        .dropdown-icon {
-                          position: absolute;
-                          right: 10px;
-                          color: #E48500;
-                          pointer-events: none; // ให้เมาส์คลิกผ่านไอคอนไปโดน select ได้
-                        }
-                      } 
-                    }
-                }
-
-                .form-grid.add-admin-form {
-                    grid-template-columns: 1fr;
-                }
-                
-                .modal-actions {
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: 15px;
-                    padding-top: 30px;
-                    border-top: 1px solid #161B20;
-
-                    button {
-                        padding: 10px 24px;
-                        border-radius: 6px;
-                        font-weight: 600;
-                        font-size: 14px;
-                        cursor: pointer;
-                        border: none;
-                        color: #fff;
-                        transition: opacity 0.2s ease;
-
-                        &:hover:not(:disabled) {
-                            opacity: 0.8;
-                        }
-
-                        &:disabled {
-                            cursor: not-allowed;
-                            opacity: 0.5;
-                        }
-
-                        &.btn-cancel {
-                            background-color: #6A7575; 
-                        }
-
-                        &.btn-update {
-                            background-color: #B87333; 
-                        }
-                    }
-                }
-            }
+          &.btn-update {
+            background-color: #B87333;
+          }
         }
- }
+      }
+    }
+  }
+}

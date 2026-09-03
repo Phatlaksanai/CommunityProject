@@ -157,7 +157,10 @@ const Navbar = () => {
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
           <span className="custom-tooltip" data-tip={displayName}>
-            {truncatedName}
+            <div className="NameAndBalance">
+              <span>{truncatedName}</span>
+              <p> 00.00 $</p>
+            </div>
           </span>
           {!currentUser && <button onClick={handleLogin}>Login</button>}
           {currentUser &&

@@ -4,6 +4,7 @@ import { useContext, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import DeleteIcon from '@mui/icons-material/Delete';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -91,11 +92,15 @@ const CommuDetail = () => {
                 <div className="moreMenu">
                   <button onClick={() => navigate(`/editcommu/${community?.communities_id}`)} style={{ cursor: "pointer" }}>
                     <SettingsIcon style={{ width: "15px", height: "15px" }} />
-                    Settings
+                    Edit Community
                   </button>
                   <button onClick={() => navigate(`/banmember/${community?.communities_id}`)} style={{  backgroundColor: "#C0903B", cursor: "pointer" }}>
                     <BlockIcon style={{ width: "15px", height: "15px" }} />
-                    Ban Member
+                    Manage Users & Posts
+                  </button>
+                  <button style={{  backgroundColor: "#c03b3b", cursor: "pointer" }}>
+                    <DeleteIcon style={{ width: "15px", height: "15px" }} />
+                    Delete Community
                   </button>
                 </div>
               ) : (

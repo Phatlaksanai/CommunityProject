@@ -205,7 +205,7 @@ const UserStats = () => {
 
     return (
         <div className="userstats">
-            <div className="container">
+            <div className="L">
                 <div className="header-title">
                     <h1>Users</h1>
                 </div>
@@ -301,27 +301,7 @@ const UserStats = () => {
                     </div>
                 </div>
 
-                <div className="donut-charts-section" style={{ display: 'flex', gap: '20px', marginTop: '40px' }}>
-
-                    {/* กราฟที่ 1: User Registrations */}
-                    <div style={{ flex: 1 }}>
-                        <DonutChart
-                            data={formattedUserRegistrations}
-                            title={`User Registrations: ${previousYear} vs ${currentYear}`}
-                            tooltipLabel="Registered"
-                        />
-                    </div>
-
-                    {/* กราฟที่ 2: User Roles */}
-                    <div style={{ flex: 1 }}>
-                        <DonutChart
-                            data={formattedRoleData}
-                            title="User Roles Proportion"
-                            tooltipLabel="Total"
-                        />
-                    </div>
-
-                </div>
+                
 
                 <div className="user-table-section" style={{ marginTop: '40px' }}>
 
@@ -385,6 +365,30 @@ const UserStats = () => {
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <div className="R">
+                <div className="donut-charts-section">
+
+                    {/* กราฟที่ 1: User Registrations */}
+                    <div >
+                        <DonutChart
+                            data={formattedUserRegistrations}
+                            title={`User Registrations: ${previousYear} vs ${currentYear}`}
+                            tooltipLabel="Registered"
+                        />
+                    </div>
+
+                    {/* กราฟที่ 2: User Roles */}
+                    <div >
+                        <DonutChart
+                            data={formattedRoleData}
+                            title="User Roles Proportion"
+                            tooltipLabel="Total"
+                        />
+                    </div>
+
                 </div>
             </div>
 
