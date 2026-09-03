@@ -535,9 +535,9 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
       // 3. ดึงรายการสินค้าในออร์เดอร์นี้
       const { data: items, error: itemsErr } = await db
         .from("order_items")
-        .select("order_item_id, seller_net")
+        .select("order_item_id, seller_net, seller_id, users(balance)")
         .eq("order_id", order.order_id);
-
+        
       if (!itemsErr && items && items.length > 0) {
         const transactions = items.map((item) => ({
           user_id: order.user_id,
@@ -554,6 +554,21 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
         if (insertErr) {
           console.error("Failed to insert transactions:", insertErr);
           throw insertErr;
+        }
+
+        const sellerId = items[0].seller_id; // id คนขาย
+        const currentBalance = items[0].users?.balance || 0; // เงินคนขายปัจจุบัน
+        const totalEarned = items.reduce((acc, item) => acc + Number(item.seller_net), 0);
+        const newBalance = currentBalance + totalEarned;
+
+        const { error: updateError } = await db
+        .from("users")
+        .update({ balance: newBalance })
+        .eq("user_id", sellerId);
+
+        if (updateError) {
+          console.error("Failed to update user balances:", updateError);
+          throw updateError;
         }
       }
 
