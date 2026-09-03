@@ -62,7 +62,7 @@ const LeftDI = ({ item }) => {
 
         </div>
         <div className="box">
-          <h2>New Releases</h2>
+          <h2>Related Categories</h2>
           {error ? "Something went wrong" : isLoading ? "Loading..." :
             relatedItems?.filter(related => related.item_id !== item.item_id).map((item) => (
               <div className="user" key={item.item_id} onClick={() => navigate(`/descitem/${item.item_id}`)} style={{ cursor: "pointer" }}>
