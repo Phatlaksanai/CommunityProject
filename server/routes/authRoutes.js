@@ -12,5 +12,6 @@ router.put("/update-profile", verifyToken, authController.updateProfile);
 router.post("/reset-password", authController.resetPassword);
 router.post("/verify-otp-resetpassword", authController.verifyOtpResetPassword);
 router.post("/deleteaccount", authController.deleteAccount);
+router.get("/user/:userId", verifyToken, authController.getUserById);
 
 module.exports = router;

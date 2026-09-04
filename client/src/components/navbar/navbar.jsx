@@ -8,7 +8,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import { makeRequest } from "../../api/axios";
 import ReportModal from "../report/ReportModal";
@@ -105,6 +105,40 @@ const Navbar = () => {
       setError("Logout failed");
     }
   };
+
+  useEffect(() => {
+    const fetchLatestBalance = async () => {
+      if (!currentUser?.user_id) return;
+
+      try {
+        // เปลี่ยน endpoint ด้านล่างนี้ ให้ตรงกับ API ดูข้อมูล User ของคุณ
+        const res = await makeRequest.get(`/user/${currentUser.user_id}`);
+
+        // หากยอดเงินจาก Database ไม่ตรงกับยอดเงินใน State ปัจจุบัน ให้อัปเดต State
+        if (res.data && res.data.balance !== currentUser.balance) {
+
+          // ใช้ setUser เพื่ออัปเดต Context (และ AuthContext จะเซฟลง localStorage ให้อัตโนมัติ)
+          setUser((prev) => ({
+            ...prev,
+            username: res.data.username,
+            name: res.data.name,
+            profilePic: res.data.profilePic,
+            balance: res.data.balance
+          }));
+
+        }
+      } catch (err) {
+        console.error("Failed to fetch latest balance:", err);
+      }
+    };
+    fetchLatestBalance(); // ดึงข้อมูลทันทีเมื่อ Navbar โหลดขึ้นมา
+
+    // [ตัวเลือกเสริม] หากอยากให้ตัวเลขอัปเดตเองตอน Webhook ทำงานเสร็จแบบกึ่ง Real-time 
+    // สามารถตั้ง Polling ให้เช็คยอดเงินใหม่ทุกๆ 10 วินาทีได้:
+    const intervalId = setInterval(fetchLatestBalance, 10000); // 10000 ms = 10 วินาที
+    return () => clearInterval(intervalId); // Cleanup เมื่อเปลี่ยนหน้า
+
+  }, [currentUser?.user_id, setUser]);
 
   const handleLogin = async () => {
     try {

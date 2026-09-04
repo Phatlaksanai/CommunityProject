@@ -634,6 +634,44 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
     }
   }
 
+  else if (event.type === "payout.paid") {
+    const payout = event.data.object;
+    
+    // ยอดเงินที่ Stripe ส่งมาจะเป็นหน่วยสตางค์ (Cents) ต้องหาร 100 เพื่อให้เป็นบาท
+    const withdrawAmount = payout.amount / 100;
+    
+    // ดึง stripe_connect_id ของร้านค้าที่ทำการถอนเงิน
+    const stripeConnectId = event.account; 
+
+    if (stripeConnectId) {
+      try {
+        // 1. ค้นหา User จาก stripe_connect_id
+        const { data: user, error: userError } = await db
+          .from("users")
+          .select("user_id, balance")
+          .eq("stripe_connect_id", stripeConnectId)
+          .single();
+
+        if (userError || !user) {
+          throw new Error("User not found for this Payout");
+        }
+
+        // 2. คำนวณยอดเงินคงเหลือ และอัปเดตลงตาราง users
+        const newBalance = user.balance - withdrawAmount;
+
+        const { error: updateError } = await db
+          .from("users")
+          .update({ balance: newBalance })
+          .eq("user_id", user.user_id);
+
+        if (updateError) throw updateError;
+
+      } catch (dbError) {
+        console.error("Database update failed during payout webhook:", dbError);
+      }
+    }
+  }
+
   res.status(200).send();
 };
 
