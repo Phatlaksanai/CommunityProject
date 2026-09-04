@@ -666,6 +666,21 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
 
         if (updateError) throw updateError;
 
+        // 3. บันทึกประวัติการถอนเงินลงตาราง transactions
+        const { error: insertTxError } = await db
+          .from("transactions")
+          .insert({
+            user_id: user.user_id,
+            amount: withdrawAmount,
+            transaction_type: "withdrawal" // กำหนดประเภทเป็น withdrawal
+          });
+
+        if (insertTxError) {
+          console.error("Failed to insert withdrawal transaction:", insertTxError);
+          throw insertTxError;
+        }
+
+        console.log(`Payout processed and transaction recorded for User ID: ${user.user_id}`);
       } catch (dbError) {
         console.error("Database update failed during payout webhook:", dbError);
       }
