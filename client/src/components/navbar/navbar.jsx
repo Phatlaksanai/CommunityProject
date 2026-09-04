@@ -159,7 +159,7 @@ const Navbar = () => {
           <span className="custom-tooltip" data-tip={displayName}>
             <div className="NameAndBalance">
               <span>{truncatedName}</span>
-              <p> 00.00 $</p>
+              <p>{currentUser?.balance?.toFixed(2) || "0.00"} $</p>
             </div>
           </span>
           {!currentUser && <button onClick={handleLogin}>Login</button>}
