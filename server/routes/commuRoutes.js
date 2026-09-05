@@ -14,5 +14,6 @@ router.delete("/unfollow/:id", verifyToken, commuController.removeFollower);
 router.get("/:id/images", commuController.getLatestCommunityImages);
 router.get("/members/:id", commuController.getMembersByCommunityId);
 router.post("/ban", verifyToken, commuController.banMember);
+router.post("/delete/community/:id", verifyToken, commuController.deleteCommunity);
 
 module.exports = router;

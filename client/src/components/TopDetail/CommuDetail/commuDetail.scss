@@ -211,3 +211,49 @@
     }
   }
 }
+
+.deleteConfirmation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  border-radius: 10px;
+}
+
+.deleteConfirmation .modalContainer {
+  @include themify($themes) {
+    background-color: themed("bg");
+    color: themed("textColorSoft");
+    padding: 25px;
+    border-radius: 15px;
+    width: 450px; // ขยายความกว้างเล็กน้อยเพื่อให้ดูไม่อึดอัด
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
+
+    p {
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: themed("textSoft");
+      text-align: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      border-radius: 6px;
+      margin: 0 10px;
+      border: none;
+      cursor: pointer;
+      color: white;
+    }
+  }
+}

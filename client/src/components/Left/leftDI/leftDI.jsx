@@ -20,7 +20,13 @@ const LeftDI = ({ item }) => {
 
   useEffect(() => {
     makeRequest.get(`/items/reviews/${item.item_id}`).then(res => setItemReviews(res.data));
-  }, []);
+    if (openReport) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [openReport]);
 
   const { isLoading, error, data: relatedItems } = useQuery({
     queryKey: ["relatedItems", "category", item.category_id],

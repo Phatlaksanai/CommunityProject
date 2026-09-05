@@ -140,6 +140,15 @@ const Navbar = () => {
 
   }, [currentUser?.user_id, setUser]);
 
+  useEffect(() => {
+    if (openReport) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [openReport]);
+
   const handleLogin = async () => {
     try {
       navigate("/login");

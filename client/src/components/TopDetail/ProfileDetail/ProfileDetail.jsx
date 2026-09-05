@@ -173,10 +173,13 @@ const ProfileDetail = () => {
     if (openModal) {
       document.body.style.overflow = "hidden";
     }
+    if (openReport) {
+      document.body.style.overflow = "hidden";
+    }
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [openModal]);
+  }, [openModal, openReport]);
 
   const displayName = userData?.name || userData?.username || "Guest";
   const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName;
