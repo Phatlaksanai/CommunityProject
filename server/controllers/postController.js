@@ -16,7 +16,7 @@ exports.getPosts = async (req, res) => {
         .select("community_id")
         .eq("user_id", currentUserId)
         .eq("status", "active");
-      myGroupIds = memberData?.map(item => item.community_id) || [];
+      myGroupIds = memberData?.map((item) => item.community_id) || [];
     }
 
     let finalPosts = [];
@@ -27,7 +27,8 @@ exports.getPosts = async (req, res) => {
     while (finalPosts.length < limit) {
       let query = db
         .from("posts")
-        .select(`
+        .select(
+          `
           *,
           imgs(img),
           models(model),
@@ -43,14 +44,17 @@ exports.getPosts = async (req, res) => {
             project_name,
             users(isdelete)
           )
-        `)
+        `,
+        )
         .eq("status", "show")
         .eq("users.isdelete", "active");
 
       // Logic การกรองเกี่ยวกับกลุ่ม
       if (currentUserId) {
         if (myGroupIds.length > 0) {
-          query = query.or(`community_id.is.null,community_id.in.(${myGroupIds.join(",")})`);
+          query = query.or(
+            `community_id.is.null,community_id.in.(${myGroupIds.join(",")})`,
+          );
         } else {
           query = query.is("community_id", null);
         }
@@ -73,7 +77,11 @@ exports.getPosts = async (req, res) => {
       // กรองข้อมูลที่ดึงมารอบนี้
       const approvedPosts = dbData.filter((post) => {
         if (post.community_id !== null) {
-          if (!post.communities || !post.communities.users || post.communities.users.isdelete === 'deleted') {
+          if (
+            !post.communities ||
+            !post.communities.users ||
+            post.communities.users.isdelete === "deleted"
+          ) {
             return false; // เจ้าของกลุ่มโดนลบ -> คัดออก
           }
         }
@@ -102,7 +110,6 @@ exports.getPosts = async (req, res) => {
     }));
 
     return res.status(200).json(formatted);
-
   } catch (error) {
     console.error("Error in getPosts:", error);
     return res.status(500).json({ error: error.message });
@@ -124,7 +131,8 @@ exports.getPostsByUserId = async (req, res) => {
     while (finalPosts.length < limit) {
       const { data: dbData, error } = await db
         .from("posts")
-        .select(`
+        .select(
+          `
           *,
           imgs(img),
           models(model),
@@ -135,7 +143,8 @@ exports.getPostsByUserId = async (req, res) => {
             cover_img,
             users(isdelete)
           )
-        `)
+        `,
+        )
         .eq("user_id", id)
         .eq("status", "show")
         .eq("users.isdelete", "active")
@@ -152,7 +161,11 @@ exports.getPostsByUserId = async (req, res) => {
       // กรองเอาเฉพาะโพสต์ที่ไม่อยู่ในกลุ่มที่เจ้าของกลุ่มลบบัญชีไปแล้ว
       const approvedPosts = dbData.filter((post) => {
         if (post.community_id !== null) {
-          if (!post.communities || !post.communities.users || post.communities.users.isdelete === 'deleted') {
+          if (
+            !post.communities ||
+            !post.communities.users ||
+            post.communities.users.isdelete === "deleted"
+          ) {
             return false; // เจ้าของกลุ่มโดนลบ -> คัดออก
           }
         }
@@ -180,7 +193,6 @@ exports.getPostsByUserId = async (req, res) => {
     }));
 
     return res.status(200).json(formatted);
-
   } catch (error) {
     console.error("Error in getPostsByUserId:", error);
     return res.status(500).json({ error: error.message });
@@ -198,7 +210,8 @@ exports.getPostsByProjectId = async (req, res) => {
 
   const { data, error } = await db
     .from("posts")
-    .select(`
+    .select(
+      `
       *,
       imgs(img),
       models(model),
@@ -207,9 +220,10 @@ exports.getPostsByProjectId = async (req, res) => {
         name,
         profilePic
       )
-    `)
+    `,
+    )
     .eq("project_id", id) // ตรวจสอบชื่อ Column ใน DB ให้แม่นยำ (บางที่ใช้ community_id)
-    .eq("status", "show")     // ควรเช็ค status ด้วยเพื่อให้เหมือนหน้า Feed หลัก
+    .eq("status", "show") // ควรเช็ค status ด้วยเพื่อให้เหมือนหน้า Feed หลัก
     .order("created_at", { ascending: false })
     .range(from, to); // 2. เพิ่ม .range() เพื่อดึงข้อมูลตามหน้า
 
@@ -240,12 +254,14 @@ exports.getPostsByCommunityId = async (req, res) => {
     while (finalPosts.length < limit) {
       const { data: dbData, error } = await db
         .from("posts")
-        .select(`
+        .select(
+          `
           *,
           imgs(img),
           models(model),
           users!inner(user_id, username, name, profilePic, isdelete)
-        `)
+        `,
+        )
         .eq("community_id", id) // ดึงเฉพาะโพสต์ของกลุ่มนี้เท่านั้น ไม่เอาของกลุ่มอื่นมาปน
         .eq("status", "show")
         .eq("users.isdelete", "active") // กรองเอาเฉพาะโพสต์ที่คนโพสต์ยังไม่ลบบัญชี
@@ -278,7 +294,6 @@ exports.getPostsByCommunityId = async (req, res) => {
     }));
 
     return res.status(200).json(formatted);
-
   } catch (error) {
     console.error("Error in getPostsByCommunityId:", error);
     return res.status(500).json({ error: error.message });
@@ -431,7 +446,8 @@ exports.getCommentsByPostId = async (req, res) => {
   try {
     const { data, error } = await db
       .from("comments")
-      .select(`
+      .select(
+        `
         comment_id,
         description,
         img,
@@ -442,7 +458,8 @@ exports.getCommentsByPostId = async (req, res) => {
           name,
           profilePic
         )
-      `)
+      `,
+      )
       .eq("post_id", id)
       .order("created_at", { ascending: false }) // เอาคอมเมนต์ใหม่ขึ้นก่อน
       .range(from, to); // 2. ดึงข้อมูลตามช่วง
@@ -489,12 +506,12 @@ exports.addLike = async (req, res) => {
     return res.status(400).json("post_id is required");
   }
 
-  const { error } = await db
-    .from("likes")
-    .insert([{
+  const { error } = await db.from("likes").insert([
+    {
       user_id: userId,
-      post_id: postId
-    }]);
+      post_id: postId,
+    },
+  ]);
 
   if (error) {
     console.error("Like Error:", error);
@@ -524,7 +541,7 @@ exports.getCommentsCount = async (req, res) => {
 
   const { count, error } = await db
     .from("comments")
-    .select("*", { count: 'exact', head: true }) // head: true คือเอาเฉพาะ count ไม่เอาเนื้อหา
+    .select("*", { count: "exact", head: true }) // head: true คือเอาเฉพาะ count ไม่เอาเนื้อหา
     .eq("post_id", post_id);
 
   if (error) return res.status(500).json(error);
@@ -537,7 +554,7 @@ exports.deletePost = async (req, res) => {
 
   const { error } = await db
     .from("posts")
-    .update([{ status: "hide" },]) // เปลี่ยนสถานะเป็น "hide"
+    .update([{ status: "hide" }]) // เปลี่ยนสถานะเป็น "hide"
     .eq("user_id", userId)
     .eq("post_id", req.params.post_id);
 
@@ -551,22 +568,94 @@ exports.getLatestUserImages = async (req, res) => {
   try {
     const { data, error } = await db
       .from("imgs")
-      .select(`
+      .select(
+        `
         img,
         posts!inner(user_id, created_at, status)
-      `)
+      `,
+      )
       .eq("posts.user_id", id)
       .eq("posts.status", "show")
-      .order("posts(created_at)", { ascending: false })
+      .order("posts(created_at)", { ascending: false });
 
     if (error) throw error;
 
     // แปลงข้อมูลให้เหลือแค่ array ของ URL รูปภาพเพื่อให้ใช้ง่ายขึ้น
-    const images = data.map(item => item.img);
+    const images = data.map((item) => item.img);
 
     return res.status(200).json(images);
   } catch (err) {
     console.error(err);
     return res.status(500).json(err);
+  }
+};
+
+exports.getPostsForManageCommunity = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { data, error } = await db
+      .from("posts")
+      .select("*, users(name, username)") // Join เอาชื่อคนโพสต์มาแสดงด้วย
+      .eq("community_id", id) // ดึงเฉพาะโพสต์ที่อยู่ในคอมมูนิตี้นี้
+      .in("status", ["show", "hide"])
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    return res.status(200).json(data);
+  } catch (error) {
+    console.error("Error in getPostsForManageCommunity:", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.deletePostsCommunity = async (req, res) => {
+  const { communityId, postIds = [] } = req.body; // postid ที่ถูกติ๊ก
+
+  try {
+    if (!communityId) {
+      return res.status(400).json({ error: "Community ID not found" });
+    }
+
+    // 1. ดึงโพสต์ในคอมมูนิตี้นี้ที่สถานะเป็น 'hide' อยู่ในปัจจุบัน
+    const { data: currentHidden, error: fetchError } = await db // หาโพสต์ที่ซ่อนอยู่ในปัจจุบัน
+      .from("posts")
+      .select("post_id")
+      .eq("community_id", communityId)
+      .eq("status", "hide");
+
+    if (fetchError) throw fetchError;
+
+    // ทำให้โพสต์ที่ซ่อนอยู่ ในรูปแบบ Array ของ ID
+    const currentHiddenIds = currentHidden.map((post) => post.post_id);
+
+    // 2. คัดแยกโพสต์ที่ต้อง "โชว์กลับ" (เคยถูกซ่อน แต่ไม่มีชื่อใน postIds ล่าสุดที่ส่งมา)
+    const postsToShow = currentHiddenIds.filter((id) => !postIds.includes(id)); // หาโพสต์ที่ถูกติ๊กเทียบกับโพสต์ที่ซ่อนอยู่ในปัจจุบัน
+
+    // 3. ดำเนินการ "โชว์โพสต์กลับมา" (เอาติ๊กออก)
+    if (postsToShow.length > 0) {
+      const { error: showError } = await db
+        .from("posts")
+        .update({ status: "show" })
+        .in("post_id", postsToShow);
+
+      if (showError) throw showError;
+    }
+
+    // 4. ดำเนินการ "ซ่อนโพสต์" (ตามรายชื่อ postIds ล่าสุดที่ถูกติ๊ก)
+    if (postIds.length > 0) {
+      const { error: hideError } = await db
+        .from("posts")
+        .update({ status: "hide" })
+        .in("post_id", postIds);
+
+      if (hideError) throw hideError;
+    }
+
+    return res.status(200).json({ message: "Update posts successfully" });
+  } catch (error) {
+    console.error("Error hiding posts:", error);
+    return res.status(500).json({ error: error.message });
   }
 };

@@ -1,11 +1,14 @@
 @use "../../style.scss" as *;
 
-.banMember {
+.manage {
   @include themify($themes) {
     min-height: calc(100vh - 70px);
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    flex-direction: column;
+    gap: 40px;
+    padding: 40px 20px;
     background-color: themed("bg");
     color: themed("textSoft");
 
@@ -34,13 +37,22 @@
       gap: 6px;
 
       .post-list {
-  margin-top: 10px;
-  max-height: 300px;
-  overflow-y: auto;
-  border: 1px solid #333;
-  border-radius: 6px;
-  padding: 8px;
-}
+        margin-top: 10px;
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #333;
+        border-radius: 6px;
+        padding: 8px;
+
+        &::-webkit-scrollbar {
+          width: 5px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: themed("buttonBg");
+          border-radius: 4px;
+        }
+      }
 
 .community-item {
   display: flex;

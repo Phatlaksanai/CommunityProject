@@ -13,6 +13,7 @@ router.get("/project-edit/:projectId", verifyToken, postController.getPostsForEd
 router.post("/addcomment", verifyToken, postController.addComment);
 router.get("/comments/:id", postController.getCommentsByPostId);
 router.get("/user/:id/images", verifyToken, postController.getLatestUserImages);
+router.get("/manage/community/:id", verifyToken, postController.getPostsForManageCommunity);
 
 // 1. ดึงข้อมูล Like (GET /api/posts/likes/post/:post_id)
 router.get("/likes/post/:post_id", postController.getLikes);
@@ -26,5 +27,6 @@ router.delete("/likes/post/:post_id", verifyToken, postController.deleteLike);
 router.get("/comments/count/:post_id", postController.getCommentsCount);
 
 router.post("/delete/post/:post_id", verifyToken, postController.deletePost);
+router.post("/delete/posts-community", verifyToken, postController.deletePostsCommunity);
 
 module.exports = router;

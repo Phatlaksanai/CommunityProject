@@ -94,7 +94,7 @@ const CommuDetail = () => {
                     <SettingsIcon style={{ width: "15px", height: "15px" }} />
                     Edit Community
                   </button>
-                  <button onClick={() => navigate(`/banmember/${community?.communities_id}`)} style={{  backgroundColor: "#C0903B", cursor: "pointer" }}>
+                  <button onClick={() => navigate(`/manage/${community?.communities_id}`)} style={{  backgroundColor: "#C0903B", cursor: "pointer" }}>
                     <BlockIcon style={{ width: "15px", height: "15px" }} />
                     Manage Users & Posts
                   </button>

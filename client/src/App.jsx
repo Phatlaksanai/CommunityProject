@@ -25,7 +25,7 @@ import EditProject from "./pages/editproject/editProject";
 import EditProfile from "./pages/editprofile/editProfile";
 import EditItem from "./pages/edititem/editItem";
 import EditCommu from "./pages/editcommu/editCommu";
-import BanMember from "./pages/banMember/banMember";
+import Manage from "./pages/manage/Manage";
 import Setting from "./pages/setting/Setting";
 import ChangePassword from "./pages/changepassword/ChangePassword";
 import DeleteAccount from "./pages/deleteaccount/DeleteAccount";
@@ -394,14 +394,14 @@ function App() {
       ]
     },
     {
-      path: "/banmember/:id",
+      path: "/manage/:id",
       element: (
         <LayoutNavbar />
       ),
       children: [
         {
           index: true,
-          element: <BanMember />
+          element: <Manage />
         },
       ]
     },
