@@ -37,7 +37,7 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
 
   // --- [เพิ่มสเตตัสสำหรับ Lightbox] ---
   const [activeImageIndex, setActiveImageIndex] = useState(null);
-  
+
   // สร้าง Array สำหรับเก็บเฉพาะ URL ของรูปภาพ เพื่อเอาไว้ใช้ไล่ลำดับใน Lightbox
   const imageList = post.imgs?.map((item) => item.img) || [];
 
@@ -51,10 +51,13 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
     } else {
       document.body.style.overflow = "auto";
     }
+    if (openReport) {
+      document.body.style.overflow = "hidden";
+    }
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [activeImageIndex]);
+  }, [activeImageIndex, openReport]);
 
   // ฟังก์ชันเลื่อนรูปซ้าย-ขวาใน Lightbox
   const handlePrevImage = (e) => {
@@ -136,7 +139,7 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
             </button>
           )}
         </div>
-        
+
         <div className="content">
           <p>{post.description}</p>
 
@@ -153,9 +156,9 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
                 {/* ส่วนของรูปภาพ (ผูก Event onClick เพื่อเปิด Lightbox) */}
                 {post.imgs?.map((item, index) => (
                   <SwiperSlide key={`img-${index}`}>
-                    <div 
-                      className="postImage" 
-                      onClick={() => setActiveImageIndex(index)} 
+                    <div
+                      className="postImage"
+                      onClick={() => setActiveImageIndex(index)}
                       style={{ cursor: "pointer" }}
                     >
                       <img src={item.img} alt="" />

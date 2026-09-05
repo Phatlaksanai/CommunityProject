@@ -29,6 +29,7 @@ exports.addCommunity = async (req, res) => {
           cover_public_id: public_id || null,
           user_id: userId,
           totalUsers: 1,
+          status: "show", // กำหนดค่าเริ่มต้นเป็น 'show' หรือ 'active' ตามที่คุณต้องการ
         },
       ])
       .select()
@@ -98,6 +99,7 @@ exports.getCommunitiesByUserId = async (req, res) => {
       *, 
       users!inner(isdelete)
     `) // ใส่ !inner เพื่อบอกว่าถ้าเงื่อนไขตาราง users ไม่ผ่าน ไม่ต้องดึง communities แถวนั้นออกมาเลย
+    .eq("status", "show")
     .eq("user_id", id)
     .eq("users.isdelete", "active") // กรองเฉพาะคอมมูนิตี้ที่เจ้าของยังไม่ถูกลบ
     .order("created_at", { ascending: false });
@@ -124,6 +126,7 @@ exports.getJoinedCommunities = async (req, res) => {
       .eq("user_id", id)
       .eq("status", "active") // ดึงเฉพาะกลุ่มที่สถานะยัง active (ไม่ได้ถูกแบนหรือออก)
       .eq("communities.users.isdelete", "active")
+      .eq("communities.status", "show")
       .order("created_at", { ascending: false });
 
     if (error) return res.status(500).json(error);
@@ -453,4 +456,29 @@ exports.banMember = async (req, res) => {
     console.error("SERVER ERROR:", err);
     return res.status(500).json(err);
   }
+};
+
+exports.deleteCommunity = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.user_id;
+
+  // 1. ซ่อน Community
+  const { error: commuError } = await db
+    .from("communities")
+    .update({ status: "hide" }) // เอา Array ออก
+    .eq("user_id", userId)
+    .eq("communities_id", id);
+
+  if (commuError) return res.status(500).json(commuError);
+
+  // 2. ซ่อน Posts ทั้งหมดใน Community นั้น
+  const { error: postsError } = await db
+    .from("posts")
+    .update({ status: "hide" })
+    // ลบ .eq("user_id", userId) ออก เพื่อให้ซ่อนโพสต์ของทุกคนในคอมมูนี้
+    .eq("community_id", id);
+
+  if (postsError) return res.status(500).json(postsError);
+
+  return res.status(200).json("Community has been deleted.");
 };

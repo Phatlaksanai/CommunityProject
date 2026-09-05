@@ -6,7 +6,7 @@ import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import LeftDC from "../../components/Left/leftDC/leftDC"
 import Posts from "../../components/PageItems/posts/posts"
-import Share from "../../components/Share/Share";
+import Share from "../../components/share/share";
 import ScrollToTop from "../../ScrollToTop";
 
 const DescCommu = () => {

@@ -23,6 +23,7 @@ const CommuDetail = () => {
   const navigate = useNavigate();
   const [openReport, setOpenReport] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const queryClient = useQueryClient();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
@@ -60,6 +61,30 @@ const CommuDetail = () => {
     followMutation.mutate(isFollowing);
   };
 
+  const deleteMutation = useMutation({
+    mutationFn: (commuId) => {
+      return makeRequest.post(`/communities/delete/community/${commuId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["communities"]);
+      // ย้าย navigate มาไว้ตรงนี้ เพื่อให้แน่ใจว่าลบสำเร็จก่อนค่อยเปลี่ยนหน้า
+      navigate("/"); 
+    },
+  });
+
+  const handleDeleteCommunity = () => {
+    deleteMutation.mutate(id);
+  };
+
+useEffect(() => {
+  if (deleteOpen || openReport) {
+    document.body.style.overflow = "hidden";
+  } 
+  return () => {
+    document.body.style.overflow = "auto";
+  };
+}, [deleteOpen || openReport]);
+
   return (
     <div className="commudetail">
       <div className="container">
@@ -94,14 +119,15 @@ const CommuDetail = () => {
                     <SettingsIcon style={{ width: "15px", height: "15px" }} />
                     Edit Community
                   </button>
-                  <button onClick={() => navigate(`/banmember/${community?.communities_id}`)} style={{  backgroundColor: "#C0903B", cursor: "pointer" }}>
+                  <button onClick={() => navigate(`/banmember/${community?.communities_id}`)} style={{ backgroundColor: "#C0903B", cursor: "pointer" }}>
                     <BlockIcon style={{ width: "15px", height: "15px" }} />
                     Manage Users & Posts
                   </button>
-                  <button style={{  backgroundColor: "#c03b3b", cursor: "pointer" }}>
+                  <button onClick={() => setDeleteOpen(!deleteOpen)} style={{ backgroundColor: "#c03b3b", cursor: "pointer" }}>
                     <DeleteIcon style={{ width: "15px", height: "15px" }} />
                     Delete Community
                   </button>
+
                 </div>
               ) : (
                 // ส่วนของคนดูทั่วไป (Visitor)
@@ -111,7 +137,7 @@ const CommuDetail = () => {
                     onClick={handleFollow}
                     style={{ backgroundColor: isFollowing ? "#C0903B" : "#A0C46E", cursor: "pointer" }}
                   >
-                    
+
                     {isFollowing ? <GroupRemoveIcon style={{ width: "15px", height: "15px" }} /> : <GroupAddIcon style={{ width: "15px", height: "15px" }} />}
                     {isFollowing ? "Unfollow" : "Follow"}
                   </button>
@@ -122,6 +148,19 @@ const CommuDetail = () => {
                   </button>
                 </div>
               )
+            )}
+            {deleteOpen && (
+              <div className="deleteConfirmation">
+                <div className="modalContainer">
+                  <p>Are you sure you want to delete this community?</p>
+                  <button onClick={() => setDeleteOpen(false)} style={{ backgroundColor: "#A0C46E", cursor: "pointer" }}>
+                    Cancel
+                  </button>
+                  <button onClick={() => handleDeleteCommunity()} style={{ backgroundColor: "#c03b3b", cursor: "pointer" }}>
+                    Delete
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>
