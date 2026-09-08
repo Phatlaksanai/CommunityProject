@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const userController = require("../Admincontrollers/userController");
+const userController = require("../AdminControllers/userController");
 const { verifyToken } = require("../middleware/verifyToken");
 
 router.get("/userRegistrations", verifyToken, userController.getuserRegistrations);
