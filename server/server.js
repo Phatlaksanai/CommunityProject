@@ -57,6 +57,7 @@ app.use("/api/reports", require("./routes/reportRoutes"));
 app.use("/api/admin", require("./AdminRoutes/authRoutes"));
 app.use("/api/admin/dashboard", require("./AdminRoutes/dashboardRoutes"));
 app.use("/api/admin/users", require("./AdminRoutes/userRoutes"));
+app.use("/api/admin/transactions", require("./AdminRoutes/transactionRoutes"));
 app.use("/api/admin/content", require("./AdminRoutes/contentRoutes"));
 app.use(express.static(path.join(__dirname, 'public')))
 

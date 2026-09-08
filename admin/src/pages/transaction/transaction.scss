@@ -1,0 +1,18 @@
+@use "../../style.scss" as *;
+
+.transactionPage{
+    display: flex;
+
+  @include themify($themes) {
+    background-color: #060A0E;
+    min-height: 100vh;
+
+    @include mobile {
+      padding: 10px;
+    }
+
+    @include tablet{
+      padding: 20px;
+    }
+  }
+ }
