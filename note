@@ -252,3 +252,80 @@ AS $$
   GROUP BY 1 -- หมายถึงให้จัดกลุ่มตามคอลัมน์ที่ 1 (role_name)
   ORDER BY total DESC; -- เรียงลำดับจากกลุ่มที่มีคนเยอะสุดไปน้อยสุด
 $$;
+
+🔎🔎 หน้า posts
+// 4 ช่อง
+CREATE OR REPLACE FUNCTION get_posts_summary()
+RETURNS TABLE (
+  total_posts bigint,
+  posts_today bigint,
+  posts_this_month bigint,
+  posts_this_year bigint
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    (SELECT COUNT(*) FROM public.posts) AS total_posts,
+    (SELECT COUNT(*) FROM public.posts WHERE DATE(created_at) = CURRENT_DATE) AS posts_today,
+    (SELECT COUNT(*) FROM public.posts WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS posts_this_month,
+    (SELECT COUNT(*) FROM public.posts WHERE EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS posts_this_year;
+END;
+$$ LANGUAGE plpgsql;
+
+// Donut Chart 1️⃣
+CREATE OR REPLACE FUNCTION get_yearly_post_stats()
+RETURNS TABLE (
+    year double precision, 
+    total bigint
+) 
+LANGUAGE sql
+AS $$
+    SELECT 
+        EXTRACT(YEAR FROM created_at) AS year, 
+        COUNT(post_id) AS total 
+    FROM posts 
+    WHERE EXTRACT(YEAR FROM created_at) IN (
+        EXTRACT(YEAR FROM CURRENT_DATE), 
+        EXTRACT(YEAR FROM CURRENT_DATE) - 1
+    )
+    GROUP BY EXTRACT(YEAR FROM created_at)
+    ORDER BY year DESC;
+$$;
+
+🔎🔎 หน้า communities
+// 4 ช่อง
+CREATE OR REPLACE FUNCTION get_communities_summary()
+RETURNS TABLE (
+  total_communites bigint,
+  communities_today bigint,
+  communities_this_month bigint,
+  communities_this_year bigint
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    (SELECT COUNT(*) FROM public.communities) AS total_communities,
+    (SELECT COUNT(*) FROM public.communities WHERE DATE(created_at) = CURRENT_DATE) AS communities_today,
+    (SELECT COUNT(*) FROM public.communities WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS communities_this_month,
+    (SELECT COUNT(*) FROM public.communities WHERE EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS communities_this_year;
+END;
+$$ LANGUAGE plpgsql;
+
+🔎🔎 หน้า items
+// 4 ช่อง
+CREATE OR REPLACE FUNCTION get_items_summary()
+RETURNS TABLE (
+  total_communites bigint,
+  items_today bigint,
+  items_this_month bigint,
+  items_this_year bigint
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    (SELECT COUNT(*) FROM public.items) AS total_items,
+    (SELECT COUNT(*) FROM public.items WHERE DATE(created_at) = CURRENT_DATE) AS items_today,
+    (SELECT COUNT(*) FROM public.items WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS items_this_month,
+    (SELECT COUNT(*) FROM public.items WHERE EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS items_this_year;
+END;
+$$ LANGUAGE plpgsql;
