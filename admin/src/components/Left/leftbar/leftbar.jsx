@@ -41,7 +41,7 @@ const LeftBar = () => {
         </div>
 
         <div className="menu">
-          <div className={`item ${isActive('/managefriends') ? 'active' : ''}`} onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
+          <div className={`item ${isActive('/transactions') ? 'active' : ''}`} onClick={() => navigate(`/transactions`)} style={{ cursor: "pointer" }}>
             <AccountBalanceWalletIcon />
             <span>Transactions</span>
           </div>

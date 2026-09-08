@@ -98,7 +98,7 @@ const RightBar = () => {
                 <PendingIcon className="icon" />
                 <span>Other</span>
               </div>
-              <span className="report-count">{reports?.other || 0}</span>
+              <span className="report-count">{reports?.other + reports?.technical_issue + reports?.bug + reports?.feedback || 0}</span>
             </div>
 
           </div>

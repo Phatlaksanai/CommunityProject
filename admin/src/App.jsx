@@ -6,6 +6,7 @@ import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 import User from "./pages/user/User";
 import Content from "./pages/content/Content";
+import Transaction from "./pages/transaction/transaction";
 
 import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/Left/leftbar/leftbar";
@@ -99,6 +100,18 @@ function App() {
         },
       ]
     },
+    {
+      path: "/transactions",
+      element: (
+        <Layout />
+      ),
+      children: [
+        {
+          path: "/transactions",
+          element: <Transaction />
+        },
+      ]
+    }
   ]);
 
   const [user, setUser] = useState(() => {

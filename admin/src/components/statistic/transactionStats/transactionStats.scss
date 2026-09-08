@@ -1,6 +1,6 @@
 @use "../../../style.scss" as *;
 
-.userstats {
+.transactionstats {
   @include themify($themes) {
     background-color: #060A0E;
     color: themed("textColor");
@@ -120,7 +120,7 @@
 
       .user-table-section {
 
-        // 2.1 กล่องค้นหา
+        // 2.1 กล่องค้นหาและตัวกรอง
         .search-section {
           margin-bottom: 30px;
           display: flex;
@@ -133,57 +133,66 @@
             color: #fff;
           }
 
-          .search-box {
+          .filter-controls {
             display: flex;
+            gap: 15px; // ระยะห่างระหว่างกล่องค้นหากับกล่อง select
             align-items: center;
-            background-color: #0D131A;
-            border: 2px solid #161B20;
-            border-radius: 8px;
-            padding: 8px 12px;
-            width: 100%;
-            max-width: 400px;
 
-            .icon {
-              color: #A0AEC0;
-              font-size: 20px;
-              margin-right: 10px;
-            }
-
-            input {
-              border: none;
-              background: transparent;
-              color: #fff;
+            .search-box {
+              display: flex;
+              align-items: center;
+              background-color: #0D131A;
+              border: 1px solid #161B20;
+              border-radius: 8px;
+              padding: 8px 12px;
               width: 100%;
-              outline: none;
-              font-size: 14px;
+              max-width: 400px;
 
-              &::placeholder {
-                color: #4A5568;
+              .icon {
+                color: #A0AEC0;
+                font-size: 20px;
+                margin-right: 10px;
+              }
+
+              input {
+                border: none;
+                background: transparent;
+                color: #fff;
+                width: 100%;
+                outline: none;
+                font-size: 14px;
+
+                &::placeholder {
+                  color: #4A5568;
+                }
               }
             }
-          }
-        }
 
-        // 2.2 ปุ่ม Add Admin
-        .action-section {
-          display: flex;
-          justify-content: flex-end;
-          position: relative;
-          z-index: 2;
+            .select-wrapper {
+              position: relative;
+              display: flex;
+              align-items: center;
+              width: 200px;
 
-          .add-admin-btn {
-            background-color: #E50914;
-            color: white;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 16px 16px 0 0; // โค้งเฉพาะด้านบน
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
+              select {
+                width: 100%;
+                background-color: #0D131A;
+                border: 1px solid #161B20;
+                border-radius: 8px;
+                padding: 10px 12px;
+                color: #fff;
+                font-size: 14px;
+                outline: none;
+                appearance: none; // ปิดลูกศรเดิมของเบราว์เซอร์
+                cursor: pointer;
+              }
 
-            &:hover {
-              background-color: #B20710;
+              .dropdown-icon {
+                position: absolute;
+                right: 10px;
+                color: #E76D09; // สีส้มตามรูป
+                pointer-events: none; // ให้คลิกทะลุไปโดน select ได้
+              }
             }
           }
         }
@@ -266,168 +275,6 @@
     .R {
       flex: 1;
       flex-direction: column;
-    }
-  }
-
-  // เพิ่มลูกเล่นให้รู้ว่าแถวตารางคลิกได้
-  .clickable-row {
-    cursor: pointer;
-
-    &:hover {
-      background-color: #111820;
-    }
-  }
-
-  // ==========================================
-  // Modal / Pop-up Styles
-  // ==========================================
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-
-    .modal-content {
-      background-color: #090F16;
-      border: 1px solid #161B20;
-      border-radius: 12px;
-      padding: 30px;
-      width: 100%;
-      max-width: 650px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-
-      &.add-admin-modal {
-        max-width: 450px;
-      }
-
-      h2 {
-        margin: 0 0 25px 0;
-        color: #fff;
-        font-size: 20px;
-      }
-
-      .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-
-        @media (max-width: 600px) {
-          grid-template-columns: 1fr;
-        }
-
-        .input-group {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-
-          &.full-width {
-            grid-column: span 2;
-            /* บังคับให้ขยายกินพื้นที่ 2 คอลัมน์เต็ม */
-
-            @media (max-width: 600px) {
-              grid-column: span 1;
-              /* ถ้าจอเล็กให้เหลือ 1 คอลัมน์ปกติ */
-            }
-          }
-
-          label {
-            color: #A0AEC0;
-            font-size: 13px;
-            font-weight: 600;
-          }
-
-          input,
-          textarea {
-            background-color: #0D131A;
-            // สีขอบตามที่ระบุ
-            border: 1px solid #B87333;
-            border-radius: 6px;
-            padding: 10px 12px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            transition: box-shadow 0.2s ease;
-            font-family: inherit;
-          }
-
-          textarea {
-            resize: vertical; // ให้ผู้ใช้ลากขยายกล่องข้อความในแนวตั้งได้
-            min-height: 80px;
-          }
-
-          .select-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-
-            select {
-              width: 100%;
-              background-color: #0D131A;
-              border: 1px solid #B87333;
-              border-radius: 6px;
-              padding: 10px 12px;
-              color: #fff;
-              font-size: 14px;
-              outline: none;
-              appearance: none;
-              cursor: pointer;
-            }
-
-            .dropdown-icon {
-              position: absolute;
-              right: 10px;
-              color: #E48500;
-              pointer-events: none; // ให้เมาส์คลิกผ่านไอคอนไปโดน select ได้
-            }
-          }
-        }
-      }
-
-      .form-grid.add-admin-form {
-        grid-template-columns: 1fr;
-      }
-
-      .modal-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 15px;
-        padding-top: 30px;
-        border-top: 1px solid #161B20;
-
-        button {
-          padding: 10px 24px;
-          border-radius: 6px;
-          font-weight: 600;
-          font-size: 14px;
-          cursor: pointer;
-          border: none;
-          color: #fff;
-          transition: opacity 0.2s ease;
-
-          &:hover:not(:disabled) {
-            opacity: 0.8;
-          }
-
-          &:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-          }
-
-          &.btn-cancel {
-            background-color: #6A7575;
-          }
-
-          &.btn-update {
-            background-color: #B87333;
-          }
-        }
-      }
     }
   }
 }
