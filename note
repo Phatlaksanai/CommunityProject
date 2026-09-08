@@ -188,7 +188,7 @@ RETURNS TABLE (
 BEGIN
   RETURN QUERY
   WITH current_week_days AS (
-    -- สร้างวันที่ตั้งแต่วันจันทร์ (0) ถึง วันอาทิตย์ (6) ของสัปดาห์ปัจจุบัน
+    -- (WITH ตารางชั่วคราว) สร้างวันที่ตั้งแต่วันจันทร์ (0) ถึง วันอาทิตย์ (6) ของสัปดาห์ปัจจุบัน
     -- DATE_TRUNC('week', CURRENT_DATE) จะดึงวันที่ของ "วันจันทร์" ในสัปดาห์นี้มาเสมอ
     SELECT (DATE_TRUNC('week', CURRENT_DATE) + (i || ' days')::interval)::date AS report_date
     FROM generate_series(0, 6) AS i
@@ -272,6 +272,29 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+// กราฟสัปดาห์
+CREATE OR REPLACE FUNCTION get_weekly_posts_chart()
+RETURNS TABLE (
+  day_name text,
+  post_count bigint
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH current_week_days AS (
+    SELECT (DATE_TRUNC('week', CURRENT_DATE) + (i || ' days')::interval)::date AS report_date
+    FROM generate_series(0, 6) AS i
+  )
+  SELECT 
+    TO_CHAR(cwd.report_date, 'Dy') AS day_name,
+    COUNT(p.created_at) AS post_count
+    
+  FROM current_week_days cwd
+  LEFT JOIN public.posts p ON DATE(p.created_at) = cwd.report_date
+  GROUP BY cwd.report_date, day_name
+  ORDER BY cwd.report_date ASC;
+END;
+$$ LANGUAGE plpgsql;
+
 // Donut Chart 1️⃣
 CREATE OR REPLACE FUNCTION get_yearly_post_stats()
 RETURNS TABLE (
@@ -296,7 +319,7 @@ $$;
 // 4 ช่อง
 CREATE OR REPLACE FUNCTION get_communities_summary()
 RETURNS TABLE (
-  total_communites bigint,
+  total_communities bigint,
   communities_today bigint,
   communities_this_month bigint,
   communities_this_year bigint
@@ -311,11 +334,33 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+// กราฟสัปดาห์
+CREATE OR REPLACE FUNCTION get_weekly_communities_chart()
+RETURNS TABLE (
+  day_name text,
+  community_count bigint
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH current_week_days AS (
+    SELECT (DATE_TRUNC('week', CURRENT_DATE) + (i || ' days')::interval)::date AS report_date
+    FROM generate_series(0, 6) AS i
+  )
+  SELECT 
+    TO_CHAR(cwd.report_date, 'Dy') AS day_name,
+    COUNT(c.created_at) AS community_count
+  FROM current_week_days cwd
+  LEFT JOIN public.communities c ON DATE(c.created_at) = cwd.report_date
+  GROUP BY cwd.report_date, day_name
+  ORDER BY cwd.report_date ASC;
+END;
+$$ LANGUAGE plpgsql;
+
 🔎🔎 หน้า items
 // 4 ช่อง
 CREATE OR REPLACE FUNCTION get_items_summary()
 RETURNS TABLE (
-  total_communites bigint,
+  total_items bigint,
   items_today bigint,
   items_this_month bigint,
   items_this_year bigint
@@ -327,5 +372,27 @@ BEGIN
     (SELECT COUNT(*) FROM public.items WHERE DATE(created_at) = CURRENT_DATE) AS items_today,
     (SELECT COUNT(*) FROM public.items WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS items_this_month,
     (SELECT COUNT(*) FROM public.items WHERE EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS items_this_year;
+END;
+$$ LANGUAGE plpgsql;
+
+// กราฟสัปดาห์
+CREATE OR REPLACE FUNCTION get_weekly_items_chart()
+RETURNS TABLE (
+  day_name text,
+  item_count bigint
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH current_week_days AS (
+    SELECT (DATE_TRUNC('week', CURRENT_DATE) + (i || ' days')::interval)::date AS report_date
+    FROM generate_series(0, 6) AS i
+  )
+  SELECT 
+    TO_CHAR(cwd.report_date, 'Dy') AS day_name,
+    COUNT(it.created_at) AS item_count
+  FROM current_week_days cwd
+  LEFT JOIN public.items it ON DATE(it.created_at) = cwd.report_date
+  GROUP BY cwd.report_date, day_name
+  ORDER BY cwd.report_date ASC;
 END;
 $$ LANGUAGE plpgsql;

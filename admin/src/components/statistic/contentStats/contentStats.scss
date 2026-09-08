@@ -234,20 +234,38 @@
 
         // 2.3 ตารางแสดงผล
         .table-container {
-          background-color: #090F16;
+           background-color: #090F16;
           border: 2px solid #161B20;
-          border-radius: 8px 0 8px 8px;
+          border-radius: 8px; // ปรับให้ขอบมน
           overflow-x: auto;
+          overflow-y: auto; // เพิ่มให้มีแถบเลื่อนแนวตั้ง
+          max-height: 400px; // กำหนดความสูงสูงสุดของตาราง (ปรับตัวเลขตามชอบได้เลย)
+
+          &::-webkit-scrollbar {
+            width: 5px;
+            height: 5px; // เผื่อแถบแนวนอน
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: #E76D09;
+            border-radius: 4px;
+          }
 
           table {
             width: 100%;
             border-collapse: collapse;
             text-align: center;
+            position: relative; // เพิ่มสำหรับ sticky
 
             thead {
+              position: sticky; // ทำให้ส่วนหัวตารางติดขอบบนตอนเลื่อนลง
+              top: 0;
+              z-index: 2;
+              background-color: #090F16; // ใส่สีพื้นหลังทับข้อมูลด้านล่างตอนเลื่อน
+
               tr {
                 border-bottom: 1px solid #161B20;
-                
+
                 th {
                   padding: 16px 10px;
                   color: #FFFFFF;

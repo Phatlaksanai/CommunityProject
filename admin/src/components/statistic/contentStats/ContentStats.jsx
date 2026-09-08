@@ -15,7 +15,6 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 const ContentStats = () => {
     const navigate = useNavigate();
-    const { currentUser, setUser } = useContext(AuthContext);
     const [searchTerm, setSearchTerm] = useState("");
     const queryClient = useQueryClient();
     const [error, setError] = useState("");
@@ -26,15 +25,11 @@ const ContentStats = () => {
 
     // ---- State สำหรับ Modal ---- //
     const [selectedUser, setSelectedUser] = useState(null);
-    const [formData, setFormData] = useState({
-        user_id: "", username: "", name: "", email: "",
-        description: "", isdelete: "", role: ""
-    });
+    const [formData, setFormData] = useState({});
 
-    const [isAddAdminOpen, setIsAddAdminOpen] = useState(false);
-    const [newAdminData, setNewAdminData] = useState({
-        username: "", email: "", password: "", role: "admin" // บังคับ role เป็น admin ตั้งแต่หน้าบ้าน
-    });
+    // State สำหรับเพิ่ม Category ใหม่
+    const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState("");
 
     const { isLoading: summaryLoading, data: summaryData, isError: isSummaryError } = useQuery({
         queryKey: ["contentSummary", activeTab], // รีเฟรชเมื่อ activeTab เปลี่ยน
@@ -50,86 +45,63 @@ const ContentStats = () => {
         }
     });
 
-    // const { isLoading: chartLoading, data: chartData, isError: isChartError } = useQuery({
-    //     queryKey: ["weeklyChartData", activeTab],
-    //     queryFn: async () => {
-    //         let endpoint = "";
-
-    //         if (activeTab === "Posts") endpoint = `/admin/posts/weeklyPosts`;
-    //         else if (activeTab === "Communities") endpoint = `/admin/communities/weeklyCommunities`;
-    //         else if (activeTab === "Items") endpoint = `/admin/items/weeklyItems`;
-
-    //         return makeRequest.get(endpoint).then(res => res.data);
-    //     }
-    // });
-
-    // const { isLoading: tableLoading, data: tableData, isError: isTableError } = useQuery({
-    //     queryKey: ["contentTable", activeTab],
-    //     queryFn: async () => {
-    //         let endpoint = "";
-
-    //         if (activeTab === "Posts") endpoint = "/admin/posts/postsTable";
-    //         else if (activeTab === "Communities") endpoint = "/admin/communities/communitiesTable";
-    //         else if (activeTab === "Items") endpoint = "/admin/items/itemsTable";
-
-    //         const res = await makeRequest.get(endpoint);
-    //         return res.data;
-    //     }
-    // });
-
     const { isLoading: chartLoading, data: chartData, isError: isChartError } = useQuery({
-        queryKey: ["weeklyUsers"],
-        queryFn: () => makeRequest.get(`/admin/users/WeeklyUsers`).then(res => res.data)
+        queryKey: ["weeklyChartData", activeTab],
+        queryFn: async () => {
+            let endpoint = "";
+
+            if (activeTab === "Posts") endpoint = `/admin/content/weeklyPosts`;
+            else if (activeTab === "Communities") endpoint = `/admin/content/weeklyCommunities`;
+            else if (activeTab === "Items") endpoint = `/admin/content/weeklyItems`;
+
+            const res = await makeRequest.get(endpoint);
+
+            // กราฟ Recharts ใช้ dataKey="total_count" 
+            // จึงต้อง map ชื่อคอลัมน์จาก RPC ให้กลายเป็น total_count
+            return res.data.map(item => ({
+                day_name: item.day_name,
+                total_count: Number(item.post_count || item.community_count || item.item_count || 0)
+            }));
+        }
     });
 
-    const { isLoading: usertableLoading, isError: usertableError, data: usertable } = useQuery({
-        queryKey: ["getUsersTable"],
-        queryFn: () => makeRequest.get("/admin/users/usersTable").then(res => res.data)
+    const { isLoading: tableLoading, isError: isTableError, data: tableData } = useQuery({
+        queryKey: ["contentTableData", activeTab],
+        queryFn: async () => {
+            let endpoint = "";
+            if (activeTab === "Posts") endpoint = "/admin/content/postsTable";
+            else if (activeTab === "Communities") endpoint = "/admin/content/communitiesTable";
+            else if (activeTab === "Items") endpoint = "/admin/content/itemsTable";
+
+            const res = await makeRequest.get(endpoint);
+            return res.data;
+        }
+    });
+
+    // ดึงข้อมูล Categories มาทำ Dropdown
+    const { data: categoriesData } = useQuery({
+        queryKey: ["categoriesList"],
+        queryFn: () => makeRequest.get("/admin/content/categories").then(res => res.data)
     });
 
     const updateMutation = useMutation({
         mutationFn: (updatedData) => {
-            return makeRequest.put(`/admin/users/updateUser/${updatedData.user_id}`, updatedData);
-        },
-        onSuccess: (data, variables) => {
-            queryClient.invalidateQueries(["getUsersTable"]); // โหลดตารางใหม่หลังอัปเดตเสร็จ
-            setSelectedUser(null); // ปิด Modal
+            // เช็คว่ากำลังแก้ตารางไหนอยู่ แล้วยิง API ให้ถูกเส้น
+            let updateEndpoint = "";
+            if (activeTab === "Posts") updateEndpoint = `/admin/content/updatePost/${updatedData.id}`;
+            else if (activeTab === "Communities") updateEndpoint = `/admin/content/updateCommunity/${updatedData.id}`;
+            else if (activeTab === "Items") updateEndpoint = `/admin/content/updateItem/${updatedData.id}`;
 
-            if (currentUser && variables.user_id === currentUser.user_id) { // variables คือข้อมูล formData (เช่น username, name, email) ที่เพิ่งกดส่งไปให้ Backend
-                const updatedCurrentUser = {
-                    ...currentUser,
-                    username: variables.username,
-                    name: variables.name
-                };
-
-                // อัปเดต Context ทำให้ Navbar เปลี่ยนทันที
-                setUser(updatedCurrentUser);
-
-                // อัปเดต LocalStorage ด้วย (อ้างอิงจากตอน Logout ที่คุณใช้ LocalStorage)
-                localStorage.setItem("user", JSON.stringify(updatedCurrentUser));
-            }
-        },
-        onError: (err) => {
-            setError("Error updating user: " + err.message);
-        }
-    });
-
-    const addAdminMutation = useMutation({
-        mutationFn: (newAdmin) => {
-            return makeRequest.post(`/admin/users/addAdmin`, newAdmin);
+            return makeRequest.put(updateEndpoint, updatedData);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(["getUsersTable"]);
-            setIsAddAdminOpen(false); // ปิดหน้าต่าง Add Admin
-            setNewAdminData({ username: "", email: "", password: "", role: "admin" }); // เคลียร์ค่า
-            setSuccess("Admin added successfully!");
+            // โหลดตารางคอนเทนต์ใหม่หลังอัปเดตเสร็จ
+            queryClient.invalidateQueries(["contentTableData", activeTab]);
+            setSelectedUser(null); // ปิด Modal
+            setSuccess("Updated successfully!");
         },
         onError: (err) => {
-            if (err.response?.data?.error || err.message) {
-                setError(err.response.data.error);
-            } else {
-                setError("Error adding admin");
-            }
+            setError("Error updating data: " + err.message);
         }
     });
 
@@ -145,11 +117,34 @@ const ContentStats = () => {
         return date.toLocaleDateString("en-GB");
     };
 
-    // ฟังก์ชันกรองข้อมูลตาม Username
-    const filteredUsers = usertable?.filter((user) => {
-        if (!user.username) return false;
+    // ฟังก์ชันกรองข้อมูลแบบครอบคลุม (Search by ID, Username)
+    const filteredData = tableData?.filter((item) => {
+        if (!searchTerm) return true; // ถ้าช่องค้นหาว่างเปล่า ให้แสดงข้อมูลทั้งหมด
 
-        return user.username.toLowerCase().includes(searchTerm.toLowerCase());
+        const term = searchTerm.toLowerCase().trim();
+
+        // หา ID ตาม Tab ปัจจุบัน
+        let id = "";
+        if (activeTab === "Posts") id = String(item.post_id || "");
+        else if (activeTab === "Communities") id = String(item.community_id || "");
+        else if (activeTab === "Items") id = String(item.item_id || "");
+
+        // ดึงข้อมูล Username และ Name ของคนที่โพสต์
+        const username = item.users?.username || "";
+
+        // เงื่อนไขที่ 1: ค้นหาด้วย ID ตรงเป๊ะ (ขึ้นแค่บรรทัดเดียว)
+        if (id === term) {
+            return true;
+        }
+
+        // เงื่อนไขที่ 2: ค้นหาด้วย Username หรือ Name ของคนโพสต์ (ขึ้นทุกโพสต์ของคนนั้น)
+        if (
+            username.toLowerCase().includes(term)
+        ) {
+            return true;
+        }
+
+        return false; // ไม่ตรงกับอะไรเลย ให้ซ่อนไป
     }) || [];
 
     // ฟังก์ชันช่วยตัดคำและใส่ Tooltip
@@ -165,17 +160,35 @@ const ContentStats = () => {
         );
     };
 
-    const handleRowClick = (user) => {
-        setSelectedUser(user);
-        setFormData({
-            user_id: user.user_id,
-            username: user.username || "",
-            name: user.name || "",
-            email: user.email || "",
-            description: user.description || "",
-            isdelete: user.isdelete || "",
-            role: user.role || ""
-        });
+    const handleRowClick = (row) => {
+        setSelectedUser(row); // ใช้ selectedUser เป็น State กลางสำหรับเก็บข้อมูลแถวที่ถูกคลิก
+
+        if (activeTab === "Posts") {
+            setFormData({
+                id: row.post_id,
+                status: row.status || "",
+                description: row.description || ""
+            });
+        } else if (activeTab === "Communities") {
+            setFormData({
+                id: row.communities_id,
+                status: row.status || "",
+                description: row.description || "",
+                cover_img: row.cover_img || ""
+            });
+        } else if (activeTab === "Items") {
+            setFormData({
+                id: row.item_id,
+                modelName: row.modelName || "",
+                description: row.description || "",
+                price: row.price || "",
+                status: row.status || "",
+                category_id: row.category_id || "",
+                img: row.img || ""
+            });
+            setIsAddingNewCategory(false); // เคลียร์ค่าหมวดหมู่ใหม่ เผื่อกดเปิดตัวอื่นต่อ
+            setNewCategoryName("");
+        }
     };
 
     // ---- ฟังก์ชันจัดการฟอร์มใน Modal ---- //
@@ -184,32 +197,16 @@ const ContentStats = () => {
     };
 
     const handleUpdate = () => {
-
-        //  แปลงค่าสตริงว่าง "" ให้กลายเป็น null ก่อนส่งไปที่ Backend
-        const formattedRole = (!formData.role || formData.role === "NULL") ? null : formData.role;
-
         const payload = {
             ...formData,
-            role: formattedRole
+            new_category_name: isAddingNewCategory ? newCategoryName : null
         };
-
-
+        
         updateMutation.mutate(payload);
     };
 
-    const handleAddAdminChange = (e) => {
-        setNewAdminData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    };
-
-    const handleAddAdminSubmit = () => {
-        if (!newAdminData.email || !newAdminData.username || !newAdminData.password) {
-            return setError("Please fill all fields (Email, Username, Password)!");
-        }
-        addAdminMutation.mutate(newAdminData);
-    };
-
-    if (summaryLoading || chartLoading || usertableLoading) return <div className="loading">Loading dashboard...</div>;
-    if (isSummaryError || isChartError || usertableError) return <div className="error">Error loading dashboard data.</div>;
+    if (summaryLoading || chartLoading || tableLoading) return <div className="loading">Loading dashboard...</div>;
+    if (isSummaryError || isChartError || isTableError) return <div className="error">Error loading dashboard data.</div>;
 
     return (
         <div className="contentStats" style={{ display: 'flex' }}>
@@ -260,9 +257,9 @@ const ContentStats = () => {
                                 </div>
                                 <div className="card-value">
                                     <h2>{formatNumber(
-                                        activeTab === "Posts" ? summaryData?.total_posts : 
-                                        activeTab === "Communities" ? summaryData?.total_communities : 
-                                        summaryData?.total_items
+                                        activeTab === "Posts" ? summaryData?.total_posts :
+                                            activeTab === "Communities" ? summaryData?.total_communities :
+                                                summaryData?.total_items
                                     )}</h2>
                                 </div>
                             </div>
@@ -274,9 +271,9 @@ const ContentStats = () => {
                                 </div>
                                 <div className="card-value">
                                     <h2>{formatNumber(
-                                        activeTab === "Posts" ? summaryData?.posts_today : 
-                                        activeTab === "Communities" ? summaryData?.communities_today : 
-                                        summaryData?.items_today
+                                        activeTab === "Posts" ? summaryData?.posts_today :
+                                            activeTab === "Communities" ? summaryData?.communities_today :
+                                                summaryData?.items_today
                                     )}</h2>
                                 </div>
                             </div>
@@ -288,9 +285,9 @@ const ContentStats = () => {
                                 </div>
                                 <div className="card-value">
                                     <h2>{formatNumber(
-                                        activeTab === "Posts" ? summaryData?.posts_this_month : 
-                                        activeTab === "Communities" ? summaryData?.communities_this_month : 
-                                        summaryData?.items_this_month
+                                        activeTab === "Posts" ? summaryData?.posts_this_month :
+                                            activeTab === "Communities" ? summaryData?.communities_this_month :
+                                                summaryData?.items_this_month
                                     )}</h2>
                                 </div>
                             </div>
@@ -302,9 +299,9 @@ const ContentStats = () => {
                                 </div>
                                 <div className="card-value">
                                     <h2>{formatNumber(
-                                        activeTab === "Posts" ? summaryData?.posts_this_year : 
-                                        activeTab === "Communities" ? summaryData?.communities_this_year : 
-                                        summaryData?.items_this_year
+                                        activeTab === "Posts" ? summaryData?.posts_this_year :
+                                            activeTab === "Communities" ? summaryData?.communities_this_year :
+                                                summaryData?.items_this_year
                                     )}</h2>
                                 </div>
                             </div>
@@ -351,66 +348,108 @@ const ContentStats = () => {
                                 </ResponsiveContainer>
                             </div>
                         </div>
-
                     </div>
 
                     <div className="user-table-section" style={{ marginTop: '40px' }}>
 
                         <div className="search-section">
-                            <label>Search by Username</label>
+                            <label>Search {activeTab}</label>
                             <div className="search-box">
                                 <SearchOutlinedIcon className="icon" />
                                 <input
                                     type="text"
-                                    placeholder="Search username..."
+                                    placeholder="Search by ID, Username..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
                         </div>
 
-                        <div className="action-section">
-                            <button className="add-admin-btn" onClick={() => setIsAddAdminOpen(true)}>Add Admin</button>
-                        </div>
-
                         <div className="table-container">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>user_id</th>
-                                        <th>username</th>
-                                        <th>name</th>
-                                        <th>email</th>
-                                        <th>description</th>
-                                        <th>isdelete</th>
-                                        <th>stripe_connect_id</th>
-                                        <th>balance</th>
-                                        <th>created_at</th>
-                                        <th>role</th>
-                                        <th></th>
+                                        {activeTab === "Posts" && (
+                                            <>
+                                                <th>post_id</th>
+                                                <th>username</th>
+                                                <th>description</th>
+                                                <th>status</th>
+                                                <th>community_name</th>
+                                                <th>created_at</th>
+                                            </>
+                                        )}
+                                        {activeTab === "Communities" && (
+                                            <>
+                                                <th>community_id</th>
+                                                <th>username</th>
+                                                <th>community_name</th>
+                                                <th>description</th>
+                                                <th>status</th>
+                                                <th>cover_img</th>
+                                                <th>created_at</th>
+                                            </>
+                                        )}
+                                        {activeTab === "Items" && (
+                                            <>
+                                                <th>item_id</th>
+                                                <th>username</th>
+                                                <th>model</th>
+                                                <th>img</th>
+                                                <th>description</th>
+                                                <th>category</th>
+                                                <th>model_name</th>
+                                                <th>status</th>
+                                                <th>price</th>
+                                                <th>created_at</th>
+                                            </>
+                                        )}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredUsers.length > 0 ? (
-                                        filteredUsers.map((user) => (
-                                            <tr key={user.user_id} onClick={() => handleRowClick(user)} className="clickable-row">
-                                                <td>{user.user_id}</td>
-                                                <td>{renderTruncatedText(user.username, 10)}</td>
-                                                <td>{renderTruncatedText(user.name, 10)}</td>
-                                                <td>{renderTruncatedText(user.email, 10)}</td>
-                                                <td >{renderTruncatedText(user.description, 10)}</td>
-                                                <td>{user.isdelete || "null"}</td>
-                                                <td>{renderTruncatedText(user.stripe_connect_id, 10)}</td>
-                                                <td>{renderTruncatedText(
-                                                    user.balance !== null ? Number(user.balance).toLocaleString() : "null", 6)}
-                                                </td>
-                                                <td>{formatDate(user.created_at)}</td>
-                                                <td>{user.role || "null"}</td>
+                                    {filteredData.length > 0 ? (
+                                        filteredData.map((row) => (
+                                            <tr key={row.post_id || row.communities_id || row.item_id} onClick={() => handleRowClick(row)} className="clickable-row">
+                                                {activeTab === "Posts" && (
+                                                    <>
+                                                        <td>{row.post_id}</td>
+                                                        <td>{renderTruncatedText(row.users?.username, 15)}</td>
+                                                        <td>{renderTruncatedText(row.description, 20)}</td>
+                                                        <td>{row.status}</td>
+                                                        <td>{renderTruncatedText(row.communities?.name, 15)}</td>
+                                                        <td>{formatDate(row.created_at)}</td>
+                                                    </>
+                                                )}
+                                                {activeTab === "Communities" && (
+                                                    <>
+                                                        <td>{row.communities_id}</td>
+                                                        <td>{renderTruncatedText(row.users?.username, 15)}</td>
+                                                        <td>{renderTruncatedText(row.name, 15)}</td>
+                                                        <td>{renderTruncatedText(row.description, 20)}</td>
+                                                        <td>{row.status}</td>
+                                                        <td>{renderTruncatedText(row.cover_img, 20)}</td>
+                                                        <td>{formatDate(row.created_at)}</td>
+                                                    </>
+                                                )}
+                                                {activeTab === "Items" && (
+                                                    <>
+                                                        <td>{row.item_id}</td>
+                                                        <td>{renderTruncatedText(row.users?.username, 15)}</td>
+                                                        <td>{renderTruncatedText(row.model, 20)}</td>
+                                                        <td>{renderTruncatedText(row.img, 20)}</td>
+                                                        <td>{renderTruncatedText(row.description, 20)}</td>
+                                                        <td>{renderTruncatedText(row.categories?.type, 15)}</td>
+                                                        <td>{renderTruncatedText(row.modelName, 15)}</td>
+                                                        <td>{row.status}</td>
+                                                        <td>{row.price}</td>
+                                                        <td>{formatDate(row.created_at)}</td>
+                                                    </>
+                                                )}
                                             </tr>
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="11" className="no-data">No users found</td>
+                                            <td colSpan="11" className="no-data">No {activeTab.toLowerCase()} found</td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -433,50 +472,164 @@ const ContentStats = () => {
             {selectedUser && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h2>Edit User ID: {selectedUser.user_id}</h2>
+                        <h2>Edit {activeTab === "Communities" ? "Community" : activeTab.slice(0, -1)} ID:{" "}
+                            {selectedUser.post_id || selectedUser.communities_id || selectedUser.item_id}</h2>
                         <div className="form-grid">
-                            <div className="input-group">
-                                <label>Username</label>
-                                <input type="text" name="username" value={formData.username} onChange={handleChange} />
-                            </div>
-                            <div className="input-group">
-                                <label>Name</label>
-                                <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="null" />
-                            </div>
-                            <div className="input-group">
-                                <label>Email</label>
-                                <input type="email" name="email" value={formData.email} onChange={handleChange} />
-                            </div>
-                            <div className="input-group">
-                                <label>Role</label>
-                                <div className="select-wrapper">
-                                    <select name="role" value={formData.role} onChange={handleChange}>
-                                        <option value="NULL">NULL</option>
-                                        <option value="admin">admin</option>
-                                    </select>
-                                    <ArrowDropDownIcon className="dropdown-icon" />
-                                </div>
-                            </div>
-                            <div className="input-group">
-                                <label>Is Delete</label>
-                                <div className="select-wrapper">
-                                    <select name="isdelete" value={formData.isdelete || ""} onChange={handleChange}>
-                                        <option value="active">active</option>
-                                        <option value="deleted">deleted</option>
-                                    </select>
-                                    <ArrowDropDownIcon className="dropdown-icon" />
-                                </div>
-                            </div>
-                            <div className="input-group full-width">
-                                <label>Description</label>
-                                <textarea
-                                    name="description"
-                                    value={formData.description}
-                                    onChange={handleChange}
-                                    rows="4"
-                                    placeholder="description..."
-                                />
-                            </div>
+
+                            {activeTab === "Posts" && (
+                                <>
+                                    <div className="input-group">
+                                        <label>Status</label>
+                                        <div className="select-wrapper">
+                                            <select name="status" value={formData.status || ""} onChange={handleChange}>
+                                                <option value="show">show</option>
+                                                <option value="hide">hide</option>
+                                            </select>
+                                            <ArrowDropDownIcon className="dropdown-icon" />
+                                        </div>
+                                    </div>
+                                    <div className="input-group full-width">
+                                        <label>Description</label>
+                                        <textarea
+                                            name="description"
+                                            value={formData.description || ""}
+                                            onChange={handleChange}
+                                            rows="4"
+                                            placeholder="description..."
+                                        />
+                                    </div>
+                                </>
+                            )}
+
+                            {activeTab === "Communities" && (
+                                <>
+                                    <div className="input-group">
+                                        <label>Status</label>
+                                        <div className="select-wrapper">
+                                            <select name="status" value={formData.status || ""} onChange={handleChange}>
+                                                <option value="show">show</option>
+                                                <option value="hide">hide</option>
+                                            </select>
+                                            <ArrowDropDownIcon className="dropdown-icon" />
+                                        </div>
+                                    </div>
+                                    <div className="input-group full-width">
+                                        <label>Description</label>
+                                        <textarea
+                                            name="description"
+                                            value={formData.description || ""}
+                                            onChange={handleChange}
+                                            rows="4"
+                                            placeholder="description..."
+                                        />
+                                    </div>
+                                    <div className="input-group full-width">
+                                        <label>Cover Image</label>
+                                        <input
+                                            type="text"
+                                            name="cover_img"
+                                            value={formData.cover_img || ""}
+                                            onChange={handleChange}
+                                            placeholder="Paste image URL here..."
+                                        />
+                                        {/* แสดงตัวอย่างรูป ถ้ามี URL */}
+                                        {formData.cover_img && (
+                                            <img src={formData.cover_img} alt="Cover Preview" className="cover-preview" style={{ marginTop: '10px', maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
+                                        )}
+                                    </div>
+                                </>
+                            )}
+
+                            {activeTab === "Items" && (
+                                <>
+                                    <div className="input-group">
+                                        <label>Model Name</label>
+                                        <input type="text" name="modelName" value={formData.modelName || ""} onChange={handleChange} />
+                                    </div>
+                                    <div className="input-group">
+                                        <label>Price</label>
+                                        <input type="number" name="price" value={formData.price || ""} onChange={handleChange} />
+                                    </div>
+                                    <div className="input-group">
+                                        <label>Status</label>
+                                        <div className="select-wrapper">
+                                            <select name="status" value={formData.status || ""} onChange={handleChange}>
+                                                <option value="show">show</option>
+                                                <option value="hide">hide</option>
+                                            </select>
+                                            <ArrowDropDownIcon className="dropdown-icon" />
+                                        </div>
+                                    </div>
+                                    <div className="input-group">
+                                        <label>Category</label>
+                                        <div className="select-wrapper">
+                                            <select
+                                                name="category_id"
+                                                value={isAddingNewCategory ? "NEW" : (formData.category_id || "")}
+                                                onChange={(e) => {
+                                                    if (e.target.value === "NEW") {
+                                                        setIsAddingNewCategory(true);
+                                                    } else {
+                                                        setIsAddingNewCategory(false);
+                                                        handleChange(e); // อัปเดต formData ปกติ
+                                                    }
+                                                }}
+                                            >
+                                                <option value="" disabled>Select Category</option>
+
+                                                {/* วนลูปดึงหมวดหมู่จาก Database มาแสดง */}
+                                                {categoriesData?.map((cat) => (
+                                                    <option key={cat.category_id} value={cat.category_id}>
+                                                        {cat.type}
+                                                    </option>
+                                                ))}
+
+                                                {/* ตัวเลือกสำหรับสร้างใหม่ */}
+                                                <option value="NEW">+ Add New Category...</option>
+                                            </select>
+                                            <ArrowDropDownIcon className="dropdown-icon" />
+                                        </div>
+                                    </div>
+
+                                    {/* จะแสดงช่องนี้ ก็ต่อเมื่อเลือก + Add New Category */}
+                                    {isAddingNewCategory && (
+                                        <div className="input-group full-width">
+                                            <label style={{ color: "#33A7E5" }}>New Category Name</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Enter new category name..."
+                                                value={newCategoryName}
+                                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="input-group full-width">
+                                        <label>Description</label>
+                                        <textarea
+                                            name="description"
+                                            value={formData.description || ""}
+                                            onChange={handleChange}
+                                            rows="4"
+                                            placeholder="description..."
+                                        />
+                                    </div>
+                                    <div className="input-group full-width">
+                                        <label>Image URL</label>
+                                        <input
+                                            type="text"
+                                            name="img"
+                                            value={formData.img || ""}
+                                            onChange={handleChange}
+                                            placeholder="Paste image URL here..."
+                                        />
+                                        {formData.img && (
+                                            <img src={formData.img} alt="Item Preview" className="cover-preview" style={{ marginTop: '10px', maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
+                                        )}
+                                    </div>
+                                </>
+                            )}
+
                         </div>
 
                         <div className="modal-actions">
@@ -485,39 +638,6 @@ const ContentStats = () => {
                             </button>
                             <button className="btn-update" onClick={handleUpdate} disabled={updateMutation.isLoading}>
                                 {updateMutation.isLoading ? "Updating..." : "Update"}
-                            </button>
-                        </div>
-                        {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
-                        {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
-                    </div>
-                </div>
-            )}
-
-            {isAddAdminOpen && (
-                <div className="modal-overlay">
-                    <div className="modal-content add-admin-modal">
-                        <h2>Add Admin</h2>
-                        <div className="form-grid add-admin-form">
-                            <div className="input-group">
-                                <label>Username</label>
-                                <input type="text" name="username" value={newAdminData.username} onChange={handleAddAdminChange} placeholder="username" />
-                            </div>
-                            <div className="input-group">
-                                <label>Email</label>
-                                <input type="email" name="email" value={newAdminData.email} onChange={handleAddAdminChange} placeholder="email" />
-                            </div>
-                            <div className="input-group">
-                                <label>Password</label>
-                                <input type="password" name="password" value={newAdminData.password} onChange={handleAddAdminChange} placeholder="password" />
-                            </div>
-                        </div>
-
-                        <div className="modal-actions">
-                            <button className="btn-cancel" onClick={() => setIsAddAdminOpen(false)} disabled={addAdminMutation.isLoading}>
-                                Cancel
-                            </button>
-                            <button className="btn-update" onClick={handleAddAdminSubmit} disabled={addAdminMutation.isLoading}>
-                                {addAdminMutation.isLoading ? "Adding..." : "Add"}
                             </button>
                         </div>
                         {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
