@@ -315,6 +315,27 @@ AS $$
     ORDER BY year DESC;
 $$;
 
+// Donut Chart 2️⃣
+CREATE OR REPLACE FUNCTION get_post_media_stats()
+RETURNS TABLE (
+    category text,
+    total bigint
+) 
+LANGUAGE sql
+AS $$
+    -- 1. นับจำนวนรูปภาพที่มี post_id (ไม่นับรูปในแชท message_id)
+    SELECT 'Images' AS category, COUNT(img_id) AS total 
+    FROM imgs 
+    WHERE post_id IS NOT NULL
+
+    -- เอาข้อมูลมาต่อกันดื้อๆ เลย ซ้ำก็ไม่ลบ เอามาโชว์ทั้งหมด
+    UNION ALL
+
+    -- 2. นับจำนวน 3D โมเดล
+    SELECT 'Models' AS category, COUNT(model_id) AS total 
+    FROM models;
+$$;
+
 🔎🔎 หน้า communities
 // 4 ช่อง
 CREATE OR REPLACE FUNCTION get_communities_summary()
@@ -356,6 +377,52 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+// Donut Chart 1️⃣
+CREATE OR REPLACE FUNCTION get_yearly_community_stats()
+RETURNS TABLE (
+    year double precision, 
+    total bigint
+) 
+LANGUAGE sql
+AS $$
+    SELECT 
+        EXTRACT(YEAR FROM created_at) AS year, 
+        COUNT(communities_id) AS total 
+    FROM communities 
+    WHERE EXTRACT(YEAR FROM created_at) IN (
+        EXTRACT(YEAR FROM CURRENT_DATE), 
+        EXTRACT(YEAR FROM CURRENT_DATE) - 1
+    )
+    GROUP BY EXTRACT(YEAR FROM created_at)
+    ORDER BY year DESC;
+$$;
+
+// Donut Chart 2️⃣
+CREATE OR REPLACE FUNCTION get_community_proportion_stats()
+RETURNS TABLE (
+    category text,
+    total bigint
+) 
+LANGUAGE sql
+AS $$
+    -- 1. นับคนที่ "เข้ากลุ่มแล้ว" (Joined)
+    -- ใช้ INNER JOIN เพื่อหาคนที่มีชื่อในตาราง community_members
+    -- ใช้ DISTINCT เผื่อ 1 คนเข้าหลายกลุ่ม จะได้นับเป็นแค่ 1 คน
+    SELECT 'Joined' AS category, COUNT(DISTINCT u.user_id) AS total 
+    FROM users u
+    INNER JOIN community_members cm ON u.user_id = cm.user_id
+    WHERE u.isdelete = 'active'
+    
+    UNION ALL
+    
+    -- 2. นับคนที่ "ยังไม่เข้ากลุ่มเลย" (Not Joined)
+    -- ใช้ LEFT JOIN แล้วหาคนที่ฝั่ง community_members เป็น NULL (แปลว่าไม่มีข้อมูลการเข้ากลุ่ม)
+    SELECT 'Not Joined' AS category, COUNT(DISTINCT u.user_id) AS total 
+    FROM users u
+    LEFT JOIN community_members cm ON u.user_id = cm.user_id
+    WHERE u.isdelete = 'active' AND cm.user_id IS NULL;
+$$;
+
 🔎🔎 หน้า items
 // 4 ช่อง
 CREATE OR REPLACE FUNCTION get_items_summary()
@@ -396,3 +463,51 @@ BEGIN
   ORDER BY cwd.report_date ASC;
 END;
 $$ LANGUAGE plpgsql;
+
+// Donut Chart 1️⃣
+CREATE OR REPLACE FUNCTION get_yearly_item_stats()
+RETURNS TABLE (
+    year double precision, 
+    total bigint
+) 
+LANGUAGE sql
+AS $$
+    SELECT 
+        EXTRACT(YEAR FROM created_at) AS year, 
+        COUNT(item_id) AS total 
+    FROM items 
+    WHERE EXTRACT(YEAR FROM created_at) IN (
+        EXTRACT(YEAR FROM CURRENT_DATE), 
+        EXTRACT(YEAR FROM CURRENT_DATE) - 1
+    )
+    GROUP BY EXTRACT(YEAR FROM created_at)
+    ORDER BY year DESC;
+$$;
+
+// Donut Chart 2️⃣
+CREATE OR REPLACE FUNCTION get_item_price_stats()
+RETURNS TABLE (
+    category text,
+    total bigint
+) 
+LANGUAGE sql
+AS $$
+    -- 1. ช่วงราคา ฿1 - ฿100
+    SELECT '฿1–฿100' AS category, COUNT(item_id) AS total 
+    FROM items 
+    WHERE price BETWEEN 1 AND 100
+
+    UNION ALL
+
+    -- 2. ช่วงราคา ฿101 - ฿500
+    SELECT '฿101–฿500' AS category, COUNT(item_id) AS total 
+    FROM items 
+    WHERE price BETWEEN 101 AND 500
+
+    UNION ALL
+
+    -- 3. ช่วงราคา ฿501 ขึ้นไป
+    SELECT '฿501+' AS category, COUNT(item_id) AS total 
+    FROM items 
+    WHERE price >= 501;
+$$;
