@@ -34,11 +34,11 @@ exports.getuserRegistrations = async (req, res) => {
     const formattedData = [
       {
         name: `${currentYear} - ${percentCurrent}% (${usersCurrent})`,
-        users: usersCurrent, // ยังต้องส่ง users ไปด้วย เพื่อให้กราฟรู้สัดส่วนชิ้นโดนัท
+        value: usersCurrent, // ยังต้องส่ง users ไปด้วย เพื่อให้กราฟรู้สัดส่วนชิ้นโดนัท
       },
       {
         name: `${previousYear} - ${percentPrevious}% (${usersPrevious})`,
-        users: usersPrevious,
+        value: usersPrevious,
       },
     ];
 

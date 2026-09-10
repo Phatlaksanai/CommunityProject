@@ -377,6 +377,7 @@ const UserStats = () => {
                             data={formattedUserRegistrations}
                             title={`User Registrations: ${previousYear} vs ${currentYear}`}
                             tooltipLabel="Registered"
+                            dataKey="value"
                         />
                     </div>
 
@@ -386,6 +387,7 @@ const UserStats = () => {
                             data={formattedRoleData}
                             title="User Roles Proportion"
                             tooltipLabel="Total"
+                            dataKey="value"
                         />
                     </div>
 

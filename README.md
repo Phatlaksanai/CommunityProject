@@ -38,12 +38,12 @@ npm install dayjs
 npm install @mui/icons-material @mui/material @emotion/styled @emotion/react
 npm install -D sass
 npm install @tanstack/react-query
+npm install three
 ```
 
 ## Client
 
 ```bash
-npm install three
 npm install swiper
 npm install react-intersection-observer
 npm install algoliasearch react-instantsearch

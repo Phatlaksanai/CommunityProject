@@ -11,6 +11,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DonutChart from "../../Right/donutChart/donutChart"
+import ModelViewer from "../../modelViewer/model_viewer";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const ContentStats = () => {
@@ -65,7 +66,7 @@ const ContentStats = () => {
         }
     });
 
-    const { isLoading: tableLoading, isError: isTableError, data: tableData } = useQuery({
+    const { isLoading: tableLoading, data: tableData, isError: isTableError } = useQuery({
         queryKey: ["contentTableData", activeTab],
         queryFn: async () => {
             let endpoint = "";
@@ -76,6 +77,64 @@ const ContentStats = () => {
             const res = await makeRequest.get(endpoint);
             return res.data;
         }
+    });
+
+    const { isLoading: donutYearlyLoading, data: donutYearlyData, isError: isDonutYearlyError } = useQuery({
+        queryKey: ["donutYearlyChartData", activeTab],
+        queryFn: async () => {
+            let endpoint = "";
+            if (activeTab === "Posts") endpoint = "/admin/content/donutYearlyPosts";
+            else if (activeTab === "Communities") endpoint = "/admin/content/donutYearlyCommunities";
+            else if (activeTab === "Items") endpoint = "/admin/content/donutYearlyItems";
+
+            const res = await makeRequest.get(endpoint);
+            return res.data;
+        }
+    });
+
+    const currentYear = new Date().getFullYear();
+    const previousYear = currentYear - 1;
+
+    const formattedDonutYearlyData = donutYearlyData?.map((entry) => {
+        let cellColor = "#D9D9D9";
+        if (entry.name.includes(currentYear.toString())) cellColor = "#FF928A";
+        else if (entry.name.includes(previousYear.toString())) cellColor = "#8979FF";
+
+        return { ...entry, fill: cellColor };
+    });
+
+    const { isLoading: donutDistributionLoading, data: donutDistributionData, isError: isDonutDistributionError } = useQuery({
+        queryKey: ["donutDistributionChartData", activeTab],
+        queryFn: async () => {
+            let endpoint = "";
+
+            if (activeTab === "Posts") endpoint = "/admin/content/donutDistributionPost";
+            else if (activeTab === "Communities") endpoint = "/admin/content/donutDistributionCommunity";
+            else if (activeTab === "Items") endpoint = "/admin/content/donutDistributionItem";
+
+            const res = await makeRequest.get(endpoint);
+            return res.data;
+        }
+    });
+
+    const formattedDonutDistributionData = donutDistributionData?.map((entry) => {
+        let cellColor = "#D9D9D9"; // สีเริ่มต้น
+
+        if (activeTab === "Posts") {
+            if (entry.name.includes("Images")) cellColor = "#D9D9D9";
+            else if (entry.name.includes("Models")) cellColor = "#74BD6E";
+        }
+        else if (activeTab === "Communities") {
+            if (entry.name.includes("Non-Members")) cellColor = "#74BD6E";
+            else if (entry.name.includes("Community Members")) cellColor = "#D9D9D9";
+        }
+        else if (activeTab === "Items") {
+            if (entry.name.includes("฿1–฿100")) cellColor = "#74BD6E";
+            else if (entry.name.includes("฿101–฿500")) cellColor = "#BD6E6E";
+            else if (entry.name.includes("฿501+")) cellColor = "#5096FF";
+        }
+
+        return { ...entry, fill: cellColor };
     });
 
     // ดึงข้อมูล Categories มาทำ Dropdown
@@ -184,7 +243,8 @@ const ContentStats = () => {
                 price: row.price || "",
                 status: row.status || "",
                 category_id: row.category_id || "",
-                img: row.img || ""
+                img: row.img || "",
+                model: row.model || ""
             });
             setIsAddingNewCategory(false); // เคลียร์ค่าหมวดหมู่ใหม่ เผื่อกดเปิดตัวอื่นต่อ
             setNewCategoryName("");
@@ -201,50 +261,20 @@ const ContentStats = () => {
             ...formData,
             new_category_name: isAddingNewCategory ? newCategoryName : null
         };
-        
+
         updateMutation.mutate(payload);
     };
 
-    if (summaryLoading || chartLoading || tableLoading) return <div className="loading">Loading dashboard...</div>;
-    if (isSummaryError || isChartError || isTableError) return <div className="error">Error loading dashboard data.</div>;
+    if (summaryLoading || chartLoading || tableLoading || donutYearlyLoading || donutDistributionLoading) return <div className="loading">Loading dashboard...</div>;
+    if (isSummaryError || isChartError || isTableError || isDonutYearlyError || isDonutDistributionError) return <div className="error">Error loading dashboard data.</div>;
 
     return (
         <div className="contentStats" style={{ display: 'flex' }}>
-            <div className="L" style={{ width: isPanelOpen ? '75%' : '100%', transition: 'width 0.3s' }}>
+            <div className={`L ${!isPanelOpen ? 'expanded' : ''}`}>
                 <div className="container">
                     <div className="top-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '20px' }}>
                         <div className="header-title">
                             <h1>Content & Assets</h1>
-                        </div>
-                        {/* กลุ่มปุ่มเลือก Tab */}
-                        <div className="tab-buttons">
-                            {isPanelOpen && (
-                                <>
-                                    <button
-                                        className={`tab-btn posts-btn ${activeTab === "Posts" ? "active" : ""}`}
-                                        onClick={() => setActiveTab("Posts")}
-                                    >
-                                        Posts
-                                    </button>
-                                    <button
-                                        className={`tab-btn commu-btn ${activeTab === "Communities" ? "active" : ""}`}
-                                        onClick={() => setActiveTab("Communities")}
-                                    >
-                                        Communities
-                                    </button>
-                                    <button
-                                        className={`tab-btn items-btn ${activeTab === "Items" ? "active" : ""}`}
-                                        onClick={() => setActiveTab("Items")}
-                                    >
-                                        Items
-                                    </button>
-                                </>
-                            )}
-
-                            {/* ปุ่มลูกศรเปิด-ปิด */}
-                            <div className="toggle-arrow" onClick={() => setIsPanelOpen(!isPanelOpen)}>
-                                {isPanelOpen ? <ArrowLeftIcon sx={{ fontSize: 45 }} /> : <ArrowRightIcon sx={{ fontSize: 45 }} />}
-                            </div>
                         </div>
                     </div>
 
@@ -459,16 +489,6 @@ const ContentStats = () => {
                 </div>
             </div>
 
-            {/* ฝั่งขวา (R) แสดง DonutChart */}
-            {isPanelOpen && (
-                <div className="R" style={{ width: '25%', transition: 'width 0.3s' }}>
-                    <div className="donut-charts-section">
-                        {/* ส่ง activeTab ไปให้ DonutChart เพื่อให้มันรู้ว่าต้องดึงข้อมูลของอะไร */}
-                        <DonutChart activeTab={activeTab} />
-                    </div>
-                </div>
-            )}
-
             {selectedUser && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -615,7 +635,7 @@ const ContentStats = () => {
                                         />
                                     </div>
                                     <div className="input-group full-width">
-                                        <label>Image URL</label>
+                                        <label>Image</label>
                                         <input
                                             type="text"
                                             name="img"
@@ -625,6 +645,22 @@ const ContentStats = () => {
                                         />
                                         {formData.img && (
                                             <img src={formData.img} alt="Item Preview" className="cover-preview" style={{ marginTop: '10px', maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
+                                        )}
+                                    </div>
+                                    <div className="input-group full-width">
+                                        <label>Model</label>
+                                        <input
+                                            type="text"
+                                            name="model"
+                                            value={formData.model || ""}
+                                            onChange={handleChange}
+                                            placeholder="Paste model URL here..."
+                                        />
+                                        {formData.model && (
+                                            <div className="postModel">
+                                                <ModelViewer modelUrl={formData.model} />
+                                            </div>
+                                            // <img src={formData.model} alt="Item Preview" className="cover-preview" style={{ marginTop: '10px', maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
                                         )}
                                     </div>
                                 </>
@@ -646,6 +682,78 @@ const ContentStats = () => {
                 </div>
             )}
 
+            {/* ฝั่งขวา (R) แสดง DonutChart */}
+                <div className="R" >
+                    <div className="right-header" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '30px' }}>
+                        <div className="tab-buttons" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+
+                            {isPanelOpen && (
+                                <>
+                                    {/* กลุ่มปุ่มเลือก Tab */}
+                                    <button
+                                        className={`tab-btn posts-btn ${activeTab === "Posts" ? "active" : ""}`}
+                                        onClick={() => setActiveTab("Posts")}
+                                    >
+                                        Posts
+                                    </button>
+                                    <button
+                                        className={`tab-btn commu-btn ${activeTab === "Communities" ? "active" : ""}`}
+                                        onClick={() => setActiveTab("Communities")}
+                                    >
+                                        Communities
+                                    </button>
+                                    <button
+                                        className={`tab-btn items-btn ${activeTab === "Items" ? "active" : ""}`}
+                                        onClick={() => setActiveTab("Items")}
+                                    >
+                                        Items
+                                    </button>
+                                </>
+                            )}
+
+                            {/* ปุ่มลูกศรเปิด-ปิด */}
+                            <div className="toggle-arrow" onClick={() => setIsPanelOpen(!isPanelOpen)}>
+                                {isPanelOpen ? <ArrowLeftIcon sx={{ fontSize: 45 }} /> : <ArrowRightIcon sx={{ fontSize: 45 }} />}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="donut-charts-section">
+                        {donutYearlyLoading ? (
+                            <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading Chart...</div>
+                        ) : (
+                            <DonutChart
+                                data={formattedDonutYearlyData}
+                                title={`${activeTab}: ${previousYear} vs ${currentYear}`}
+                                tooltipLabel={activeTab}
+                                dataKey="value"
+                            />
+                        )}
+
+                        {donutDistributionLoading ? (
+                            <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading Distribution Chart...</div>
+                        ) : (
+                            formattedDonutDistributionData && formattedDonutDistributionData.length > 0 && (
+                                <div style={{ marginTop: '20px' }}>
+                                    <DonutChart
+                                        data={formattedDonutDistributionData}
+                                        title={
+                                            activeTab === "Posts" ? "Media Distribution: Images vs Models" :
+                                                activeTab === "Communities" ? "Community Membership Distribution" :
+                                                    "Item Distribution by Price Range"
+                                        }
+                                        tooltipLabel={
+                                            activeTab === "Posts" ? "Files" :
+                                                activeTab === "Communities" ? "Users" :
+                                                    "Items"
+                                        }
+                                        dataKey="value"
+                                    />
+                                </div>
+                            )
+                        )}
+                    </div>
+                </div>
         </div >
     )
 }

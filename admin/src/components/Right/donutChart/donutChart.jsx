@@ -2,7 +2,7 @@ import "./donutChart.scss"
 import { PieChart, Pie, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 // รับ Props ที่จำเป็นสำหรับการแสดงผลกราฟ
-const DonutChart = ({ data, title, tooltipLabel, dataKey = "users" }) => {
+const DonutChart = ({ data, title, tooltipLabel, dataKey = "value" }) => {
 
     if (!data || data.length === 0) return <div>No data available</div>;
 
