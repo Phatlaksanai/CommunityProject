@@ -80,54 +80,58 @@ const DescDownload = () => {
     return (
         <div className="descDownload">
             <div className="container">
-                <div className="Header">
-                    <h2>Item</h2>
-                    <h2>Price</h2>
-                    <h2>Date</h2>
-                    <h2>Type</h2>
-                    <h2>Download</h2>
-                    <h2>Review</h2>
+                <div className="table-header-sticky">
+                    <div className="Header">
+                        <h2>Item</h2>
+                        <h2>Price</h2>
+                        <h2>Date</h2>
+                        <h2>Type</h2>
+                        <h2>Download</h2>
+                        <h2>Review</h2>
+                    </div>
                 </div>
                 <hr />
-                <div className="content">
-                    {downloads.map(item => (
-                        <div className="row" key={item.order_item_id}>
-                            <h3>{item.items.modelName}</h3>
-                            <span>฿{item.items.price}</span>
-                            <span>{new Date(item.orders.created_at).toLocaleDateString()}</span>
-                            <select className="file-type-select"
-                                value={fileTypes[item.order_item_id] || getDefaultFileType(item.items)}
-                                onChange={(e) =>
-                                    setFileTypes({
-                                        ...fileTypes,
-                                        [item.order_item_id]: e.target.value
-                                    })
-                                }
-                            >
-                                <option disabled={!item.items.obj} value="obj">OBJ</option>
-                                <option disabled={!item.items.fbx} value="fbx">FBX</option>
-                                <option disabled={!item.items.blend} value="blend">BLEND</option>
-                                <option disabled={!item.items.usdz} value="usdz">USDZ</option>
-                                <option disabled={!item.items.gltf} value="gltf">GLTF</option>
-                            </select>
-                            <button onClick={() => {
-                                const typeToDownload = fileTypes[item.order_item_id] || getDefaultFileType(item.items); // ใช้ประเภทไฟล์ที่เลือกหรือประเภทเริ่มต้นถ้าไม่มีการเลือก
-                                handleDownload(item.order_item_id, typeToDownload);
-                            }}>Download</button>
-                            {item.is_reviewed ? (
-                                <span className="review-complete">Complete</span>
-                            ) : (
-                                <button className="review-btn"
-                                    onClick={() => {
-                                        setSelectedItemId(item.items.item_id);
-                                        setOpenReview(true);
-                                    }}
+                <div className="table-scroll-body">
+                    <div className="content">
+                        {downloads.map(item => (
+                            <div className="row" key={item.order_item_id}>
+                                <h3>{item.items.modelName}</h3>
+                                <span>฿{item.items.price}</span>
+                                <span>{new Date(item.orders.created_at).toLocaleDateString()}</span>
+                                <select className="file-type-select"
+                                    value={fileTypes[item.order_item_id] || getDefaultFileType(item.items)}
+                                    onChange={(e) =>
+                                        setFileTypes({
+                                            ...fileTypes,
+                                            [item.order_item_id]: e.target.value
+                                        })
+                                    }
                                 >
-                                    Review
-                                </button>
-                            )}
-                        </div>
-                    ))}
+                                    <option disabled={!item.items.obj} value="obj">OBJ</option>
+                                    <option disabled={!item.items.fbx} value="fbx">FBX</option>
+                                    <option disabled={!item.items.blend} value="blend">BLEND</option>
+                                    <option disabled={!item.items.usdz} value="usdz">USDZ</option>
+                                    <option disabled={!item.items.gltf} value="gltf">GLTF</option>
+                                </select>
+                                <button onClick={() => {
+                                    const typeToDownload = fileTypes[item.order_item_id] || getDefaultFileType(item.items); // ใช้ประเภทไฟล์ที่เลือกหรือประเภทเริ่มต้นถ้าไม่มีการเลือก
+                                    handleDownload(item.order_item_id, typeToDownload);
+                                }}>Download</button>
+                                {item.is_reviewed ? (
+                                    <span className="review-complete">Complete</span>
+                                ) : (
+                                    <button className="review-btn"
+                                        onClick={() => {
+                                            setSelectedItemId(item.items.item_id);
+                                            setOpenReview(true);
+                                        }}
+                                    >
+                                        Review
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 

@@ -12,7 +12,8 @@ exports.getTransection = async (req, res) => {
                     transaction_type,
                     order_items!inner(
                         items(
-                            modelName
+                            modelName,
+                            img
                         )
                     )
                 `)
