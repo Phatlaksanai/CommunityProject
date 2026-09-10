@@ -4,7 +4,7 @@
   @include themify($themes) {
     padding: 50px 15%;
     background-color: themed("bg");
-    min-height: 100vh;
+    height: auto;
     color: themed("textColor");
 
     @include mobile {
@@ -19,6 +19,33 @@
       width: 100%;
       display: flex;
       flex-direction: column;
+    }
+
+    .table-header-sticky {
+      width: 100%;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background-color: themed("bg"); // ใช้สีพื้นหลังกล่องเพื่อบังข้อมูลเวลาเลื่อนผ่าน
+    }
+
+    // ส่วนเนื้อหาที่เปิดให้เลื่อนแนวตั้งได้
+    .table-scroll-body {
+      width: 100%;
+      max-height: 350px; // ปรับความสูงสูงสุดตามต้องการ
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      // ตกแต่ง Scrollbar ตามสไตล์ที่คุณต้องการ
+      &::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #A0C46E;
+        border-radius: 4px;
+      }
     }
 
     .Header,
@@ -92,7 +119,7 @@
         }
       }
 
-      .review-complete{
+      .review-complete {
         color: themed("textColorSoft");
         font-size: 15px;
         font-weight: bold;

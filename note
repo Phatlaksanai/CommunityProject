@@ -188,7 +188,7 @@ RETURNS TABLE (
 BEGIN
   RETURN QUERY
   WITH current_week_days AS (
-    -- (WITH ตารางชั่วคราว) สร้างวันที่ตั้งแต่วันจันทร์ (0) ถึง วันอาทิตย์ (6) ของสัปดาห์ปัจจุบัน
+    --  (WITH ตารางชั่วคราว) สร้างวันที่ตั้งแต่วันจันทร์ (0) ถึง วันอาทิตย์ (6) ของสัปดาห์ปัจจุบัน
     -- DATE_TRUNC('week', CURRENT_DATE) จะดึงวันที่ของ "วันจันทร์" ในสัปดาห์นี้มาเสมอ
     SELECT (DATE_TRUNC('week', CURRENT_DATE) + (i || ' days')::interval)::date AS report_date
     FROM generate_series(0, 6) AS i
@@ -511,3 +511,119 @@ AS $$
     FROM items 
     WHERE price >= 501;
 $$;
+
+🔎🔎 หน้า TransactionStats
+// weekly order at TransactionStats
+CREATE OR REPLACE FUNCTION get_weekly_orders_chart()
+RETURNS TABLE (
+  day_name text,
+  order_count bigint
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH current_week_days AS (
+    -- สร้างวันที่ตั้งแต่วันจันทร์ (0) ถึง วันอาทิตย์ (6) ของสัปดาห์ปัจจุบัน
+    SELECT (DATE_TRUNC('week', CURRENT_DATE) + (i || ' days')::interval)::date AS report_date
+    FROM generate_series(0, 6) AS i
+  )
+  SELECT 
+    -- แปลงวันที่ให้เป็นชื่อย่อ เช่น Mon, Tue, Wed
+    TO_CHAR(cwd.report_date, 'Dy') AS day_name, 
+    
+    -- นับจำนวนออเดอร์ในวันนั้นๆ (ถ้าไม่มีออเดอร์ จะได้ค่า 0 กลับไป)
+    COUNT(o.created_at) AS order_count
+    
+  FROM current_week_days cwd
+  -- ใช้ LEFT JOIN เพื่อรักษาข้อมูลวันที่เอาไว้
+  -- แนะนำให้เปรียบเทียบแบบ Range (>= และ <) เพื่อให้ Database สามารถใช้ Index ดึงข้อมูลได้รวดเร็ว
+  LEFT JOIN public.orders o 
+    ON o.created_at >= cwd.report_date 
+    AND o.created_at < cwd.report_date + INTERVAL '1 day'
+  
+  GROUP BY cwd.report_date, day_name
+  ORDER BY cwd.report_date ASC;
+END;
+$$ LANGUAGE plpgsql;
+
+// Range Order by price at Transection
+CREATE OR REPLACE FUNCTION get_order_by_range()
+RETURNS TABLE (
+  range_name text,
+  total bigint
+) 
+LANGUAGE sql
+AS $$
+  SELECT 
+    CASE 
+      WHEN (oi.platform_fee + oi.seller_net) <= 100 THEN '฿1–฿100'
+      WHEN (oi.platform_fee + oi.seller_net) > 100 AND (oi.platform_fee + oi.seller_net) <= 500 THEN '฿101–฿500'
+      ELSE '฿501+'
+    END AS range_name,
+    COUNT(oi.order_item_id) AS total
+  FROM public.order_items oi
+  JOIN public.orders o ON oi.order_id = o.order_id
+  WHERE o.status = 'completed'
+  GROUP BY 1
+  ORDER BY total DESC;
+$$;
+
+// weekly sale at transaction
+CREATE OR REPLACE FUNCTION get_weekly_sales_chart()
+RETURNS TABLE (
+  day_name text,
+  total_sales numeric
+) 
+LANGUAGE sql
+AS $$
+  WITH days AS (
+    SELECT unnest(ARRAY['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']) AS day_name,
+           unnest(ARRAY[1, 2, 3, 4, 5, 6, 7]) AS day_of_week
+  )
+  SELECT 
+    d.day_name,
+    COALESCE(SUM(t.amount), 0) AS total_sales
+  FROM days d
+  LEFT JOIN public.transactions t 
+    ON EXTRACT(ISODOW FROM t.created_at) = d.day_of_week 
+    AND t.created_at >= date_trunc('week', CURRENT_DATE)
+    AND t.transaction_type = 'sale'
+  GROUP BY d.day_of_week, d.day_name
+  ORDER BY d.day_of_week;
+$$;
+
+// Transaction 4 Box
+CREATE OR REPLACE FUNCTION get_transaction_summary () 
+RETURNS table (
+  total_revenue numeric,
+  total_sales bigint,
+  total_order bigint,
+  order_today bigint
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH OrderStats AS (
+    SELECT 
+      -- รวมยอดขายจาก Order ที่ completed
+      COALESCE(SUM(total_amount) FILTER (WHERE status = 'completed'), 0) AS total_sales,
+      -- นับจำนวน Order ทั้งหมด
+      COUNT(*) AS total_order,
+      -- นับจำนวน Order เฉพาะวันนี้ (ใช้วิธีนี้ Index จะทำงานได้ดีกว่า DATE() = CURRENT_DATE)
+      COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE AND created_at < CURRENT_DATE + INTERVAL '1 day') AS order_today
+    FROM public.orders
+  ),
+  RevenueStats AS (
+    -- รวมค่าธรรมเนียม
+    SELECT COALESCE(SUM(oi.platform_fee), 0) AS total_revenue
+    FROM public.order_items oi 
+    JOIN public.orders o ON oi.order_id = o.order_id 
+    WHERE o.status = 'completed'
+  )
+  SELECT 
+    r.total_revenue,
+    o.total_sales::bigint, -- Cast data type ให้ตรงกับโครงสร้าง
+    o.total_order::bigint,
+    o.order_today::bigint
+  FROM OrderStats o
+  CROSS JOIN RevenueStats r;
+END;
+$$ LANGUAGE plpgsql;
