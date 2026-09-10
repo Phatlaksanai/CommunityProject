@@ -165,7 +165,8 @@ exports.addItem = async (req, res) => {
         polygon_count: polygon_count ? parseInt(polygon_count) : 0, // เพิ่มฟิลด์ใหม่
         has_textures: has_textures || false,                        // เพิ่มฟิลด์ใหม่
         is_rigged: is_rigged || false,                              // เพิ่มฟิลด์ใหม่
-        is_uv_mapped: is_uv_mapped || false
+        is_uv_mapped: is_uv_mapped || false,
+        status: "show"
       }])
     .select()
     .single();

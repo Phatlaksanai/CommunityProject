@@ -102,7 +102,7 @@ exports.getUsersTable = async (req, res) => {
       .select(
         "user_id, username, name, email, description, isdelete, stripe_connect_id, balance, created_at, role",
       )
-      .order("user_id", { ascending: true });
+      .order("user_id", { ascending: true }); // เรียงจากน้อยไปมาก
 
     if (error) throw error;
 
