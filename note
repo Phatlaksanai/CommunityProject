@@ -627,3 +627,34 @@ BEGIN
   CROSS JOIN RevenueStats r;
 END;
 $$ LANGUAGE plpgsql;
+
+🔎🔎 หน้า earnings&payouts
+// earnings&payouts
+-- 1. สร้าง View มัดรวมสินค้า (Grouped Earnings)
+CREATE OR REPLACE VIEW view_grouped_earnings AS
+SELECT 
+    oi.seller_id,
+    i."modelName" AS model_name,
+    i.img,
+    COUNT(t.transaction_id) AS quantity,
+    SUM(t.amount) AS total_amount
+FROM transactions t
+INNER JOIN order_items oi ON t.order_item_id = oi.order_item_id
+INNER JOIN items i ON oi.item_id = i.item_id
+WHERE t.transaction_type = 'sale'
+GROUP BY oi.seller_id, i."modelName", i.img;
+
+-- 2. สร้าง View สรุปยอดขาย (Summary Stats) 
+-- มีการอิงเวลาประเทศไทย (Asia/Bangkok) เพื่อกันปัญหาวันที่เหลื่อมกับเวลาโลก
+CREATE OR REPLACE VIEW view_summary_stats AS
+SELECT 
+    oi.seller_id,
+    COUNT(t.transaction_id) AS total_quantity,
+    COALESCE(SUM(t.amount), 0) AS total_sale,
+    COALESCE(SUM(CASE WHEN DATE(t.created_at AT TIME ZONE 'Asia/Bangkok') = CURRENT_DATE THEN t.amount ELSE 0 END), 0) AS day_sale,
+    COALESCE(SUM(CASE WHEN DATE_TRUNC('month', t.created_at AT TIME ZONE 'Asia/Bangkok') = DATE_TRUNC('month', CURRENT_DATE) THEN t.amount ELSE 0 END), 0) AS month_sale,
+    COALESCE(SUM(CASE WHEN DATE_TRUNC('year', t.created_at AT TIME ZONE 'Asia/Bangkok') = DATE_TRUNC('year', CURRENT_DATE) THEN t.amount ELSE 0 END), 0) AS year_sale
+FROM transactions t
+INNER JOIN order_items oi ON t.order_item_id = oi.order_item_id
+WHERE t.transaction_type = 'sale'
+GROUP BY oi.seller_id;

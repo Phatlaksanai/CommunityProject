@@ -13,7 +13,7 @@ import DescItem from './pages/descItem/DescItem';
 import DescProject from './pages/descProject/DescProject';
 import DescCommu from './pages/descCommu/DescCommu';
 import DescDownload from './pages/descDownload/DescDownload';
-import Transection from './pages/descDownload/Transection';
+import Earn_Pay from './pages/descDownload/Earn_Pay';
 import Buyitem from './pages/buyitem/Buyitem';
 import Cart from './pages/cart/Cart';
 import Profile from "./pages/profile/Profile";
@@ -316,8 +316,8 @@ function App() {
           element: <DescDownload />
         },
         {
-          path: "transection",
-          element: <Transection />
+          path: "Earnings&PayOuts",
+          element: <Earn_Pay />
         },
       ]
     },

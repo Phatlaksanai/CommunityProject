@@ -1,15 +1,18 @@
-import './transection.scss';
-import { useParams } from "react-router-dom";
+import './earn_pay.scss';
 import { useState, useEffect } from "react";
 import { makeRequest } from "../../api/axios";
 
-const Transection = () => {
-    const [transection, setTransection] = useState([]);
+const Earn_Pay = () => {
+    // แยก State ให้ตรงกับที่ Backend ส่งมา
+    const [groupedEarnings, setGroupedEarnings] = useState([]);
+    const [summaryStats, setSummaryStats] = useState({});
+    const [payouts, setPayouts] = useState([]);
 
     useEffect(() => {
         makeRequest.get(`/transections`).then(res => {
-            console.log("API Data:", res.data);
-            setTransection(res.data);
+            setGroupedEarnings(res.data.groupedEarnings);
+            setSummaryStats(res.data.summaryStats);
+            setPayouts(res.data.payouts);
         });
     }, []);
 
@@ -23,10 +26,10 @@ const Transection = () => {
                         {/* ส่วนหัวที่ต้องการล็อคให้อยู่กับที่ */}
                         <div className="table-header-sticky">
                             <div className="Header">
-                                <h2>Item Name</h2>
-                                <h2>Amount</h2>
-                                <h2>Type</h2>
-                                <h2>Date</h2>
+                                <h2>Item</h2>
+                                <h2>Price</h2>
+                                <h2>Quantity</h2>
+                                <h2>Total</h2>
                             </div>
                             <hr />
                         </div>
@@ -34,26 +37,19 @@ const Transection = () => {
                         {/* ส่วนเนื้อหาที่สามารถเลื่อน (Scroll) ได้ */}
                         <div className="table-scroll-body">
                             <div className="content">
-                                {transection.map(item => (
-                                    <div className="row" key={item.transaction_id}>
+                                {groupedEarnings.map((item, index) => (
+                                    <div className="row" key={index}>
                                         <div className="item-info">
-                                            {/* ใส่แท็ก img หรือกล่อง placeholder สำหรับรูปภาพ */}
                                             <div className="img">
-                                                <img src={item.order_items?.items?.img} alt="" />
+                                                <img src={item.img} alt="" />
                                             </div>
-
-                                            {(() => {
-                                                const displayName = item.order_items?.items?.modelName || "-";
-                                                return (
-                                                    <h3 style={{ cursor: "pointer" }}>
-                                                        {displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName}
-                                                    </h3>
-                                                );
-                                            })()}
+                                            <h3 className="custom-tooltip" data-tip={item.model_name}>
+                                                {item.model_name.length > 10 ? `${item.model_name.substring(0, 10)}...` : item.model_name}
+                                            </h3>
                                         </div>
-                                        <span>฿{item.amount}</span>
-                                        <span>{item.transaction_type}</span>
-                                        <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                                        <span>฿{item.total_amount / item.quantity}</span>
+                                        <span>{item.quantity}</span>
+                                        <span>฿{item.total_amount}</span>
                                     </div>
                                 ))}
                             </div>
@@ -76,7 +72,7 @@ const Transection = () => {
                         {/* ส่วนเนื้อหาฝั่งขวาที่เลื่อนได้ */}
                         <div className="table-scroll-body">
                             <div className="content">
-                                {transection.map(item => (
+                                {payouts.map(item => (
                                     <div className="row" key={item.transaction_id}>
                                         <span>฿{item.amount}</span>
                                         <span>{new Date(item.created_at).toLocaleDateString()}</span>
@@ -91,23 +87,23 @@ const Transection = () => {
                 <div className="All">
                     <div className="box">
                         <h2 className="title">Total Quantity</h2>
-                        <h2 className="number">50</h2>
+                        <h2 className="number">{Number(summaryStats.total_quantity || 0).toLocaleString()}</h2>
                     </div>
                     <div className="box">
                         <h2 className="title">Total Sale</h2>
-                        <h2 className="number">50,000</h2>
+                        <h2 className="number">{Number(summaryStats.total_sale || 0).toLocaleString()}</h2>
                     </div>
                     <div className="box">
                         <h2 className="title">Day Sale</h2>
-                        <h2 className="number">5,000</h2>
+                        <h2 className="number">{Number(summaryStats.day_sale || 0).toLocaleString()}</h2>
                     </div>
                     <div className="box">
                         <h2 className="title">Month Sale</h2>
-                        <h2 className="number">50,000</h2>
+                        <h2 className="number">{Number(summaryStats.month_sale || 0).toLocaleString()}</h2>
                     </div>
                     <div className="box">
                         <h2 className="title">Year Sale</h2>
-                        <h2 className="number">500,000</h2>
+                        <h2 className="number">{Number(summaryStats.year_sale || 0).toLocaleString()}</h2>
                     </div>
                 </div>
             </div>
@@ -115,4 +111,4 @@ const Transection = () => {
     );
 }
 
-export default Transection;
+export default Earn_Pay;
