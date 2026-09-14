@@ -627,3 +627,124 @@ BEGIN
   CROSS JOIN RevenueStats r;
 END;
 $$ LANGUAGE plpgsql;
+
+🔎🔎 หน้า Reports
+// Top Posts
+CREATE OR REPLACE FUNCTION get_top_reported_posts()
+RETURNS TABLE (
+    id integer,
+    image varchar,
+    description varchar,
+    report_count bigint
+)
+LANGUAGE sql
+AS $$
+    SELECT
+        p.post_id AS id,
+        i.img AS image,
+        p.description,
+        COUNT(r.report_id) AS report_count
+    FROM reports r
+    INNER JOIN posts p
+        ON r.post_id = p.post_id
+
+    LEFT JOIN LATERAL (
+        SELECT img
+        FROM imgs
+        WHERE imgs.post_id = p.post_id
+        ORDER BY img_id ASC
+        LIMIT 1
+    ) i ON true
+
+    WHERE r.post_id IS NOT NULL
+
+    GROUP BY
+        p.post_id,
+        i.img,
+        p.description
+
+    ORDER BY report_count DESC
+    LIMIT 5;
+$$;
+
+// Top Community
+CREATE OR REPLACE FUNCTION get_top_reported_communities()
+RETURNS TABLE (
+    id integer,
+    image varchar,
+    description varchar,
+    report_count bigint
+)
+LANGUAGE sql
+AS $$
+    SELECT
+        c.communities_id AS id,
+        c.cover_img AS image,
+        c.name AS description,
+        COUNT(r.report_id) AS report_count
+    FROM reports r
+    INNER JOIN communities c
+        ON r.community_id = c.communities_id
+    WHERE r.community_id IS NOT NULL
+    GROUP BY
+        c.communities_id,
+        c.cover_img,
+        c.name
+    ORDER BY report_count DESC
+    LIMIT 5;
+$$;
+
+// Top Reported User
+CREATE OR REPLACE FUNCTION get_top_reported_users()
+RETURNS TABLE (
+    id integer,
+    image varchar,
+    description varchar,
+    report_count bigint
+)
+LANGUAGE sql
+AS $$
+    SELECT
+        u.user_id AS id,
+        u.profilePic AS image,
+        COALESCE(u.name, u.username) AS description,
+        COUNT(r.report_id) AS report_count
+    FROM reports r
+    INNER JOIN users u
+        ON r.target_id = u.user_id
+    WHERE r.target_id IS NOT NULL
+    GROUP BY
+        u.user_id,
+        u.profilePic,
+        u.name,
+        u.username
+    ORDER BY report_count DESC
+    LIMIT 5;
+$$;
+
+// Top Reporting User
+CREATE OR REPLACE FUNCTION get_top_reporting_users()
+RETURNS TABLE (
+    id integer,
+    image varchar,
+    description varchar,
+    report_count bigint
+)
+LANGUAGE sql
+AS $$
+    SELECT
+        u.user_id AS id,
+        u.profilePic AS image,
+        COALESCE(u.name, u.username) AS description,
+        COUNT(r.report_id) AS report_count
+    FROM reports r
+    INNER JOIN users u
+        ON r.actor_id = u.user_id
+    GROUP BY
+        u.user_id,
+        u.profilePic,
+        u.name,
+        u.username
+    ORDER BY report_count DESC
+    LIMIT 5;
+$$;
