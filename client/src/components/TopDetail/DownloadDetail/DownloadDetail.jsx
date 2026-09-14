@@ -11,7 +11,7 @@ const DownloadDetail = () => {
                     <h1>My Account</h1>
                     <div className="btntabs">
                         <NavLink to={`/download/${id}`} end>Downloads</NavLink>
-                        <NavLink to={`/download/${id}/transection`}>Transection</NavLink>
+                        <NavLink to={`/download/${id}/Earnings&PayOuts`}>Earnings & PayOuts</NavLink>
                     </div>
                 </div>
             </div>
