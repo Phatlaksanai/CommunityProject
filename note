@@ -642,11 +642,14 @@ AS $$
     SELECT
         p.post_id AS id,
         i.img AS image,
-        p.description,
+        COALESCE(u.name, u.username) AS description,
         COUNT(r.report_id) AS report_count
     FROM reports r
     INNER JOIN posts p
         ON r.post_id = p.post_id
+
+    INNER JOIN users u
+        ON p.user_id = u.user_id
 
     LEFT JOIN LATERAL (
         SELECT img
@@ -661,7 +664,8 @@ AS $$
     GROUP BY
         p.post_id,
         i.img,
-        p.description
+        u.name,
+        u.username
 
     ORDER BY report_count DESC
     LIMIT 5;
@@ -706,7 +710,7 @@ LANGUAGE sql
 AS $$
     SELECT
         u.user_id AS id,
-        u.profilePic AS image,
+        u."profilePic" AS image,
         COALESCE(u.name, u.username) AS description,
         COUNT(r.report_id) AS report_count
     FROM reports r
@@ -715,7 +719,7 @@ AS $$
     WHERE r.target_id IS NOT NULL
     GROUP BY
         u.user_id,
-        u.profilePic,
+        u."profilePic",
         u.name,
         u.username
     ORDER BY report_count DESC
@@ -734,7 +738,7 @@ LANGUAGE sql
 AS $$
     SELECT
         u.user_id AS id,
-        u.profilePic AS image,
+        u."profilePic" AS image,
         COALESCE(u.name, u.username) AS description,
         COUNT(r.report_id) AS report_count
     FROM reports r
@@ -742,7 +746,7 @@ AS $$
         ON r.actor_id = u.user_id
     GROUP BY
         u.user_id,
-        u.profilePic,
+        u."profilePic",
         u.name,
         u.username
     ORDER BY report_count DESC

@@ -1,0 +1,513 @@
+@use "../../../style.scss" as *;
+
+.reportstats {
+  @include themify($themes) {
+    background-color: #060a0e;
+    color: themed("textColor");
+    min-height: 100vh;
+    padding: 20px 10px 20px 25px;
+    display: flex;
+    flex-direction: column;
+
+    // ส่วนหัว Welcome back
+    .header-title {
+      margin-bottom: 30px;
+
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+      }
+
+      p {
+        margin-top: 8px;
+        color: #a0aec0;
+        font-size: 15px;
+      }
+    }
+
+    .top-overview-section {
+      margin-bottom: 40px;
+
+      .report-boxes-row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .report-box {
+        flex: 1;
+        min-width: 260px;
+        background: #090f16;
+        border: 2px solid #161b20;
+        border-radius: 12px;
+        padding: 16px;
+
+        .report-box-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+
+          h3 {
+            font-size: 15px;
+            color: #fff;
+            margin: 0;
+          }
+          .total-label {
+            font-size: 15px;
+            color: #8a8f9c;
+          }
+        }
+
+        .report-box-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .report-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          .report-item-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+          }
+
+          .report-item-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+
+            .report-item-id {
+              font-size: 16px;
+              color: #fff;
+              font-weight: 600;
+            }
+            .report-item-desc {
+              font-size: 14px;
+              color: #8a8f9c;
+            }
+          }
+
+          .report-item-count {
+            font-size: 16px;
+            color: #fff;
+            font-weight: 600;
+          }
+        }
+
+        .report-item-empty {
+          color: #8a8f9c;
+          font-size: 15px;
+          text-align: center;
+          padding: 12px 0;
+        }
+      }
+
+      // ฝั่งขวา: สไตล์ของกล่องกราฟ
+      .chart-container {
+        background-color: #090f16;
+        border: 2px solid #161b20;
+        border-radius: 12px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+
+        .chart-title {
+          font-size: 18px;
+          font-weight: 600;
+          margin: 0 0 20px 0;
+          color: #fff;
+        }
+
+        .recharts-tooltip-wrapper {
+          outline: none;
+        }
+      }
+    }
+
+    .main-content {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .L {
+      flex: 2;
+      max-width: 1400px;
+
+      .user-table-section {
+        // 2.1 กล่องค้นหา
+        .search-section {
+          margin-bottom: 30px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+          }
+
+          .search-box {
+            display: flex;
+            align-items: center;
+            background-color: #0d131a;
+            border: 2px solid #161b20;
+            border-radius: 8px;
+            padding: 8px 12px;
+            width: 100%;
+            max-width: 400px;
+
+            .icon {
+              color: #a0aec0;
+              font-size: 20px;
+              margin-right: 10px;
+            }
+
+            input {
+              border: none;
+              background: transparent;
+              color: #fff;
+              width: 100%;
+              outline: none;
+              font-size: 14px;
+
+              &::placeholder {
+                color: #4a5568;
+              }
+            }
+          }
+        }
+
+        // 2.2 ปุ่ม Add Admin
+        .action-section {
+          display: flex;
+          justify-content: flex-end;
+          position: relative;
+          z-index: 2;
+
+          .add-admin-btn {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 16px 16px 0 0; // โค้งเฉพาะด้านบน
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+              background-color: #b20710;
+            }
+          }
+        }
+
+        // 2.3 ตารางแสดงผล
+        .table-container {
+          background-color: #090f16;
+          border: 2px solid #161b20;
+          border-radius: 8px; // ปรับให้ขอบมน
+          overflow-x: auto;
+          overflow-y: auto; // เพิ่มให้มีแถบเลื่อนแนวตั้ง
+          max-height: 400px; // กำหนดความสูงสูงสุดของตาราง (ปรับตัวเลขตามชอบได้เลย)
+
+          &::-webkit-scrollbar {
+            width: 5px;
+            height: 5px; // เผื่อแถบแนวนอน
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: #e76d09;
+            border-radius: 4px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            position: relative; // เพิ่มสำหรับ sticky
+
+            thead {
+              position: sticky; // ทำให้ส่วนหัวตารางติดขอบบนตอนเลื่อนลง
+              top: 0;
+              z-index: 2;
+              background-color: #090f16; // ใส่สีพื้นหลังทับข้อมูลด้านล่างตอนเลื่อน
+
+              tr {
+                border-bottom: 1px solid #161b20;
+
+                th {
+                  padding: 16px 10px;
+                  color: #ffffff;
+                  font-size: 14px;
+                  font-weight: 600;
+                  white-space: nowrap;
+                }
+              }
+            }
+
+            tbody {
+              tr {
+                border-bottom: 1px solid #161b20;
+                transition: background-color 0.2s ease;
+
+                &:hover {
+                  background-color: #111820; // ไฮไลท์เมื่อชี้เมาส์
+                }
+
+                &:last-child {
+                  border-bottom: none;
+                }
+
+                td {
+                  padding: 16px 10px;
+                  color: #ffffff;
+                  font-size: 13px;
+                  font-weight: 500;
+
+                  &.no-data {
+                    color: #4a5568;
+                    padding: 30px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .R {
+      flex: 1;
+      flex-direction: column;
+      margin-top: 40px;
+
+      .item {
+        margin-top: 78px;
+        background-color: #090f16;
+        border: 2px solid #161b20;
+        border-radius: 12px;
+        padding: 24px;
+
+        .box-title {
+          color: #fff;
+          font-size: 16px;
+          font-weight: 600;
+          display: block;
+          margin-bottom: 15px;
+        }
+
+        .reports-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          .report-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 10px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+
+            .report-left {
+              display: flex;
+              align-items: center;
+              gap: 15px;
+
+              .icon {
+                color: #e76d09;
+                font-size: 22px;
+              }
+
+              span {
+                color: #ffffff;
+                font-size: 14px;
+                font-weight: 500;
+                text-transform: capitalize;
+              }
+            }
+
+            .report-count {
+              color: #e76d09;
+              font-size: 15px;
+              font-weight: 600;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // เพิ่มลูกเล่นให้รู้ว่าแถวตารางคลิกได้
+  .clickable-row {
+    cursor: pointer;
+
+    &:hover {
+      background-color: #111820;
+    }
+  }
+
+  // ==========================================
+  // Modal / Pop-up Styles
+  // ==========================================
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+
+    .modal-content {
+      background-color: #090f16;
+      border: 1px solid #161b20;
+      border-radius: 12px;
+      padding: 30px;
+      width: 100%;
+      max-width: 650px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+
+      &.add-admin-modal {
+        max-width: 450px;
+      }
+
+      h2 {
+        margin: 0 0 25px 0;
+        color: #fff;
+        font-size: 20px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+
+        @media (max-width: 600px) {
+          grid-template-columns: 1fr;
+        }
+
+        .input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+
+          &.full-width {
+            grid-column: span 2;
+            /* บังคับให้ขยายกินพื้นที่ 2 คอลัมน์เต็ม */
+
+            @media (max-width: 600px) {
+              grid-column: span 1;
+              /* ถ้าจอเล็กให้เหลือ 1 คอลัมน์ปกติ */
+            }
+          }
+
+          label {
+            color: #a0aec0;
+            font-size: 13px;
+            font-weight: 600;
+          }
+
+          input,
+          textarea {
+            background-color: #0d131a;
+            // สีขอบตามที่ระบุ
+            border: 1px solid #b87333;
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: box-shadow 0.2s ease;
+            font-family: inherit;
+          }
+
+          textarea {
+            resize: vertical; // ให้ผู้ใช้ลากขยายกล่องข้อความในแนวตั้งได้
+            min-height: 80px;
+          }
+
+          .select-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+
+            select {
+              width: 100%;
+              background-color: #0d131a;
+              border: 1px solid #b87333;
+              border-radius: 6px;
+              padding: 10px 12px;
+              color: #fff;
+              font-size: 14px;
+              outline: none;
+              appearance: none;
+              cursor: pointer;
+            }
+
+            .dropdown-icon {
+              position: absolute;
+              right: 10px;
+              color: #e48500;
+              pointer-events: none; // ให้เมาส์คลิกผ่านไอคอนไปโดน select ได้
+            }
+          }
+        }
+      }
+
+      .form-grid.add-admin-form {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        padding-top: 30px;
+        border-top: 1px solid #161b20;
+
+        button {
+          padding: 10px 24px;
+          border-radius: 6px;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          border: none;
+          color: #fff;
+          transition: opacity 0.2s ease;
+
+          &:hover:not(:disabled) {
+            opacity: 0.8;
+          }
+
+          &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+          }
+
+          &.btn-cancel {
+            background-color: #6a7575;
+          }
+
+          &.btn-update {
+            background-color: #b87333;
+          }
+        }
+      }
+    }
+  }
+}

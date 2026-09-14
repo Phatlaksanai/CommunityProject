@@ -7,6 +7,7 @@ import Login from "./pages/login/Login";
 import User from "./pages/user/User";
 import Content from "./pages/content/Content";
 import Transaction from "./pages/transaction/transaction";
+import Report from "./pages/report/Report";
 
 import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/Left/leftbar/leftbar";
@@ -111,7 +112,19 @@ function App() {
           element: <Transaction />
         },
       ]
-    }
+    },
+    {
+      path: "/reports",
+      element: (
+        <Layout />
+      ),
+      children: [
+        {
+          path: "/reports",
+          element: <Report />
+        },
+      ]
+    },
   ]);
 
   const [user, setUser] = useState(() => {

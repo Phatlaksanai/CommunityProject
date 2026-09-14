@@ -6,7 +6,6 @@ import { makeRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PersonIcon from '@mui/icons-material/Person';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import SystemUpdateAltOutlinedIcon from '@mui/icons-material/SystemUpdateAltOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -545,14 +544,6 @@ const ContentStats = () => {
                                     </div>
                                     <div className="input-group full-width">
                                         <label>Cover Image</label>
-                                        <input
-                                            type="text"
-                                            name="cover_img"
-                                            value={formData.cover_img || ""}
-                                            onChange={handleChange}
-                                            placeholder="Paste image URL here..."
-                                        />
-                                        {/* แสดงตัวอย่างรูป ถ้ามี URL */}
                                         {formData.cover_img && (
                                             <img src={formData.cover_img} alt="Cover Preview" className="cover-preview" style={{ marginTop: '10px', maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
                                         )}
@@ -636,31 +627,16 @@ const ContentStats = () => {
                                     </div>
                                     <div className="input-group full-width">
                                         <label>Image</label>
-                                        <input
-                                            type="text"
-                                            name="img"
-                                            value={formData.img || ""}
-                                            onChange={handleChange}
-                                            placeholder="Paste image URL here..."
-                                        />
                                         {formData.img && (
                                             <img src={formData.img} alt="Item Preview" className="cover-preview" style={{ marginTop: '10px', maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
                                         )}
                                     </div>
                                     <div className="input-group full-width">
                                         <label>Model</label>
-                                        <input
-                                            type="text"
-                                            name="model"
-                                            value={formData.model || ""}
-                                            onChange={handleChange}
-                                            placeholder="Paste model URL here..."
-                                        />
                                         {formData.model && (
                                             <div className="postModel">
                                                 <ModelViewer modelUrl={formData.model} />
                                             </div>
-                                            // <img src={formData.model} alt="Item Preview" className="cover-preview" style={{ marginTop: '10px', maxWidth: '100%', height: 'auto', borderRadius: '8px' }} />
                                         )}
                                     </div>
                                 </>

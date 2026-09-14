@@ -48,7 +48,7 @@ const LeftBar = () => {
         </div>
 
         <div className="menu">
-          <div className={`item ${isActive('/managefriends') ? 'active' : ''}`} onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
+          <div className={`item ${isActive('/reports') ? 'active' : ''}`} onClick={() => navigate(`/reports`)} style={{ cursor: "pointer" }}>
             <OutlinedFlagIcon />
             <span>Reports</span>
           </div>
