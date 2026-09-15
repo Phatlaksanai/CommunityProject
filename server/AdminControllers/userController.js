@@ -84,7 +84,7 @@ exports.getUserRolesProportion = async (req, res) => {
 
       return {
         name: `${role} - ${percent}% (${count})`, // เช่น "User - 80% (400)"
-        users: count, // ส่งตัวเลขจำนวนคนแยกไปด้วย เพื่อให้ Recharts รู้สัดส่วนชิ้นโดนัท
+        value: count, // ส่งตัวเลขจำนวนคนแยกไปด้วย เพื่อให้ Recharts รู้สัดส่วนชิ้นโดนัท
       };
     });
 

@@ -11,6 +11,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import PendingIcon from '@mui/icons-material/Pending';
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import ReportPopup from "../../Right/reportPopup/reportPopup";
 
 const ReportStats = () => {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ const ReportStats = () => {
 
     // ---- State สำหรับ Modal ---- //
     const [selectedReport, setSelectedReport] = useState(null);
-    const [formData, setFormData] = useState({ report_id: "", report_type: "", description: "", created_at: "",status: "" });
+    const [formData, setFormData] = useState({ report_id: "", report_type: "", description: "", created_at: "", status: "" });
 
     const { isLoading: topPostsLoading, isError: topPostsError, data: topPosts } = useQuery({
         queryKey: ["topReportedPosts"],
@@ -109,15 +110,23 @@ const ReportStats = () => {
         );
     };
 
+    const ROUTES = {
+        userStats: "/users",
+        contentStats: "/content&assets",
+    };
+
     const handleRowClick = (report) => {
+
+        if (report.target_id) {
+            navigate(ROUTES.userStats, { state: { reportPopup: report } });
+            return;
+        }
+        if (report.community_id || report.item_id || report.post_id) {
+            navigate(ROUTES.contentStats, { state: { reportPopup: report } });
+            return;
+        }
+
         setSelectedReport(report);
-        setFormData({
-            report_id: report.report_id,
-            report_type: report.report_type || "",
-            description: report.description || "",
-            created_at: report.created_at || "",
-            status: report.status || ""
-        });
     };
 
     // ---- ฟังก์ชันจัดการฟอร์มใน Modal ---- //
@@ -297,52 +306,7 @@ const ReportStats = () => {
             </div>
 
             {selectedReport && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <h2>Edit Report ID: {selectedReport.report_id}</h2>
-                        <div className="form-grid">
-                            <div className="input-group">
-                                <label>Report Type</label>
-                                <input type="text" name="report_type" value={formData.report_type} />
-                            </div>
-                            <div className="input-group full-width">
-                                <label>Description</label>
-                                <textarea
-                                    name="description"
-                                    value={formData.description}
-                                    rows="4"
-                                    placeholder="description..."
-                                />
-                            </div>
-                            <div className="input-group">
-                                <label>Created At</label>
-                                <input type="text" name="created_at" value={formatDate(formData.created_at)} />
-                            </div>
-                            <div className="input-group full-width">
-                                <label>Status</label>
-                                <div className="select-wrapper">
-                                    <select name="status" value={formData.status} onChange={handleChange}>
-                                        <option value="pending">pending</option>
-                                        <option value="completed">completed</option>
-                                        <option value="cancelled">cancelled</option>
-                                    </select>
-                                    <ArrowDropDownIcon className="dropdown-icon" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="modal-actions">
-                            <button className="btn-cancel" onClick={() => setSelectedReport(null)} disabled={updateMutation.isLoading}>
-                                Cancel
-                            </button>
-                            <button className="btn-update" onClick={handleUpdate} disabled={updateMutation.isLoading}>
-                                {updateMutation.isLoading ? "Updating..." : "Update"}
-                            </button>
-                        </div>
-                        {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
-                        {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
-                    </div>
-                </div>
+                <ReportPopup report={selectedReport} onClose={() => setSelectedReport(null)} />
             )}
 
         </div>

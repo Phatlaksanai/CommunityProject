@@ -4,7 +4,7 @@
   @include themify($themes) {
     padding: 50px 15%;
     background-color: themed("bg");
-    height: 60vh;
+    height: 80vh;
     color: themed("textColor");
 
     @include mobile {

@@ -1,7 +1,7 @@
 import "./userStats.scss"
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PersonIcon from '@mui/icons-material/Person';
@@ -9,10 +9,15 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SystemUpdateAltOutlinedIcon from '@mui/icons-material/SystemUpdateAltOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import DonutChart from "../../Right/donutChart/donutChart"
+import ReportPopup from "../../Right/reportPopup/reportPopup";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const UserStats = () => {
-    const navigate = useNavigate();
+    const location = useLocation();
+
+    // ถ้ามาจากการกดแถวใน Reports จะมี report แปะมาด้วย ให้เอามาโชว์เป็น popup มุมล่างขวาของหน้านี้เลย
+    const [reportPopupData, setReportPopupData] = useState(location.state?.reportPopup ?? null);
+
     const { currentUser, setUser } = useContext(AuthContext);
     const [searchTerm, setSearchTerm] = useState("");
     const queryClient = useQueryClient();
@@ -301,7 +306,7 @@ const UserStats = () => {
                     </div>
                 </div>
 
-                
+
 
                 <div className="user-table-section" style={{ marginTop: '40px' }}>
 
@@ -393,6 +398,10 @@ const UserStats = () => {
 
                 </div>
             </div>
+
+            {reportPopupData && (
+                <ReportPopup report={reportPopupData} onClose={() => setReportPopupData(null)} />
+            )}
 
             {selectedUser && (
                 <div className="modal-overlay">

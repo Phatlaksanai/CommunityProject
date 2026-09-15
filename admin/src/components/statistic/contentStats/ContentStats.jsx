@@ -1,7 +1,7 @@
 import "./contentStats.scss"
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PersonIcon from '@mui/icons-material/Person';
@@ -11,10 +11,15 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DonutChart from "../../Right/donutChart/donutChart"
 import ModelViewer from "../../modelViewer/model_viewer";
+import ReportPopup from "../../Right/reportPopup/reportPopup";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const ContentStats = () => {
-    const navigate = useNavigate();
+    const location = useLocation();
+
+    // ถ้ามาจากการกดแถวใน Reports จะมี report แปะมาด้วย ให้เอามาโชว์เป็น popup มุมล่างขวาของหน้านี้เลย
+    const [reportPopupData, setReportPopupData] = useState(location.state?.reportPopup ?? null);
+
     const [searchTerm, setSearchTerm] = useState("");
     const queryClient = useQueryClient();
     const [error, setError] = useState("");
@@ -488,6 +493,10 @@ const ContentStats = () => {
                 </div>
             </div>
 
+            {reportPopupData && (
+                <ReportPopup report={reportPopupData} onClose={() => setReportPopupData(null)} />
+            )}
+
             {selectedUser && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -659,77 +668,77 @@ const ContentStats = () => {
             )}
 
             {/* ฝั่งขวา (R) แสดง DonutChart */}
-                <div className="R" >
-                    <div className="right-header" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '30px' }}>
-                        <div className="tab-buttons" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="R" >
+                <div className="right-header" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '30px' }}>
+                    <div className="tab-buttons" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
 
-                            {isPanelOpen && (
-                                <>
-                                    {/* กลุ่มปุ่มเลือก Tab */}
-                                    <button
-                                        className={`tab-btn posts-btn ${activeTab === "Posts" ? "active" : ""}`}
-                                        onClick={() => setActiveTab("Posts")}
-                                    >
-                                        Posts
-                                    </button>
-                                    <button
-                                        className={`tab-btn commu-btn ${activeTab === "Communities" ? "active" : ""}`}
-                                        onClick={() => setActiveTab("Communities")}
-                                    >
-                                        Communities
-                                    </button>
-                                    <button
-                                        className={`tab-btn items-btn ${activeTab === "Items" ? "active" : ""}`}
-                                        onClick={() => setActiveTab("Items")}
-                                    >
-                                        Items
-                                    </button>
-                                </>
-                            )}
+                        {isPanelOpen && (
+                            <>
+                                {/* กลุ่มปุ่มเลือก Tab */}
+                                <button
+                                    className={`tab-btn posts-btn ${activeTab === "Posts" ? "active" : ""}`}
+                                    onClick={() => setActiveTab("Posts")}
+                                >
+                                    Posts
+                                </button>
+                                <button
+                                    className={`tab-btn commu-btn ${activeTab === "Communities" ? "active" : ""}`}
+                                    onClick={() => setActiveTab("Communities")}
+                                >
+                                    Communities
+                                </button>
+                                <button
+                                    className={`tab-btn items-btn ${activeTab === "Items" ? "active" : ""}`}
+                                    onClick={() => setActiveTab("Items")}
+                                >
+                                    Items
+                                </button>
+                            </>
+                        )}
 
-                            {/* ปุ่มลูกศรเปิด-ปิด */}
-                            <div className="toggle-arrow" onClick={() => setIsPanelOpen(!isPanelOpen)}>
-                                {isPanelOpen ? <ArrowLeftIcon sx={{ fontSize: 45 }} /> : <ArrowRightIcon sx={{ fontSize: 45 }} />}
-                            </div>
+                        {/* ปุ่มลูกศรเปิด-ปิด */}
+                        <div className="toggle-arrow" onClick={() => setIsPanelOpen(!isPanelOpen)}>
+                            {isPanelOpen ? <ArrowLeftIcon sx={{ fontSize: 45 }} /> : <ArrowRightIcon sx={{ fontSize: 45 }} />}
                         </div>
                     </div>
-
-                    <div className="donut-charts-section">
-                        {donutYearlyLoading ? (
-                            <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading Chart...</div>
-                        ) : (
-                            <DonutChart
-                                data={formattedDonutYearlyData}
-                                title={`${activeTab}: ${previousYear} vs ${currentYear}`}
-                                tooltipLabel={activeTab}
-                                dataKey="value"
-                            />
-                        )}
-
-                        {donutDistributionLoading ? (
-                            <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading Distribution Chart...</div>
-                        ) : (
-                            formattedDonutDistributionData && formattedDonutDistributionData.length > 0 && (
-                                <div style={{ marginTop: '20px' }}>
-                                    <DonutChart
-                                        data={formattedDonutDistributionData}
-                                        title={
-                                            activeTab === "Posts" ? "Media Distribution: Images vs Models" :
-                                                activeTab === "Communities" ? "Community Membership Distribution" :
-                                                    "Item Distribution by Price Range"
-                                        }
-                                        tooltipLabel={
-                                            activeTab === "Posts" ? "Files" :
-                                                activeTab === "Communities" ? "Users" :
-                                                    "Items"
-                                        }
-                                        dataKey="value"
-                                    />
-                                </div>
-                            )
-                        )}
-                    </div>
                 </div>
+
+                <div className="donut-charts-section">
+                    {donutYearlyLoading ? (
+                        <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading Chart...</div>
+                    ) : (
+                        <DonutChart
+                            data={formattedDonutYearlyData}
+                            title={`${activeTab}: ${previousYear} vs ${currentYear}`}
+                            tooltipLabel={activeTab}
+                            dataKey="value"
+                        />
+                    )}
+
+                    {donutDistributionLoading ? (
+                        <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading Distribution Chart...</div>
+                    ) : (
+                        formattedDonutDistributionData && formattedDonutDistributionData.length > 0 && (
+                            <div style={{ marginTop: '20px' }}>
+                                <DonutChart
+                                    data={formattedDonutDistributionData}
+                                    title={
+                                        activeTab === "Posts" ? "Media Distribution: Images vs Models" :
+                                            activeTab === "Communities" ? "Community Membership Distribution" :
+                                                "Item Distribution by Price Range"
+                                    }
+                                    tooltipLabel={
+                                        activeTab === "Posts" ? "Files" :
+                                            activeTab === "Communities" ? "Users" :
+                                                "Items"
+                                    }
+                                    dataKey="value"
+                                />
+                            </div>
+                        )
+                    )}
+                </div>
+            </div>
         </div >
     )
 }
