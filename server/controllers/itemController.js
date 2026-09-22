@@ -143,10 +143,14 @@ exports.getItemsByProjectId = async (req, res) => {
   const { id } = req.params;
 
   const { data, error } = await db
-    .from("items")
+    .from("item")
     .select(
       `
       *,
+      update_models(
+        model,
+        created_at
+      ),
       users (
         username,
         profilePic
@@ -154,11 +158,30 @@ exports.getItemsByProjectId = async (req, res) => {
     `,
     )
     .eq("project_id", id)
-    .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
 
-  return res.json(data || []);
+  const formatted = data.map((item) => {
+    const latestUpdate = [...(item.update_models || [])].sort( // .sort() ข้างใน latestUpdate หา update ล่าสุดของ แต่ละ Item
+      (update1, update2) =>
+        new Date(update2.created_at) - new Date(update1.created_at)
+    )[0];
+
+    return {
+      ...item,
+      model: latestUpdate?.model || null,
+      created_at: latestUpdate?.created_at || null,
+      username: item.users?.username || null,
+      profilePic: item.users?.profilePic || null,
+    };
+  });
+
+  formatted.sort( // .sort() ที่ formatted เรียง Item ทั้งหมด ตาม update ล่าสุด
+    (item1, item2) =>
+      new Date(item2.created_at) - new Date(item1.created_at)
+  );
+
+  return res.json(formatted);
 };
 
 exports.getItemsByUserIdAvailable = async (req, res) => {
@@ -180,14 +203,34 @@ exports.getItemsByUserId = async (req, res) => {
   const { id } = req.params;
 
   const { data, error } = await db
-    .from("items")
-    .select("*")
+    .from("item")
+    .select(`
+      *,
+      update_models (
+        created_at
+      )
+    `)
     .eq("user_id", id)
-    .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
 
-  return res.json(data || []);
+  const formatted = data.map((item) => {
+    const latestUpdate = [...(item.update_models || [])].sort( // .sort() ข้างใน latestUpdate หา update ล่าสุดของ แต่ละ Item
+      (update1, update2) =>
+        new Date(update2.created_at) - new Date(update1.created_at)
+    )[0];
+
+    return {
+      ...item,
+      updated_at: latestUpdate?.created_at || null,
+    };
+  });
+
+  formatted.sort((item1, item2) => // .sort() ที่ formatted เรียง Item ทั้งหมด ตาม update ล่าสุด
+    new Date(item2.updated_at) - new Date(item1.updated_at)
+  );
+
+  return res.json(formatted);
 };
 
 exports.addItem = async (req, res) => {
@@ -290,7 +333,6 @@ exports.editItem = async (req, res) => {
   const {
     itemId, modelName, description, price, img, category_id,
   } = req.body;
-
   try {
     // 2. สร้าง Object สำหรับ Update (เช็คเฉพาะที่มีค่าจริงๆ)
     const updateData = {};
