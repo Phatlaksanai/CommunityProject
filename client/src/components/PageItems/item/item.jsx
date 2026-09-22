@@ -13,6 +13,7 @@ const Item = ({ item, isProfile, isShop }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { currentUser } = useContext(AuthContext);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleAddToCart = async () => {
     if (!currentUser) {
@@ -65,8 +66,19 @@ const Item = ({ item, isProfile, isShop }) => {
         </div>
         <div className="price">
           <p>$ {item.price}</p>
-          {isShop && (<ControlPointIcon onClick={handleAddToCart} style={{ cursor: "pointer" , color: "#A0C46E"}} />)}
-          {isProfile && item.user_id === currentUser.user_id && (<SettingsIcon onClick={() => navigate(`/edititem/${item?.item_id}`)} style={{ cursor: "pointer" , color: "#A0C46E"}} />)}
+          {isShop && (<ControlPointIcon onClick={handleAddToCart} style={{ cursor: "pointer", color: "#A0C46E" }} />)}
+          {isProfile && item.user_id === currentUser.user_id &&
+            <div className="more-container">
+              <SettingsIcon onClick={() => setMenuOpen(!menuOpen)} style={{ cursor: "pointer", color: "#A0C46E" }} />
+              {menuOpen && (
+                <div className="moreMenu">
+                  <button onClick={() => navigate(`/edititem/${item.item_id}`)}>edit</button>
+                  <button onClick={() => navigate(`/updatemodel/${item.item_id}`)}>update version</button>
+                </div>
+              )}
+
+            </div>
+          }
         </div>
         {error && <div className="popupError">{error}</div>}
         {success && <div className="popupSuccess">{success}</div>}

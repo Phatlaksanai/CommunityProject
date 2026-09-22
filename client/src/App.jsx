@@ -24,6 +24,7 @@ import ManageAddfriend from "./pages/manageFriend/ManageAddfriend";
 import EditProject from "./pages/editproject/editProject";
 import EditProfile from "./pages/editprofile/editProfile";
 import EditItem from "./pages/edititem/editItem";
+import UpdateModel from "./pages/edititem/updateModel";
 import EditCommu from "./pages/editcommu/editCommu";
 import Manage from "./pages/manage/Manage";
 import Setting from "./pages/setting/Setting";
@@ -378,6 +379,18 @@ function App() {
         {
           index: true,
           element: <EditItem />
+        },
+      ]
+    },
+    {
+      path: "/updatemodel/:id",
+      element: (
+        <LayoutNavbar />
+      ),
+      children: [
+        {
+          index: true,
+          element: <UpdateModel />
         },
       ]
     },

@@ -14,7 +14,8 @@ router.get("/categories", itemController.getCategories);
 router.get("/:id", itemController.getItemsById);
 
 router.post("/additem", verifyToken, itemController.addItem);
-router.put("/update-item", verifyToken, itemController.updateItem);
+router.put("/edit-item", verifyToken, itemController.editItem);
+router.put("/update-version", verifyToken, itemController.updateVersion);
 
 router.get("/project-edit/:projectId", verifyToken, itemController.getItemsForEditProject);
 

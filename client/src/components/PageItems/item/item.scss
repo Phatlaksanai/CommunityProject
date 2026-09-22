@@ -48,6 +48,33 @@
           margin: 5px 0px;
           color: themed("textColorSoft");
         }
+
+        .moreMenu {
+          display: flex;
+          flex-direction: column;
+          position: absolute;
+          z-index: 10;
+          gap: 3px;
+
+
+          button {
+            padding: 8px 18px;
+            max-height: 35px;
+            border: none;
+            cursor: pointer;
+
+            /* จัดระเบียบไอคอนกับข้อความในปุ่มให้สวยขึ้น */
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: white;
+            background-color: #A0C46E;
+
+            &:hover {
+              opacity: 0.8;
+            }
+          }
+        }
       }
     }
 
