@@ -6,12 +6,12 @@ exports.getItems = async (req, res) => {
   const { category_id, date } = req.query;
 
   let query = db.from("items")
-  .select(`*,
+    .select(`*,
       categories(
         category_id,
         type
       )`
-  );
+    );
 
   // ✅ filter category
   if (category_id) {
@@ -121,10 +121,10 @@ exports.getItemsByUserId = async (req, res) => {
 };
 
 exports.addItem = async (req, res) => {
-  const { 
-    modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category_id, 
+  const {
+    modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category_id,
     imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId,
-    polygon_count, has_textures, is_rigged, is_uv_mapped // เพิ่มฟิลด์ใหม่
+    polygon_count, has_textures, is_rigged, is_uv_mapped
   } = req.body;
 
   if (!modelName || !price) {
@@ -139,84 +139,89 @@ exports.addItem = async (req, res) => {
     return res.status(400).json({ error: "Price must be at least 10" });
   }
 
-  const { data, error } = await db
-    .from("items")
-    .insert([
-      {
+  try {
+    // 1. Insert ข้อมูลลงตาราง "item" ก่อน
+    const { data: itemData, error: itemError } = await db
+      .from("item")
+      .insert([{
         modelName,
         description: description || null,
         price: Number(price),
         img: img || null,
+        img_public_id: imgPublicId || null,
+        category_id: category_id || null,
+        user_id: req.user.user_id,
+      }])
+      .select()
+      .single();
+
+    // ถ้าตารางแรกพัง ให้ return error ออกไปเลย
+    if (itemError) return res.status(500).json({ error: itemError.message });
+
+    // 2. Insert ข้อมูลลงตาราง "update_models" โดยใช้ item_id จากตารางแรก
+    const { data: updateModelData, error: updateModelError } = await db
+      .from("update_models")
+      .insert([{
         model: model || null,
         obj: obj || null,
         blend: blend || null,
         fbx: fbx || null,
         usdz: usdz || null,
         gltf: gltf || null,
-        category_id: category_id || null,
-        user_id: req.user.user_id,
-        img_public_id: imgPublicId || null,
         model_public_id: modelPublicId || null,
         obj_public_id: objPublicId || null,
         blend_public_id: blendPublicId || null,
         fbx_public_id: fbxPublicId || null,
         usdz_public_id: usdzPublicId || null,
         gltf_public_id: gltfPublicId || null,
-        polygon_count: polygon_count ? parseInt(polygon_count) : 0, // เพิ่มฟิลด์ใหม่
-        has_textures: has_textures || false,                        // เพิ่มฟิลด์ใหม่
-        is_rigged: is_rigged || false,                              // เพิ่มฟิลด์ใหม่
+        polygon_count: polygon_count ? parseInt(polygon_count) : 0,
+        has_textures: has_textures || false,
+        is_rigged: is_rigged || false,
         is_uv_mapped: is_uv_mapped || false,
-        status: "show"
+        version: "1.0.0",
+        item_id: itemData.item_id // เชื่อมโยงกับ item_id ของไอเทมที่เพิ่งสร้างจาก itemData
       }])
-    .select()
-    .single();
+      .select()
+      .single();
 
-  if (error) return res.status(500).json(error);
+    // ถ้าตารางสองพัง (คุณอาจจะพิจารณาลบข้อมูลตารางแรกทิ้งด้วยเพื่อไม่ให้ข้อมูลขยะค้าง หรือปล่อยผ่านแล้ว return error)
+    if (updateModelError) {
+      // Optional: db.from('item').delete().eq('item_id', itemData.item_id);
+      return res.status(500).json({ error: updateModelError.message });
+    }
 
-  // 🚀 2. [เพิ่มคำสั่ง Algolia v5] ส่งข้อมูลไอเทมใหม่เข้าสู่คลังค้นหารวม
-  try {
-    await algoliaClient.saveObject({
-      indexName: 'WebCommunity_Search', // ใช้ชื่อคลังข้อมูลเดียวกันกับฝั่งคอมมูนิตี้
-      body: {
-        objectID: `item_${data.item_id}`, // ใช้ prefix ไอเดีย item_ เพื่อแยกแยะฝั่งหน้าบ้าน
-        title: data.modelName,            // แมปชื่อสินค้าเข้าช่อง title ตรงกลาง
-        description: data.description,    // แมปคำอธิบายสินค้าเข้าช่อง description
-        img: data.img,                    // แมป URL รูปภาพเข้าช่อง img (ถ้ามี)
-        type: 'item',                    // ระบุ type เป็นไอเทมเพื่อส่งหน้าบ้านไปถูกหน้ามาร์เก็ต
-        targetId: data.item_id
-      }
-    });
-  } catch (algoliaErr) {
-    // ดักแยกไว้เผื่อระบบเสิร์ชชั่วคราว ข้อมูลหลักในดาต้าเบสจะได้เซฟสำเร็จปกติ
-    console.error("Algolia Insert Item Warning:", algoliaErr);
+    // 3. ส่งข้อมูลเข้า Algolia
+    try {
+      await algoliaClient.saveObject({
+        indexName: 'WebCommunity_Search',
+        body: {
+          objectID: `item_${itemData.item_id}`,
+          title: itemData.modelName,
+          description: itemData.description,
+          img: itemData.img,
+          type: 'item',
+          targetId: itemData.item_id
+        }
+      });
+    } catch (algoliaErr) {
+      console.error("Algolia Insert Item Warning:", algoliaErr);
+    }
+
+    // Return ข้อมูลทั้งหมดเมื่อสำเร็จ
+    return res.status(201).json({ item: itemData, models: updateModelData });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
-
-  return res.status(201).json(data);
 };
 
-exports.updateItem = async (req, res) => {
-  const { 
-    itemId ,modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category_id, 
-    imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId,
-    polygon_count, has_textures, is_rigged, is_uv_mapped // เพิ่มฟิลด์ใหม่
+exports.editItem = async (req, res) => {
+  const {
+    itemId, modelName, description, price, img, category_id,
   } = req.body;
 
   try {
-    const { data: items, error } = await db
-      .from("items")
-      .select(`img_public_id, 
-                    model_public_id, 
-                    obj_public_id, 
-                    blend_public_id, 
-                    fbx_public_id, 
-                    usdz_public_id, 
-                    gltf_public_id`)
-      .eq("item_id", itemId)
-      .maybeSingle();
-    if (error) {
-      return res.status(500).json(error);
-    }
-
     // 2. สร้าง Object สำหรับ Update (เช็คเฉพาะที่มีค่าจริงๆ)
     const updateData = {};
 
@@ -225,27 +230,8 @@ exports.updateItem = async (req, res) => {
     if (description && description.trim() !== "") updateData.description = description;
     if (price && !isNaN(price)) updateData.price = parseFloat(price);
     if (category_id) updateData.category_id = category_id;
-
     // ส่วนของรูปภาพ (ใช้ logic เดิมของคุณ)
     if (img) updateData.img = img;
-    if (model) updateData.model = model;
-    if (obj) updateData.obj = obj;
-    if (blend) updateData.blend = blend;
-    if (fbx) updateData.fbx = fbx;
-    if (usdz) updateData.usdz = usdz;
-    if (gltf) updateData.gltf = gltf;
-    if (imgPublicId) updateData.img_public_id = imgPublicId;
-    if (modelPublicId) updateData.model_public_id = modelPublicId;
-    if (objPublicId) updateData.obj_public_id = objPublicId;
-    if (blendPublicId) updateData.blend_public_id = blendPublicId;
-    if (fbxPublicId) updateData.fbx_public_id = fbxPublicId;
-    if (usdzPublicId) updateData.usdz_public_id = usdzPublicId;
-    if (gltfPublicId) updateData.gltf_public_id = gltfPublicId;
-
-    if (polygon_count !== undefined) updateData.polygon_count = parseInt(polygon_count) || 0;
-    if (has_textures !== undefined) updateData.has_textures = has_textures;
-    if (is_rigged !== undefined) updateData.is_rigged = is_rigged;
-    if (is_uv_mapped !== undefined) updateData.is_uv_mapped = is_uv_mapped;
 
     // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
     if (Object.keys(updateData).length === 0) {
@@ -254,7 +240,7 @@ exports.updateItem = async (req, res) => {
 
     // 3. Update ลง DB
     const { error: updateError } = await db
-      .from("items")
+      .from("item")
       .update(updateData) // ส่งเฉพาะ field ที่มีค่าไป
       .eq("item_id", itemId);
 
@@ -279,17 +265,84 @@ exports.updateItem = async (req, res) => {
 
     // เก็บ id เก่าไว้ก่อน
     const oldImgId = items?.img_public_id;
+
+    // แล้วค่อยลบ
+    if (imgPublicId && oldImgId && oldImgId !== imgPublicId) {
+      await cloudinary.uploader.destroy(oldImgId);
+    }
+
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+exports.updateVersion = async (req, res) => {
+  const {
+    itemId, version, summary, model, obj, blend, fbx, usdz, gltf,
+    modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId,
+    polygon_count, has_textures, is_rigged, is_uv_mapped // เพิ่มฟิลด์ใหม่
+  } = req.body;
+
+  try {
+    const { data: items, error } = await db
+      .from("update_models")
+      .select(`model_public_id, 
+                    obj_public_id, 
+                    blend_public_id, 
+                    fbx_public_id, 
+                    usdz_public_id, 
+                    gltf_public_id`)
+      .eq("item_id", itemId)
+      .maybeSingle();
+    if (error) {
+      return res.status(500).json(error);
+    }
+
+    // 2. สร้าง Object สำหรับ Update (เช็คเฉพาะที่มีค่าจริงๆ)
+    const updateData = {};
+
+    // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
+    if (version) updateData.version = version.trim();
+    if (summary) updateData.summary = summary.trim();
+    if (model) updateData.model = model;
+    if (obj) updateData.obj = obj;
+    if (blend) updateData.blend = blend;
+    if (fbx) updateData.fbx = fbx;
+    if (usdz) updateData.usdz = usdz;
+    if (gltf) updateData.gltf = gltf;
+    if (modelPublicId) updateData.model_public_id = modelPublicId;
+    if (objPublicId) updateData.obj_public_id = objPublicId;
+    if (blendPublicId) updateData.blend_public_id = blendPublicId;
+    if (fbxPublicId) updateData.fbx_public_id = fbxPublicId;
+    if (usdzPublicId) updateData.usdz_public_id = usdzPublicId;
+    if (gltfPublicId) updateData.gltf_public_id = gltfPublicId;
+
+    if (polygon_count !== undefined) updateData.polygon_count = parseInt(polygon_count) || 0;
+    if (has_textures !== undefined) updateData.has_textures = has_textures;
+    if (is_rigged !== undefined) updateData.is_rigged = is_rigged;
+    if (is_uv_mapped !== undefined) updateData.is_uv_mapped = is_uv_mapped;
+
+    // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
+    if (Object.keys(updateData).length === 0) {
+      return res.status(200).json({ success: true, message: "Nothing to update" });
+    }
+
+    // 3. Update ลง DB
+    const { error: updateError } = await db
+      .from("update_models")
+      .update(updateData) // ส่งเฉพาะ field ที่มีค่าไป
+      .eq("item_id", itemId);
+
+    if (updateError) return res.status(500).json(updateError);
+
+    // เก็บ id เก่าไว้ก่อน
     const oldModelId = items?.model_public_id;
     const oldObjId = items?.obj_public_id;
     const oldBlendId = items?.blend_public_id;
     const oldFbxId = items?.fbx_public_id;
     const oldUsdzId = items?.usdz_public_id;
     const oldGltfId = items?.gltf_public_id;
-
-    // แล้วค่อยลบ
-    if (imgPublicId && oldImgId && oldImgId !== imgPublicId) {
-      await cloudinary.uploader.destroy(oldImgId);
-    }
 
     if (modelPublicId && oldModelId && oldModelId !== modelPublicId) {
       await cloudinary.uploader.destroy(oldModelId);
@@ -389,7 +442,7 @@ exports.addReview = async (req, res) => {
       {
         user_id: userId,
         item_id: itemId,
-        review: description, 
+        review: description,
         points: points
       }])
     .select()
@@ -415,7 +468,7 @@ exports.getReviewsByItemId = async (req, res) => {
       `)
       .eq("item_id", itemId)
       .order("created_at", { ascending: false });
-    
+
     if (error) throw error;
     return res.status(200).json(data);
   } catch (err) {
@@ -424,7 +477,7 @@ exports.getReviewsByItemId = async (req, res) => {
 };
 
 exports.getCategories = async (req, res) => {
-  const { data ,error } = await db
+  const { data, error } = await db
     .from("categories")
     .select("*")
     .order("type");
