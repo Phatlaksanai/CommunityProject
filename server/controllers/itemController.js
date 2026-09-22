@@ -5,18 +5,20 @@ const algoliaClient = require("../config/algolia");
 exports.getItems = async (req, res) => {
   const { category_id, date } = req.query;
 
-  let query = db.from("items")
+  let query = db.from("item")
     .select(`*,
       categories(
         category_id,
         type
-      )`
-    );
+    )`
+  );
 
   // ✅ filter category
   if (category_id) {
     // ถ้าเลือกหลาย category → เป็น array
-    const categoryIds = Array.isArray(category_id) ? category_id : [category_id];
+    const categoryIds = Array.isArray(category_id)
+      ? category_id
+      : [category_id];
     query = query.in("category_id", categoryIds);
   }
 
@@ -33,12 +35,44 @@ exports.getItems = async (req, res) => {
       pastDate.setDate(now.getDate() - 1);
     }
 
-    query = query.gte("created_at", pastDate.toISOString());
+    // หา item ที่มี update ล่าสุดอยู่ในช่วงวันที่เลือก
+    const { data: updates, error: updateError } = await db
+      .from("update_models")
+      .select("item_id, created_at")
+      .gte("created_at", pastDate.toISOString());
+
+    if (updateError) {
+      return res.status(500).json(updateError);
+    }
+
+    // เก็บเฉพาะ update ล่าสุดของแต่ละ item
+    const latestUpdates = new Map();
+
+    updates.forEach((update) => {
+      if (!latestUpdates.has(update.item_id)) {
+        latestUpdates.set(update.item_id, update.created_at);
+      }
+    });
+
+    // หา item ที่ update ล่าสุดอยู่ในช่วงวันที่เลือก
+    const itemIds = [...latestUpdates.entries()]
+      .filter(([itemId, createdAt]) => {
+        return new Date(createdAt) >= pastDate;
+      })
+      .map(([itemId]) => itemId);
+
+    if (itemIds.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    query = query.in("item_id", itemIds);
   }
 
-  const { data, error } = await query.order("created_at", { ascending: false });
+  const { data, error } = await query;
 
-  if (error) return res.status(500).json(error);
+  if (error) {
+    return res.status(500).json(error);
+  }
 
   return res.status(200).json(data || []);
 };
@@ -47,25 +81,59 @@ exports.getItemsById = async (req, res) => {
   const { id } = req.params;
 
   const { data, error } = await db
-    .from("items")
-    .select(`
+    .from("item")
+    .select(
+      `
       *,
+      update_models (
+        model,
+        obj,
+        blend,
+        fbx,
+        usdz,
+        gltf,
+        polygon_count,
+        has_textures,
+        is_rigged,
+        is_uv_mapped,
+        version,
+        created_at,
+        update_summary
+      ),
       users (
         username,
         name,
         profilePic
       )
-    `)
+    `,
+    )
     .eq("item_id", id)
     .single();
 
   if (error) return res.status(404).json({ error: "Item not found" });
+
+  const latestUpdate = data.update_models?.sort(
+    (update1, update2) => new Date(update2.created_at) - new Date(update1.created_at),
+  )[0]; // เอาตัวแรกที่มีวันที่ใหม่ที่สุด
 
   const formatted = {
     ...data,
     username: data.users?.username || null,
     name: data.users?.name || null,
     profilePic: data.users?.profilePic || null,
+    model: latestUpdate?.model || null,
+    obj: latestUpdate?.obj || null,
+    blend: latestUpdate?.blend || null,
+    fbx: latestUpdate?.fbx || null,
+    usdz: latestUpdate?.usdz || null,
+    gltf: latestUpdate?.gltf || null,
+    polygon_count: latestUpdate?.polygon_count || null,
+    has_textures: latestUpdate?.has_textures || false,
+    is_rigged: latestUpdate?.is_rigged || false,
+    is_uv_mapped: latestUpdate?.is_uv_mapped || false,
+    version: latestUpdate?.version || null,
+    update_summary: latestUpdate?.update_summary || null,
+    updated_at: latestUpdate?.created_at || null,
   };
 
   return res.json(formatted);
@@ -76,13 +144,15 @@ exports.getItemsByProjectId = async (req, res) => {
 
   const { data, error } = await db
     .from("items")
-    .select(`
+    .select(
+      `
       *,
       users (
         username,
         profilePic
       )
-    `)
+    `,
+    )
     .eq("project_id", id)
     .order("created_at", { ascending: false });
 
@@ -227,7 +297,8 @@ exports.editItem = async (req, res) => {
 
     // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
     if (modelName && modelName.trim() !== "") updateData.modelName = modelName;
-    if (description && description.trim() !== "") updateData.description = description;
+    if (description && description.trim() !== "")
+      updateData.description = description;
     if (price && !isNaN(price)) updateData.price = parseFloat(price);
     if (category_id) updateData.category_id = category_id;
     // ส่วนของรูปภาพ (ใช้ logic เดิมของคุณ)
@@ -235,7 +306,9 @@ exports.editItem = async (req, res) => {
 
     // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
     if (Object.keys(updateData).length === 0) {
-      return res.status(200).json({ success: true, message: "Nothing to update" });
+      return res
+        .status(200)
+        .json({ success: true, message: "Nothing to update" });
     }
 
     // 3. Update ลง DB
@@ -249,15 +322,18 @@ exports.editItem = async (req, res) => {
     // 🚀 [เพิ่มคำสั่ง Algolia v5] สั่งบันทึกทับข้อมูลสินค้าบนคลังเสิร์ชด้วย objectID เดิม
     try {
       await algoliaClient.saveObject({
-        indexName: 'WebCommunity_Search', // ชื่อคลังกลางที่ใช้ร่วมกัน
+        indexName: "WebCommunity_Search", // ชื่อคลังกลางที่ใช้ร่วมกัน
         body: {
           objectID: `item_${itemId}`, // ต้องใช้รูปแบบไอดีเดียวกับตอนสร้าง (addItem) เพื่อให้มันบันทึกทับตัวเดิม
           title: updateData.modelName || items.modelName, // ใช้ค่าใหม่ ถ้าไม่มีให้ใช้ค่าเดิมใน DB
-          description: updateData.description !== undefined ? updateData.description : items.description,
+          description:
+            updateData.description !== undefined
+              ? updateData.description
+              : items.description,
           img: updateData.img || items.img, // ใช้ค่าใหม่ ถ้าไม่มีให้ใช้ค่าเดิมใน DB
-          type: 'item',
-          targetId: itemId
-        }
+          type: "item",
+          targetId: itemId,
+        },
       });
     } catch (algoliaErr) {
       console.error("Algolia Update Item Warning:", algoliaErr);
@@ -382,7 +458,9 @@ exports.getItemsForEditProject = async (req, res) => {
   const { data, error } = await db
     .from("items")
     .select("*")
-    .or(`project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`);
+    .or(
+      `project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`,
+    );
 
   if (error) return res.status(500).json(error);
   return res.status(200).json(data || []);
@@ -405,7 +483,7 @@ exports.getLatestItems = async (req, res) => {
 
 exports.getItemsByCategory = async (req, res) => {
   const { categoryId } = req.params; // รับค่า :categoryId จาก path
-  const { limit } = req.query;       // รับค่า ?limit=5 จาก query
+  const { limit } = req.query; // รับค่า ?limit=5 จาก query
 
   // กำหนดจำนวน limit (ถ้าไม่ส่งมาให้ค่าเริ่มต้นเป็น 10)
   const parsedLimit = parseInt(limit) || 10;
@@ -458,14 +536,16 @@ exports.getReviewsByItemId = async (req, res) => {
   try {
     const { data, error } = await db
       .from("reviews")
-      .select(`
+      .select(
+        `
         *,
         users (
           username,
           name,
           profilePic
         )
-      `)
+      `,
+      )
       .eq("item_id", itemId)
       .order("created_at", { ascending: false });
 
@@ -482,8 +562,7 @@ exports.getCategories = async (req, res) => {
     .select("*")
     .order("type");
 
-  if (error)
-    return res.status(500).json(error);
+  if (error) return res.status(500).json(error);
 
   res.status(200).json(data);
 };
