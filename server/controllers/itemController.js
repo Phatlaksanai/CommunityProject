@@ -11,7 +11,7 @@ exports.getItems = async (req, res) => {
         category_id,
         type
     )`
-  );
+    );
 
   // ✅ filter category
   if (category_id) {
@@ -331,48 +331,53 @@ exports.addItem = async (req, res) => {
 
 exports.editItem = async (req, res) => {
   const {
-    itemId, modelName, description, price, img, category_id,
+    itemId, modelName, description, price, img, category_id, imgPublicId // เพิ่ม imgPublicId ตรงนี้
   } = req.body;
+  
   try {
-    // 2. สร้าง Object สำหรับ Update (เช็คเฉพาะที่มีค่าจริงๆ)
+    // 1. ดึงข้อมูลไอเทมเดิมมาก่อน เพื่อเอาไปใช้กับ Algolia และเช็คลบรูปภาพเก่า
+    const { data: items, error: fetchError } = await db
+      .from("item")
+      .select("*")
+      .eq("item_id", itemId)
+      .single();
+
+    if (fetchError || !items) {
+      return res.status(404).json({ error: "Item not found" });
+    }
+
+    // 2. สร้าง Object สำหรับ Update
     const updateData = {};
 
-    // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
     if (modelName && modelName.trim() !== "") updateData.modelName = modelName;
-    if (description && description.trim() !== "")
-      updateData.description = description;
+    if (description && description.trim() !== "") updateData.description = description;
     if (price && !isNaN(price)) updateData.price = parseFloat(price);
     if (category_id) updateData.category_id = category_id;
-    // ส่วนของรูปภาพ (ใช้ logic เดิมของคุณ)
     if (img) updateData.img = img;
+    // หากมีการอัปเดต imgPublicId ก็บันทึกลง DB ด้วย (ถ้ามีคอลัมน์นี้)
+    if (imgPublicId) updateData.img_public_id = imgPublicId;
 
-    // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
     if (Object.keys(updateData).length === 0) {
-      return res
-        .status(200)
-        .json({ success: true, message: "Nothing to update" });
+      return res.status(200).json({ success: true, message: "Nothing to update" });
     }
 
     // 3. Update ลง DB
     const { error: updateError } = await db
       .from("item")
-      .update(updateData) // ส่งเฉพาะ field ที่มีค่าไป
+      .update(updateData)
       .eq("item_id", itemId);
 
-    if (updateError) return res.status(500).json(updateError);
+    if (updateError) return res.status(500).json({ error: updateError.message });
 
-    // 🚀 [เพิ่มคำสั่ง Algolia v5] สั่งบันทึกทับข้อมูลสินค้าบนคลังเสิร์ชด้วย objectID เดิม
+    // 4. อัปเดตข้อมูลบน Algolia v5
     try {
       await algoliaClient.saveObject({
-        indexName: "WebCommunity_Search", // ชื่อคลังกลางที่ใช้ร่วมกัน
+        indexName: "WebCommunity_Search",
         body: {
-          objectID: `item_${itemId}`, // ต้องใช้รูปแบบไอดีเดียวกับตอนสร้าง (addItem) เพื่อให้มันบันทึกทับตัวเดิม
-          title: updateData.modelName || items.modelName, // ใช้ค่าใหม่ ถ้าไม่มีให้ใช้ค่าเดิมใน DB
-          description:
-            updateData.description !== undefined
-              ? updateData.description
-              : items.description,
-          img: updateData.img || items.img, // ใช้ค่าใหม่ ถ้าไม่มีให้ใช้ค่าเดิมใน DB
+          objectID: `item_${itemId}`,
+          title: updateData.modelName || items.modelName,
+          description: updateData.description !== undefined ? updateData.description : items.description,
+          img: updateData.img || items.img,
           type: "item",
           targetId: itemId,
         },
@@ -381,17 +386,19 @@ exports.editItem = async (req, res) => {
       console.error("Algolia Update Item Warning:", algoliaErr);
     }
 
-    // เก็บ id เก่าไว้ก่อน
-    const oldImgId = items?.img_public_id;
-
-    // แล้วค่อยลบ
+    // 5. จัดการลบรูปภาพเก่า
+    const oldImgId = items.img_public_id; // ตอนนี้เรียก items ได้แล้ว
+    
+    // ถ้ามีการส่งรูปใหม่มา และของเก่ามี public_id และไอดีไม่ตรงกัน
     if (imgPublicId && oldImgId && oldImgId !== imgPublicId) {
       await cloudinary.uploader.destroy(oldImgId);
     }
 
     return res.status(200).json({ success: true });
   } catch (err) {
-    return res.status(500).json(err);
+    console.error(err);
+    // แปลง error เป็น string ข้อความให้ฝั่งหน้าบ้านจับได้
+    return res.status(500).json({ error: err.message || "Internal server error" });
   }
 };
 
