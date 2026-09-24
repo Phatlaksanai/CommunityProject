@@ -309,7 +309,8 @@ exports.addItem = async (req, res) => {
         has_textures: has_textures || false,
         is_rigged: is_rigged || false,
         is_uv_mapped: is_uv_mapped || false,
-        version: "1.0.0",
+        version: "1.0",
+        update_summary: description || null,
         item_id: itemData.item_id // เชื่อมโยงกับ item_id ของไอเทมที่เพิ่งสร้างจาก itemData
       }])
       .select()
@@ -424,96 +425,155 @@ exports.updateVersion = async (req, res) => {
   const {
     itemId, version, summary, model, obj, blend, fbx, usdz, gltf,
     modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId,
-    polygon_count, has_textures, is_rigged, is_uv_mapped // เพิ่มฟิลด์ใหม่
+    polygon_count, has_textures, is_rigged, is_uv_mapped,
+    isNewVersion // รับค่า Checkbox มาจาก Frontend
   } = req.body;
 
   try {
-    const { data: items, error } = await db
+    // 1. หาข้อมูล "เวอร์ชันล่าสุด" ของโมเดลนี้มาเทียบ
+    const { data: latestItem, error } = await db
       .from("update_models")
-      .select(`model_public_id, 
-                    obj_public_id, 
-                    blend_public_id, 
-                    fbx_public_id, 
-                    usdz_public_id, 
-                    gltf_public_id`)
+      .select("*")
       .eq("item_id", itemId)
+      .order("created_at", { ascending: false }) 
+      .limit(1)
       .maybeSingle();
-    if (error) {
-      return res.status(500).json(error);
+
+    if (error) return res.status(500).json({ error: error.message || "Database error" });
+    if (!latestItem) return res.status(404).json({ error: "Item not found" });
+
+    // 2. ฟังก์ชันตรวจสอบว่า "มีการแก้ไขข้อมูลใดๆ หรือไม่?" 
+    // (ตอนนี้รับรู้ undefined = ไม่เปลี่ยน, null = สั่งลบทิ้ง)
+    const checkIsChanged = () => {
+      if (version && version.trim() !== latestItem.version) return true;
+      if (summary && summary.trim() !== latestItem.update_summary) return true;
+      if (polygon_count !== undefined && parseInt(polygon_count) !== latestItem.polygon_count) return true;
+      if (has_textures !== undefined && has_textures !== latestItem.has_textures) return true;
+      if (is_rigged !== undefined && is_rigged !== latestItem.is_rigged) return true;
+      if (is_uv_mapped !== undefined && is_uv_mapped !== latestItem.is_uv_mapped) return true;
+
+      // ถ้า Frontend ส่ง undefined มา ระบบจะข้ามไปไม่มองว่าเป็นการเปลี่ยนแปลง
+      if (modelPublicId !== undefined && modelPublicId !== latestItem.model_public_id) return true;
+      if (objPublicId !== undefined && objPublicId !== latestItem.obj_public_id) return true;
+      if (blendPublicId !== undefined && blendPublicId !== latestItem.blend_public_id) return true;
+      if (fbxPublicId !== undefined && fbxPublicId !== latestItem.fbx_public_id) return true;
+      if (usdzPublicId !== undefined && usdzPublicId !== latestItem.usdz_public_id) return true;
+      if (gltfPublicId !== undefined && gltfPublicId !== latestItem.gltf_public_id) return true;
+
+      return false;
+    };
+
+    if (!checkIsChanged()) {
+      return res.status(400).json({ error: "No changes detected. Please modify the data before saving." });
     }
 
-    // 2. สร้าง Object สำหรับ Update (เช็คเฉพาะที่มีค่าจริงๆ)
-    const updateData = {};
+    // =========================================================
+    // กรณีที่ 1: ติ๊กบันทึกเป็นเวอร์ชันใหม่ (INSERT)
+    // =========================================================
+    if (isNewVersion) {
+      const newVersionData = {
+        item_id: itemId,
+        version: version ? version.trim() : latestItem.version,
+        update_summary: summary ? summary.trim() : latestItem.update_summary,
+        polygon_count: polygon_count !== undefined ? parseInt(polygon_count) : latestItem.polygon_count,
+        has_textures: has_textures !== undefined ? has_textures : latestItem.has_textures,
+        is_rigged: is_rigged !== undefined ? is_rigged : latestItem.is_rigged,
+        is_uv_mapped: is_uv_mapped !== undefined ? is_uv_mapped : latestItem.is_uv_mapped,
 
-    // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
-    if (version) updateData.version = version.trim();
-    if (summary) updateData.summary = summary.trim();
-    if (model) updateData.model = model;
-    if (obj) updateData.obj = obj;
-    if (blend) updateData.blend = blend;
-    if (fbx) updateData.fbx = fbx;
-    if (usdz) updateData.usdz = usdz;
-    if (gltf) updateData.gltf = gltf;
-    if (modelPublicId) updateData.model_public_id = modelPublicId;
-    if (objPublicId) updateData.obj_public_id = objPublicId;
-    if (blendPublicId) updateData.blend_public_id = blendPublicId;
-    if (fbxPublicId) updateData.fbx_public_id = fbxPublicId;
-    if (usdzPublicId) updateData.usdz_public_id = usdzPublicId;
-    if (gltfPublicId) updateData.gltf_public_id = gltfPublicId;
+        // การใส่ไฟล์: ถ้าส่ง undefined มา ให้ดึงของเก่ามาใช้ / ถ้าส่ง null มา ก็บันทึกเป็น null (แปลว่าเอาออกในเวอร์ชันใหม่)
+        model: modelPublicId !== undefined ? model : latestItem.model,
+        model_public_id: modelPublicId !== undefined ? modelPublicId : latestItem.model_public_id,
+        obj: objPublicId !== undefined ? obj : latestItem.obj,
+        obj_public_id: objPublicId !== undefined ? objPublicId : latestItem.obj_public_id,
+        blend: blendPublicId !== undefined ? blend : latestItem.blend,
+        blend_public_id: blendPublicId !== undefined ? blendPublicId : latestItem.blend_public_id,
+        fbx: fbxPublicId !== undefined ? fbx : latestItem.fbx,
+        fbx_public_id: fbxPublicId !== undefined ? fbxPublicId : latestItem.fbx_public_id,
+        usdz: usdzPublicId !== undefined ? usdz : latestItem.usdz,
+        usdz_public_id: usdzPublicId !== undefined ? usdzPublicId : latestItem.usdz_public_id,
+        gltf: gltfPublicId !== undefined ? gltf : latestItem.gltf,
+        gltf_public_id: gltfPublicId !== undefined ? gltfPublicId : latestItem.gltf_public_id,
+      };
 
-    if (polygon_count !== undefined) updateData.polygon_count = parseInt(polygon_count) || 0;
-    if (has_textures !== undefined) updateData.has_textures = has_textures;
-    if (is_rigged !== undefined) updateData.is_rigged = is_rigged;
-    if (is_uv_mapped !== undefined) updateData.is_uv_mapped = is_uv_mapped;
+      const { error: insertError } = await db.from("update_models").insert(newVersionData);
+      if (insertError) return res.status(500).json({ error: insertError.message });
 
-    // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
-    if (Object.keys(updateData).length === 0) {
-      return res.status(200).json({ success: true, message: "Nothing to update" });
+      return res.status(201).json({ success: true, message: "Published as new version successfully!" });
     }
 
-    // 3. Update ลง DB
-    const { error: updateError } = await db
-      .from("update_models")
-      .update(updateData) // ส่งเฉพาะ field ที่มีค่าไป
-      .eq("item_id", itemId);
+    // =========================================================
+    // กรณีที่ 2: อัปเดตทับ Row เดิม (UPDATE) + สั่งลบไฟล์เก่าจาก Cloudinary
+    // =========================================================
+    else {
+      const updateData = {};
+      const filesToDelete = [];
 
-    if (updateError) return res.status(500).json(updateError);
+      if (version && version.trim() !== latestItem.version) updateData.version = version.trim();
+      if (summary && summary.trim() !== latestItem.update_summary) updateData.update_summary = summary.trim();
+      if (polygon_count !== undefined && parseInt(polygon_count) !== latestItem.polygon_count) updateData.polygon_count = parseInt(polygon_count);
+      if (has_textures !== undefined && has_textures !== latestItem.has_textures) updateData.has_textures = has_textures;
+      if (is_rigged !== undefined && is_rigged !== latestItem.is_rigged) updateData.is_rigged = is_rigged;
+      if (is_uv_mapped !== undefined && is_uv_mapped !== latestItem.is_uv_mapped) updateData.is_uv_mapped = is_uv_mapped;
 
-    // เก็บ id เก่าไว้ก่อน
-    const oldModelId = items?.model_public_id;
-    const oldObjId = items?.obj_public_id;
-    const oldBlendId = items?.blend_public_id;
-    const oldFbxId = items?.fbx_public_id;
-    const oldUsdzId = items?.usdz_public_id;
-    const oldGltfId = items?.gltf_public_id;
+      // Helper function: เช็คเฉพาะช่องที่ส่งมาไม่เท่ากับ undefined เท่านั้น
+      const handleFileUpdate = (field, pubField, reqUrl, reqPubId, dbPubId, isRawType) => {
+        if (reqPubId !== undefined && reqPubId !== dbPubId) {
+          updateData[field] = reqUrl;
+          updateData[pubField] = reqPubId;
+          // ถ้ามีรหัสเดิมอยู่ใน DB เอาใส่คิวรอเผาทิ้ง
+          if (dbPubId) {
+            filesToDelete.push({ id: dbPubId, isRaw: isRawType });
+          }
+        }
+      };
 
-    if (modelPublicId && oldModelId && oldModelId !== modelPublicId) {
-      await cloudinary.uploader.destroy(oldModelId);
+      handleFileUpdate("model", "model_public_id", model, modelPublicId, latestItem.model_public_id, false); 
+      handleFileUpdate("obj", "obj_public_id", obj, objPublicId, latestItem.obj_public_id, true); 
+      handleFileUpdate("blend", "blend_public_id", blend, blendPublicId, latestItem.blend_public_id, true);
+      handleFileUpdate("fbx", "fbx_public_id", fbx, fbxPublicId, latestItem.fbx_public_id, true);
+      handleFileUpdate("usdz", "usdz_public_id", usdz, usdzPublicId, latestItem.usdz_public_id, true);
+      handleFileUpdate("gltf", "gltf_public_id", gltf, gltfPublicId, latestItem.gltf_public_id, true);
+
+      // อัปเดตตาราง
+      const { error: updateError } = await db
+        .from("update_models")
+        .update(updateData)
+        .eq("update_models_id", latestItem.update_models_id); 
+
+      if (updateError) return res.status(500).json({ error: updateError.message });
+
+      // เกราะป้องกันชั้นสุดท้าย: ดูว่าไฟล์ที่อยู่ในคิวจะลบ มีใครยังใช้อยู่ในช่องอื่นไหม
+      const activeIds = [
+        updateData.model_public_id !== undefined ? updateData.model_public_id : latestItem.model_public_id,
+        updateData.obj_public_id !== undefined ? updateData.obj_public_id : latestItem.obj_public_id,
+        updateData.blend_public_id !== undefined ? updateData.blend_public_id : latestItem.blend_public_id,
+        updateData.fbx_public_id !== undefined ? updateData.fbx_public_id : latestItem.fbx_public_id,
+        updateData.usdz_public_id !== undefined ? updateData.usdz_public_id : latestItem.usdz_public_id,
+        updateData.gltf_public_id !== undefined ? updateData.gltf_public_id : latestItem.gltf_public_id,
+      ].filter(Boolean); // ล้างค่าว่างทิ้ง
+
+      // คัดกรองเหลือเฉพาะไฟล์ที่ปลอดภัยต่อการลบจริงๆ
+      const safeFilesToDelete = filesToDelete.filter(file => !activeIds.includes(file.id));
+
+      if (safeFilesToDelete.length > 0) {
+        for (const file of safeFilesToDelete) {
+          try {
+            if (file.isRaw) {
+              await cloudinary.uploader.destroy(file.id, { resource_type: "raw" });
+            } else {
+              await cloudinary.uploader.destroy(file.id);
+            }
+          } catch (cloudError) {
+            console.error("Cloudinary Delete Error:", cloudError);
+          }
+        }
+      }
+
+      return res.status(200).json({ success: true, message: "Model details updated successfully" });
     }
 
-    if (objPublicId && oldObjId && oldObjId !== objPublicId) {
-      await cloudinary.uploader.destroy(oldObjId, { resource_type: "raw" });
-    }
-
-    if (blendPublicId && oldBlendId && oldBlendId !== blendPublicId) {
-      await cloudinary.uploader.destroy(oldBlendId, { resource_type: "raw" });
-    }
-
-    if (fbxPublicId && oldFbxId && oldFbxId !== fbxPublicId) {
-      await cloudinary.uploader.destroy(oldFbxId, { resource_type: "raw" });
-    }
-
-    if (usdzPublicId && oldUsdzId && oldUsdzId !== usdzPublicId) {
-      await cloudinary.uploader.destroy(oldUsdzId, { resource_type: "raw" });
-    }
-
-    if (gltfPublicId && oldGltfId && oldGltfId !== gltfPublicId) {
-      await cloudinary.uploader.destroy(oldGltfId, { resource_type: "raw" });
-    }
-
-    return res.status(200).json({ success: true });
   } catch (err) {
-    return res.status(500).json(err);
+    return res.status(500).json({ error: err.message || "Internal Server Error" });
   }
 };
 

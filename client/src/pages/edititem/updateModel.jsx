@@ -25,6 +25,7 @@ const UpdateModel = () => {
     const [hasTextures, setHasTextures] = useState(false);
     const [isRigged, setIsRigged] = useState(false);
     const [isUvMapped, setIsUvMapped] = useState(false);
+    const [isNewVersion, setIsNewVersion] = useState(false);
 
     const [formats, setFormats] = useState({
         obj: false,
@@ -58,7 +59,7 @@ const UpdateModel = () => {
     useEffect(() => {
         if (items) {
             setVersion(items.version || "");
-            setSummary(items.summary || "");
+            setSummary(items.update_summary || "");
             setModel(items.model || null);
             setModelPublicId(items.model_public_id || null);
             setObj(items.obj || null);
@@ -188,22 +189,31 @@ const UpdateModel = () => {
                 itemId: items?.item_id,
                 version,
                 summary,
-                model: finalModel,
-                obj: finalObj,
-                blend: finalBlend,
-                fbx: finalFbx,
-                usdz: finalUsdz,
-                gltf: finalGltf,
-                modelPublicId: finalModelPublicId,
-                objPublicId: finalObjPublicId,
-                blendPublicId: finalBlendPublicId,
-                fbxPublicId: finalFbxPublicId,
-                usdzPublicId: finalUsdzPublicId,
-                gltfPublicId: finalGltfPublicId,
+                // ถ้าอัปไฟล์ใหม่ส่งไฟล์ไป ถ้าไม่ได้เปลี่ยน ให้ส่ง undefined (ห้ามยุ่ง)
+                model: (model instanceof File) ? finalModel : undefined,
+                modelPublicId: (model instanceof File) ? finalModelPublicId : undefined,
+
+                // ==== 2. ส่วนไฟล์ ZIP ต่างๆ ====
+                // กฎ: ถ้าเอาติ๊กออก = ส่ง null (สั่งลบ) / ถ้าใส่ไฟล์ใหม่ = ส่งไฟล์ / ถ้าไม่แตะต้อง = ส่ง undefined (ห้ามยุ่ง)
+                obj: !formats.obj ? null : (obj instanceof File ? finalObj : undefined),
+                objPublicId: !formats.obj ? null : (obj instanceof File ? finalObjPublicId : undefined),
+                
+                blend: !formats.blend ? null : (blend instanceof File ? finalBlend : undefined),
+                blendPublicId: !formats.blend ? null : (blend instanceof File ? finalBlendPublicId : undefined),
+                
+                fbx: !formats.fbx ? null : (fbx instanceof File ? finalFbx : undefined),
+                fbxPublicId: !formats.fbx ? null : (fbx instanceof File ? finalFbxPublicId : undefined),
+                
+                usdz: !formats.usdz ? null : (usdz instanceof File ? finalUsdz : undefined),
+                usdzPublicId: !formats.usdz ? null : (usdz instanceof File ? finalUsdzPublicId : undefined),
+                
+                gltf: !formats.gltf ? null : (gltf instanceof File ? finalGltf : undefined),
+                gltfPublicId: !formats.gltf ? null : (gltf instanceof File ? finalGltfPublicId : undefined),
                 polygon_count: parseInt(polygonCount) || 0,
                 has_textures: hasTextures,
                 is_rigged: isRigged,
                 is_uv_mapped: isUvMapped,
+                isNewVersion,
             });
 
             setSuccess("Update item success");
@@ -348,6 +358,19 @@ const UpdateModel = () => {
                             <input type="file" id="gltf" accept=".zip" onChange={handleModelChange(setGltf)} hidden />
                         </div>
                     )}
+
+                    <div className="form-group checkbox-container" style={{ margin: "20px 0" }}>
+                        <label>
+                            <input
+                                type="checkbox"
+                                className="custom-checkbox"
+                                checked={isNewVersion}
+                                onChange={(e) => setIsNewVersion(e.target.checked)}
+                            />
+                            <span className="box"></span>
+                            <b style={{ color: "orange" }}>Publish as New Version</b>
+                        </label>
+                    </div>
 
                     <input type="submit" value="Save Changes" className="add-item__submit" />
                     {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}

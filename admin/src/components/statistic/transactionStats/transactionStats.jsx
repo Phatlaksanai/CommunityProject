@@ -40,6 +40,12 @@ const TransactionStats = () => {
         queryFn: () => makeRequest.get("/admin/transactions/OrderByRange").then(res => res.data) //วงล่าง
     });
 
+    const formatDate = (dateString) => {
+        if (!dateString) return "-";
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-GB");
+    };
+
     const formattedRangeData = RangeData?.map((entry) => { //วงล่าง
         let cellColor = "#D9D9D9";
         if (entry.name.includes("฿1–฿100")) cellColor = "#74BD6E";
@@ -234,7 +240,7 @@ const TransactionStats = () => {
                                             <td>{renderTruncatedText(transaction.users?.username || "null", 10)}</td>
                                             <td>{renderTruncatedText(transaction.amount, 10)}</td>
                                             <td>{renderTruncatedText(transaction.transaction_type, 10)}</td>
-                                            <td >{renderTruncatedText(transaction.created_at, 10)}</td>
+                                            <td >{formatDate(transaction.created_at)}</td>
                                         </tr>
                                     ))
                                 ) : (
