@@ -469,7 +469,7 @@ const ContentStats = () => {
                                                     <>
                                                         <td>{row.item_id}</td>
                                                         <td>{renderTruncatedText(row.users?.username, 15)}</td>
-                                                        <td>{renderTruncatedText(row.model, 20)}</td>
+                                                        <td>{renderTruncatedText(row.update_models?.model, 20)}</td>
                                                         <td>{renderTruncatedText(row.img, 20)}</td>
                                                         <td>{renderTruncatedText(row.description, 20)}</td>
                                                         <td>{renderTruncatedText(row.categories?.type, 15)}</td>

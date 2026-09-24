@@ -310,15 +310,35 @@ exports.getCommunitiesTable = async (req, res) => {
 exports.getItemsTable = async (req, res) => {
   try {
     const { data, error } = await db
-      .from("items")
+      .from("item")
       .select(
-        "item_id, users(username), model, modelName, img, description, category_id, categories(type), status, price, created_at",
+        "item_id, users(username), update_models(model, created_at), modelName, img, description, category_id, categories(type), status, price",
       )
-      .order("item_id", { ascending: true });
 
     if (error) throw error;
 
-    return res.status(200).json(data);
+    const formatted = data.map((item) => {
+      const latestUpdate = [...(item.update_models || [])].sort( // .sort() ข้างใน latestUpdate หา update ล่าสุดของ แต่ละ Item
+        (update1, update2) =>
+          new Date(update2.created_at) - new Date(update1.created_at) // เรียง update จากเก่า → ใหม่
+      )[0];
+
+      return {
+        ...item,
+        model: latestUpdate?.model || null,
+        created_at: latestUpdate?.created_at || null,
+        username: item.users?.username || null,
+        profilePic: item.users?.profilePic || null,
+      };  
+    });
+
+    formatted.sort( // .sort() ที่ formatted เรียง Item ทั้งหมด ตาม update ล่าสุด
+      (item1, item2) =>
+        new Date(item1.item_id) - new Date(item2.item_id) // เรียง Item ทั้งหมดจากเก่า → ใหม่
+    );
+
+    return res.json(formatted);
+    
   } catch (error) {
     console.error("Error fetching items:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -398,7 +418,7 @@ exports.updateItem = async (req, res) => {
 
     // อัปเดต Item ด้วย finalCategoryId
     const { data, error } = await db
-      .from("items")
+      .from("item")
       .update({
         modelName: modelName,
         description: description,
