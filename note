@@ -94,26 +94,26 @@ BEGIN
   -- 1. ยอดรวมทั้งหมด (All-time)
   all_time AS (
     SELECT 
-      COALESCE((SELECT SUM(oi.platform_fee) FROM public.order_items oi JOIN public.orders o ON oi.order_id = o.order_id WHERE o.status = 'completed'), 0) AS revenue,
-      (SELECT COUNT(*) FROM public.users) AS users,
-      (SELECT COUNT(*) FROM public.items) AS assets,
-      (SELECT COUNT(*) FROM public.communities) AS communities
+      COALESCE((SELECT SUM(oi.platform_fee) FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.status = 'completed'), 0) AS revenue,
+      (SELECT COUNT(*) FROM users) AS users,
+      (SELECT COUNT(*) FROM item) AS assets,
+      (SELECT COUNT(*) FROM communities) AS communities
   ),
   -- 2. ยอดของ 7 วันล่าสุด (Current Period)
   current_period AS (
     SELECT 
-      COALESCE((SELECT SUM(oi.platform_fee) FROM public.order_items oi JOIN public.orders o ON oi.order_id = o.order_id WHERE o.status = 'completed' AND o.created_at >= NOW() - INTERVAL '7 days'), 0) AS revenue,
-      (SELECT COUNT(*) FROM public.users WHERE created_at >= NOW() - INTERVAL '7 days') AS users,
-      (SELECT COUNT(*) FROM public.items WHERE created_at >= NOW() - INTERVAL '7 days') AS assets,
-      (SELECT COUNT(*) FROM public.communities WHERE created_at >= NOW() - INTERVAL '7 days') AS communities
+      COALESCE((SELECT SUM(oi.platform_fee) FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.status = 'completed' AND o.created_at >= NOW() - INTERVAL '7 days'), 0) AS revenue,
+      (SELECT COUNT(*) FROM users WHERE created_at >= NOW() - INTERVAL '7 days') AS users,
+      (SELECT COUNT(DISTINCT i.item_id) FROM item i JOIN update_models um ON um.item_id = i.item_id WHERE um.created_at >= NOW() - INTERVAL '7 days') AS assets,
+      (SELECT COUNT(*) FROM communities WHERE created_at >= NOW() - INTERVAL '7 days') AS communities
   ),
   -- 3. ยอดของ 7 วันก่อนหน้า (Previous Period: วันที่ 8 ถึง 14 ย้อนหลัง)
   previous_period AS (
     SELECT 
-      COALESCE((SELECT SUM(oi.platform_fee) FROM public.order_items oi JOIN public.orders o ON oi.order_id = o.order_id WHERE o.status = 'completed' AND o.created_at >= NOW() - INTERVAL '14 days' AND o.created_at < NOW() - INTERVAL '7 days'), 0) AS revenue,
-      (SELECT COUNT(*) FROM public.users WHERE created_at >= NOW() - INTERVAL '14 days' AND created_at < NOW() - INTERVAL '7 days') AS users,
-      (SELECT COUNT(*) FROM public.items WHERE created_at >= NOW() - INTERVAL '14 days' AND created_at < NOW() - INTERVAL '7 days') AS assets,
-      (SELECT COUNT(*) FROM public.communities WHERE created_at >= NOW() - INTERVAL '14 days' AND created_at < NOW() - INTERVAL '7 days') AS communities
+      COALESCE((SELECT SUM(oi.platform_fee) FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.status = 'completed' AND o.created_at >= NOW() - INTERVAL '14 days' AND o.created_at < NOW() - INTERVAL '7 days'), 0) AS revenue,
+      (SELECT COUNT(*) FROM users WHERE created_at >= NOW() - INTERVAL '14 days' AND created_at < NOW() - INTERVAL '7 days') AS users,
+      (SELECT COUNT(DISTINCT i.item_id) FROM item i JOIN update_models um ON um.item_id = i.item_id WHERE um.created_at >= NOW() - INTERVAL '14 days' AND um.created_at < NOW() - INTERVAL '7 days') AS assets,
+      (SELECT COUNT(*) FROM communities WHERE created_at >= NOW() - INTERVAL '14 days' AND created_at < NOW() - INTERVAL '7 days') AS communities
   )
   -- 4. คำนวณผลลัพธ์และเปอร์เซ็นต์
   SELECT 
@@ -145,7 +145,7 @@ BEGIN
     COALESCE(SUM(oi.platform_fee), 0) AS revenue 
   FROM public.order_items oi
   JOIN public.orders o ON oi.order_id = o.order_id 
-  WHERE o.created_at >= (now() - interval '1 year') // ตอนนี้ใช้ 1 ปีแทนไปก่อน (7 days)
+  WHERE o.created_at >= (now() - interval '1 year') -- ตอนนี้ใช้ 1 ปีแทนไปก่อน (7 days)
     AND o.status = 'completed' -- กรองเฉพาะออเดอร์ที่ status เป็น completed
   GROUP BY to_char(o.created_at, 'DD/MM'), date_trunc('day', o.created_at)
   ORDER BY date_trunc('day', o.created_at) ASC;
@@ -435,10 +435,10 @@ RETURNS TABLE (
 BEGIN
   RETURN QUERY
   SELECT
-    (SELECT COUNT(*) FROM public.items) AS total_items,
-    (SELECT COUNT(*) FROM public.items WHERE DATE(created_at) = CURRENT_DATE) AS items_today,
-    (SELECT COUNT(*) FROM public.items WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS items_this_month,
-    (SELECT COUNT(*) FROM public.items WHERE EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS items_this_year;
+    (SELECT COUNT(*) FROM item) AS total_items,
+    (SELECT COUNT(*) FROM item i JOIN update_models um ON um.item_id = i.item_id WHERE DATE(um.created_at) = CURRENT_DATE) AS items_today,
+    (SELECT COUNT(*) FROM item i JOIN update_models um ON um.item_id = i.item_id WHERE EXTRACT(MONTH FROM um.created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM um.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS items_this_month,
+    (SELECT COUNT(*) FROM item i JOIN update_models um ON um.item_id = i.item_id WHERE EXTRACT(YEAR FROM um.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS items_this_year;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -456,9 +456,12 @@ BEGIN
   )
   SELECT 
     TO_CHAR(cwd.report_date, 'Dy') AS day_name,
-    COUNT(it.created_at) AS item_count
+    COUNT(um.created_at) AS item_count
   FROM current_week_days cwd
-  LEFT JOIN public.items it ON DATE(it.created_at) = cwd.report_date
+  LEFT JOIN item it ON true
+  LEFT JOIN update_models um
+  ON um.item_id = it.item_id
+    AND DATE(um.created_at) = cwd.report_date
   GROUP BY cwd.report_date, day_name
   ORDER BY cwd.report_date ASC;
 END;
@@ -474,13 +477,15 @@ LANGUAGE sql
 AS $$
     SELECT 
         EXTRACT(YEAR FROM created_at) AS year, 
-        COUNT(item_id) AS total 
-    FROM items 
-    WHERE EXTRACT(YEAR FROM created_at) IN (
+        COUNT(i.item_id) AS total 
+    FROM item i
+    JOIN update_models um 
+        ON um.item_id = i.item_id
+    WHERE EXTRACT(YEAR FROM um.created_at) IN (
         EXTRACT(YEAR FROM CURRENT_DATE), 
         EXTRACT(YEAR FROM CURRENT_DATE) - 1
     )
-    GROUP BY EXTRACT(YEAR FROM created_at)
+    GROUP BY EXTRACT(YEAR FROM um.created_at)
     ORDER BY year DESC;
 $$;
 
@@ -494,21 +499,21 @@ LANGUAGE sql
 AS $$
     -- 1. ช่วงราคา ฿1 - ฿100
     SELECT '฿1–฿100' AS category, COUNT(item_id) AS total 
-    FROM items 
+    FROM item
     WHERE price BETWEEN 1 AND 100
 
     UNION ALL
 
     -- 2. ช่วงราคา ฿101 - ฿500
     SELECT '฿101–฿500' AS category, COUNT(item_id) AS total 
-    FROM items 
+    FROM item
     WHERE price BETWEEN 101 AND 500
 
     UNION ALL
 
     -- 3. ช่วงราคา ฿501 ขึ้นไป
     SELECT '฿501+' AS category, COUNT(item_id) AS total 
-    FROM items 
+    FROM item
     WHERE price >= 501;
 $$;
 
@@ -765,7 +770,7 @@ SELECT
     SUM(t.amount) AS total_amount
 FROM transactions t
 INNER JOIN order_items oi ON t.order_item_id = oi.order_item_id
-INNER JOIN items i ON oi.item_id = i.item_id
+INNER JOIN item i ON oi.item_id = i.item_id
 WHERE t.transaction_type = 'sale'
 GROUP BY oi.seller_id, i."modelName", i.img;
 
