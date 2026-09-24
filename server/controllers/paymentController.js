@@ -10,13 +10,13 @@ exports.createPayment = async (req, res) => {
       .select(
         `
         cart_items_id,
-        items!inner(price ,item_id ,user_id, users!inner ( username ) ),
+        item!inner(price ,item_id ,user_id, users!inner ( username ) ),
         carts!inner(cart_id, user_id)
       `,
       )
       .eq("carts.cart_id", cartId)
       .eq("carts.user_id", userId)
-      .eq("items.users.username", sellerUsername);
+      .eq("item.users.username", sellerUsername);
 
     if (error) {
       throw error;
@@ -28,8 +28,8 @@ exports.createPayment = async (req, res) => {
 
     // [เพิ่มเติม] ตรวจสอบว่าสินค้าในตะกร้ามาจากร้านเดียวกันทั้งหมดหรือไม่ 
     // เพราะ Destination Charge รองรับการโอนเข้า 1 ปลายทางต่อ 1 PaymentIntent
-    const firstSellerId = cartItems[0].items.user_id;
-    const isSameSeller = cartItems.every(item => item.items.user_id === firstSellerId);
+    const firstSellerId = cartItems[0].item.user_id;
+    const isSameSeller = cartItems.every(cartitem => cartitem.item.user_id === firstSellerId);
 
     if (!isSameSeller) {
       return res.status(400).json({
@@ -37,7 +37,7 @@ exports.createPayment = async (req, res) => {
       });
     }
 
-    const subtotal = cartItems.reduce((sum, cartItem) => sum + cartItem.items.price, 0);
+    const subtotal = cartItems.reduce((sum, cartItem) => sum + cartItem.item.price, 0);
 
     const platformFee = subtotal * 0.035;
     const netTarget = subtotal + platformFee;
@@ -61,13 +61,13 @@ exports.createPayment = async (req, res) => {
     }
 
     const orderItems = cartItems.map((cartItem) => {
-      const itemPrice = cartItem.items.price;
+      const itemPrice = cartItem.item.price;
       const itemPlatformFee = itemPrice * 0.035;
 
       return {
         order_id: order.order_id,
-        item_id: cartItem.items.item_id,
-        seller_id: cartItem.items.user_id,
+        item_id: cartItem.item.item_id,
+        seller_id: cartItem.item.user_id,
         platform_fee: itemPlatformFee, // ค่าธรรมเนียมเฉพาะของสินค้านี้
         seller_net: itemPrice, // รายได้เฉพาะชิ้นนี้
       };
@@ -143,7 +143,7 @@ exports.addItemToCart = async (req, res) => {
   try {
     // ตรวจสอบสินค้า
     const { data: item, error: itemError } = await db
-      .from("items")
+      .from("item")
       .select("*")
       .eq("item_id", item_id)
       .single();
@@ -258,7 +258,7 @@ exports.getCardItems = async (req, res) => {
         cart_items_id,
         cart_id,
         carts!inner ( user_id ),
-        items ( item_id, modelName, price, img, users ( username, name, profilePic ) )`,
+        item ( item_id, modelName, price, img, users ( username, name, profilePic ) )`,
       )
       .eq("carts.user_id", userId);
 
@@ -267,16 +267,16 @@ exports.getCardItems = async (req, res) => {
     }
 
     // จัดรูปทรงของ Data ใหม่ให้อยู่ในระดับเดียวกัน เพื่อให้ Frontend เรียกใช้ง่าย
-    const formattedData = cartItems.map((item) => ({
-      cart_items_id: item.cart_items_id,
-      cart_id: item.cart_id,
-      item_id: item.items.item_id,
-      modelName: item.items.modelName,
-      price: item.items.price,
-      img: item.items.img,
-      username: item.items.users?.username,
-      name: item.items.users?.name,
-      profilePic: item.items.users?.profilePic,
+    const formattedData = cartItems.map((cartItem) => ({
+      cart_items_id: cartItem.cart_items_id,
+      cart_id: cartItem.cart_id,
+      item_id: cartItem.item.item_id,
+      modelName: cartItem.item.modelName,
+      price: cartItem.item.price,
+      img: cartItem.item.img,
+      username: cartItem.item.users?.username,
+      name: cartItem.item.users?.name,
+      profilePic: cartItem.item.users?.profilePic,
     }));
 
     // ส่ง Array กลับไปโดยตรง เพื่อให้ data.map() ฝั่ง Frontend ทำงานได้
@@ -378,15 +378,11 @@ exports.getDownloads = async (req, res) => {
           created_at,
           user_id
         ),
-        items(
+        item(
           item_id,
           modelName,
           price,
-          obj,
-          fbx,
-          blend,
-          usdz,
-          gltf
+          update_models(obj,fbx,blend,usdz,gltf)
         )
       `,
       )
@@ -396,7 +392,7 @@ exports.getDownloads = async (req, res) => {
     if (error) throw error;
 
     // 1. ดึง item_id ทั้งหมดจาก data ที่ได้มา
-    const itemIds = data.map((d) => d.items.item_id);
+    const itemIds = data.filter((d) => d.item).map((d) => d.item.item_id);;
 
     // 2. ค้นหาตาราง reviews ด้วย user_id ปัจจุบัน และ item_id ที่อยู่ในรายการดาวน์โหลด
     const { data: reviewsData, error: reviewsError } = await db
@@ -411,9 +407,9 @@ exports.getDownloads = async (req, res) => {
     const reviewedItemIds = new Set(reviewsData.map((r) => r.item_id));
 
     // 4. Map ค่า is_reviewed เพิ่มเข้าไปในชุดข้อมูลเดิม
-    const result = data.map((item) => ({
-      ...item,
-      is_reviewed: reviewedItemIds.has(item.items.item_id),
+    const result = data.map((downloadItem) => ({
+      ...downloadItem,
+      is_reviewed: reviewedItemIds.has(downloadItem.item.item_id),
     }));
 
     res.json(result);
@@ -440,13 +436,9 @@ exports.getDownloadFile = async (req, res) => {
           status
         ),
 
-        items(
+        item(
           modelName,
-          obj,
-          fbx,
-          blend,
-          usdz,
-          gltf
+          update_models(obj,fbx,blend,usdz,gltf)
         )
       `,
       )
@@ -482,7 +474,7 @@ exports.getDownloadFile = async (req, res) => {
       });
     }
 
-    const fileUrl = data.items[type];
+    const fileUrl = data.item?.update_models?.[0]?.[type];
 
     if (!fileUrl) { return res.status(404).json({ error: "File not found" }); }
 
