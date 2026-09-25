@@ -47,7 +47,10 @@ const LeftDP = ({ project }) => {
                     .format("D MMM YYYY")}
                 </span>
               </div>
-              <button className="buy-button" onClick={() => navigate(`/descitem/${item.item_id}`)}>Buy</button>
+              <div className="groupBtn">
+                <button className="timeline-button">Timeline</button>
+                <button className="buy-button" onClick={() => navigate(`/descitem/${item.item_id}`)}>Buy</button>
+              </div>
             </div>
           ))}
 

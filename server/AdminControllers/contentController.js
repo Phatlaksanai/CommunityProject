@@ -310,7 +310,7 @@ exports.getCommunitiesTable = async (req, res) => {
 exports.getItemsTable = async (req, res) => {
   try {
     const { data, error } = await db
-      .from("item")
+      .from("items")
       .select(
         "item_id, users(username), update_models(model, created_at), modelName, img, description, category_id, categories(type), status, price",
       )
@@ -418,7 +418,7 @@ exports.updateItem = async (req, res) => {
 
     // อัปเดต Item ด้วย finalCategoryId
     const { data, error } = await db
-      .from("item")
+      .from("items")
       .update({
         modelName: modelName,
         description: description,

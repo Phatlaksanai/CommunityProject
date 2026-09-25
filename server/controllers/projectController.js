@@ -43,7 +43,7 @@ exports.getProjectsByUserId = async (req, res) => {
 
   // ดึง project_id จาก items
   const { data: itemProjects, error: itemError } = await db
-    .from("item")
+    .from("items")
     .select("project_id")
     .eq("user_id", id)
     .not("project_id", "is", null);
@@ -122,7 +122,7 @@ exports.addProject = async (req, res) => {
   // update item
   if (relatedItem) { 
     const { error: itemError } = await db
-      .from("item")
+      .from("items")
       .update({ project_id: projectId })
       .eq("item_id", relatedItem)
       .is("project_id", null);
@@ -174,11 +174,11 @@ exports.updateProject = async (req, res) => {
     }
 
     // 3. จัดการ Items: ล้างค่า FK เดิม
-    await db.from("item").update({ project_id: null }).eq("project_id", projectId);
+    await db.from("items").update({ project_id: null }).eq("project_id", projectId);
 
     // ใส่ค่าใหม่ (ถ้ามีเลือก)
     if (relatedItem) {
-      await db.from("item").update({ project_id: projectId }).eq("item_id", relatedItem);
+      await db.from("items").update({ project_id: projectId }).eq("item_id", relatedItem);
     }
 
     return res.status(200).json({ success: true });

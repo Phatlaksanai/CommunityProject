@@ -5,7 +5,7 @@ const algoliaClient = require("../config/algolia");
 exports.getItems = async (req, res) => {
   const { category_id, date } = req.query;
 
-  let query = db.from("item")
+  let query = db.from("items")
     .select(`*,
       categories(
         category_id,
@@ -81,7 +81,7 @@ exports.getItemsById = async (req, res) => {
   const { id } = req.params;
 
   const { data, error } = await db
-    .from("item")
+    .from("items")
     .select(
       `
       *,
@@ -143,7 +143,7 @@ exports.getItemsByProjectId = async (req, res) => {
   const { id } = req.params;
 
   const { data, error } = await db
-    .from("item")
+    .from("items")
     .select(
       `
       *,
@@ -188,7 +188,7 @@ exports.getItemsByUserIdAvailable = async (req, res) => {
   const { id } = req.params;
 
   const { data, error } = await db
-    .from("item")
+    .from("items")
     .select(`*, 
       update_models(created_at) 
       `)
@@ -221,7 +221,7 @@ exports.getItemsByUserId = async (req, res) => {
   const { id } = req.params;
 
   const { data, error } = await db
-    .from("item")
+    .from("items")
     .select(`
       *,
       update_models (
@@ -273,7 +273,7 @@ exports.addItem = async (req, res) => {
   try {
     // 1. Insert ข้อมูลลงตาราง "item" ก่อน
     const { data: itemData, error: itemError } = await db
-      .from("item")
+      .from("items")
       .insert([{
         modelName,
         description: description || null,
@@ -356,7 +356,7 @@ exports.editItem = async (req, res) => {
   try {
     // 1. ดึงข้อมูลไอเทมเดิมมาก่อน เพื่อเอาไปใช้กับ Algolia และเช็คลบรูปภาพเก่า
     const { data: items, error: fetchError } = await db
-      .from("item")
+      .from("items")
       .select("*")
       .eq("item_id", itemId)
       .single();
@@ -382,7 +382,7 @@ exports.editItem = async (req, res) => {
 
     // 3. Update ลง DB
     const { error: updateError } = await db
-      .from("item")
+      .from("items")
       .update(updateData)
       .eq("item_id", itemId);
 
@@ -583,7 +583,7 @@ exports.getItemsForEditProject = async (req, res) => {
   const userId = req.user.user_id;
 
   const { data, error } = await db
-    .from("item")
+    .from("items")
     .select("*")
     .or(
       `project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`,
@@ -596,7 +596,7 @@ exports.getItemsForEditProject = async (req, res) => {
 exports.getLatestItems = async (req, res) => {
   try {
     const { data, error } = await db
-      .from("item") // เปลี่ยนชื่อตารางตามที่คุณใช้
+      .from("items") // เปลี่ยนชื่อตารางตามที่คุณใช้
       .select(`*,
         update_models(created_at)
         `);
@@ -634,7 +634,7 @@ exports.getItemsByCategory = async (req, res) => {
 
   try {
     const { data, error } = await db
-      .from("item")
+      .from("items")
       .select(`item_id, modelName, description, img, price, user_id,
         update_models(created_at)
         `) // เลือกเฉพาะฟิลด์ที่ใช้แสดงใน Card
