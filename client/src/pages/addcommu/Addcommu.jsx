@@ -2,6 +2,7 @@ import "./addcommu.scss";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";//-------------------------------------
 import { makeRequest } from "../../api/axios";
+import { ClipLoader } from "react-spinners";
 
 const AddCommu = () => {
   //----------------------------------------------------------
@@ -15,6 +16,7 @@ const AddCommu = () => {
   // message
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -41,12 +43,14 @@ const AddCommu = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setIsLoadingSpinner(true);
 
     if (!img) {
       setError("Please upload your image and model files");
+      setIsLoadingSpinner(false);
       return;
     }
-
+    
     try {
       const imgURL = await uploadFile(img);
 
@@ -71,6 +75,7 @@ const AddCommu = () => {
       } else {
         setError("Failed to connect to server");
       }
+      setIsLoadingSpinner(false);
     }
   };
 
@@ -112,7 +117,14 @@ const AddCommu = () => {
             />
           </div>
 
-          <input type="submit" value="Submit" className="add-item__submit" />
+          <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+          >
+            {isLoadingSpinner ? (
+              <ClipLoader size={16} color="#ffffff" />
+            ) : (
+              "Submit"
+            )}
+          </button>
           {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
           {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
         </form>

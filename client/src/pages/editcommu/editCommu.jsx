@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";//--------------------
 import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
+import { ClipLoader } from "react-spinners";
 
 const EditCommu = () => {
     //---------------------------------------------------------- 
@@ -21,6 +22,8 @@ const EditCommu = () => {
     const [success, setSuccess] = useState("");
     const [imgPublicId, setImgPublicId] = useState(null);
     const [modelPublicId, setModelPublicId] = useState(null);
+
+    const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
     const { data: commu } = useQuery({
         queryKey: ["community", community_id],
@@ -63,6 +66,7 @@ const EditCommu = () => {
         e.preventDefault();
         setError("");
         setSuccess("");
+        setIsLoadingSpinner(true);
 
         try {
 
@@ -94,6 +98,7 @@ const EditCommu = () => {
             } else {
                 setError("Failed to connect to server");
             }
+            setIsLoadingSpinner(false);
         }
     };
 
@@ -135,7 +140,14 @@ const EditCommu = () => {
                         />
                     </div>
 
-                    <input type="submit" value="Save Changes" className="add-item__submit" />
+                    <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+                    >
+                        {isLoadingSpinner ? (
+                            <ClipLoader size={16} color="#ffffff" />
+                        ) : (
+                            "Save Changes"
+                        )}
+                    </button>
                     {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
                     {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
                 </form>

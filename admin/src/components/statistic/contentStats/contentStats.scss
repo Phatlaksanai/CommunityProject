@@ -402,6 +402,14 @@
             @media (max-width: 600px) {
               grid-column: span 1; /* ถ้าจอเล็กให้เหลือ 1 คอลัมน์ปกติ */
             }
+
+            .cover-preview {
+              margin-top: 10px;
+              max-width: 400px;
+              max-height: 400px;
+              object-fit: contain;
+              border-radius: 8px;
+            }
           }
 
           label {

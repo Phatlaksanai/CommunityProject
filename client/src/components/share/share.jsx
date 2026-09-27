@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import { useQuery } from "@tanstack/react-query"; // เพิ่ม useQuery
 import { backdropClasses } from "@mui/material/Backdrop";
+import { ClipLoader } from "react-spinners";
 
 const Share = ({ isDescCommu, commuId }) => {
   const [desc, setDesc] = useState("");
@@ -24,6 +25,7 @@ const Share = ({ isDescCommu, commuId }) => {
   const [selectedProject, setSelectedProject] = useState(null); // State สำหรับเก็บ ID โปรเจคที่เลือก
 
   const [error, setError] = useState("");
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
   // ดึงข้อมูลโปรเจคของผู้ใช้ (ตัวอย่าง API path: /projects)
   const { isLoading, data: projects } = useQuery({
@@ -56,6 +58,11 @@ const Share = ({ isDescCommu, commuId }) => {
       setFilePreviews([]);
       setSelectedProject(null); // <--- ล้างค่า ID โปรเจกต์ที่เลือกไว้
       setSearch("");         // (Option) ล้างค่าการค้นหาใน Modal ด้วยก็ได้
+      setIsLoadingSpinner(false);
+    },
+    onError: (error) => {
+      console.error("Error Post:", error);
+      setIsLoadingSpinner(false);
     },
   });
 
@@ -63,28 +70,35 @@ const Share = ({ isDescCommu, commuId }) => {
     e.preventDefault();
     if (desc.trim() === "" && files.length === 0 && !selectedProject) return;
 
-    let imgUrls = [];
-    let modelUrls = [];
+    setIsLoadingSpinner(true);
 
-    for (const file of files) {
-      const result = await upload(file);
-      if (result?.url) {
-        const isModel = /\.(glb|gltf)$/i.test(file.name);
-        if (isModel) {
-          modelUrls.push(result.url);
-        } else {
-          imgUrls.push(result.url);
+    try {
+      let imgUrls = [];
+      let modelUrls = [];
+
+      for (const file of files) {
+        const result = await upload(file);
+        if (result?.url) {
+          const isModel = /\.(glb|gltf)$/i.test(file.name);
+          if (isModel) {
+            modelUrls.push(result.url);
+          } else {
+            imgUrls.push(result.url);
+          }
         }
       }
-    }
 
-    mutation.mutate({
-      desc,
-      img: imgUrls.length ? imgUrls : null,
-      model: modelUrls.length ? modelUrls : null,
-      project_id: selectedProject,
-      commu_id: commuId || null,
-    });
+      mutation.mutate({
+        desc,
+        img: imgUrls.length ? imgUrls : null,
+        model: modelUrls.length ? modelUrls : null,
+        project_id: selectedProject,
+        commu_id: commuId || null,
+      });
+    } catch (error) {
+      console.error("Error Post:", error);
+      setIsLoadingSpinner(false);
+    }
   };
 
   const MAX_MODEL_SIZE = 10 * 1024 * 1024; // 10MB
@@ -122,17 +136,17 @@ const Share = ({ isDescCommu, commuId }) => {
   };
 
   const selectedProjectData = projects?.find( // หาก้อน object ที่ตรงกับ id ที่เลือกไว้
-  (p) => p.project_id === selectedProject
+    (p) => p.project_id === selectedProject
   );
 
   useEffect(() => {
-  if (openProjectModal) {
-    document.body.style.overflow = "hidden";
-  } 
-  return () => {
-    document.body.style.overflow = "auto";
-  };
-}, [openProjectModal]);
+    if (openProjectModal) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [openProjectModal]);
 
   return (
     <div className="share">
@@ -145,7 +159,7 @@ const Share = ({ isDescCommu, commuId }) => {
             onChange={(e) => setDesc(e.target.value)}
             value={desc}
           />
-          
+
         </div>
 
         <div className="right">
@@ -156,7 +170,7 @@ const Share = ({ isDescCommu, commuId }) => {
                   className="file"
                   alt=""
                   src={filePreviews[i]}
-                  style={{ width: "50px", height: "50px", objectFit: "cover" , borderRadius: "10px"}}
+                  style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "10px" }}
                 />
               ) : (
                 <span style={{ fontSize: "12px", color: "gray" }}>
@@ -220,9 +234,16 @@ const Share = ({ isDescCommu, commuId }) => {
               </div>
             )}
           </div>
-          {error && <p style={{ color: "red" , fontSize: "14px" }}>{error}</p>}
+          {error && <p style={{ color: "red", fontSize: "14px" }}>{error}</p>}
           <div className="right">
-            <button onClick={handleClick}>Share</button>
+            <button onClick={handleClick} disabled={isLoadingSpinner}
+            >
+              {isLoadingSpinner ? (
+                <ClipLoader size={16} color="#ffffff" />
+              ) : (
+                "Share"
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -270,7 +291,7 @@ const Share = ({ isDescCommu, commuId }) => {
               {/* ปุ่มควบคุมด้านล่าง */}
               <div className="modalButtons">
                 <button onClick={() => setOpenProjectModal(false)}>Cancel</button>
-                <button onClick={() => setOpenProjectModal(false)} style={{backgroundColor: "#A0C46E"}}>Confirm</button>
+                <button onClick={() => setOpenProjectModal(false)} style={{ backgroundColor: "#A0C46E" }}>Confirm</button>
               </div>
 
             </div>

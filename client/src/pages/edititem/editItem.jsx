@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";//--------------------
 import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
+import { ClipLoader } from "react-spinners";
 
 const EditItem = () => {
     //---------------------------------------------------------- 
@@ -22,6 +23,8 @@ const EditItem = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [imgPublicId, setImgPublicId] = useState(null);
+
+    const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
     const { data: items } = useQuery({
         queryKey: ["item", item_id],
@@ -72,7 +75,7 @@ const EditItem = () => {
         e.preventDefault();
         setError("");
         setSuccess("");
-
+        setIsLoadingSpinner(true);
         try {
             let finalImg = img;
             let finalImgPublicId = imgPublicId;
@@ -91,7 +94,7 @@ const EditItem = () => {
                 category_id: categoryId,
                 img: finalImg,
                 imgPublicId: finalImgPublicId,
-                
+
             });
 
             setSuccess("Update item success");
@@ -102,6 +105,7 @@ const EditItem = () => {
             } else {
                 setError("Failed to connect to server");
             }
+            setIsLoadingSpinner(false);
         }
     };
 
@@ -169,7 +173,14 @@ const EditItem = () => {
                         </select>
                     </div>
 
-                    <input type="submit" value="Save Changes" className="add-item__submit" />
+                    <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+                    >
+                        {isLoadingSpinner ? (
+                            <ClipLoader size={16} color="#ffffff" />
+                        ) : (
+                            "Save Changes"
+                        )}
+                    </button>
                     {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
                     {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
                 </form>

@@ -5,6 +5,7 @@ import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import ScrollToTop from "../../ScrollToTop";
+import { ClipLoader } from "react-spinners";
 
 const UpdateModel = () => {
     const navigate = useNavigate();
@@ -43,6 +44,7 @@ const UpdateModel = () => {
     });
 
     // message
+    const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [modelPublicId, setModelPublicId] = useState(null);
@@ -166,7 +168,8 @@ const UpdateModel = () => {
         e.preventDefault();
         setError("");
         setSuccess("");
-
+        setIsLoadingSpinner(true);
+        
         let finalImg1 = previewImg1;
         let finalImg2 = previewImg2;
 
@@ -182,13 +185,16 @@ const UpdateModel = () => {
         // เช็คว่ามีรูปครบทั้ง 2 ช่องหรือไม่ (นับรวมรูปเก่า + รูปอัปเดตใหม่)
         if (!finalImg1 || !finalImg2) {
             setError("Please provide reference images for the update in both slots 1 and 2.");
+            setIsLoadingSpinner(false);
             return;
         }
 
         if (!obj && !blend && !fbx && !usdz && !gltf) {
             setError("Please upload zip model files");
+            setIsLoadingSpinner(false);
             return;
         }
+        
 
         try {
             let finalModel = model;
@@ -279,6 +285,7 @@ const UpdateModel = () => {
             } else {
                 setError("Failed to connect to server");
             }
+            setIsLoadingSpinner(false);
         }
     };
 
@@ -296,7 +303,7 @@ const UpdateModel = () => {
                     />
                     <span>New Version</span>
                 </div>
-                
+
                 {/* รายการเวอร์ชันที่มีอยู่ */}
                 {versions?.map((item) => (
                     <div
@@ -520,8 +527,26 @@ const UpdateModel = () => {
                             </div>
                         )}
 
-                        {isNewVersion && <input type="submit" value="Add Version" className="add-item__submit" />}
-                        {!isNewVersion && <input type="submit" value="Save Changes" className="add-item__submit" />}
+                        {isNewVersion &&
+                            <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+                            >
+                                {isLoadingSpinner ? (
+                                    <ClipLoader size={16} color="#ffffff" />
+                                ) : (
+                                    "Add Version"
+                                )}
+                            </button>
+                        }
+                        {!isNewVersion &&
+                            <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+                            >
+                                {isLoadingSpinner ? (
+                                    <ClipLoader size={16} color="#ffffff" />
+                                ) : (
+                                    "Save Changes"
+                                )}
+                            </button>
+                        }
                         {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
                         {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
                     </form>

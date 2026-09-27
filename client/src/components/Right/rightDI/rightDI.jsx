@@ -5,6 +5,7 @@ import { AuthContext } from "../../../context/authContext";
 import { useContext, useState, useEffect } from "react";
 import { makeRequest } from "../../../api/axios";
 import { useQuery } from "@tanstack/react-query";
+import { ClipLoader } from "react-spinners";
 
 const RightDI = ({ item }) => {
   if (!item) return null;
@@ -13,15 +14,19 @@ const RightDI = ({ item }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [itemReviews, setItemReviews] = useState([]);
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
   const handleAddToCart = async () => {
+    setIsLoadingSpinner(true);
 
     if (!currentUser) {
       setError("Please log in to add items to your cart.");
+      setIsLoadingSpinner(false);
       return;
     }
     if (item.user_id === currentUser.user_id) {
       setError("You cannot add your own item to the cart.");
+      setIsLoadingSpinner(false);
       return;
     }
 
@@ -36,6 +41,7 @@ const RightDI = ({ item }) => {
         navigate(`/cart/${currentUser.user_id}`)
       } else {
         setError(data.error || "Failed to add item to cart");
+        setIsLoadingSpinner(false);
       }
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
@@ -43,6 +49,7 @@ const RightDI = ({ item }) => {
       } else {
         setError("Failed to connect to server");
       }
+      setIsLoadingSpinner(false);
     }
   };
 
@@ -89,7 +96,14 @@ const RightDI = ({ item }) => {
         </div>
         <div className="menu">
           <div className="buttons">
-            <button onClick={handleAddToCart} style={{ cursor: "pointer" }}>Add to Cart</button>
+            <button onClick={handleAddToCart} style={{ cursor: "pointer" }} disabled={isLoadingSpinner}
+            >
+              {isLoadingSpinner ? (
+                <ClipLoader size={16} color="#ffffff" />
+              ) : (
+                "Add to Cart"
+              )}
+            </button>
           </div>
           {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
           {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}

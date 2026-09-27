@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
+import { ClipLoader } from "react-spinners";
 
 const Manage = () => {
   const navigate = useNavigate();
@@ -21,6 +22,9 @@ const Manage = () => {
   const [searchPost, setSearchPost] = useState("");
   const [selectedPosts, setSelectedPosts] = useState([]);
   const [showPostModal, setShowPostModal] = useState(false);
+
+  const [isLoadingSpinBan, setIsLoadingSpinBan] = useState(false);
+  const [isLoadingSpinPost, setIsLoadingSpinPost] = useState(false);
 
   // ดึงข้อมูลสมาชิก
   const { data: members = [], isLoading } = useQuery({
@@ -63,10 +67,12 @@ const Manage = () => {
         userIds: targetUserId
       });
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries(["communityMembers", community_id]);
       setSuccessMember("Ban Successful!");
       setSelectedUsers([]);
+      setIsLoadingSpinBan(false);
       setTimeout(() => {
         navigate(`/desccommu/${community_id}`);
       }, 1500);
@@ -79,6 +85,7 @@ const Manage = () => {
       } else {
         setErrorMember("Ban Failed");
       }
+      setIsLoadingSpinBan(false);
     }
   });
 
@@ -94,6 +101,7 @@ const Manage = () => {
       setSuccessPost("Posts Deleted Successfully!");
       setSelectedPosts([]);
       setShowPostModal(false);
+      setIsLoadingSpinPost(false);
       setTimeout(() => {
         navigate(`/desccommu/${community_id}`);
       }, 1500);
@@ -101,6 +109,7 @@ const Manage = () => {
     onError: (err) => {
       setErrorPost(err.response?.data?.error || "Delete Post Failed");
       setShowPostModal(false);
+      setIsLoadingSpinPost(false);
     }
   });
 
@@ -109,6 +118,7 @@ const Manage = () => {
     setErrorMember("");
     setSuccessMember("");
     setShowMemberModal(true);
+    setIsLoadingSpinBan(true);
   };
 
   const handleDeletePosts = async (e) => {
@@ -116,14 +126,17 @@ const Manage = () => {
     setErrorPost("");
     setSuccessPost("");
     setShowPostModal(true);
+    setIsLoadingSpinPost(true);
   };
 
   const confirmBan = () => {
+    setIsLoadingSpinBan(true);
     banmutation.mutate(selectedUsers);
     setShowMemberModal(false); // ปิด Pop-up
   };
 
   const confirmDeletePosts = () => {
+    setIsLoadingSpinPost(true);
     deletePostMutation.mutate(selectedPosts);
   };
 
@@ -166,7 +179,14 @@ const Manage = () => {
             </div>
           </div>
 
-          <input type="submit" value="Confirm" className="add-item__submit" />
+          <button type="submit" className="add-item__submit" disabled={isLoadingSpinBan}
+          >
+            {isLoadingSpinBan ? (
+              <ClipLoader size={16} color="#ffffff" />
+            ) : (
+              "Confirm"
+            )}
+          </button>
           {errorMember && <span style={{ color: "red", margin: "0px 10px" }}>{errorMember}</span>}
           {successMember && <span style={{ color: "green", margin: "0px 10px" }}>{successMember}</span>}
         </form>
@@ -232,7 +252,14 @@ const Manage = () => {
                 ))}
             </div>
           </div>
-          <input type="submit" value="Confirm" className="add-item__submit" />
+          <button type="submit" className="add-item__submit" disabled={isLoadingSpinPost}
+          >
+            {isLoadingSpinPost ? (
+              <ClipLoader size={16} color="#ffffff" />
+            ) : (
+              "Confirm"
+            )}
+          </button>
           {errorPost && <span style={{ color: "red", margin: "0px 10px" }}>{errorPost}</span>}
           {successPost && <span style={{ color: "green", margin: "0px 10px" }}>{successPost}</span>}
         </form>
