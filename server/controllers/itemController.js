@@ -5,7 +5,7 @@ const algoliaClient = require("../config/algolia");
 exports.getItems = async (req, res) => {
   const { category_id, date } = req.query;
 
-  let query = db.from("item")
+  let query = db.from("items")
     .select(`*,
       categories(
         category_id,
@@ -81,7 +81,7 @@ exports.getItemsById = async (req, res) => {
   const { id } = req.params;
 
   const { data, error } = await db
-    .from("item")
+    .from("items")
     .select(
       `
       *,
@@ -143,7 +143,7 @@ exports.getItemsByProjectId = async (req, res) => {
   const { id } = req.params;
 
   const { data, error } = await db
-    .from("item")
+    .from("items")
     .select(
       `
       *,
@@ -188,7 +188,7 @@ exports.getItemsByUserIdAvailable = async (req, res) => {
   const { id } = req.params;
 
   const { data, error } = await db
-    .from("item")
+    .from("items")
     .select(`*, 
       update_models(created_at) 
       `)
@@ -221,7 +221,7 @@ exports.getItemsByUserId = async (req, res) => {
   const { id } = req.params;
 
   const { data, error } = await db
-    .from("item")
+    .from("items")
     .select(`
       *,
       update_models (
@@ -273,7 +273,7 @@ exports.addItem = async (req, res) => {
   try {
     // 1. Insert ข้อมูลลงตาราง "item" ก่อน
     const { data: itemData, error: itemError } = await db
-      .from("item")
+      .from("items")
       .insert([{
         modelName,
         description: description || null,
@@ -352,11 +352,11 @@ exports.editItem = async (req, res) => {
   const {
     itemId, modelName, description, price, img, category_id, imgPublicId // เพิ่ม imgPublicId ตรงนี้
   } = req.body;
-  
+
   try {
     // 1. ดึงข้อมูลไอเทมเดิมมาก่อน เพื่อเอาไปใช้กับ Algolia และเช็คลบรูปภาพเก่า
     const { data: items, error: fetchError } = await db
-      .from("item")
+      .from("items")
       .select("*")
       .eq("item_id", itemId)
       .single();
@@ -382,7 +382,7 @@ exports.editItem = async (req, res) => {
 
     // 3. Update ลง DB
     const { error: updateError } = await db
-      .from("item")
+      .from("items")
       .update(updateData)
       .eq("item_id", itemId);
 
@@ -407,7 +407,7 @@ exports.editItem = async (req, res) => {
 
     // 5. จัดการลบรูปภาพเก่า
     const oldImgId = items.img_public_id; // ตอนนี้เรียก items ได้แล้ว
-    
+
     // ถ้ามีการส่งรูปใหม่มา และของเก่ามี public_id และไอดีไม่ตรงกัน
     if (imgPublicId && oldImgId && oldImgId !== imgPublicId) {
       await cloudinary.uploader.destroy(oldImgId);
@@ -423,47 +423,70 @@ exports.editItem = async (req, res) => {
 
 exports.updateVersion = async (req, res) => {
   const {
-    itemId, version, summary, model, obj, blend, fbx, usdz, gltf,
+    itemId, updateModelsId, version, summary, model, obj, blend, fbx, usdz, gltf,
     modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId,
     polygon_count, has_textures, is_rigged, is_uv_mapped,
-    isNewVersion // รับค่า Checkbox มาจาก Frontend
+    isNewVersion, img1, img2, // รับค่า Checkbox มาจาก Frontend
   } = req.body;
 
   try {
-    // 1. หาข้อมูล "เวอร์ชันล่าสุด" ของโมเดลนี้มาเทียบ
-    const { data: latestItem, error } = await db
-      .from("update_models")
-      .select("*")
-      .eq("item_id", itemId)
-      .order("created_at", { ascending: false }) 
-      .limit(1)
-      .maybeSingle();
+    let targetItem; // ตัวแปรสำหรับเก็บข้อมูลเวอร์ชันที่เราจะเอามาเทียบ
 
-    if (error) return res.status(500).json({ error: error.message || "Database error" });
-    if (!latestItem) return res.status(404).json({ error: "Item not found" });
+    // 1. ตรวจสอบและดึงข้อมูลเป้าหมาย
+    if (isNewVersion) {
+      // กรณีสร้างใหม่ ดึงเวอร์ชันล่าสุดมาเป็น Base สำหรับ fallback ข้อมูล (ตามลอจิกเดิม)
+      const { data, error } = await db
+        .from("update_models")
+        .select("*, imgs(*)")
+        .eq("item_id", itemId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-    // 2. ฟังก์ชันตรวจสอบว่า "มีการแก้ไขข้อมูลใดๆ หรือไม่?" 
-    // (ตอนนี้รับรู้ undefined = ไม่เปลี่ยน, null = สั่งลบทิ้ง)
+      if (error) return res.status(500).json({ error: error.message });
+      if (!data) return res.status(404).json({ error: "Item not found" });
+      targetItem = data;
+
+    } else {
+      // กรณีบันทึกทับ ต้องดึงข้อมูลของเวอร์ชันนั้นๆ มาเทียบโดยตรง
+      if (!updateModelsId) return res.status(400).json({ error: "Missing version ID" });
+
+      const { data, error } = await db
+        .from("update_models")
+        .select("*, imgs(*)")
+        .eq("update_models_id", updateModelsId)
+        .maybeSingle();
+
+      if (error) return res.status(500).json({ error: error.message });
+      if (!data) return res.status(404).json({ error: "Target version not found" });
+      targetItem = data;
+    }
+
+    // 2. ฟังก์ชันตรวจสอบการเปลี่ยนแปลง (เปลี่ยนจาก latestItem เป็น targetItem)
     const checkIsChanged = () => {
-      if (version && version.trim() !== latestItem.version) return true;
-      if (summary && summary.trim() !== latestItem.update_summary) return true;
-      if (polygon_count !== undefined && parseInt(polygon_count) !== latestItem.polygon_count) return true;
-      if (has_textures !== undefined && has_textures !== latestItem.has_textures) return true;
-      if (is_rigged !== undefined && is_rigged !== latestItem.is_rigged) return true;
-      if (is_uv_mapped !== undefined && is_uv_mapped !== latestItem.is_uv_mapped) return true;
+      if (version && version.trim() !== targetItem.version) return true;
+      if (summary && summary.trim() !== targetItem.update_summary) return true;
+      if (polygon_count !== undefined && parseInt(polygon_count) !== targetItem.polygon_count) return true;
+      if (has_textures !== undefined && has_textures !== targetItem.has_textures) return true;
+      if (is_rigged !== undefined && is_rigged !== targetItem.is_rigged) return true;
+      if (is_uv_mapped !== undefined && is_uv_mapped !== targetItem.is_uv_mapped) return true;
 
-      // ถ้า Frontend ส่ง undefined มา ระบบจะข้ามไปไม่มองว่าเป็นการเปลี่ยนแปลง
-      if (modelPublicId !== undefined && modelPublicId !== latestItem.model_public_id) return true;
-      if (objPublicId !== undefined && objPublicId !== latestItem.obj_public_id) return true;
-      if (blendPublicId !== undefined && blendPublicId !== latestItem.blend_public_id) return true;
-      if (fbxPublicId !== undefined && fbxPublicId !== latestItem.fbx_public_id) return true;
-      if (usdzPublicId !== undefined && usdzPublicId !== latestItem.usdz_public_id) return true;
-      if (gltfPublicId !== undefined && gltfPublicId !== latestItem.gltf_public_id) return true;
+      if (modelPublicId !== undefined && modelPublicId !== targetItem.model_public_id) return true;
+      if (objPublicId !== undefined && objPublicId !== targetItem.obj_public_id) return true;
+      if (blendPublicId !== undefined && blendPublicId !== targetItem.blend_public_id) return true;
+      if (fbxPublicId !== undefined && fbxPublicId !== targetItem.fbx_public_id) return true;
+      if (usdzPublicId !== undefined && usdzPublicId !== targetItem.usdz_public_id) return true;
+      if (gltfPublicId !== undefined && gltfPublicId !== targetItem.gltf_public_id) return true;
+
+      const oldImg1 = targetItem.imgs && targetItem.imgs[0] ? targetItem.imgs[0].img : null;
+      const oldImg2 = targetItem.imgs && targetItem.imgs[1] ? targetItem.imgs[1].img : null;
+      if (img1 !== undefined && img1 !== oldImg1) return true;
+      if (img2 !== undefined && img2 !== oldImg2) return true;
 
       return false;
     };
 
-    if (!checkIsChanged()) {
+    if (!isNewVersion && !checkIsChanged()) {
       return res.status(400).json({ error: "No changes detected. Please modify the data before saving." });
     }
 
@@ -473,30 +496,44 @@ exports.updateVersion = async (req, res) => {
     if (isNewVersion) {
       const newVersionData = {
         item_id: itemId,
-        version: version ? version.trim() : latestItem.version,
-        update_summary: summary ? summary.trim() : latestItem.update_summary,
-        polygon_count: polygon_count !== undefined ? parseInt(polygon_count) : latestItem.polygon_count,
-        has_textures: has_textures !== undefined ? has_textures : latestItem.has_textures,
-        is_rigged: is_rigged !== undefined ? is_rigged : latestItem.is_rigged,
-        is_uv_mapped: is_uv_mapped !== undefined ? is_uv_mapped : latestItem.is_uv_mapped,
+        version: version ? version.trim() : targetItem.version,
+        update_summary: summary ? summary.trim() : targetItem.update_summary,
+        polygon_count: polygon_count !== undefined ? parseInt(polygon_count) : targetItem.polygon_count,
+        has_textures: has_textures !== undefined ? has_textures : targetItem.has_textures,
+        is_rigged: is_rigged !== undefined ? is_rigged : targetItem.is_rigged,
+        is_uv_mapped: is_uv_mapped !== undefined ? is_uv_mapped : targetItem.is_uv_mapped,
 
         // การใส่ไฟล์: ถ้าส่ง undefined มา ให้ดึงของเก่ามาใช้ / ถ้าส่ง null มา ก็บันทึกเป็น null (แปลว่าเอาออกในเวอร์ชันใหม่)
-        model: modelPublicId !== undefined ? model : latestItem.model,
-        model_public_id: modelPublicId !== undefined ? modelPublicId : latestItem.model_public_id,
-        obj: objPublicId !== undefined ? obj : latestItem.obj,
-        obj_public_id: objPublicId !== undefined ? objPublicId : latestItem.obj_public_id,
-        blend: blendPublicId !== undefined ? blend : latestItem.blend,
-        blend_public_id: blendPublicId !== undefined ? blendPublicId : latestItem.blend_public_id,
-        fbx: fbxPublicId !== undefined ? fbx : latestItem.fbx,
-        fbx_public_id: fbxPublicId !== undefined ? fbxPublicId : latestItem.fbx_public_id,
-        usdz: usdzPublicId !== undefined ? usdz : latestItem.usdz,
-        usdz_public_id: usdzPublicId !== undefined ? usdzPublicId : latestItem.usdz_public_id,
-        gltf: gltfPublicId !== undefined ? gltf : latestItem.gltf,
-        gltf_public_id: gltfPublicId !== undefined ? gltfPublicId : latestItem.gltf_public_id,
+        model: modelPublicId !== undefined ? model : targetItem.model,
+        model_public_id: modelPublicId !== undefined ? modelPublicId : targetItem.model_public_id,
+        obj: objPublicId !== undefined ? obj : targetItem.obj,
+        obj_public_id: objPublicId !== undefined ? objPublicId : targetItem.obj_public_id,
+        blend: blendPublicId !== undefined ? blend : targetItem.blend,
+        blend_public_id: blendPublicId !== undefined ? blendPublicId : targetItem.blend_public_id,
+        fbx: fbxPublicId !== undefined ? fbx : targetItem.fbx,
+        fbx_public_id: fbxPublicId !== undefined ? fbxPublicId : targetItem.fbx_public_id,
+        usdz: usdzPublicId !== undefined ? usdz : targetItem.usdz,
+        usdz_public_id: usdzPublicId !== undefined ? usdzPublicId : targetItem.usdz_public_id,
+        gltf: gltfPublicId !== undefined ? gltf : targetItem.gltf,
+        gltf_public_id: gltfPublicId !== undefined ? gltfPublicId : targetItem.gltf_public_id,
       };
 
-      const { error: insertError } = await db.from("update_models").insert(newVersionData);
+      // 🌟 2. เพิ่ม .select().single() เพื่อเอา ID ที่เพิ่งสร้างใหม่มาใช้
+      const { data: newModel, error: insertError } = await db
+        .from("update_models")
+        .insert(newVersionData)
+        .select()
+        .single();
+
       if (insertError) return res.status(500).json({ error: insertError.message });
+
+      // 🌟 3. บันทึกรูปลงตาราง imgs โดยผูกกับ update_models_id ใหม่
+      const newImgs = [];
+      if (img1) newImgs.push({ update_models_id: newModel.update_models_id, img: img1 });
+      if (img2) newImgs.push({ update_models_id: newModel.update_models_id, img: img2 });
+      if (newImgs.length > 0) {
+        await db.from("imgs").insert(newImgs);
+      }
 
       return res.status(201).json({ success: true, message: "Published as new version successfully!" });
     }
@@ -508,12 +545,12 @@ exports.updateVersion = async (req, res) => {
       const updateData = {};
       const filesToDelete = [];
 
-      if (version && version.trim() !== latestItem.version) updateData.version = version.trim();
-      if (summary && summary.trim() !== latestItem.update_summary) updateData.update_summary = summary.trim();
-      if (polygon_count !== undefined && parseInt(polygon_count) !== latestItem.polygon_count) updateData.polygon_count = parseInt(polygon_count);
-      if (has_textures !== undefined && has_textures !== latestItem.has_textures) updateData.has_textures = has_textures;
-      if (is_rigged !== undefined && is_rigged !== latestItem.is_rigged) updateData.is_rigged = is_rigged;
-      if (is_uv_mapped !== undefined && is_uv_mapped !== latestItem.is_uv_mapped) updateData.is_uv_mapped = is_uv_mapped;
+      if (version && version.trim() !== targetItem.version) updateData.version = version.trim();
+      if (summary && summary.trim() !== targetItem.update_summary) updateData.update_summary = summary.trim();
+      if (polygon_count !== undefined && parseInt(polygon_count) !== targetItem.polygon_count) updateData.polygon_count = parseInt(polygon_count);
+      if (has_textures !== undefined && has_textures !== targetItem.has_textures) updateData.has_textures = has_textures;
+      if (is_rigged !== undefined && is_rigged !== targetItem.is_rigged) updateData.is_rigged = is_rigged;
+      if (is_uv_mapped !== undefined && is_uv_mapped !== targetItem.is_uv_mapped) updateData.is_uv_mapped = is_uv_mapped;
 
       // Helper function: เช็คเฉพาะช่องที่ส่งมาไม่เท่ากับ undefined เท่านั้น
       const handleFileUpdate = (field, pubField, reqUrl, reqPubId, dbPubId, isRawType) => {
@@ -527,29 +564,38 @@ exports.updateVersion = async (req, res) => {
         }
       };
 
-      handleFileUpdate("model", "model_public_id", model, modelPublicId, latestItem.model_public_id, false); 
-      handleFileUpdate("obj", "obj_public_id", obj, objPublicId, latestItem.obj_public_id, true); 
-      handleFileUpdate("blend", "blend_public_id", blend, blendPublicId, latestItem.blend_public_id, true);
-      handleFileUpdate("fbx", "fbx_public_id", fbx, fbxPublicId, latestItem.fbx_public_id, true);
-      handleFileUpdate("usdz", "usdz_public_id", usdz, usdzPublicId, latestItem.usdz_public_id, true);
-      handleFileUpdate("gltf", "gltf_public_id", gltf, gltfPublicId, latestItem.gltf_public_id, true);
+      handleFileUpdate("model", "model_public_id", model, modelPublicId, targetItem.model_public_id, false);
+      handleFileUpdate("obj", "obj_public_id", obj, objPublicId, targetItem.obj_public_id, true);
+      handleFileUpdate("blend", "blend_public_id", blend, blendPublicId, targetItem.blend_public_id, true);
+      handleFileUpdate("fbx", "fbx_public_id", fbx, fbxPublicId, targetItem.fbx_public_id, true);
+      handleFileUpdate("usdz", "usdz_public_id", usdz, usdzPublicId, targetItem.usdz_public_id, true);
+      handleFileUpdate("gltf", "gltf_public_id", gltf, gltfPublicId, targetItem.gltf_public_id, true);
 
       // อัปเดตตาราง
       const { error: updateError } = await db
         .from("update_models")
         .update(updateData)
-        .eq("update_models_id", latestItem.update_models_id); 
+        .eq("update_models_id", targetItem.update_models_id);
 
       if (updateError) return res.status(500).json({ error: updateError.message });
 
+      await db.from("imgs").delete().eq("update_models_id", targetItem.update_models_id);
+
+      const updatedImgs = [];
+      if (img1) updatedImgs.push({ update_models_id: targetItem.update_models_id, img: img1 });
+      if (img2) updatedImgs.push({ update_models_id: targetItem.update_models_id, img: img2 });
+      if (updatedImgs.length > 0) {
+        await db.from("imgs").insert(updatedImgs);
+      }
+
       // เกราะป้องกันชั้นสุดท้าย: ดูว่าไฟล์ที่อยู่ในคิวจะลบ มีใครยังใช้อยู่ในช่องอื่นไหม
       const activeIds = [
-        updateData.model_public_id !== undefined ? updateData.model_public_id : latestItem.model_public_id,
-        updateData.obj_public_id !== undefined ? updateData.obj_public_id : latestItem.obj_public_id,
-        updateData.blend_public_id !== undefined ? updateData.blend_public_id : latestItem.blend_public_id,
-        updateData.fbx_public_id !== undefined ? updateData.fbx_public_id : latestItem.fbx_public_id,
-        updateData.usdz_public_id !== undefined ? updateData.usdz_public_id : latestItem.usdz_public_id,
-        updateData.gltf_public_id !== undefined ? updateData.gltf_public_id : latestItem.gltf_public_id,
+        updateData.model_public_id !== undefined ? updateData.model_public_id : targetItem.model_public_id,
+        updateData.obj_public_id !== undefined ? updateData.obj_public_id : targetItem.obj_public_id,
+        updateData.blend_public_id !== undefined ? updateData.blend_public_id : targetItem.blend_public_id,
+        updateData.fbx_public_id !== undefined ? updateData.fbx_public_id : targetItem.fbx_public_id,
+        updateData.usdz_public_id !== undefined ? updateData.usdz_public_id : targetItem.usdz_public_id,
+        updateData.gltf_public_id !== undefined ? updateData.gltf_public_id : targetItem.gltf_public_id,
       ].filter(Boolean); // ล้างค่าว่างทิ้ง
 
       // คัดกรองเหลือเฉพาะไฟล์ที่ปลอดภัยต่อการลบจริงๆ
@@ -583,7 +629,7 @@ exports.getItemsForEditProject = async (req, res) => {
   const userId = req.user.user_id;
 
   const { data, error } = await db
-    .from("item")
+    .from("items")
     .select("*")
     .or(
       `project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`,
@@ -596,13 +642,13 @@ exports.getItemsForEditProject = async (req, res) => {
 exports.getLatestItems = async (req, res) => {
   try {
     const { data, error } = await db
-      .from("item") // เปลี่ยนชื่อตารางตามที่คุณใช้
+      .from("items") // เปลี่ยนชื่อตารางตามที่คุณใช้
       .select(`*,
         update_models(created_at)
         `);
 
     if (error) throw error;
-    
+
     const formatted = data.map((item) => {
       const latestUpdate = [...(item.update_models || [])].sort( // .sort() ข้างใน latestUpdate หา update ล่าสุดของ แต่ละ Item
         (update1, update2) =>
@@ -634,7 +680,7 @@ exports.getItemsByCategory = async (req, res) => {
 
   try {
     const { data, error } = await db
-      .from("item")
+      .from("items")
       .select(`item_id, modelName, description, img, price, user_id,
         update_models(created_at)
         `) // เลือกเฉพาะฟิลด์ที่ใช้แสดงใน Card
@@ -726,4 +772,19 @@ exports.getCategories = async (req, res) => {
   if (error) return res.status(500).json(error);
 
   res.status(200).json(data);
+};
+
+exports.getItemAllVersions = async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await db
+    .from("update_models")
+    .select(
+      `*, imgs(*)`,
+    )
+    .eq("item_id", id)
+    .order("created_at", { ascending: false });
+
+  if (error) return res.status(404).json({ error: "Item not found" });
+  return res.json(data);
 };

@@ -12,6 +12,7 @@ router.get("/user/:id", itemController.getItemsByUserId);
 
 router.get("/categories", itemController.getCategories);
 router.get("/:id", itemController.getItemsById);
+router.get("/:id/versions", itemController.getItemAllVersions);
 
 router.post("/additem", verifyToken, itemController.addItem);
 router.put("/edit-item", verifyToken, itemController.editItem);
