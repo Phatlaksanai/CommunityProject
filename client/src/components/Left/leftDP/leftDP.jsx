@@ -2,11 +2,15 @@ import "./leftDP.scss";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
+import { useState } from "react";
 import dayjs from "dayjs";
 import ModelViewer from "../../modelViewer/model_viewer";
+import Timeline from "../../timeline/timeline";
 
 const LeftDP = ({ project }) => {
   const navigate = useNavigate();
+  const [timelineItemId, setTimelineItemId] = useState(null);
+
   const { isLoading, error, data } = useQuery({
     queryKey: ["project-data", project],
     enabled: !!project,
@@ -30,7 +34,6 @@ const LeftDP = ({ project }) => {
   return (
     <div className="leftDP">
       <div className="container">
-
         {/* ===== ITEMS ===== */}
         {hasItems &&
           items.map(item => (
@@ -48,7 +51,7 @@ const LeftDP = ({ project }) => {
                 </span>
               </div>
               <div className="groupBtn">
-                <button className="timeline-button">Timeline</button>
+                <button className="timeline-button" onClick={() => setTimelineItemId(item.item_id)}>Timeline</button>
                 <button className="buy-button" onClick={() => navigate(`/descitem/${item.item_id}`)}>Buy</button>
               </div>
             </div>
@@ -90,6 +93,11 @@ const LeftDP = ({ project }) => {
         </div>
 
       </div>
+
+      {timelineItemId && (
+        <Timeline itemId={timelineItemId} onClose={() => setTimelineItemId(null)}/>
+      )}
+
     </div>
   );
 };

@@ -22,4 +22,6 @@ router.get("/project-edit/:projectId", verifyToken, itemController.getItemsForEd
 router.post("/review", verifyToken, itemController.addReview);
 router.get("/reviews/:itemId", itemController.getReviewsByItemId);
 
+router.get("/:itemId/timeline", itemController.getItemTimeline)
+
 module.exports = router;

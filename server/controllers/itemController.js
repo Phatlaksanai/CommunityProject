@@ -727,3 +727,59 @@ exports.getCategories = async (req, res) => {
 
   res.status(200).json(data);
 };
+
+exports.getItemTimeline = async (req, res) => {
+  const { itemId } = req.params;
+
+  try {
+    const { data, error } = await db
+      .from("items")
+      .select(`
+        item_id,
+        update_models (
+          update_models_id,
+          version,
+          update_summary,
+          model,
+          created_at,
+          imgs(img)
+        )
+      `)
+      .eq("item_id", itemId)
+      .single();
+
+    if (error) {
+      console.error("getItemTimeline error:", error);
+      return res.status(500).json({success: false, message: error.message});
+    }
+
+    if (!data) {
+      return res.status(404).json({success: false, message: "Item not found"});
+    }
+
+    // เรียง Version ล่าสุดก่อน
+    const updates = [...(data.update_models || [])].sort(
+      (update1, update2) =>
+        new Date(update2.created_at) - new Date(update1.created_at)
+    );
+
+    const formatted = {
+      item_id: data.item_id,
+
+      // Timeline
+      updates: updates.map((update) => ({
+        update_models_id: update.update_models_id,
+        version: update.version,
+        update_summary: update.update_summary,
+        model: update.model,
+        created_at: update.created_at,
+        imgs: update.imgs || [], // ส่งรูปทั้งหมด
+      })),
+    };
+    
+    return res.status(200).json(formatted);
+  } catch (err) {
+    console.error("getItemTimeline error:", err);
+    return res.status(500).json({success: false, message: "Server error"});
+  }
+};
