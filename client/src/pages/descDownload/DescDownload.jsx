@@ -60,7 +60,7 @@ const DescDownload = () => {
             // อัปเดต state downloads เพื่อให้ปุ่มของ item นี้กลายเป็น Complete ทันที
             setDownloads(prevDownloads =>
                 prevDownloads.map(dl =>
-                    dl.item.item_id === selectedItemId
+                    dl.items.item_id === selectedItemId
                         ? { ...dl, is_reviewed: true }
                         : dl
                 )
@@ -95,11 +95,11 @@ const DescDownload = () => {
                     <div className="content">
                         {downloads.map(item => (
                             <div className="row" key={item.order_item_id}>
-                                <h3>{item.item?.modelName}</h3>
-                                <span>฿{item.item?.price}</span>
+                                <h3>{item.items?.modelName}</h3>
+                                <span>฿{item.items?.price}</span>
                                 <span>{new Date(item.orders.created_at).toLocaleDateString()}</span>
                                 <select className="file-type-select"
-                                    value={fileTypes[item.order_item_id] || getDefaultFileType(item.item?.update_models?.[0])}
+                                    value={fileTypes[item.order_item_id] || getDefaultFileType(item.items?.update_models?.[0])}
                                     onChange={(e) =>
                                         setFileTypes({
                                             ...fileTypes,
@@ -107,14 +107,14 @@ const DescDownload = () => {
                                         })
                                     }
                                 >
-                                    <option disabled={!item.item?.update_models?.[0]?.obj} value="obj">OBJ</option>
-                                    <option disabled={!item.item?.update_models?.[0]?.fbx} value="fbx">FBX</option>
-                                    <option disabled={!item.item?.update_models?.[0]?.blend} value="blend">BLEND</option>
-                                    <option disabled={!item.item?.update_models?.[0]?.usdz} value="usdz">USDZ</option>
-                                    <option disabled={!item.item?.update_models?.[0]?.gltf} value="gltf">GLTF</option>
+                                    <option disabled={!item.items?.update_models?.[0]?.obj} value="obj">OBJ</option>
+                                    <option disabled={!item.items?.update_models?.[0]?.fbx} value="fbx">FBX</option>
+                                    <option disabled={!item.items?.update_models?.[0]?.blend} value="blend">BLEND</option>
+                                    <option disabled={!item.items?.update_models?.[0]?.usdz} value="usdz">USDZ</option>
+                                    <option disabled={!item.items?.update_models?.[0]?.gltf} value="gltf">GLTF</option>
                                 </select>
                                 <button onClick={() => {
-                                    const typeToDownload = fileTypes[item.order_item_id] || getDefaultFileType(item.item?.update_models?.[0]); // ใช้ประเภทไฟล์ที่เลือกหรือประเภทเริ่มต้นถ้าไม่มีการเลือก
+                                    const typeToDownload = fileTypes[item.order_item_id] || getDefaultFileType(item.items?.update_models?.[0]); // ใช้ประเภทไฟล์ที่เลือกหรือประเภทเริ่มต้นถ้าไม่มีการเลือก
                                     handleDownload(item.order_item_id, typeToDownload);
                                 }}>Download</button>
                                 {item.is_reviewed ? (
@@ -122,7 +122,7 @@ const DescDownload = () => {
                                 ) : (
                                     <button className="review-btn"
                                         onClick={() => {
-                                            setSelectedItemId(item.item.item_id);
+                                            setSelectedItemId(item.items.item_id);
                                             setOpenReview(true);
                                         }}
                                     >
