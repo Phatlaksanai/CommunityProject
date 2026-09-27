@@ -4,11 +4,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
+import { ClipLoader } from "react-spinners";
 
 const EditProject = () => {
   const navigate = useNavigate();
   const { id: project_id } = useParams();
   const { currentUser } = useContext(AuthContext);
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
@@ -83,6 +85,7 @@ const EditProject = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setIsLoadingSpinner(true);
 
     // ใช้ .trim() เพื่อตัดช่องว่างหน้า-หลัง และเช็คว่าชื่อว่างหรือไม่
     const trimmedProjectName = projectName.trim();
@@ -90,12 +93,14 @@ const EditProject = () => {
     // เช็คชื่อโปรเจคที่ตัดช่องว่างออกแล้ว
     if (!trimmedProjectName) {
       setError("Please enter a Project Name (cannot be empty)");
+      setIsLoadingSpinner(false);
       return;
     }
 
     // เพิ่มการเช็คว่าเลือก Post อย่างน้อย 1 อันหรือยัง
     if (selectedPosts.length === 0) {
       setError("Please select at least one related Post");
+      setIsLoadingSpinner(false);
       return;
     }
 
@@ -129,6 +134,7 @@ const EditProject = () => {
     } catch (err) {
       console.error(err);
       setError("Update failed");
+      setIsLoadingSpinner(false);
     }
   };
 
@@ -217,7 +223,14 @@ const EditProject = () => {
             </div>
           </div>
 
-          <input type="submit" value="Save Changes" className="add-item__submit" />
+          <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+          >
+            {isLoadingSpinner ? (
+              <ClipLoader size={16} color="#ffffff" />
+            ) : (
+              "Save Changes"
+            )}
+          </button>
           {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
           {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
         </form>

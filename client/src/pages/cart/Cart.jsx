@@ -5,6 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { useContext, useState, useMemo, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
+import { ClipLoader } from "react-spinners";
 
 const Cart = () => {
     const { id } = useParams();
@@ -14,6 +15,7 @@ const Cart = () => {
 
     // State สำหรับเก็บ username ของคนขายที่ถูกเลือกฝั่งซ้าย
     const [selectedSeller, setSelectedSeller] = useState(null);
+    const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
     const { isLoading, error: cartItemsError, data: cartItems } = useQuery({
         queryKey: ["cards", id],
@@ -58,6 +60,17 @@ const Cart = () => {
 
     const cartId = cartItems?.length ? cartItems[0].cart_id : null; // cartItems ถูกส่งกลับเป็น array ต้องวนหา cart_id
 
+    const handleCheckout = () => {
+        setIsLoadingSpinner(true);
+
+        navigate(`/buyitem/${currentUser.user_id}`, {
+            state: {
+                cartId: cartId,
+                selectedSeller: selectedSeller // ส่งคนขายที่เลือก
+            }
+        });
+    };
+    
     return (
         <div className="cart">
             <div className="container">
@@ -98,12 +111,14 @@ const Cart = () => {
                     </div>
 
                     <div className="checkoutBar">
-                        <button onClick={() => navigate((`/buyitem/${currentUser.user_id}`), {
-                            state: {
-                                cartId: cartId,
-                                selectedSeller: selectedSeller // ส่งคนขายที่เลือก
-                            }
-                        })} style={{ cursor: "pointer" }}>Check Out</button>
+                        <button onClick={handleCheckout} style={{ cursor: "pointer" }} disabled={isLoadingSpinner}
+                        >
+                            {isLoadingSpinner ? (
+                                <ClipLoader size={16} color="#ffffff" />
+                            ) : (
+                                "Check Out"
+                            )}
+                        </button>
                     </div>
                 </div>
 

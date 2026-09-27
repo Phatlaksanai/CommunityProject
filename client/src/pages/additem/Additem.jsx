@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 //-------------------------------------
 import { makeRequest } from "../../api/axios";
 import { useQuery } from "@tanstack/react-query";
+import { ClipLoader } from "react-spinners";
 
 const AddItem = () => {
   //----------------------------------------------------------
@@ -38,6 +39,7 @@ const AddItem = () => {
   // message
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -109,21 +111,27 @@ const AddItem = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
+    setIsLoadingSpinner(true);
+    
     if (!categoryId) {
       setError("Please select a category");
+      setIsLoadingSpinner(false);
       return;
     }
 
     if (!img || !model) {
       setError("Please upload your image and model files");
+      setIsLoadingSpinner(false);
       return;
     }
 
     if (!obj && !blend && !fbx && !usdz && !gltf) {
       setError("Please upload zip model files");
+      setIsLoadingSpinner(false);
       return;
     }
+
+    
 
     try {
       const imgURL = await uploadFile(img);
@@ -136,11 +144,13 @@ const AddItem = () => {
 
       if (!imgURL || !modelURL) {
         setError("Failed to upload file");
+        setIsLoadingSpinner(false);
         return;
       }
 
       if (!objURL && !blendURL && !fbxURL && !usdzURL && !gltfURL) {
         setError("Failed to upload model files");
+        setIsLoadingSpinner(false);
         return;
       }
 
@@ -177,6 +187,7 @@ const AddItem = () => {
       } else {
         setError("Failed to connect to server");
       }
+      setIsLoadingSpinner(false);
     }
   };
 
@@ -354,7 +365,14 @@ const AddItem = () => {
             </div>
           )}
 
-          <input type="submit" value="Submit" className="add-item__submit" />
+          <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+          >
+            {isLoadingSpinner ? (
+              <ClipLoader size={16} color="#ffffff" />
+            ) : (
+              "Submit"
+            )}
+          </button>
           {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
           {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
         </form>

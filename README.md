@@ -47,6 +47,7 @@ npm install three
 npm install swiper
 npm install react-intersection-observer
 npm install algoliasearch react-instantsearch
+npm install react-spinners
 ```
 
 ## Admin

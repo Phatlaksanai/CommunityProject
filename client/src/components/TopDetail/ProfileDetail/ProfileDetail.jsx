@@ -236,7 +236,7 @@ const ProfileDetail = () => {
 
               {isOwner ? (
                 <div className="actions">
-                  <button className="followBtn" onClick={() => navigate(`/editprofile/${userData?.user_id}`)} style={{ cursor: "pointer" , backgroundColor: "#A0C46E", color: "white" }}>Edit Profile</button>
+                  <button className="followBtn" onClick={() => navigate(`/editprofile/${userData?.user_id}`)}>Edit Profile</button>
                 </div>
               ) : (
                 <>

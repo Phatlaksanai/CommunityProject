@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
+import { ClipLoader } from "react-spinners";
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -21,6 +22,8 @@ const EditProfile = () => {
   const [success, setSuccess] = useState("");
   const [profilePublicId, setProfilePublicId] = useState(null);
   const [coverPublicId, setCoverPublicId] = useState(null);
+
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
   // const { data: user } = useQuery({
   //   queryKey: ["user", id],
@@ -71,6 +74,7 @@ const EditProfile = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setIsLoadingSpinner(true);
 
     try {
       // 1. ตั้งค่าเริ่มต้นจาก State ปัจจุบัน (ซึ่งอาจเป็น URL เดิม)
@@ -126,6 +130,7 @@ const EditProfile = () => {
       } else {
         setError("Internal Server Error");
       }
+      setIsLoadingSpinner(false);
     }
   };
 
@@ -201,9 +206,16 @@ const EditProfile = () => {
             />
           </div>
 
-          <input type="submit" value="Save Changes" className="add-item__submit" />
-          {error && <span style={{ color: "red" , margin: "0px 10px" }}>{error}</span>}
-          {success && <span style={{ color: "green" , margin: "0px 10px" }}>{success}</span>}
+          <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+          >
+            {isLoadingSpinner ? (
+              <ClipLoader size={16} color="#ffffff" />
+            ) : (
+              "Save Changes"
+            )}
+          </button>
+          {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
+          {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
         </form>
       </div>
     </div>

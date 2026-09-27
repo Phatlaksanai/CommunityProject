@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
+import { ClipLoader } from "react-spinners";
 
 const LeftBarDownload = ({ filters = {}, setFilters }) => {
   const { currentUser } = useContext(AuthContext);
@@ -17,6 +18,7 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
   };
   const [success, setSuccess] = useState("")
   const [error, setError] = useState("")
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -49,6 +51,9 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
   const handleAddItemClick = async () => {
     if (!currentUser) return;
 
+    setIsLoadingSpinner(true);
+    setError("");
+
     try {
       const res = await makeRequest.get(`/payments/check-stripe/${currentUser.user_id}`);
       const data = res.data;
@@ -73,11 +78,13 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
         } catch (onboardErr) {
           console.error("Error creating Stripe account:", onboardErr);
           setError("Failed to setup Stripe account. Please try again.");
+          setIsLoadingSpinner(false);
         }
       }
     } catch (err) {
       console.error("Error checking Stripe Connect status:", err);
       setError("Error checking account status");
+      setIsLoadingSpinner(false);
     }
   };
 
@@ -91,7 +98,14 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
         <span className="custom-tooltip" data-tip={displayName}>
           {truncatedName}
         </span>
-        <button onClick={handleAddItemClick} style={{ cursor: "pointer" }}>Add Item</button>
+        <button onClick={handleAddItemClick} disabled={isLoadingSpinner} style={{ cursor: "pointer" }}
+        >
+          {isLoadingSpinner ? (
+            <ClipLoader size={16} color="#ffffff" />
+          ) : (
+            "Add Item"
+          )}
+        </button>
       </div>
 
       <h3>Detailed search</h3>

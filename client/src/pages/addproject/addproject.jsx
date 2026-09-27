@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
+import { ClipLoader } from "react-spinners";
 
 const AddProject = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const AddProject = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
   const [searchPost, setSearchPost] = useState("");
   const [searchItem, setSearchItem] = useState("");
@@ -60,6 +62,7 @@ const AddProject = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setIsLoadingSpinner(true);
 
     // ใช้ .trim() เพื่อตัดช่องว่างหน้า-หลัง และเช็คว่าชื่อว่างหรือไม่
     const trimmedProjectName = projectName.trim();
@@ -67,12 +70,14 @@ const AddProject = () => {
     // 1. เช็คชื่อโปรเจคที่ตัดช่องว่างออกแล้ว
     if (!trimmedProjectName) {
       setError("Please enter a Project Name (cannot be empty)");
+      setIsLoadingSpinner(false);
       return;
     }
 
     // 2. เพิ่มการเช็คว่าเลือก Post อย่างน้อย 1 อันหรือยัง
     if (selectedPosts.length === 0) {
       setError("Please select at least one related Post");
+      setIsLoadingSpinner(false);
       return;
     }
 
@@ -101,6 +106,7 @@ const AddProject = () => {
     } catch (err) {
       console.error(err);
       setError("Failed to connect to server");
+      setIsLoadingSpinner(false);
     }
   };
 
@@ -212,7 +218,14 @@ const AddProject = () => {
             </div>
           </div>
 
-          <input type="submit" value="Submit" className="add-item__submit" />
+          <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+          >
+            {isLoadingSpinner ? (
+              <ClipLoader size={16} color="#ffffff" />
+            ) : (
+              "Submit"
+            )}
+          </button>
           {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
           {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
         </form>
