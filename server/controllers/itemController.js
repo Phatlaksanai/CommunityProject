@@ -11,7 +11,8 @@ exports.getItems = async (req, res) => {
         category_id,
         type
     )`
-    );
+    )
+    .order("item_id", { ascending: false });
 
   // ✅ filter category
   if (category_id) {

@@ -2,7 +2,7 @@ import "./leftDP.scss";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import ModelViewer from "../../modelViewer/model_viewer";
 import Timeline from "../../timeline/timeline";
@@ -20,6 +20,15 @@ const LeftDP = ({ project }) => {
         makeRequest.get(`/posts/project/${project}`).then(res => res.data),
       ]).then(([items, posts]) => ({ items, posts })),
   });
+
+  useEffect(() => {
+    if (timelineItemId) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [timelineItemId]);
 
   if (isLoading) return "Loading...";
   if (error) return "Something went wrong!";
