@@ -7,7 +7,7 @@
     top: 70px;
     height: calc(100vh - 70px);
     overflow: scroll;
-    background-color: themed("bg");
+    background-color: themed("bgSoft");
     color: themed("textColorSoft");
     border-radius: 10px;
 
@@ -21,6 +21,16 @@
 
     .container {
       padding: 20px;
+      color: themed("textSoft");
+      background-color: themed("bg");
+      margin-bottom: 20px;
+      border-radius: 10px;
+
+      .title {
+        h2 {
+          margin-top: 0px;
+        }
+      }
 
 
       hr {
@@ -28,6 +38,35 @@
         border: none;
         height: 0.5px;
         background-color: themed("border");
+      }
+
+      .timeline {
+        display: flex;
+        padding: 0;
+
+        .img {
+          img {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+          }
+        }
+
+        .version {
+          margin-left: 20px;
+
+          p {
+            font-size: 16;
+            font-weight: bold;
+            color: themed("textColorSoft");
+            margin-bottom: 5px;
+          }
+
+        }
+
+        &:hover {
+          background-color: themed("bgSoft");
+        }
       }
 
       .menu {

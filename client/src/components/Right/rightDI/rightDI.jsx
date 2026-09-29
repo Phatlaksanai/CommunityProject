@@ -6,6 +6,7 @@ import { useContext, useState, useEffect } from "react";
 import { makeRequest } from "../../../api/axios";
 import { useQuery } from "@tanstack/react-query";
 import { ClipLoader } from "react-spinners";
+import Timeline from "../../timeline/timeline";
 
 const RightDI = ({ item }) => {
   if (!item) return null;
@@ -15,6 +16,7 @@ const RightDI = ({ item }) => {
   const [success, setSuccess] = useState("");
   const [itemReviews, setItemReviews] = useState([]);
   const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
+  const [timelineItemId, setTimelineItemId] = useState(null);
 
   const handleAddToCart = async () => {
     setIsLoadingSpinner(true);
@@ -60,15 +62,46 @@ const RightDI = ({ item }) => {
   });
   useEffect(() => {
     makeRequest.get(`/items/reviews/${item.item_id}`).then(res => setItemReviews(res.data));
-  }, []);
+
+    if (timelineItemId) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [timelineItemId]);
 
   const averageRating = itemReviews.length > 0 ? (itemReviews.reduce((sum, review) => sum + Number(review.points), 0) / itemReviews.length).toFixed(1) : "No reviews yet";
 
   const currentCategory = categories.find( // หา category_id ที่ตรงกับ item_id โดยไม่ต้องใช้ .map 
     (category) => category.category_id === item.category_id
   );
+
+  console.log(item);
   return (
     <div className="rightDI">
+      <div className="container">
+        <div className="title"><h2>Timeline</h2></div>
+        <div className="timeline" onClick={() => setTimelineItemId(item.item_id)} style={{ cursor: "pointer" }}>
+          <div className="img">
+            <img src={item.img} alt="" />
+          </div>
+          <div className="version">
+            <p>Version : {item.version}</p>
+            {(() => {
+              const displayName = item.update_summary;
+              return (
+                <span>
+                  Description : {displayName.length > 50 ? `${displayName.substring(0, 50)}...` : displayName}
+                </span>
+              );
+            })()}
+          </div>
+        </div>
+        {timelineItemId && (
+          <Timeline itemId={timelineItemId} onClose={() => setTimelineItemId(null)} />
+        )}
+      </div>
       <div className="container">
         <div className="menu">
           <h2>{item.modelName}</h2>
