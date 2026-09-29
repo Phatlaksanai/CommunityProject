@@ -169,7 +169,7 @@ const UpdateModel = () => {
         setError("");
         setSuccess("");
         setIsLoadingSpinner(true);
-        
+
         let finalImg1 = previewImg1;
         let finalImg2 = previewImg2;
 
@@ -194,7 +194,7 @@ const UpdateModel = () => {
             setIsLoadingSpinner(false);
             return;
         }
-        
+
 
         try {
             let finalModel = model;
@@ -393,7 +393,12 @@ const UpdateModel = () => {
                         <div className="form-group">
                             <label>Reference Image 1</label>
                             <label htmlFor="image1" className="file-input">
-                                {img1 ? img1.name : (previewImg1 ? "Current Image 1" : "No file selected")}
+                                {img1 instanceof File
+                                    ? img1.name
+                                    : previewImg1
+                                        ? previewImg1.split("/").pop()
+                                        : "No file selected"
+                                }
                             </label>
                             <input
                                 type="file"
@@ -407,7 +412,12 @@ const UpdateModel = () => {
                         <div className="form-group">
                             <label>Reference Image 2</label>
                             <label htmlFor="image2" className="file-input">
-                                {img2 ? img2.name : (previewImg2 ? "Current Image 2" : "No file selected")}
+                                {img2 instanceof File
+                                    ? img2.name
+                                    : previewImg2
+                                        ? previewImg2.split("/").pop()
+                                        : "No file selected"
+                                }
                             </label>
                             <input
                                 type="file"
@@ -454,7 +464,12 @@ const UpdateModel = () => {
                             <label>GLB for Web Page Rendering</label>
 
                             <label htmlFor="model" className="file-input">
-                                {model instanceof File ? model.name : (model ? "Current model" : "No file selected")}
+                                {model instanceof File // เช็กว่า model เป็น File object หรือไม่
+                                    ? model.name
+                                    : model
+                                        ? model.split("/").pop() // split แยกทุก "/" แล้ว pop ตัวท้ายออกมาเป็นชื่อ
+                                        : "No file selected"
+                                }
                             </label>
 
                             <input
@@ -481,7 +496,12 @@ const UpdateModel = () => {
                             <div className="form-group">
                                 <label>Zip File for Obj</label>
                                 <label htmlFor="obj" className="file-input">
-                                    {obj instanceof File ? obj.name : (obj ? "Current model" : "No file selected")}
+                                    {obj instanceof File
+                                        ? obj.name
+                                        : model
+                                            ? obj.split("/").pop()
+                                            : "No file selected"
+                                    }
                                 </label>
                                 <input type="file" id="obj" accept=".zip" onChange={handleModelChange(setObj)} hidden />
                             </div>
@@ -491,7 +511,12 @@ const UpdateModel = () => {
                             <div className="form-group">
                                 <label>Zip File for blend</label>
                                 <label htmlFor="blend" className="file-input">
-                                    {blend instanceof File ? blend.name : (blend ? "Current model" : "No file selected")}
+                                    {blend instanceof File
+                                        ? blend.name
+                                        : model
+                                            ? blend.split("/").pop()
+                                            : "No file selected"
+                                    }
                                 </label>
                                 <input type="file" id="blend" accept=".zip" onChange={handleModelChange(setBlend)} hidden />
                             </div>
@@ -501,7 +526,12 @@ const UpdateModel = () => {
                             <div className="form-group">
                                 <label>Zip File for Fbx</label>
                                 <label htmlFor="fbx" className="file-input">
-                                    {fbx instanceof File ? fbx.name : (fbx ? "Current model" : "No file selected")}
+                                    {fbx instanceof File
+                                        ? fbx.name
+                                        : model
+                                            ? fbx.split("/").pop()
+                                            : "No file selected"
+                                    }
                                 </label>
                                 <input type="file" id="fbx" accept=".zip" onChange={handleModelChange(setFbx)} hidden />
                             </div>
@@ -511,7 +541,12 @@ const UpdateModel = () => {
                             <div className="form-group">
                                 <label>Zip File for USDZ</label>
                                 <label htmlFor="usdz" className="file-input">
-                                    {usdz instanceof File ? usdz.name : (usdz ? "Current model" : "No file selected")}
+                                    {usdz instanceof File
+                                        ? usdz.name
+                                        : model
+                                            ? usdz.split("/").pop()
+                                            : "No file selected"
+                                    }
                                 </label>
                                 <input type="file" id="usdz" accept=".zip" onChange={handleModelChange(setUsdz)} hidden />
                             </div>
@@ -521,7 +556,12 @@ const UpdateModel = () => {
                             <div className="form-group">
                                 <label>Zip File for gltf</label>
                                 <label htmlFor="gltf" className="file-input">
-                                    {gltf instanceof File ? gltf.name : (gltf ? "Current model" : "No file selected")}
+                                    {gltf instanceof File
+                                        ? gltf.name
+                                        : model
+                                            ? gltf.split("/").pop()
+                                            : "No file selected"
+                                    }
                                 </label>
                                 <input type="file" id="gltf" accept=".zip" onChange={handleModelChange(setGltf)} hidden />
                             </div>

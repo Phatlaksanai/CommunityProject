@@ -178,7 +178,12 @@ const EditProfile = () => {
             <label>Profile Image</label>
 
             <label htmlFor="image" className="file-input">
-              {profileimg instanceof File ? profileimg.name : "Current image"}
+              {profileimg instanceof File
+                ? profileimg.name
+                : profileimg
+                  ? profileimg.split("/").pop()
+                  : "No file selected"
+              }
             </label>
 
             <input
@@ -194,7 +199,12 @@ const EditProfile = () => {
             <label>Cover Image</label>
 
             <label htmlFor="cover" className="file-input">
-              {coverimg instanceof File ? coverimg.name : "Current image"}
+              {coverimg instanceof File
+                ? coverimg.name
+                : coverimg
+                  ? coverimg.split("/").pop()
+                  : "No file selected"
+              }
             </label>
 
             <input

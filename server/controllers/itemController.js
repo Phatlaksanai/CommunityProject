@@ -134,7 +134,7 @@ exports.getItemsById = async (req, res) => {
     is_uv_mapped: latestUpdate?.is_uv_mapped || false,
     version: latestUpdate?.version || null,
     update_summary: latestUpdate?.update_summary || null,
-    updated_at: latestUpdate?.created_at || null,
+    created_at: latestUpdate?.created_at || null,
   };
 
   return res.json(formatted);

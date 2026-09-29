@@ -6,6 +6,7 @@ import { useContext, useState, useEffect } from "react";
 import { makeRequest } from "../../../api/axios";
 import { useQuery } from "@tanstack/react-query";
 import { ClipLoader } from "react-spinners";
+import dayjs from "dayjs";
 import Timeline from "../../timeline/timeline";
 
 const RightDI = ({ item }) => {
@@ -17,7 +18,7 @@ const RightDI = ({ item }) => {
   const [itemReviews, setItemReviews] = useState([]);
   const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
   const [timelineItemId, setTimelineItemId] = useState(null);
-
+console.log(item);
   const handleAddToCart = async () => {
     setIsLoadingSpinner(true);
 
@@ -96,6 +97,7 @@ const RightDI = ({ item }) => {
                 </span>
               );
             })()}
+            <p>Created at : {dayjs(item.created_at).format("D MMM YYYY")}</p>
           </div>
         </div>
         {timelineItemId && (

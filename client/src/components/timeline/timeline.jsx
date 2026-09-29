@@ -57,9 +57,27 @@ const Timeline = ({ itemId, onClose }) => {
                 {currentUpdate ? (
                     <div className="timeline-item">
                         <div className="L">
-                            {currentUpdate.imgs?.map((image, index) => (
-                                <img key={index} src={image.img} alt={item.modelName} />
-                            ))}
+                            <div className="image-box">
+                                {currentUpdate.imgs?.[0]?.img ? (
+                                    <img
+                                        src={currentUpdate.imgs[0].img}
+                                        alt={item.modelName}
+                                    />
+                                ) : (
+                                    <span>No Image</span>
+                                )}
+                            </div>
+
+                            <div className="image-box">
+                                {currentUpdate.imgs?.[1]?.img ? (
+                                    <img
+                                        src={currentUpdate.imgs[1].img}
+                                        alt={item.modelName}
+                                    />
+                                ) : (
+                                    <span>No Image</span>
+                                )}
+                            </div>
                         </div>
                         <div className="R">
                             {currentUpdate.model && (
@@ -74,7 +92,7 @@ const Timeline = ({ itemId, onClose }) => {
                             <span>{dayjs(currentUpdate.created_at).format("D MMM YYYY")}</span>
                         </div>
                     </div>
-                    
+
                 ) : (
                     <p>No updates</p>
                 )}

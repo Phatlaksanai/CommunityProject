@@ -199,7 +199,11 @@ const Manage = () => {
             <h3>Confirm Action</h3>
             <p>Are you sure to ban <strong>{selectedUsers.length}</strong> selected members?</p>
             <div className="modal-buttons">
-              <button className="btn-cancel" onClick={() => setShowMemberModal(false)}>Cancel</button>
+              <button className="btn-cancel" onClick={() => {
+                setShowMemberModal(false);
+                setIsLoadingSpinBan(false);
+              }}
+              >Cancel</button>
               <button className="btn-confirm" onClick={confirmBan}>
                 {banmutation.isLoading ? "Banning..." : "Confirm"}
               </button>
@@ -272,7 +276,11 @@ const Manage = () => {
             <h3>Confirm Action</h3>
             <p>Are you sure to delete <strong>{selectedPosts.length}</strong> selected posts?</p>
             <div className="modal-buttons">
-              <button type="button" className="btn-cancel" onClick={() => setShowPostModal(false)}>Cancel</button>
+              <button type="button" className="btn-cancel" onClick={() => {
+                setShowPostModal(false);
+                setIsLoadingSpinPost(false);
+              }}
+              >Cancel</button>
               <button type="button" className="btn-confirm" onClick={confirmDeletePosts}>
                 {deletePostMutation.loadingPosts ? "Deleting..." : "Confirm"}
               </button>

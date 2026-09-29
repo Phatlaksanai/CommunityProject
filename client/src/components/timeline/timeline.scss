@@ -35,13 +35,29 @@
         overflow-y: auto;
         max-height: 70vh;
 
-        img {
+        .image-box {
           width: 100%;
           height: 220px;
-          object-fit: contain;
           border-radius: 4px;
-          padding: 12px;
-          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          background-color: themed("bgSoft");
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 12px;
+            box-sizing: border-box;
+          }
+
+          span {
+            color: themed("textSoft");
+            font-weight: 700;
+            font-size: 16px;
+          }
         }
       }
 
@@ -98,7 +114,7 @@
         }
 
         p {
-          color: themed("textColorSoft");
+          color: themed("textSoft");
           font-weight: 700;
           font-size: 16px;
           margin: 0 0 6px;
@@ -106,7 +122,7 @@
         }
 
         span {
-          color: themed("textColorSoft");
+          color: themed("textSoft");
           font-weight: 700;
           font-size: 16px;
         }

@@ -163,7 +163,12 @@ const EditProject = () => {
           <div className="form-group">
             <label>Image</label>
             <label htmlFor="image" className="file-input">
-              {img instanceof File ? img.name : "Click to change image"}
+              {img instanceof File
+                ? img.name
+                : img
+                  ? img.split("/").pop()
+                  : "No file selected"
+              }
             </label>
             <input type="file" id="image" accept=".png,.jpg,.jpeg" onChange={handleImageChange} hidden />
           </div>
