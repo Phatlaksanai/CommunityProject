@@ -12,11 +12,12 @@ import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import { makeRequest } from "../../api/axios";
 import ReportModal from "../report/ReportModal";
+import { useQuery, } from "@tanstack/react-query";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 // 🚀 [ปรับการ Import: เอา Hits ออก แล้วนำ useHits กับ useSearchBox มาจัดการเอง]
-import { InstantSearch, SearchBox, useSearchBox, useHits } from 'react-instantsearch';
+import { InstantSearch, SearchBox, useSearchBox, useHits, Configure } from 'react-instantsearch';
 import { searchClient } from "../../api/algoliaClient";
-import { div } from "three/src/nodes/TSL.js";
 
 // ============================================================
 // 1. คอมโพเนนต์ดรอปดาวน์เวอร์ชัน Custom (แก้บั๊กแวบ 0.2 วิ แบบเบ็ดเสร็จ)
@@ -27,10 +28,9 @@ const CustomSearchResults = () => {
 
   // 🛡️ ดักจับจังหวะแวบ: ถ้าคำในกล่องพิมพ์กับคำที่ระบบกำลังประมวลผลอยู่ไม่ตรงกัน (กำลังโหลด) 
   // หรือพิมพ์ยังไม่เสร็จ ให้ส่ง null ซ่อนหน้าต่างไปเลย ไม่ยอมให้ข้อมูลเก่าแวบขึ้นมาเด็ดขาด
-  if (!query.trim() || !results || results.query !== query) {
+  if (!query.trim() || !results) {
     return null;
   }
-
   // ถ้าพิมพ์คำค้นหาแล้ว แต่ระบบหาไม่เจอจริง ๆ (ไม่มีข้อมูล)
   if (results.hits.length === 0) {
     return (
@@ -72,12 +72,41 @@ const SearchHit = ({ hit }) => {
         <img src={hit.img || defaultPic} className="hit-image" />
 
         <div className="hit-info">
-          <span className={`badge ${hit.type}`}>{hit.type.toUpperCase()}</span>
+          <div className="hit-type-category">
+            <span className={`badge ${hit.type}`}>{hit.type.toUpperCase()}</span>
+            {hit.category && (
+              <span className="hit-category">
+                {hit.category}
+              </span>
+            )}
+          </div>
           <h4 className="hit-title">{hit.title}</h4>
           <p className="hit-desc">{hit.description ? hit.description.substring(0, 50) + "..." : null}</p>
         </div>
       </div>
     </Link>
+  );
+};
+
+const CustomSearchBox = ({ searchText, setSearchText, onFocus, onBlur }) => {
+  const { refine } = useSearchBox();
+
+  // ทุกครั้งที่ searchText ของเราเปลี่ยน (หรือ filter เปลี่ยนแล้ว InstantSearch รีเซ็ต)
+  // ให้ส่งคำค้นหาเดิมเข้า Algolia ซ้ำเสมอ
+  useEffect(() => {
+    refine(searchText);
+  }, [searchText, refine]); // refine เป็นฟังก์ชันที่ได้จาก hook useSearchBox() เก็บคำค้นหาไว้แล้วส่งไป Algolia
+
+  return (
+    <input
+      type="search"
+      className="ais-SearchBox-input"
+      placeholder="Search"
+      value={searchText}
+      onChange={(e) => setSearchText(e.target.value)}
+      onFocus={onFocus}
+      onBlur={onBlur}
+    />
   );
 };
 
@@ -89,9 +118,16 @@ const Navbar = () => {
 
   // สถานะคุม เปิด/ปิด ดรอปดาวน์ผลลัพธ์เมื่อมีการ Focus กล่องพิมพ์
   const [isSearching, setIsSearching] = useState(false);
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [searchText, setSearchText] = useState("");
 
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
   const navigate = useNavigate();
+
+  const { data: categories } = useQuery({
+    queryKey: ["category"],
+    queryFn: () => makeRequest.get(`/items/categories`).then(res => res.data)
+  });
 
   const handleLogout = async () => {
     try {
@@ -177,10 +213,14 @@ const Navbar = () => {
         {/* ============================================================ */}
         <div className="search-container-algolia">
           <InstantSearch searchClient={searchClient} indexName="WebCommunity_Search">
+            {/* ใช้ configure ให้ Dropdown กรอง Algolia */}
+            <Configure filters={filterCategory === "all" ? "" : `category:"${filterCategory}"`} />
             <div className="search-box-wrapper">
               <SearchOutlinedIcon className="search-icon-inside" />
-              <SearchBox
+              <CustomSearchBox
                 placeholder="Search"
+                searchText={searchText}
+                setSearchText={setSearchText}
                 onFocus={() => setIsSearching(true)}
                 onBlur={() => setTimeout(() => setIsSearching(false), 300)}
               />
@@ -191,6 +231,30 @@ const Navbar = () => {
           </InstantSearch>
         </div>
         {/* ============================================================ */}
+
+        <div className="select-wrapper">
+          <select
+            value={filterCategory}
+            onChange={(e) => {
+              setFilterCategory(e.target.value);
+              setIsSearching(true); // เปิดผลลัพธ์ให้เห็นผลการกรองทันที
+            }}
+          >
+            <option value="all">All Categories</option>
+
+            {categories?.map((category) => (
+              <option
+                key={category.category_id}
+                value={category.type}
+              >
+                {category.type}
+              </option>
+            ))}
+          </select>
+
+          <ArrowDropDownIcon className="dropdown-icon" />
+        </div>
+
       </div>
 
       <div className="right">

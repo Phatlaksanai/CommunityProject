@@ -323,6 +323,12 @@ exports.addItem = async (req, res) => {
       return res.status(500).json({ error: updateModelError.message });
     }
 
+    const { data: category } = await db
+      .from("categories")
+      .select("type")
+      .eq("category_id", itemData.category_id)
+      .single();
+  
     // 3. ส่งข้อมูลเข้า Algolia
     try {
       await algoliaClient.saveObject({
@@ -333,6 +339,7 @@ exports.addItem = async (req, res) => {
           description: itemData.description,
           img: itemData.img,
           type: 'item',
+          category: category?.type,
           targetId: itemData.item_id
         }
       });
@@ -389,6 +396,14 @@ exports.editItem = async (req, res) => {
 
     if (updateError) return res.status(500).json({ error: updateError.message });
 
+    const finalCategoryId = category_id || items.category_id;
+    
+    const { data: category } = await db
+      .from("categories")
+      .select("type")
+      .eq("category_id", finalCategoryId)
+      .single();
+
     // 4. อัปเดตข้อมูลบน Algolia v5
     try {
       await algoliaClient.saveObject({
@@ -399,6 +414,7 @@ exports.editItem = async (req, res) => {
           description: updateData.description !== undefined ? updateData.description : items.description,
           img: updateData.img || items.img,
           type: "item",
+          category: category?.type,
           targetId: itemId,
         },
       });

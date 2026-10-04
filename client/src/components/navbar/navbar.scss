@@ -1,5 +1,5 @@
 @use "../../style.scss" as *;
-@import url('https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
 .navbar {
   @include themify($themes) {
@@ -63,65 +63,27 @@
             font-size: 20px;
           }
 
-          // 🚀 1. บังคับให้กล่องครอบตัวหลักของ Algolia ขยายพื้นที่ 100% ตามกรอบ 500px
-          .ais-SearchBox {
+          .ais-SearchBox-input {
             flex: 1;
+            min-width: 0;
             width: 100%;
-          }
+            border: none;
+            outline: none;
+            background-color: transparent;
+            color: themed("textColor");
+            font-family: inherit;
+            font-size: 14px;
+            padding: 0;
 
-          .ais-SearchBox-form {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            background: transparent;
-            position: relative;
-
-            .ais-SearchBox-input {
-              border: none;
-              outline: none;
-              background-color: transparent;
-              width: calc(100% - 25px);
-              color: themed("textColor");
-              font-family: inherit;
-              font-size: 14px;
-              padding-right: 5px;
-
-              // 🚀 2. เจาะยางกากบาทสีฟ้า (Native Search Cancel Button ของเบราว์เซอร์)
-              &::-webkit-search-cancel-button,
-              &::-webkit-search-decoration,
-              &::-webkit-search-results-button,
-              &::-webkit-search-results-decoration {
-                -webkit-appearance: none;
-                appearance: none;
-              }
+            &::placeholder {
+              color: gray;
             }
 
-            .ais-SearchBox-submit {
-              display: none;
-            }
-
-            .ais-SearchBox-reset {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              background: transparent;
-              border: none;
-              cursor: pointer;
-              padding: 0;
-              position: absolute;
-              right: 0;
-
-              svg {
-                width: 14px;
-                height: 14px;
-                fill: gray;
-                transition: fill 0.2s;
-
-                &:hover {
-                  fill: themed("textColor");
-                }
-              }
+            &::-webkit-search-decoration,
+            &::-webkit-search-results-button,
+            &::-webkit-search-results-decoration {
+              -webkit-appearance: none;
+              appearance: none;
             }
           }
         }
@@ -207,6 +169,12 @@
                 gap: 4px;
                 overflow: hidden; // กันตัวอักษรทะลุกรอบ
 
+                .hit-type-category {
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                }
+
                 .badge {
                   align-self: flex-start;
                   font-size: 9px;
@@ -228,6 +196,16 @@
                   }
                 }
 
+                .hit-category {
+                  font-size: 9px;
+                  color: white;
+                  background-color: themed("logo");
+                  font-weight: 500;
+                  padding: 2px 6px;
+                  border-radius: 4px;
+                  text-transform: uppercase;
+                }
+
                 .hit-title {
                   margin: 0;
                   font-size: 13px;
@@ -242,6 +220,33 @@
               }
             }
           }
+        }
+      }
+
+      .select-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 200px;
+
+        select {
+          width: 100%;
+          background-color: themed("bg");
+          border: 1px solid themed("border");
+          border-radius: 8px;
+          padding: 10px 12px;
+          color: themed("textColor");
+          font-size: 14px;
+          outline: none;
+          appearance: none; // ปิดลูกศรเดิมของเบราว์เซอร์
+          cursor: pointer;
+        }
+
+        .dropdown-icon {
+          position: absolute;
+          right: 10px;
+          color: themed("logo");
+          pointer-events: none; // ให้คลิกทะลุไปโดน select ได้
         }
       }
     }
@@ -288,7 +293,6 @@
           z-index: 10;
           gap: 3px;
 
-
           button {
             padding: 8px 18px;
             max-height: 35px;
@@ -300,7 +304,7 @@
             align-items: center;
             gap: 5px;
             color: white;
-            background-color: #A0C46E;
+            background-color: #a0c46e;
 
             &:hover {
               opacity: 0.8;
@@ -326,7 +330,6 @@
             font-weight: 500;
           }
         }
-
       }
     }
   }

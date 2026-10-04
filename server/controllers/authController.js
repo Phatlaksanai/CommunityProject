@@ -430,6 +430,7 @@ exports.updateProfile = async (req, res) => {
           // ถ้าตั้ง Display Name แล้วให้ใช้คู่กับ Username เพื่อให้เสิร์ชเจอทั้งสองแบบ
           title: updateData.name || user.name || user.username,
           img: updateData.profilePic || user.profilePic, // โยน URL รูปโปรไฟล์ล่าสุดเข้าไป
+          description: updateData.description || user.description || "",
           type: "user",
           targetId: userId,
         },
