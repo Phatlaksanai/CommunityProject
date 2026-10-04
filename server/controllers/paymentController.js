@@ -382,12 +382,13 @@ exports.getDownloads = async (req, res) => {
           item_id,
           modelName,
           price,
-          update_models(obj,fbx,blend,usdz,gltf)
+          update_models(update_models_id,version,obj,fbx,blend,usdz,gltf)
         )
       `,
       )
       .eq("orders.user_id", req.user.user_id)
-      .eq("orders.status", "completed");
+      .eq("orders.status", "completed")
+      .order('created_at', { referencedTable: 'items.update_models', ascending: false })
 
     if (error) throw error;
 
@@ -422,65 +423,63 @@ exports.getDownloads = async (req, res) => {
 };
 
 exports.getDownloadFile = async (req, res) => {
-  const { orderItemId, type } = req.params;
+  // *เปลี่ยนชื่อตัวแปรให้ตรงกับความจริง (หน้าบ้านส่ง update_models_id มาให้)
+  // หากใน Route (router.js) ของคุณตั้งชื่อไว้ว่า /download/:orderItemId/:type ก็ให้รับเป็น orderItemId ไปก่อนแล้วจับใส่ตัวแปรใหม่
+  const updateModelId = req.params.orderItemId || req.params.id; 
+  const { type } = req.params;
 
   try {
-    const { data, error } = await db
-      .from("order_items")
-      .select(
-        `
-        order_item_id,
+    // 1. อนุญาตเฉพาะชนิดไฟล์ที่กำหนด (เช็กเพื่อความปลอดภัยก่อนเลย)
+    const allowTypes = ["obj", "fbx", "blend", "usdz", "gltf"];
+    if (!allowTypes.includes(type)) {
+      return res.status(400).json({ error: "Invalid file type" });
+    }
 
+    // 2. ค้นหาเวอร์ชันที่ต้องการดาวน์โหลดจาก update_models โดยตรง
+    const { data: modelData, error: modelError } = await db
+      .from("update_models")
+      .select(`
+        item_id, 
+        ${type} 
+      `)
+      .eq("update_models_id", updateModelId)
+      .single();
+
+    if (modelError || !modelData) {
+      return res.status(404).json({ error: "File version not found" });
+    }
+
+    const fileUrl = modelData[type];
+    if (!fileUrl) { 
+      return res.status(404).json({ error: "File not found for this version" }); 
+    }
+
+    // 3. ตรวจสอบสิทธิ์ว่า User คนนี้ เคยซื้อ item_id นี้และจ่ายเงินเสร็จสิ้นแล้วหรือไม่
+    const { data: orderData, error: orderError } = await db
+      .from("order_items")
+      .select(`
+        order_item_id,
         orders!inner(
           user_id,
           status
-        ),
-
-        items(
-          modelName,
-          update_models(obj,fbx,blend,usdz,gltf)
         )
-      `,
-      )
-      .eq("order_item_id", orderItemId)
-      .single();
+      `)
+      .eq("item_id", modelData.item_id) // เช็กว่าเคยซื้อ item_id นี้ไหม
+      .eq("orders.user_id", req.user.user_id) // เช็กว่าเป็น user ที่ล็อกอินอยู่หรือไม่
+      .eq("orders.status", "completed") // เช็กว่าจ่ายเงินแล้ว
+      .limit(1);
 
-    if (error || !data) {
-      return res.status(404).json({
-        error: "Order item not found",
-      });
-    }
-
-    // ตรวจสอบว่าเป็นเจ้าของรายการซื้อ
-    if (data.orders.user_id !== req.user.user_id) {
+    if (orderError || !orderData || orderData.length === 0) {
       return res.status(403).json({
-        error: "You do not have permission to download this file",
+        error: "You do not have permission to download this file or payment not completed",
       });
     }
 
-    // ตรวจสอบว่าจ่ายเงินแล้ว
-    if (data.orders.status !== "completed") {
-      return res.status(403).json({
-        error: "Payment not completed",
-      });
-    }
-
-    // อนุญาตเฉพาะชนิดไฟล์ที่กำหนด
-    const allowTypes = ["obj", "fbx", "blend", "usdz", "gltf"];
-
-    if (!allowTypes.includes(type)) {
-      return res.status(400).json({
-        error: "Invalid file type",
-      });
-    }
-
-    const fileUrl = data.items?.update_models?.[0]?.[type];
-
-    if (!fileUrl) { return res.status(404).json({ error: "File not found" }); }
-
+    // 4. ผ่านทุกด่าน -> ส่งลิงก์ให้ดาวน์โหลด
     return res.json({ downloadUrl: fileUrl });
+
   } catch (err) {
-    console.error(err);
+    console.error("Download Error:", err);
     res.status(500).json({
       error: "Server error",
     });

@@ -18,7 +18,7 @@ const RightDI = ({ item }) => {
   const [itemReviews, setItemReviews] = useState([]);
   const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
   const [timelineItemId, setTimelineItemId] = useState(null);
-console.log(item);
+
   const handleAddToCart = async () => {
     setIsLoadingSpinner(true);
 
@@ -77,8 +77,7 @@ console.log(item);
   const currentCategory = categories.find( // หา category_id ที่ตรงกับ item_id โดยไม่ต้องใช้ .map 
     (category) => category.category_id === item.category_id
   );
-
-  console.log(item);
+  
   return (
     <div className="rightDI">
       <div className="container">

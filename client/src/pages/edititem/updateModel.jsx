@@ -376,9 +376,14 @@ const UpdateModel = () => {
 
                         <div className="form-group">
                             <label htmlFor="itemName">Version</label>
-                            <input type="text" id="itemName" placeholder="Version"
+                            <input type="text" id="itemName" placeholder="1.0"
+                                maxLength={5} // จำกัดความยาวไม่เกิน 5 ตัวอักษร
                                 value={version}
-                                onChange={(e) => setVersion(e.target.value)}
+                                onChange={(e) => {
+                                    // อนุญาตให้พิมพ์ได้เฉพาะตัวเลข (0-9) และจุด (.) เท่านั้น
+                                    const validValue = e.target.value.replace(/[^0-9.]/g, '');
+                                    setVersion(validValue);
+                                }}
                                 required />
                         </div>
 
