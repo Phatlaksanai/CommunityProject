@@ -254,7 +254,7 @@ exports.getItemsByUserId = async (req, res) => {
 
 exports.addItem = async (req, res) => {
   const {
-    modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category_id,
+    modelName, description, price, isFree, img, model, obj, blend, fbx, usdz, gltf, category_id,
     imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId,
     polygon_count, has_textures, is_rigged, is_uv_mapped
   } = req.body;
@@ -267,7 +267,7 @@ exports.addItem = async (req, res) => {
     return res.status(400).json({ error: "Price must be number" });
   }
 
-  if (price < 10) {
+  if (!isFree && price < 10) {
     return res.status(400).json({ error: "Price must be at least 10" });
   }
 

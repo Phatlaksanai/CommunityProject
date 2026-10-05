@@ -19,11 +19,48 @@ const RightDI = ({ item }) => {
   const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
   const [timelineItemId, setTimelineItemId] = useState(null);
 
+  const handleAddToDownload = async () => {
+    setIsLoadingSpinner(true);
+
+    if (!currentUser) {
+      setError("Please login to add items to your cart.");
+      setIsLoadingSpinner(false);
+      return;
+    }
+    if (item.user_id === currentUser.user_id) {
+      setError("You cannot add your own item to the cart.");
+      setIsLoadingSpinner(false);
+      return;
+    }
+
+    try {
+      const res = await makeRequest.post("/payments/addToDownload", {
+        item_id: item.item_id,
+      });
+      const data = res.data;
+
+      if (data.success) {
+        setSuccess("Add to download success");
+      } else {
+        setError(data.error || "Failed to add item to download");
+        setIsLoadingSpinner(false);
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Failed to connect to server");
+      }
+      setIsLoadingSpinner(false);
+    }
+
+  }
+
   const handleAddToCart = async () => {
     setIsLoadingSpinner(true);
 
     if (!currentUser) {
-      setError("Please log in to add items to your cart.");
+      setError("Please login to add items to your cart.");
       setIsLoadingSpinner(false);
       return;
     }
@@ -77,7 +114,7 @@ const RightDI = ({ item }) => {
   const currentCategory = categories.find( // หา category_id ที่ตรงกับ item_id โดยไม่ต้องใช้ .map 
     (category) => category.category_id === item.category_id
   );
-  
+
   return (
     <div className="rightDI">
       <div className="container">
@@ -116,7 +153,7 @@ const RightDI = ({ item }) => {
         <div className="text">
           <div className="row">
             <h3>price</h3>
-            <p>{item.price} $</p>
+            <p>{item.price === 0 ? "Free" : item.price} $</p>
           </div>
         </div>
 
@@ -125,19 +162,30 @@ const RightDI = ({ item }) => {
         <div className="text">
           <div className="row">
             <h3>Subtotal</h3>
-            <p>{item.price} $</p>
+            <p>{item.price === 0 ? "Free" : item.price} $</p>
           </div>
         </div>
         <div className="menu">
           <div className="buttons">
-            <button onClick={handleAddToCart} style={{ cursor: "pointer" }} disabled={isLoadingSpinner}
-            >
-              {isLoadingSpinner ? (
-                <ClipLoader size={16} color="#ffffff" />
-              ) : (
-                "Add to Cart"
-              )}
-            </button>
+            {item.price === 0 ? (
+              <button onClick={handleAddToDownload} style={{ cursor: "pointer" }} disabled={isLoadingSpinner}
+              >
+                {isLoadingSpinner ? (
+                  <ClipLoader size={16} color="#ffffff" />
+                ) : (
+                  "Add to Download"
+                )}
+              </button>
+            ) : (
+              <button onClick={handleAddToCart} style={{ cursor: "pointer" }} disabled={isLoadingSpinner}
+              >
+                {isLoadingSpinner ? (
+                  <ClipLoader size={16} color="#ffffff" />
+                ) : (
+                  "Add to Cart"
+                )}
+              </button>
+            )}
           </div>
           {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
           {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}

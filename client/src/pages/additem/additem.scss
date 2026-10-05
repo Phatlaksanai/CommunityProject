@@ -35,7 +35,6 @@
 
       label {
         font-size: 14px;
-        font-weight: 500;
       }
 
       input[type="text"],
@@ -71,7 +70,7 @@
     }
 
 
-.category {
+    .category {
       display: flex;
       flex-direction: column;
       gap: 6px;

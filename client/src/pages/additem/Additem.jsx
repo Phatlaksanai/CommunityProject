@@ -9,6 +9,7 @@ import { ClipLoader } from "react-spinners";
 const AddItem = () => {
   //----------------------------------------------------------
   const navigate = useNavigate();
+  const [isFree, setIsFree] = useState(false);
 
   // form data
   const [modelName, setModelName] = useState("");
@@ -112,7 +113,7 @@ const AddItem = () => {
     setError("");
     setSuccess("");
     setIsLoadingSpinner(true);
-    
+
     if (!categoryId) {
       setError("Please select a category");
       setIsLoadingSpinner(false);
@@ -131,7 +132,7 @@ const AddItem = () => {
       return;
     }
 
-    
+
 
     try {
       const imgURL = await uploadFile(img);
@@ -177,6 +178,7 @@ const AddItem = () => {
         has_textures: hasTextures,
         is_rigged: isRigged,
         is_uv_mapped: isUvMapped,
+        isFree : isFree,
       });
 
       setSuccess("add item success");
@@ -214,10 +216,29 @@ const AddItem = () => {
 
           <div className="form-group">
             <label htmlFor="price">Price</label>
-            <input type="text" id="price" placeholder="Price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required />
+            <div className="price-input">
+              <input type="number" id="price" placeholder="Price"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                disabled={isFree} /* ถ้าติ๊ก Free จะล็อกช่องพิมพ์ */
+                required={!isFree} /* บังคับกรอกเฉพาะตอนที่ไม่ฟรี */
+              />
+              <label>
+                <input type="checkbox" className="custom-checkbox" checked={isFree}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setIsFree(checked); // อัปเดตสถานะปุ่ม
+
+                    if (checked) {
+                      setPrice("0"); // ถ้าติ๊กฟรี ให้ราคาเป็น 0 ทันที
+                    } else {
+                      setPrice("");  // ถ้าเอาติ๊กออก ให้เคลียร์ช่องว่างเพื่อให้พิมพ์ราคาใหม่ได้
+                    }
+                  }}
+                />
+                Free
+              </label>
+            </div>
           </div>
 
           <div className="form-group">
@@ -235,17 +256,14 @@ const AddItem = () => {
             <div className="checkbox-container">
               <label>
                 <input type="checkbox" className="custom-checkbox" checked={hasTextures} onChange={(e) => setHasTextures(e.target.checked)} />
-                <span className="box"></span>
                 Has Textures
               </label>
               <label>
                 <input type="checkbox" className="custom-checkbox" checked={isRigged} onChange={(e) => setIsRigged(e.target.checked)} />
-                <span className="box"></span>
                 Is Rigged
               </label>
               <label >
                 <input type="checkbox" className="custom-checkbox" checked={isUvMapped} onChange={(e) => setIsUvMapped(e.target.checked)} />
-                <span className="box"></span>
                 Is UV Mapped
               </label>
             </div>

@@ -425,7 +425,7 @@ exports.getDownloads = async (req, res) => {
 exports.getDownloadFile = async (req, res) => {
   // *เปลี่ยนชื่อตัวแปรให้ตรงกับความจริง (หน้าบ้านส่ง update_models_id มาให้)
   // หากใน Route (router.js) ของคุณตั้งชื่อไว้ว่า /download/:orderItemId/:type ก็ให้รับเป็น orderItemId ไปก่อนแล้วจับใส่ตัวแปรใหม่
-  const updateModelId = req.params.orderItemId || req.params.id; 
+  const updateModelId = req.params.orderItemId || req.params.id;
   const { type } = req.params;
 
   try {
@@ -450,8 +450,8 @@ exports.getDownloadFile = async (req, res) => {
     }
 
     const fileUrl = modelData[type];
-    if (!fileUrl) { 
-      return res.status(404).json({ error: "File not found for this version" }); 
+    if (!fileUrl) {
+      return res.status(404).json({ error: "File not found for this version" });
     }
 
     // 3. ตรวจสอบสิทธิ์ว่า User คนนี้ เคยซื้อ item_id นี้และจ่ายเงินเสร็จสิ้นแล้วหรือไม่
@@ -528,7 +528,7 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
         .from("order_items")
         .select("order_item_id, seller_net, seller_id, users(balance)")
         .eq("order_id", order.order_id);
-        
+
       if (!itemsErr && items && items.length > 0) {
         const transactions = items.map((item) => ({
           user_id: order.user_id,
@@ -553,9 +553,9 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
         const newBalance = currentBalance + totalEarned;
 
         const { error: updateError } = await db
-        .from("users")
-        .update({ balance: newBalance })
-        .eq("user_id", sellerId);
+          .from("users")
+          .update({ balance: newBalance })
+          .eq("user_id", sellerId);
 
         if (updateError) {
           console.error("Failed to update user balances:", updateError);
@@ -627,12 +627,12 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
 
   else if (event.type === "payout.paid") {
     const payout = event.data.object;
-    
+
     // ยอดเงินที่ Stripe ส่งมาจะเป็นหน่วยสตางค์ (Cents) ต้องหาร 100 เพื่อให้เป็นบาท
     const withdrawAmount = payout.amount / 100;
-    
+
     // ดึง stripe_connect_id ของร้านค้าที่ทำการถอนเงิน
-    const stripeConnectId = event.account; 
+    const stripeConnectId = event.account;
 
     if (stripeConnectId) {
       try {
@@ -752,5 +752,77 @@ exports.CreateStripeAccount = async (req, res) => {
   } catch (err) {
     console.error("Stripe/Server Error:", err);
     return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.addItemToDownload = async (req, res) => {
+  const { item_id } = req.body;
+  const user_id = req.user.user_id;
+
+  try {
+    // 1. ตรวจสอบว่ามีสินค้านี้อยู่จริงหรือไม่
+    const { data: item, error: itemError } = await db
+      .from("items")
+      .select("*")
+      .eq("item_id", item_id)
+      .single();
+
+    if (itemError || !item) {
+      return res.status(404).json({ error: "Item not found" });
+    }
+
+    // 2. (แนะนำเพิ่ม) ตรวจสอบว่า User เคยมีสินค้านี้แล้วหรือยัง ป้องกันการกดรับซ้ำ
+    const { data: existingOrder } = await db
+      .from("order_items")
+      .select(`
+        order_id,
+        orders!inner(user_id)
+      `)
+      .eq("item_id", item_id)
+      .eq("orders.user_id", user_id)
+      .limit(1);
+
+    if (existingOrder && existingOrder.length > 0) {
+      return res.status(400).json({ error: "You already own this item" });
+    }
+
+    // 3. สร้างออเดอร์ใหม่ (ฟรี)
+    const { data: order, error: orderError } = await db
+      .from("orders")
+      .insert({
+        user_id: user_id,
+        total_amount: 0,
+        status: "completed",
+      })
+      .select()
+      .single();
+
+    if (orderError) throw orderError;
+
+    // 4. นำสินค้าเข้า order_items
+    const { error: orderItemsError } = await db
+      .from("order_items")
+      .insert({
+        order_id: order.order_id,
+        item_id: item_id,
+        seller_id: item.user_id,
+        platform_fee: 0,
+        seller_net: 0,
+      });
+
+    if (orderItemsError) throw orderItemsError;
+
+    // 5. ส่ง Response (ลบ cartItem ที่ไม่มีตัวตนออก)
+    res.status(200).json({
+      success: true,
+      message: "Item added to download successfully"
+    });
+
+  } catch (error) {
+    console.error("Error adding item to download:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to add item to download",
+    });
   }
 };

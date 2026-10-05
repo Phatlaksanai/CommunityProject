@@ -11,6 +11,8 @@ const EditItem = () => {
     const navigate = useNavigate();
     const { id: item_id } = useParams();
     const { currentUser } = useContext(AuthContext);
+    const [isFree, setIsFree] = useState(false);
+    const [previousPrice, setPreviousPrice] = useState("");
 
     // form data
     const [modelName, setModelName] = useState("");
@@ -42,6 +44,19 @@ const EditItem = () => {
             setModelName(items.modelName || "");
             setDescription(items.description || "");
             setPrice(items.price || "");
+
+            // --------- เพิ่มเงื่อนไขเช็คราคาตรงนี้ ---------
+            // ถ้าราคาเท่ากับ 0 (เช็คทั้งแบบตัวเลขและข้อความเผื่อไว้)
+            if (items.price === 0) {
+                setIsFree(true); // ให้ติ๊กถูกที่กล่อง Free ทันที
+                setPrice("0");
+                setPreviousPrice(""); // เตรียมค่าว่างไว้เผื่อ user เอาติ๊กออกจะได้พิมพ์ราคาใหม่ได้เลย
+            } else {
+                setIsFree(false);
+                setPreviousPrice(items.price || ""); // ถ้าราคาไม่ฟรี ให้จำราคาเดิมไว้
+            }
+            // ------------------------------------------
+
             setImg(items.img || "");
             setImgPublicId(items.img_public_id || null);
             setCategoryId(items.category_id || "");
@@ -94,6 +109,7 @@ const EditItem = () => {
                 category_id: categoryId,
                 img: finalImg,
                 imgPublicId: finalImgPublicId,
+                isFree: isFree,
 
             });
 
@@ -132,10 +148,30 @@ const EditItem = () => {
 
                     <div className="form-group">
                         <label htmlFor="price">Price</label>
-                        <input type="text" id="price" placeholder="Price"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
-                            required />
+                        <div className="price-input">
+                            <input type="number" id="price" placeholder="Price"
+                                value={price}
+                                onChange={(e) => setPrice(e.target.value)}
+                                disabled={isFree} /* ถ้าติ๊ก Free จะล็อกช่องพิมพ์ */
+                                required={!isFree} /* บังคับกรอกเฉพาะตอนที่ไม่ฟรี */
+                            />
+                            <label>
+                                <input type="checkbox" className="custom-checkbox" checked={isFree}
+                                    onChange={(e) => {
+                                        const checked = e.target.checked;
+                                        setIsFree(checked); // อัปเดตสถานะปุ่ม
+
+                                        if (checked) {
+                                            setPreviousPrice(price); // สำคัญ: เซฟราคาที่พิมพ์ไว้เก็บลง previousPrice ก่อน
+                                            setPrice("0");           // จากนั้นค่อยเปลี่ยนช่องราคาเป็น 0
+                                        } else {
+                                            setPrice(previousPrice); // พอเอาติ๊กออก ก็ดึงราคาที่เซฟไว้กลับมาแสดง
+                                        }
+                                    }}
+                                />
+                                Free
+                            </label>
+                        </div>
                     </div>
 
                     <div className="form-group">

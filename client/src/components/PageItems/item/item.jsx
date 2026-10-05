@@ -65,7 +65,7 @@ const Item = ({ item, isProfile, isShop }) => {
           <p>{item.modelName}</p>
         </div>
         <div className="price">
-          <p>$ {item.price}</p>
+          <p>$ {item.price === 0 ? "Free" : item.price}</p>
           {isShop && (<ControlPointIcon onClick={handleAddToCart} style={{ cursor: "pointer", color: "#A0C46E" }} />)}
           {isProfile && item.user_id === currentUser.user_id &&
             <div className="more-container">
