@@ -75,7 +75,44 @@ exports.getItems = async (req, res) => {
     return res.status(500).json(error);
   }
 
-  return res.status(200).json(data || []);
+  // นับจำนวนการสั่งซื้อของแต่ละ item จาก order ที่ complete
+  const itemIds = data.map((item) => item.item_id);
+  let orderItems = []; // เอาข้อมูล order_items ที่เป็น completed มาใส่ตรงนี้
+
+  if (itemIds.length > 0) {
+    const { data: completedOrders, error: orderError } = await db
+      .from("order_items")
+      .select(`
+        item_id,
+        orders!inner(
+          status
+        )
+      `)
+      .in("item_id", itemIds)
+      .eq("orders.status", "completed");
+
+    if (orderError) {
+      return res.status(500).json(orderError);
+    }
+
+    orderItems = completedOrders || [];
+  }
+
+  // นับจำนวน order ของแต่ละ item_id
+  const orderCountMap = {};
+  orderItems.forEach((orderItem) => { // วนดู Order ทีละรายการ
+    const itemId = orderItem.item_id; // เอา item_id ออกมานับ
+
+    orderCountMap[itemId] = (orderCountMap[itemId] || 0) + 1;
+  });
+
+  // เพิ่ม order_count เข้าไปในแต่ละ item
+  const result = data.map((item) => ({
+    ...item,
+    order_count: orderCountMap[item.item_id] || 0,
+  }));
+   
+  return res.status(200).json(result);
 };
 
 exports.getItemsById = async (req, res) => {

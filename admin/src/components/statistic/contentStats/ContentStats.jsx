@@ -32,9 +32,10 @@ const ContentStats = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [formData, setFormData] = useState({});
 
-    // State สำหรับเพิ่ม Category ใหม่
-    const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
-    const [newCategoryName, setNewCategoryName] = useState("");
+    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+    const [newCategoryData, setNewCategoryData] = useState({
+        newCategory: ""
+    });
 
     const { isLoading: summaryLoading, data: summaryData, isError: isSummaryError } = useQuery({
         queryKey: ["contentSummary", activeTab], // รีเฟรชเมื่อ activeTab เปลี่ยน
@@ -250,8 +251,6 @@ const ContentStats = () => {
                 img: row.img || "",
                 model: row.model || ""
             });
-            setIsAddingNewCategory(false); // เคลียร์ค่าหมวดหมู่ใหม่ เผื่อกดเปิดตัวอื่นต่อ
-            setNewCategoryName("");
         }
     };
 
@@ -262,11 +261,39 @@ const ContentStats = () => {
 
     const handleUpdate = () => {
         const payload = {
-            ...formData,
-            new_category_name: isAddingNewCategory ? newCategoryName : null
+            ...formData
         };
 
         updateMutation.mutate(payload);
+    };
+
+    const addCategoryMutation = useMutation({
+        mutationFn: (newCategory) => {
+            return makeRequest.post(`/admin/content/addNewCategory`, newCategory);
+        },
+        onSuccess: () => {
+            setIsAddCategoryOpen(false); // ปิดหน้าต่าง Add Category
+            setNewCategoryData({ newCategory: "" }); // เคลียร์ค่า
+            setSuccess("Category added successfully!");
+        },
+        onError: (err) => {
+            if (err.response?.data?.error || err.message) {
+                setError(err.response.data.error);
+            } else {
+                setError("Error adding category");
+            }
+        }
+    });
+
+    const handleAddCategoryChange = (e) => {
+        setNewCategoryData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleAddCategorySubmit = () => {
+        if (!newCategoryData.newCategory) {
+            return setError("Please fill Category Type!");
+        }
+        addCategoryMutation.mutate(newCategoryData);
     };
 
     if (summaryLoading || chartLoading || tableLoading || donutYearlyLoading || donutDistributionLoading) return <div className="loading">Loading dashboard...</div>;
@@ -399,7 +426,13 @@ const ContentStats = () => {
                             </div>
                         </div>
 
-                        <div className="table-container">
+                        <div className="action-section">
+                            {activeTab === "Items" && (
+                                <button className="add-category-btn" onClick={() => setIsAddCategoryOpen(true)}>Add New Category</button>
+                            )}
+                        </div>
+
+                        <div className="table-container" style={{ marginTop: '15px' }}>
                             <table>
                                 <thead>
                                     <tr>
@@ -489,6 +522,7 @@ const ContentStats = () => {
                                 </tbody>
                             </table>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -583,46 +617,18 @@ const ContentStats = () => {
                                     <div className="input-group">
                                         <label>Category</label>
                                         <div className="select-wrapper">
-                                            <select
-                                                name="category_id"
-                                                value={isAddingNewCategory ? "NEW" : (formData.category_id || "")}
-                                                onChange={(e) => {
-                                                    if (e.target.value === "NEW") {
-                                                        setIsAddingNewCategory(true);
-                                                    } else {
-                                                        setIsAddingNewCategory(false);
-                                                        handleChange(e); // อัปเดต formData ปกติ
-                                                    }
-                                                }}
-                                            >
+                                            <select name="category_id" value={formData.category_id || ""} onChange={handleChange}>
                                                 <option value="" disabled>Select Category</option>
-
                                                 {/* วนลูปดึงหมวดหมู่จาก Database มาแสดง */}
                                                 {categoriesData?.map((cat) => (
                                                     <option key={cat.category_id} value={cat.category_id}>
                                                         {cat.type}
                                                     </option>
                                                 ))}
-
-                                                {/* ตัวเลือกสำหรับสร้างใหม่ */}
-                                                <option value="NEW">+ Add New Category...</option>
                                             </select>
                                             <ArrowDropDownIcon className="dropdown-icon" />
                                         </div>
                                     </div>
-
-                                    {/* จะแสดงช่องนี้ ก็ต่อเมื่อเลือก + Add New Category */}
-                                    {isAddingNewCategory && (
-                                        <div className="input-group full-width">
-                                            <label style={{ color: "#33A7E5" }}>New Category Name</label>
-                                            <input
-                                                type="text"
-                                                placeholder="Enter new category name..."
-                                                value={newCategoryName}
-                                                onChange={(e) => setNewCategoryName(e.target.value)}
-                                            />
-                                        </div>
-                                    )}
 
                                     <div className="input-group full-width">
                                         <label>Description</label>
@@ -739,6 +745,32 @@ const ContentStats = () => {
                     )}
                 </div>
             </div>
+
+            {isAddCategoryOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content add-category-modal">
+                        <h2>Add New Category</h2>
+                        <div className="form-grid add-category-form">
+                            <div className="input-group">
+                                <label>Category Name</label>
+                                <input type="text" name="newCategory" value={newCategoryData.newCategory} onChange={handleAddCategoryChange} placeholder="Category Name" />
+                            </div>
+                        </div>
+
+                        <div className="modal-actions">
+                            <button className="btn-cancel" onClick={() => setIsAddCategoryOpen(false)} disabled={addCategoryMutation.isLoading}>
+                                Cancel
+                            </button>
+                            <button className="btn-update" onClick={handleAddCategorySubmit} disabled={addCategoryMutation.isLoading}>
+                                {addCategoryMutation.isLoading ? "Adding..." : "Add"}
+                            </button>
+                        </div>
+                        {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
+                        {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
+                    </div>
+                </div>
+            )}
+
         </div >
     )
 }
