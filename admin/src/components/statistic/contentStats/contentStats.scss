@@ -179,7 +179,7 @@
             position: relative;
             z-index: 2;
 
-            .add-admin-btn {
+            .add-category-btn {
               background-color: #e50914;
               color: white;
               border: none;
@@ -375,6 +375,10 @@
         border-radius: 4px;
       }
 
+      &.add-category-modal {
+        max-width: 450px;
+      }
+
       h2 {
         margin: 0 0 25px 0;
         color: #fff;
@@ -464,7 +468,7 @@
         }
       }
 
-      .form-grid.add-admin-form {
+      .form-grid.add-category-form {
         grid-template-columns: 1fr;
       }
 

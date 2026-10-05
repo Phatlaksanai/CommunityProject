@@ -4,6 +4,7 @@ import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../../context/authContext";
 import SettingsIcon from '@mui/icons-material/Settings';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import DownloadIcon from '@mui/icons-material/Download';
 import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 
@@ -65,7 +66,15 @@ const Item = ({ item, isProfile, isShop }) => {
           <p>{item.modelName}</p>
         </div>
         <div className="price">
-          <p>$ {item.price}</p>
+          <div className="price-info">
+            <p>$ {item.price}</p>
+            {isShop && (
+              <div className="order-count">
+                <DownloadIcon />
+                <span>{item.order_count}</span>
+              </div>
+            )}
+          </div>
           {isShop && (<ControlPointIcon onClick={handleAddToCart} style={{ cursor: "pointer", color: "#A0C46E" }} />)}
           {isProfile && item.user_id === currentUser.user_id &&
             <div className="more-container">

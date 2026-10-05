@@ -450,3 +450,19 @@ exports.getCategories = async (req, res) => { // เพิ่มฟังก์�
     return res.status(500).json({ error: "Server Error" });
   }
 };
+
+exports.addNewCategory = async (req, res) => {
+  const { newCategory } = req.body;
+
+  try {
+    const { data, error } = await db
+      .from("categories")
+      .insert([{ type: newCategory }])
+      .select();
+
+    if (error) throw error;
+    return res.status(201).json(data);
+  } catch (error) {
+    return res.status(500).json({ error: "Server Error" });
+  }
+};

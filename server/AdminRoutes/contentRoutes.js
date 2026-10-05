@@ -25,5 +25,6 @@ router.put("/updatePost/:postId", verifyToken, contentController.updatePost);
 router.put("/updateCommunity/:communityId", verifyToken, contentController.updateCommunity);
 router.put("/updateItem/:itemId", verifyToken, contentController.updateItem);
 router.get("/categories", verifyToken, contentController.getCategories);
+router.post("/addNewCategory", verifyToken, contentController.addNewCategory);
 
 module.exports = router;

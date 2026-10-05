@@ -101,7 +101,7 @@ const CustomSearchBox = ({ searchText, setSearchText, onFocus, onBlur }) => {
     <input
       type="search"
       className="ais-SearchBox-input"
-      placeholder="Search"
+      placeholder="Search for community, item, or user..."
       value={searchText}
       onChange={(e) => setSearchText(e.target.value)}
       onFocus={onFocus}
