@@ -289,75 +289,95 @@ exports.getItemsByUserIdAvailable = async (req, res) => {
 };
 
 exports.getItemsByUserId = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const { data, error } = await db
-    .from("items")
-    .select(`
-      *,
-      update_models (
-        created_at
-      )
-    `)
-    .eq("user_id", id)
+    // 1. รับค่า page และเตรียมตัวแปรสำหรับการตัด 15 ชิ้น
+    const page = parseInt(req.query.page) || 0;
+    const limit = 15;
+    const offset = page * limit;
 
-  if (error) return res.status(500).json(error);
-
-  const formatted = data.map((item) => {
-    const latestUpdate = [...(item.update_models || [])].sort( // .sort() ข้างใน latestUpdate หา update ล่าสุดของ แต่ละ Item
-      (update1, update2) =>
-        new Date(update2.created_at) - new Date(update1.created_at)
-    )[0];
-
-    return {
-      ...item,
-      created_at: latestUpdate?.created_at || null,
-    };
-  });
-
-  formatted.sort((item1, item2) => // .sort() ที่ formatted เรียง Item ทั้งหมด ตาม update ล่าสุด
-    new Date(item2.created_at) - new Date(item1.created_at)
-  );
-
-  const itemIds = data.map((item) => item.item_id);
-  let orderItems = []; // เอาข้อมูล order_items ที่เป็น completed มาใส่ตรงนี้
-
-  if (itemIds.length > 0) {
-    const { data: completedOrders, error: orderError } = await db
-      .from("order_items")
+    // 2. ดึงสินค้าทั้งหมดของผู้ใช้
+    const { data, error } = await db
+      .from("items")
       .select(`
-        item_id,
-        orders!inner(
-          status
+        *,
+        update_models (
+          created_at
         )
       `)
-      .in("item_id", itemIds)
-      .eq("orders.status", "completed");
+      .eq("user_id", id);
 
-    if (orderError) {
-      return res.status(500).json(orderError);
+    if (error) return res.status(500).json(error);
+
+    // 3. หาวันที่อัปเดตล่าสุด
+    const formatted = data.map((item) => {
+      const latestUpdate = [...(item.update_models || [])].sort( 
+        (update1, update2) =>
+          new Date(update2.created_at) - new Date(update1.created_at)
+      )[0];
+
+      return {
+        ...item,
+        created_at: latestUpdate?.created_at || item.created_at || null, // กันพลาดใส่ item.created_at สำรองไว้
+      };
+    });
+
+    // 4. เรียง Item ทั้งหมด ตามเวลา update ล่าสุด
+    formatted.sort((item1, item2) => 
+      new Date(item2.created_at || 0) - new Date(item1.created_at || 0)
+    );
+
+    // 5. ✅ ตัดแบ่งข้อมูลให้เหลือแค่ 15 ชิ้น ตรงนี้เลย! 
+    const paginatedItems = formatted.slice(offset, offset + limit);
+
+    // ถ้าตัดมาแล้วไม่มีข้อมูล (ผู้ใช้เลื่อนลงไปลึกจนสุดแล้ว) ก็ส่งอาเรย์ว่างกลับได้เลย ไม่ต้องไปดึง Order ให้เหนื่อย
+    if (paginatedItems.length === 0) {
+      return res.status(200).json([]);
     }
 
-    orderItems = completedOrders || [];
+    // 6. ดึงข้อมูลยอดสั่งซื้อเฉพาะ "15 ชิ้น" ที่ผ่านการตัดมาแล้ว
+    const itemIds = paginatedItems.map((item) => item.item_id);
+    let orderItems = []; 
+
+    if (itemIds.length > 0) {
+      const { data: completedOrders, error: orderError } = await db
+        .from("order_items")
+        .select(`
+          item_id,
+          orders!inner(
+            status
+          )
+        `)
+        .in("item_id", itemIds)
+        .eq("orders.status", "completed");
+
+      if (orderError) {
+        return res.status(500).json(orderError);
+      }
+
+      orderItems = completedOrders || [];
+    }
+
+    // นับจำนวน order
+    const orderCountMap = {};
+    orderItems.forEach((orderItem) => { 
+      const itemId = orderItem.item_id; 
+      orderCountMap[itemId] = (orderCountMap[itemId] || 0) + 1;
+    });
+
+    // 7. นำ order_count ยัดกลับเข้าไปในของ 15 ชิ้นนั้น
+    const result = paginatedItems.map((item) => ({
+      ...item,
+      order_count: orderCountMap[item.item_id] || 0,
+    }));
+
+    return res.status(200).json(result);
+
+  } catch (err) {
+    console.error("Error in getItemsByUserId:", err);
+    return res.status(500).json({ error: err.message });
   }
-
-  // นับจำนวน order ของแต่ละ item_id
-  const orderCountMap = {};
-  orderItems.forEach((orderItem) => { // วนดู Order ทีละรายการ
-    const itemId = orderItem.item_id; // เอา item_id ออกมานับ
-
-    orderCountMap[itemId] = (orderCountMap[itemId] || 0) + 1;
-  });
-
-  // เพิ่ม order_count เข้าไปในแต่ละ item
-  const result = formatted.map((item) => ({
-    ...item,
-    order_count: orderCountMap[item.item_id] || 0,
-  }));
-
-  return res.status(200).json(result);
-
-  // return res.json(formatted);
 };
 
 exports.addItem = async (req, res) => {
