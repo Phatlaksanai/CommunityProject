@@ -3,10 +3,13 @@ import "./items.scss";
 import { useQuery } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query"; // เปลี่ยนมาใช้ตัวนี้
 import { makeRequest } from "../../../api/axios";
+import { AuthContext } from "../../../context/authContext";
+import { useContext } from "react";
 import { useInView } from "react-intersection-observer"; // เพิ่มเข้ามา
 import { useEffect } from "react";
 
 const Items = ({ userId, filters, isProfile, isShop }) => {
+  const { currentUser } = useContext(AuthContext);
   const { ref, inView } = useInView(); // ref ตัวนี้จะเอาไปแปะไว้ล่างสุดของหน้าจอ
 
   const {
@@ -33,6 +36,10 @@ const Items = ({ userId, filters, isProfile, isShop }) => {
 
       // ✅ 2. สร้าง URL ให้สะอาด
       const baseUrl = userId ? `/items/user/${userId}` : `/items`;
+
+      if (currentUser?.user_id) {
+        query.set("user_id", currentUser.user_id);
+      }
 
       // ตัว query.toString() จะจัดการเครื่องหมาย & ให้อัตโนมัติ (เช่น ?date=AllTime&page=0)
       return makeRequest.get(`${baseUrl}?${query.toString()}`).then(res => res.data);

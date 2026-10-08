@@ -4,8 +4,8 @@ const algoliaClient = require("../config/algolia");
 
 exports.getItems = async (req, res) => {
   try {
-    const { category_id, date } = req.query;
-    
+    const { category_id, date, user_id } = req.query;
+
     // รับค่า page จาก Frontend, กำหนด default เป็น 0
     const page = parseInt(req.query.page) || 0;
     const limit = 15; // จำนวนสินค้าที่ต้องการส่งกลับไปให้ Frontend
@@ -23,6 +23,10 @@ exports.getItems = async (req, res) => {
           )`
         )
         .order("item_id", { ascending: false });
+
+      if (user_id) {
+        query = query.neq("user_id", user_id);
+      }
 
       // ✅ filter category
       if (category_id) {
@@ -68,9 +72,9 @@ exports.getItems = async (req, res) => {
 
         // หากมีการกรองวันที่ แต่ไม่มีข้อมูลตรงกับช่วงเวลานั้นเลย ให้หยุดแล้วส่งอาเรย์ว่าง (เฉพาะการโหลดรอบแรก)
         if (itemIdsFromDateFilter.length === 0) {
-            return res.status(200).json([]);
+          return res.status(200).json([]);
         }
-        
+
         query = query.in("item_id", itemIdsFromDateFilter);
       }
 
@@ -85,11 +89,11 @@ exports.getItems = async (req, res) => {
       if (!dbData || dbData.length === 0) {
         break;
       }
-      
+
       // (ถ้ามีเงื่อนไขการกรองสถานะผู้ใช้ หรือเงื่อนไขอื่นๆ ที่ต้องเช็คทีหลัง สามารถเพิ่ม Filter ตรงนี้ได้เหมือน getPosts)
       // ปัจจุบันสมมติว่า dbData ที่ดึงมาผ่านเงื่อนไขหมดแล้ว
-      const approvedItems = dbData; 
-      
+      const approvedItems = dbData;
+
       finalItems = [...finalItems, ...approvedItems];
       currentOffset += fetchSize;
     }
@@ -99,7 +103,7 @@ exports.getItems = async (req, res) => {
 
     // หากไม่มีข้อมูล ให้ส่งกลับเป็น Array ว่าง
     if (resultItems.length === 0) {
-        return res.status(200).json([]);
+      return res.status(200).json([]);
     }
 
     // ✅ นับจำนวนการสั่งซื้อของแต่ละ item จาก order ที่ complete
@@ -123,10 +127,10 @@ exports.getItems = async (req, res) => {
       }
 
       if (completedOrders) {
-          completedOrders.forEach((orderItem) => {
-            const itemId = orderItem.item_id;
-            orderCountMap[itemId] = (orderCountMap[itemId] || 0) + 1;
-          });
+        completedOrders.forEach((orderItem) => {
+          const itemId = orderItem.item_id;
+          orderCountMap[itemId] = (orderCountMap[itemId] || 0) + 1;
+        });
       }
     }
 
@@ -315,7 +319,45 @@ exports.getItemsByUserId = async (req, res) => {
     new Date(item2.created_at) - new Date(item1.created_at)
   );
 
-  return res.json(formatted);
+  const itemIds = data.map((item) => item.item_id);
+  let orderItems = []; // เอาข้อมูล order_items ที่เป็น completed มาใส่ตรงนี้
+
+  if (itemIds.length > 0) {
+    const { data: completedOrders, error: orderError } = await db
+      .from("order_items")
+      .select(`
+        item_id,
+        orders!inner(
+          status
+        )
+      `)
+      .in("item_id", itemIds)
+      .eq("orders.status", "completed");
+
+    if (orderError) {
+      return res.status(500).json(orderError);
+    }
+
+    orderItems = completedOrders || [];
+  }
+
+  // นับจำนวน order ของแต่ละ item_id
+  const orderCountMap = {};
+  orderItems.forEach((orderItem) => { // วนดู Order ทีละรายการ
+    const itemId = orderItem.item_id; // เอา item_id ออกมานับ
+
+    orderCountMap[itemId] = (orderCountMap[itemId] || 0) + 1;
+  });
+
+  // เพิ่ม order_count เข้าไปในแต่ละ item
+  const result = formatted.map((item) => ({
+    ...item,
+    order_count: orderCountMap[item.item_id] || 0,
+  }));
+
+  return res.status(200).json(result);
+
+  // return res.json(formatted);
 };
 
 exports.addItem = async (req, res) => {

@@ -15,7 +15,7 @@ const Market = () => {
       <LeftBarDownload filters={filters} setFilters={setFilters} />
       <div className="content">
         <ScrollToTop />
-        <Items filters={filters} isShop={true}/>
+        <Items filters={filters} isShop={true} />
       </div>
     </div>
   )
