@@ -2,8 +2,13 @@ import Item from "../item/item";
 import "./items.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
+import { AuthContext } from "../../../context/authContext";
+import { useContext } from "react";
 
-const Items = ({ userId, filters ,isProfile, isShop}) => {
+const Items = ({ userId, filters, isProfile, isShop }) => {
+
+  const { currentUser } = useContext(AuthContext);
+
   const { isLoading, error, data } = useQuery({
     queryKey: ["items", userId, filters],
     queryFn: () => {
@@ -16,11 +21,15 @@ const Items = ({ userId, filters ,isProfile, isShop}) => {
       }
 
       query.append("date", filters?.date || "AllTime");
-      if (userId) {
-        return makeRequest.get(`/items/user/${userId}?${query.toString()}`).then((res) => res.data);
-      }
 
-      return makeRequest.get(`/items?${query.toString()}`).then((res) => res.data);
+      if (userId) {
+        return makeRequest.get(`/items/user/${userId}?${query.toString()}`).then((res) => res.data); // หน้า profile
+      }
+      
+      if (currentUser?.user_id) {
+        query.set("user_id", currentUser.user_id);
+      }
+      return makeRequest.get(`/items?${query.toString()}`).then((res) => res.data); // หน้า market
     },
   });
 
