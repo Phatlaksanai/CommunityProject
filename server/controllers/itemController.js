@@ -3,116 +3,145 @@ const cloudinary = require("../config/cloudinary");
 const algoliaClient = require("../config/algolia");
 
 exports.getItems = async (req, res) => {
-  const { category_id, date } = req.query;
+  try {
+    const { category_id, date } = req.query;
+    
+    // รับค่า page จาก Frontend, กำหนด default เป็น 0
+    const page = parseInt(req.query.page) || 0;
+    const limit = 15; // จำนวนสินค้าที่ต้องการส่งกลับไปให้ Frontend
+    let fetchSize = 20; // ดึงมาตรวจทีละ 20 เพื่อความรวดเร็วเผื่อมีข้อมูลโดนกรองทิ้ง
+    let currentOffset = page * limit;
+    let finalItems = [];
 
-  let query = db.from("items")
-    .select(`*,
-      categories(
-        category_id,
-        type
-    )`
-    )
-    .order("item_id", { ascending: false });
-
-  // ✅ filter category
-  if (category_id) {
-    // ถ้าเลือกหลาย category → เป็น array
-    const categoryIds = Array.isArray(category_id)
-      ? category_id
-      : [category_id];
-    query = query.in("category_id", categoryIds);
-  }
-
-  // ✅ filter date
-  if (date && date !== "AllTime") {
-    const now = new Date();
-    let pastDate = new Date();
-
-    if (date === "ThisMonth") {
-      pastDate.setMonth(now.getMonth() - 1);
-    } else if (date === "ThisWeek") {
-      pastDate.setDate(now.getDate() - 7);
-    } else if (date === "ThisDay") {
-      pastDate.setDate(now.getDate() - 1);
-    }
-
-    // หา item ที่มี update ล่าสุดอยู่ในช่วงวันที่เลือก
-    const { data: updates, error: updateError } = await db
-      .from("update_models")
-      .select("item_id, created_at")
-      .gte("created_at", pastDate.toISOString());
-
-    if (updateError) {
-      return res.status(500).json(updateError);
-    }
-
-    // เก็บเฉพาะ update ล่าสุดของแต่ละ item
-    const latestUpdates = new Map();
-
-    updates.forEach((update) => {
-      if (!latestUpdates.has(update.item_id)) {
-        latestUpdates.set(update.item_id, update.created_at);
-      }
-    });
-
-    // หา item ที่ update ล่าสุดอยู่ในช่วงวันที่เลือก
-    const itemIds = [...latestUpdates.entries()]
-      .filter(([itemId, createdAt]) => {
-        return new Date(createdAt) >= pastDate;
-      })
-      .map(([itemId]) => itemId);
-
-    if (itemIds.length === 0) {
-      return res.status(200).json([]);
-    }
-
-    query = query.in("item_id", itemIds);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    return res.status(500).json(error);
-  }
-
-  // นับจำนวนการสั่งซื้อของแต่ละ item จาก order ที่ complete
-  const itemIds = data.map((item) => item.item_id);
-  let orderItems = []; // เอาข้อมูล order_items ที่เป็น completed มาใส่ตรงนี้
-
-  if (itemIds.length > 0) {
-    const { data: completedOrders, error: orderError } = await db
-      .from("order_items")
-      .select(`
-        item_id,
-        orders!inner(
-          status
+    // วนลูปดึงข้อมูลจนกว่าจะได้ครบ 15 ชิ้น หรือหมดฐานข้อมูล
+    while (finalItems.length < limit) {
+      let query = db.from("items")
+        .select(`*,
+          categories(
+            category_id,
+            type
+          )`
         )
-      `)
-      .in("item_id", itemIds)
-      .eq("orders.status", "completed");
+        .order("item_id", { ascending: false });
 
-    if (orderError) {
-      return res.status(500).json(orderError);
+      // ✅ filter category
+      if (category_id) {
+        const categoryIds = Array.isArray(category_id)
+          ? category_id
+          : [category_id];
+        query = query.in("category_id", categoryIds);
+      }
+
+      // ✅ filter date
+      let itemIdsFromDateFilter = null;
+      if (date && date !== "AllTime") {
+        const now = new Date();
+        let pastDate = new Date();
+
+        if (date === "ThisMonth") {
+          pastDate.setMonth(now.getMonth() - 1);
+        } else if (date === "ThisWeek") {
+          pastDate.setDate(now.getDate() - 7);
+        } else if (date === "ThisDay") {
+          pastDate.setDate(now.getDate() - 1);
+        }
+
+        const { data: updates, error: updateError } = await db
+          .from("update_models")
+          .select("item_id, created_at")
+          .gte("created_at", pastDate.toISOString());
+
+        if (updateError) {
+          return res.status(500).json(updateError);
+        }
+
+        const latestUpdates = new Map();
+        updates.forEach((update) => {
+          if (!latestUpdates.has(update.item_id)) {
+            latestUpdates.set(update.item_id, update.created_at);
+          }
+        });
+
+        itemIdsFromDateFilter = [...latestUpdates.entries()]
+          .filter(([itemId, createdAt]) => new Date(createdAt) >= pastDate)
+          .map(([itemId]) => itemId);
+
+        // หากมีการกรองวันที่ แต่ไม่มีข้อมูลตรงกับช่วงเวลานั้นเลย ให้หยุดแล้วส่งอาเรย์ว่าง (เฉพาะการโหลดรอบแรก)
+        if (itemIdsFromDateFilter.length === 0) {
+            return res.status(200).json([]);
+        }
+        
+        query = query.in("item_id", itemIdsFromDateFilter);
+      }
+
+      // ดึงข้อมูลเป็นชุดตาม offset
+      const { data: dbData, error } = await query.range(currentOffset, currentOffset + fetchSize - 1);
+
+      if (error) {
+        throw error;
+      }
+
+      // ถ้าดึงข้อมูลมาแล้วได้อาเรย์ว่าง แปลว่าไม่มีข้อมูลในฐานข้อมูลให้ดึงแล้ว ให้ break ออกจากลูป
+      if (!dbData || dbData.length === 0) {
+        break;
+      }
+      
+      // (ถ้ามีเงื่อนไขการกรองสถานะผู้ใช้ หรือเงื่อนไขอื่นๆ ที่ต้องเช็คทีหลัง สามารถเพิ่ม Filter ตรงนี้ได้เหมือน getPosts)
+      // ปัจจุบันสมมติว่า dbData ที่ดึงมาผ่านเงื่อนไขหมดแล้ว
+      const approvedItems = dbData; 
+      
+      finalItems = [...finalItems, ...approvedItems];
+      currentOffset += fetchSize;
     }
 
-    orderItems = completedOrders || [];
+    // เอาเฉพาะตามจำนวน limit (15 รายการ) 
+    const resultItems = finalItems.slice(0, limit);
+
+    // หากไม่มีข้อมูล ให้ส่งกลับเป็น Array ว่าง
+    if (resultItems.length === 0) {
+        return res.status(200).json([]);
+    }
+
+    // ✅ นับจำนวนการสั่งซื้อของแต่ละ item จาก order ที่ complete
+    const finalItemIds = resultItems.map((item) => item.item_id);
+    let orderCountMap = {};
+
+    if (finalItemIds.length > 0) {
+      const { data: completedOrders, error: orderError } = await db
+        .from("order_items")
+        .select(`
+          item_id,
+          orders!inner(
+            status
+          )
+        `)
+        .in("item_id", finalItemIds)
+        .eq("orders.status", "completed");
+
+      if (orderError) {
+        throw orderError;
+      }
+
+      if (completedOrders) {
+          completedOrders.forEach((orderItem) => {
+            const itemId = orderItem.item_id;
+            orderCountMap[itemId] = (orderCountMap[itemId] || 0) + 1;
+          });
+      }
+    }
+
+    // เพิ่ม order_count เข้าไปในแต่ละ item
+    const formattedResult = resultItems.map((item) => ({
+      ...item,
+      order_count: orderCountMap[item.item_id] || 0,
+    }));
+
+    return res.status(200).json(formattedResult);
+
+  } catch (err) {
+    console.error("Error in getItems:", err);
+    return res.status(500).json({ error: err.message });
   }
-
-  // นับจำนวน order ของแต่ละ item_id
-  const orderCountMap = {};
-  orderItems.forEach((orderItem) => { // วนดู Order ทีละรายการ
-    const itemId = orderItem.item_id; // เอา item_id ออกมานับ
-
-    orderCountMap[itemId] = (orderCountMap[itemId] || 0) + 1;
-  });
-
-  // เพิ่ม order_count เข้าไปในแต่ละ item
-  const result = data.map((item) => ({
-    ...item,
-    order_count: orderCountMap[item.item_id] || 0,
-  }));
-   
-  return res.status(200).json(result);
 };
 
 exports.getItemsById = async (req, res) => {
@@ -365,7 +394,7 @@ exports.addItem = async (req, res) => {
       .select("type")
       .eq("category_id", itemData.category_id)
       .single();
-  
+
     // 3. ส่งข้อมูลเข้า Algolia
     try {
       await algoliaClient.saveObject({
@@ -434,7 +463,7 @@ exports.editItem = async (req, res) => {
     if (updateError) return res.status(500).json({ error: updateError.message });
 
     const finalCategoryId = category_id || items.category_id;
-    
+
     const { data: category } = await db
       .from("categories")
       .select("type")
@@ -842,6 +871,7 @@ exports.getItemAllVersions = async (req, res) => {
   if (error) return res.status(404).json({ error: "Item not found" });
   return res.json(data);
 };
+
 exports.getItemTimeline = async (req, res) => {
   const { itemId } = req.params;
 
@@ -864,11 +894,11 @@ exports.getItemTimeline = async (req, res) => {
 
     if (error) {
       console.error("getItemTimeline error:", error);
-      return res.status(500).json({success: false, message: error.message});
+      return res.status(500).json({ success: false, message: error.message });
     }
 
     if (!data) {
-      return res.status(404).json({success: false, message: "Item not found"});
+      return res.status(404).json({ success: false, message: "Item not found" });
     }
 
     // เรียง Version ล่าสุดก่อน
@@ -890,10 +920,10 @@ exports.getItemTimeline = async (req, res) => {
         imgs: update.imgs || [], // ส่งรูปทั้งหมด
       })),
     };
-    
+
     return res.status(200).json(formatted);
   } catch (err) {
     console.error("getItemTimeline error:", err);
-    return res.status(500).json({success: false, message: "Server error"});
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };

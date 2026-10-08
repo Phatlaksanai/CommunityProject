@@ -41,6 +41,7 @@ const RightDI = ({ item }) => {
 
       if (data.success) {
         setSuccess("Add to download success");
+        setIsLoadingSpinner(false);
       } else {
         setError(data.error || "Failed to add item to download");
         setIsLoadingSpinner(false);
