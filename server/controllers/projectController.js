@@ -1,4 +1,4 @@
-const db = require("../config/db")
+const db = require("../config/db");
 const cloudinary = require("../config/cloudinary");
 
 exports.getProjectsAddByPostUser = async (req, res) => {
@@ -32,57 +32,98 @@ exports.getProjectById = async (req, res) => {
 exports.getProjectsByUserId = async (req, res) => {
   const { id } = req.params;
 
-  // ดึง project_id จาก posts
-  const { data: postProjects, error: postError } = await db
-    .from("posts")
-    .select("project_id")
-    .eq("user_id", id)
-    .not("project_id", "is", null);
+  try {
+    const page = parseInt(req.query.page) || 0;
+    const limit = 15; // จำนวนสินค้าที่ต้องการส่งกลับไปให้ Frontend
+    let fetchSize = 20; // ดึงมาตรวจทีละ 20 เพื่อความรวดเร็วเผื่อมีข้อมูลโดนกรองทิ้ง
+    let currentOffset = page * limit;
+    let finalProjects = [];
 
-  if (postError) return res.status(500).json(postError);
+    // ดึง project_id จาก posts
+    const { data: postProjects, error: postError } = await db
+      .from("posts")
+      .select("project_id")
+      .eq("user_id", id)
+      .not("project_id", "is", null);
 
-  // ดึง project_id จาก items
-  const { data: itemProjects, error: itemError } = await db
-    .from("items")
-    .select("project_id")
-    .eq("user_id", id)
-    .not("project_id", "is", null);
+    if (postError) return res.status(500).json(postError);
 
-  if (itemError) return res.status(500).json(itemError);
+    // ดึง project_id จาก items
+    const { data: itemProjects, error: itemError } = await db
+      .from("items")
+      .select("project_id")
+      .eq("user_id", id)
+      .not("project_id", "is", null);
 
-  // รวม id ทั้งหมด
-  const projectIds = [
-    ...new Set([
-      ...postProjects.map(p => p.project_id),
-      ...itemProjects.map(i => i.project_id),
-    ]),
-  ];
+    if (itemError) return res.status(500).json(itemError);
 
-  if (projectIds.length === 0) {
-    return res.json([]);
+    // รวม id ทั้งหมด
+    const projectIds = [
+      ...new Set([
+        ...postProjects.map((p) => p.project_id),
+        ...itemProjects.map((i) => i.project_id),
+      ]),
+    ];
+
+    if (projectIds.length === 0) {
+      return res.json([]);
+    }
+
+    // ดึง project จริง
+    while (finalProjects.length < limit) {
+      const { data: projects, error: projectError } = await db
+        .from("projects")
+        .select("*")
+        .in("project_id", projectIds)
+        .order("created_at", { ascending: false })
+        .range(currentOffset, currentOffset + fetchSize - 1);
+
+      if (projectError) return res.status(500).json(projectError);
+
+      if (!projects || projects.length === 0) {
+        break;
+      }
+
+      // ตอนนี้ projects ผ่านเงื่อนไขทั้งหมดแล้ว
+      const approvedProjects = projects;
+
+      finalProjects = [...finalProjects, ...approvedProjects];
+
+      // ขยับ offset ไปชุดถัดไป
+      currentOffset += fetchSize;
+    }
+    // เอาเฉพาะ 15 Project
+    const resultProjects = finalProjects.slice(0, limit);
+
+    // ถ้าไม่มีข้อมูล
+    if (resultProjects.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    return res.status(200).json(resultProjects);
+  } catch (err) {
+    console.error("Error in getProjectsByUserId:", err);
+    return res.status(500).json({ error: err.message });
   }
-
-  // ดึง project จริง
-  const { data: projects, error: projectError } = await db
-    .from("projects")
-    .select("*")
-    .in("project_id", projectIds)
-    .order("created_at", { ascending: false });
-
-  if (projectError) return res.status(500).json(projectError);
-  
-  return res.json(projects);
 };
 
 exports.addProject = async (req, res) => {
-  const { projectName, description, imgUrl, imgPublicId, relatedPosts, relatedItem, userId } = req.body;
+  const {
+    projectName,
+    description,
+    imgUrl,
+    imgPublicId,
+    relatedPosts,
+    relatedItem,
+    userId,
+  } = req.body;
 
   if (!projectName) {
     return res.status(400).json({ error: "Project name required" });
   }
-  
+
   // สร้าง project
-  const { data: project, error: projectError } = await db 
+  const { data: project, error: projectError } = await db
     .from("projects")
     .insert([
       {
@@ -104,14 +145,12 @@ exports.addProject = async (req, res) => {
   const projectId = project.project_id;
 
   // update posts
-  if (relatedPosts && relatedPosts.length > 0) { 
+  if (relatedPosts && relatedPosts.length > 0) {
     const { error: postError } = await db
       .from("posts")
       .update({ project_id: projectId })
       .in("post_id", relatedPosts)
-      .is("project_id", null)
-      
-      
+      .is("project_id", null);
 
     if (postError) {
       console.log("POST UPDATE ERROR:", postError);
@@ -120,7 +159,7 @@ exports.addProject = async (req, res) => {
   }
 
   // update item
-  if (relatedItem) { 
+  if (relatedItem) {
     const { error: itemError } = await db
       .from("items")
       .update({ project_id: projectId })
@@ -140,7 +179,15 @@ exports.addProject = async (req, res) => {
 };
 
 exports.updateProject = async (req, res) => {
-  const { projectId, projectName, description, img, relatedPosts, relatedItem, imgPublicId } = req.body;
+  const {
+    projectId,
+    projectName,
+    description,
+    img,
+    relatedPosts,
+    relatedItem,
+    imgPublicId,
+  } = req.body;
 
   try {
     // 0. ดึง public_id เดิมก่อน
@@ -149,36 +196,60 @@ exports.updateProject = async (req, res) => {
       .select("img_public_id")
       .eq("project_id", projectId)
       .maybeSingle();
-      if (error) {
-        return res.status(500).json(error);
-      }
+    if (error) {
+      return res.status(500).json(error);
+    }
 
-      // ถ้ามีการอัปโหลดรูปใหม่ และ public_id เปลี่ยน
-    if (imgPublicId && oldProject?.img_public_id && oldProject.img_public_id !== imgPublicId) {
-  try {
-    await cloudinary.uploader.destroy(oldProject.img_public_id);
-  } catch (cloudErr) {
-    console.log("CLOUD DELETE ERROR:", cloudErr);
-  }
-}
-    
+    // ถ้ามีการอัปโหลดรูปใหม่ และ public_id เปลี่ยน
+    if (
+      imgPublicId &&
+      oldProject?.img_public_id &&
+      oldProject.img_public_id !== imgPublicId
+    ) {
+      try {
+        await cloudinary.uploader.destroy(oldProject.img_public_id);
+      } catch (cloudErr) {
+        console.log("CLOUD DELETE ERROR:", cloudErr);
+      }
+    }
+
     // 1. อัปเดตข้อมูล Project หลัก
-    await db.from("projects").update({ project_name: projectName, description, img, img_public_id: imgPublicId }).eq("project_id", projectId);
+    await db
+      .from("projects")
+      .update({
+        project_name: projectName,
+        description,
+        img,
+        img_public_id: imgPublicId,
+      })
+      .eq("project_id", projectId);
 
     // 2. จัดการ Posts: ล้างค่า FK เดิมที่เป็นของโปรเจกต์นี้ให้เป็น null ทั้งหมดก่อน
-    await db.from("posts").update({ project_id: null }).eq("project_id", projectId);
+    await db
+      .from("posts")
+      .update({ project_id: null })
+      .eq("project_id", projectId);
 
     // แล้วค่อยเอาลิสต์ใหม่ที่ติ๊กเลือก มาใส่ projectId
     if (relatedPosts && relatedPosts.length > 0) {
-      await db.from("posts").update({ project_id: projectId }).in("post_id", relatedPosts);
+      await db
+        .from("posts")
+        .update({ project_id: projectId })
+        .in("post_id", relatedPosts);
     }
 
     // 3. จัดการ Items: ล้างค่า FK เดิม
-    await db.from("items").update({ project_id: null }).eq("project_id", projectId);
+    await db
+      .from("items")
+      .update({ project_id: null })
+      .eq("project_id", projectId);
 
     // ใส่ค่าใหม่ (ถ้ามีเลือก)
     if (relatedItem) {
-      await db.from("items").update({ project_id: projectId }).eq("item_id", relatedItem);
+      await db
+        .from("items")
+        .update({ project_id: projectId })
+        .eq("item_id", relatedItem);
     }
 
     return res.status(200).json({ success: true });
