@@ -10,11 +10,13 @@ import { makeRequest } from "../../api/axios";
 import { useQuery } from "@tanstack/react-query"; // เพิ่ม useQuery
 import { backdropClasses } from "@mui/material/Backdrop";
 import { ClipLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
 
 const Share = ({ isDescCommu, commuId }) => {
   const [desc, setDesc] = useState("");
   const [files, setFiles] = useState([]);
   const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const defaultPic =
     "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
@@ -220,7 +222,14 @@ const Share = ({ isDescCommu, commuId }) => {
               accept=".jpg,.png,.jpeg,.gif,.glb,.gltf"
               onChange={handleFileChange}
             />
-            <label htmlFor="file">
+            <label htmlFor="file"
+              onClick={(e) => {
+                if (!currentUser?.user_id) {
+                  e.preventDefault();
+                  navigate("/login");
+                }
+              }}
+            >
               <div className="item">
                 <AttachmentIcon />
                 <span>Image/Model</span>
@@ -228,7 +237,13 @@ const Share = ({ isDescCommu, commuId }) => {
             </label>
             {/* เพิ่ม onClick เพื่อเปิด Modal */}
             {!isDescCommu && (
-              <div className="item" onClick={() => setOpenProjectModal(true)}>
+              <div className="item" onClick={() => {
+                if (!currentUser?.user_id) {
+                  navigate("/login");
+                  return;
+                }
+                setOpenProjectModal(true)
+              }}>
                 <CreateNewFolderIcon />
                 <span>Project</span>
               </div>
@@ -236,7 +251,14 @@ const Share = ({ isDescCommu, commuId }) => {
           </div>
           {error && <p style={{ color: "red", fontSize: "14px" }}>{error}</p>}
           <div className="right">
-            <button onClick={handleClick} disabled={isLoadingSpinner}
+            <button onClick={() => {
+              if (!currentUser?.user_id) {
+                navigate("/login");
+                return;
+              }
+              handleClick();
+            }}
+              disabled={isLoadingSpinner}
             >
               {isLoadingSpinner ? (
                 <ClipLoader size={16} color="#ffffff" />

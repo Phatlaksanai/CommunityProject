@@ -98,7 +98,15 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
         <span className="custom-tooltip" data-tip={displayName}>
           {truncatedName}
         </span>
-        <button onClick={handleAddItemClick} disabled={isLoadingSpinner} style={{ cursor: "pointer" }}
+        <button onClick={() => {
+          if (!currentUser?.user_id) {
+            navigate("/login");
+            return;
+          }
+          handleAddItemClick();
+        }}
+          disabled={isLoadingSpinner}
+          style={{ cursor: "pointer" }}
         >
           {isLoadingSpinner ? (
             <ClipLoader size={16} color="#ffffff" />

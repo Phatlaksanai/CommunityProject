@@ -169,7 +169,15 @@ const RightDI = ({ item }) => {
         <div className="menu">
           <div className="buttons">
             {item.price === 0 ? (
-              <button onClick={handleAddToDownload} style={{ cursor: "pointer" }} disabled={isLoadingSpinner}
+              <button onClick={() => {
+                if (!currentUser?.user_id) {
+                  navigate("/login");
+                  return;
+                }
+                handleAddToDownload();
+              }}
+                style={{ cursor: "pointer" }}
+                disabled={isLoadingSpinner}
               >
                 {isLoadingSpinner ? (
                   <ClipLoader size={16} color="#ffffff" />
@@ -178,7 +186,15 @@ const RightDI = ({ item }) => {
                 )}
               </button>
             ) : (
-              <button onClick={handleAddToCart} style={{ cursor: "pointer" }} disabled={isLoadingSpinner}
+              <button onClick={() => {
+                if (!currentUser?.user_id) {
+                  navigate("/login");
+                  return;
+                }
+                handleAddToCart();
+              }}
+                style={{ cursor: "pointer" }}
+                disabled={isLoadingSpinner}
               >
                 {isLoadingSpinner ? (
                   <ClipLoader size={16} color="#ffffff" />

@@ -78,7 +78,13 @@ const ProfileDetail = () => {
         <div className="actions">
           <button
             className="followBtn"
-            onClick={() => addMutation.mutate()}
+            onClick={() => {
+              if (!currentUser?.user_id) {
+                navigate("/login");
+                return;
+              }
+              addMutation.mutate()
+            }}
             disabled={addMutation.isLoading}
             style={{ backgroundColor: "#A0C46E", cursor: addMutation.isLoading ? "not-allowed" : "pointer", color: "white" }}
           >
@@ -241,7 +247,15 @@ const ProfileDetail = () => {
               ) : (
                 <>
                   {renderFriendButton()}
-                  <ReportProblemIcon style={{ cursor: "pointer", color: "red" }} onClick={() => setOpenReport(true)} />
+                  <ReportProblemIcon style={{ cursor: "pointer", color: "red" }}
+                    onClick={() => {
+                      if (!currentUser?.user_id) {
+                        navigate("/login");
+                        return;
+                      }
+                      setOpenReport(true)
+                    }}
+                  />
                 </>
               )}
 
@@ -251,7 +265,7 @@ const ProfileDetail = () => {
             <span className="handle">
               {shortDesc}
               <span
-                style={{ cursor: "pointer", marginLeft: "5px" , fontWeight: "bold", color: "#6A9043"}}
+                style={{ cursor: "pointer", marginLeft: "5px", fontWeight: "bold", color: "#6A9043" }}
                 onClick={() => setOpenModal(true)}
               >
                 ...more

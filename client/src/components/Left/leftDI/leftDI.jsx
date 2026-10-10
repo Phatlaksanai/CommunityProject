@@ -94,7 +94,15 @@ const LeftDI = ({ item }) => {
           <div className="user">
             <h2>Description</h2>
             {item.user_id !== currentUser?.user_id && (
-              <ReportProblemIcon style={{ cursor: "pointer" }} onClick={() => setOpenReport(true)} />
+              <ReportProblemIcon style={{ cursor: "pointer" }}
+                onClick={() => {
+                  if (!currentUser?.user_id) {
+                    navigate("/login");
+                    return;
+                  }
+                  setOpenReport(true)
+                }}
+              />
             )}
           </div>
           <span>{item.description}</span>
@@ -123,7 +131,7 @@ const LeftDI = ({ item }) => {
                   <img
                     src={review.users.profilePic}
                     onClick={() => navigate(`/profile/${review?.user_id}`)}
-                    style={{cursor: "pointer"}}
+                    style={{ cursor: "pointer" }}
                     alt=""
                   />
                   <div className="review-info" >
@@ -131,7 +139,7 @@ const LeftDI = ({ item }) => {
                       {(() => {
                         const displayName = review.users.name || review.users.username;
                         return (
-                          <span onClick={() => navigate(`/profile/${review?.user_id}`)} style={{cursor: "pointer"}}>
+                          <span onClick={() => navigate(`/profile/${review?.user_id}`)} style={{ cursor: "pointer" }}>
                             {displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName}
                           </span>
                         );

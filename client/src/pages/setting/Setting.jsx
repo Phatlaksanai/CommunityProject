@@ -1,6 +1,7 @@
 import "./setting.scss";
 import { useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { AuthContext } from "../../context/authContext";
 import { DarkModeContext } from "../../context/darkModeContext";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
@@ -11,6 +12,7 @@ const Setting = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const { toggle, darkMode } = useContext(DarkModeContext);
+    const { currentUser } = useContext(AuthContext);
 
     return (
         <div className="setting">
@@ -25,9 +27,15 @@ const Setting = () => {
 
                 <div className="btn-group">
                     <button type="button" className="Changepassword"
-                        onClick={() => navigate(`/setting/${id}/changepassword`)}
-                        style={{ cursor: "pointer" }}>
-                        Change Password
+                        onClick={() => {
+                            if (!currentUser?.user_id) {
+                                navigate("/login");
+                                return;
+                            }
+                            navigate(`/setting/${id}/changepassword`);
+                        }}
+                        style={{ cursor: "pointer" }}
+                    >Change Password
                     </button>
 
                     {darkMode ? (
@@ -37,8 +45,14 @@ const Setting = () => {
                     )}
 
                     <button type="button" className="Deleteaccount"
-                        onClick={() => navigate(`/setting/${id}/deleteaccount`)}>
-                        Delete Account
+                        onClick={() => {
+                            if (!currentUser?.user_id) {
+                                navigate("/login");
+                                return;
+                            }
+                            navigate(`/setting/${id}/deleteaccount`);
+                        }}
+                    >Delete Account
                     </button>
 
                 </div>

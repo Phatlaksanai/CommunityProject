@@ -68,7 +68,7 @@ const CommuDetail = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["communities"]);
       // ย้าย navigate มาไว้ตรงนี้ เพื่อให้แน่ใจว่าลบสำเร็จก่อนค่อยเปลี่ยนหน้า
-      navigate("/"); 
+      navigate("/");
     },
   });
 
@@ -76,14 +76,14 @@ const CommuDetail = () => {
     deleteMutation.mutate(id);
   };
 
-useEffect(() => {
-  if (deleteOpen || openReport) {
-    document.body.style.overflow = "hidden";
-  } 
-  return () => {
-    document.body.style.overflow = "auto";
-  };
-}, [deleteOpen || openReport]);
+  useEffect(() => {
+    if (deleteOpen || openReport) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [deleteOpen || openReport]);
 
   return (
     <div className="commudetail">
@@ -119,7 +119,7 @@ useEffect(() => {
                     <SettingsIcon style={{ width: "15px", height: "15px" }} />
                     Edit Community
                   </button>
-                  <button onClick={() => navigate(`/manage/${community?.communities_id}`)} style={{  backgroundColor: "#C0903B", cursor: "pointer" }}>
+                  <button onClick={() => navigate(`/manage/${community?.communities_id}`)} style={{ backgroundColor: "#C0903B", cursor: "pointer" }}>
                     <BlockIcon style={{ width: "15px", height: "15px" }} />
                     Manage Users & Posts
                   </button>
@@ -134,7 +134,13 @@ useEffect(() => {
                 <div className="moreMenu">
                   <button
                     className="followBtn"
-                    onClick={handleFollow}
+                    onClick={() => {
+                      if (!currentUser?.user_id) {
+                        navigate("/login");
+                        return;
+                      }
+                      handleFollow();
+                    }}
                     style={{ backgroundColor: isFollowing ? "#C0903B" : "#A0C46E", cursor: "pointer" }}
                   >
 
@@ -142,7 +148,15 @@ useEffect(() => {
                     {isFollowing ? "Unfollow" : "Follow"}
                   </button>
 
-                  <button onClick={() => setOpenReport(true)} style={{ backgroundColor: "#C0903B", cursor: "pointer" }}>
+                  <button onClick={() => {
+                    if (!currentUser?.user_id) {
+                      navigate("/login");
+                      return;
+                    }
+                    setOpenReport(true);
+                  }}
+                    style={{ backgroundColor: "#C0903B", cursor: "pointer" }}
+                  >
                     <ReportProblemIcon style={{ width: "15px", height: "15px" }} />
                     Report
                   </button>

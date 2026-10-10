@@ -133,7 +133,13 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
             </button>
           )}
           {menuOpen && post.user_id !== currentUser?.user_id && (
-            <button onClick={() => setOpenReport(true)}>
+            <button onClick={() => {
+              if (!currentUser?.user_id) {
+                navigate("/login");
+                return;
+              }
+              setOpenReport(true);
+            }}>
               <ReportProblemIcon style={{ width: "15px", height: "15px" }} />
               Report
             </button>
