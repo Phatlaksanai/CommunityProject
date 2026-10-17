@@ -5,6 +5,8 @@ import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import { ClipLoader } from "react-spinners";
+import NotFound from "../../components/NotFound/notFound";
+import Loading from "../../components/NotFound/loading";
 
 const EditCommu = () => {
     //---------------------------------------------------------- 
@@ -25,10 +27,11 @@ const EditCommu = () => {
 
     const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
-    const { data: commu } = useQuery({
+    const { data: commu , isLoading, error: commuError} = useQuery({
         queryKey: ["community", community_id],
         queryFn: () =>
-            makeRequest.get(`/communities/${community_id}`).then(res => res.data),
+            makeRequest.get(`/communities/edit/${community_id}`).then(res => res.data),
+        retry: false,
     });
 
     useEffect(() => {
@@ -102,6 +105,19 @@ const EditCommu = () => {
         }
     };
 
+    if (isLoading) {
+        return (
+            <div className="loading-container" style={{ minHeight: "100vh" }}>
+                <Loading />
+            </div>
+        );
+    }
+
+     if (commuError || !commu) {
+        return (
+            <NotFound />
+        );
+    }
 
     return (
         <div className="edit-commu">

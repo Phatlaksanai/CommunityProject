@@ -5,6 +5,8 @@ import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import { ClipLoader } from "react-spinners";
+import NotFound from "../../components/NotFound/notFound";
+import Loading from "../../components/NotFound/loading";
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -25,6 +27,9 @@ const EditProfile = () => {
 
   const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
+  // สร้าง State สำหรับเช็คการโหลดข้อมูลจาก Context
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
   // const { data: user } = useQuery({
   //   queryKey: ["user", id],
   //   queryFn: () => makeRequest.get(`/${currentUser}`).then(res => res.data),
@@ -40,7 +45,21 @@ const EditProfile = () => {
       setCoverImg(currentUser.coverPic || null);
       setCoverPublicId(currentUser.cover_public_id || null);
     }
+    setIsPageLoading(false); // เมื่อเช็ค currentUser เสร็จแล้วให้ปิด Loading
   }, [currentUser]);
+
+  if (isPageLoading) {
+    return (
+      <div className="loading-container" style={{ minHeight: "100vh" }}>
+        <Loading />
+      </div>
+    );
+  }
+
+  if (!currentUser || String(currentUser.user_id) !== String(id)) {
+    return <NotFound />;
+  }
+  
   // ================= UPLOAD FILES TO CLOUDINARY =================
   const handleImageChange = (e, type) => {
     const file = e.target.files[0];

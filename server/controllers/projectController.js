@@ -28,6 +28,23 @@ exports.getProjectById = async (req, res) => {
 
   return res.json(data);
 };
+exports.getProjectForEdit = async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await db
+    .from("projects")
+    .select("*")
+    .eq("project_id", id)
+    .eq("user_id", req.user.user_id)
+    .single();
+
+  if (error) {
+    return res.status(404).json({ error: "Project not found" });
+  }
+
+  return res.json(data);
+};
+
 
 exports.getProjectsByUserId = async (req, res) => {
   const { id } = req.params;

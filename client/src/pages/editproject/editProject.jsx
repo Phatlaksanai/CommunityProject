@@ -5,6 +5,8 @@ import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import { ClipLoader } from "react-spinners";
+import NotFound from "../../components/NotFound/notFound";
+import Loading from "../../components/NotFound/loading";
 
 const EditProject = () => {
   const navigate = useNavigate();
@@ -23,21 +25,22 @@ const EditProject = () => {
   const [imgPublicId, setImgPublicId] = useState(null);
 
   // ดึงข้อมูล Posts
-  const { data: posts = [], isLoading: isPostsLoading } = useQuery({
+  const { data: posts = [] } = useQuery({
     queryKey: ["editProjectPosts", project_id],
     queryFn: () => makeRequest.get(`/posts/project-edit/${project_id}`).then(res => res.data),
   });
 
   // ดึงข้อมูล Items
-  const { data: items = [], isLoading: isItemsLoading } = useQuery({
+  const { data: items = [] } = useQuery({
     queryKey: ["editProjectItems", project_id],
     queryFn: () => makeRequest.get(`/items/project-edit/${project_id}`).then(res => res.data),
   });
 
-  const { data: projects } = useQuery({
+  const { data: projects, isLoading: isProjectsLoading, error: projectsError } = useQuery({
     queryKey: ["project", project_id],
     queryFn: () =>
-      makeRequest.get(`/projects/${project_id}`).then(res => res.data),
+      makeRequest.get(`/projects/edit/${project_id}`).then(res => res.data),
+    retry: false,
   });
 
   // ✅ 1. ย้าย useEffect มาไว้ข้างนอก (Top Level)
@@ -138,8 +141,18 @@ const EditProject = () => {
     }
   };
 
-  if (isPostsLoading || isItemsLoading) {
-    return <div className="loading">Loading...</div>;
+  if (isProjectsLoading) {
+    return (
+      <div className="loading-container" style={{ minHeight: "100vh" }}>
+        <Loading />
+      </div>
+    );
+  }
+
+  if (projectsError || !projects) {
+    return (
+      <NotFound />
+    );
   }
 
   return (

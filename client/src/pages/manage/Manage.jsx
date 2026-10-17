@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import { ClipLoader } from "react-spinners";
+import NotFound from "../../components/NotFound/notFound";
+import Loading from "../../components/NotFound/loading";
 
 const Manage = () => {
   const navigate = useNavigate();
@@ -27,14 +29,16 @@ const Manage = () => {
   const [isLoadingSpinPost, setIsLoadingSpinPost] = useState(false);
 
   // ดึงข้อมูลสมาชิก
-  const { data: members = [], isLoading } = useQuery({
+  const { data: members = [], isLoading: loadingMembers, error: membersError } = useQuery({
     queryKey: ["communityMembers", community_id],
     queryFn: () => makeRequest.get(`/communities/members/${community_id}`).then(res => res.data),
+    retry: false,
   });
 
-  const { data: posts = [], isLoading: loadingPosts } = useQuery({
+  const { data: posts = [], isLoading: loadingPosts, error: postsError } = useQuery({
     queryKey: ["communityPosts", community_id],
     queryFn: () => makeRequest.get(`/posts/manage/community/${community_id}`).then(res => res.data),
+    retry: false,
   });
 
   useEffect(() => {
@@ -140,8 +144,18 @@ const Manage = () => {
     deletePostMutation.mutate(selectedPosts);
   };
 
-  if (isLoading || loadingPosts) {
-    return <div className="loading">Loading...</div>;
+  if (loadingMembers || loadingPosts) {
+    return (
+      <div className="loading-container" style={{ minHeight: "100vh" }}>
+        <Loading />
+      </div>
+    );
+  }
+
+  if (membersError || postsError || !members || !posts) {
+    return (
+      <NotFound />
+    );
   }
 
   return (
