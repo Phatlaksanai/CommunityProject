@@ -79,20 +79,32 @@ exports.addCommunity = async (req, res) => {
 exports.getCommunityById = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user?.user_id;
 
-    const { data, error } = await db
+    let query = db
       .from("communities")
-      .select(`*,
-        community_members!inner(user_id, status)
-        `)
+      .select(`
+        *,
+        community_members(user_id, status)
+      `)
       .eq("communities_id", id)
-      .eq("status", "show")
-      .eq("community_members.user_id", req.user.user_id)
-      .eq("community_members.status", "active")
-      .single();
+      .eq("status", "show");
+
+    // ถ้าล็อกอินอยู่ ให้กรองตาราง community_members เฉพาะของ user คนนี้
+    if (userId) {
+      query = query.eq("community_members.user_id", userId);
+    }
+
+    const { data, error } = await query.single();
 
     if (error || !data) {
       return res.status(404).json({ message: "Community not found or deleted" });
+    }
+
+    // เช็คว่าถ้ามีข้อมูลใน community_members และสถานะเป็น banned (หรือไม่ใช่ active) ให้บล็อก
+    const memberRecord = data.community_members?.[0];
+    if (memberRecord && memberRecord.status !== "active") {
+      return res.status(403).json({ message: "You are banned from this community" });
     }
 
     return res.status(200).json(data);
