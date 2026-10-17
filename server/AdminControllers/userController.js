@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
+const algoliaClient = require("../config/algolia");
 
 exports.getuserRegistrations = async (req, res) => {
   try {
@@ -130,11 +131,41 @@ exports.updateUser = async (req, res) => {
         isdelete: isdelete,
       })
       .eq("user_id", userId)
-      .select(); // ใส่ .select() ถ้าต้องการให้ Supabase รีเทิร์นข้อมูลที่อัปเดตแล้วกลับมา
+      .select() // ใส่ .select() ถ้าต้องการให้ Supabase รีเทิร์นข้อมูลที่อัปเดตแล้วกลับมา
+      .single();
 
     if (error) {
       return res.status(400).json({ error: error.message });
     }
+
+    if (isdelete === "deleted") {
+      try {
+        await algoliaClient.deleteObject({
+          indexName: "WebCommunity_Search", // ชื่อคลังที่คุณตั้งไว้บนเว็บ Algolia
+          objectID: `user_${userId}`, // ID อ้างอิงเดียวกับตอนที่คุณใช้เซฟข้อมูลขึ้นไป
+        });
+      } catch (algoliaErr) {
+        // แยก try/catch ไว้ป้องกันกรณีที่ผู้ใช้คนนี้ยังไม่เคยถูกบันทึกในคลัง Algolia
+        console.error("Algolia Delete Warning:", algoliaErr);
+      }
+    } else {
+      try {
+        await algoliaClient.saveObject({
+          indexName: "WebCommunity_Search",
+          body: {
+            objectID: `user_${userId}`,
+            title: name || username,
+            img: data.profilePic ,
+            description: description || "",
+            type: "user",
+            targetId: userId,
+          },
+        });
+      } catch (algoliaErr) {
+        console.error("Algolia Update Warning:", algoliaErr);
+      }
+    }
+
     return res.status(200).json({ message: "User updated successfully", data });
   } catch (err) {
     console.error("Update User Error:", err);

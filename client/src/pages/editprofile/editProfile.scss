@@ -63,37 +63,43 @@
       font-size: 14px;
       cursor: pointer;
 
+      display: block;
+      /* บังคับให้ขนาดเท่ากับ container */
+      overflow-wrap: break-word;
+      /* ตัดคำที่ยาวเกินไปขึ้นบรรทัดใหม่ */
+      word-break: break-all;
+
       &:hover {
         border-color: themed("button");
       }
     }
 
 
-.category {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+    .category {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
 
-  &__title {
-    font-size: 14px;
-    font-weight: 600;
-  }
+      &__title {
+        font-size: 14px;
+        font-weight: 600;
+      }
 
-  &__select {
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid themed("border");
-    background-color: themed("bg");
-    color: themed("textColor");
-    font-size: 14px;
-    cursor: pointer;
+      &__select {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid themed("border");
+        background-color: themed("bg");
+        color: themed("textColor");
+        font-size: 14px;
+        cursor: pointer;
 
-    &:focus {
-      outline: none;
-      border-color: themed("button");
+        &:focus {
+          outline: none;
+          border-color: themed("button");
+        }
+      }
     }
-  }
-}
 
     &__submit {
       margin-top: 15px;

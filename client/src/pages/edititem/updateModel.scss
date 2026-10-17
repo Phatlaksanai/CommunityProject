@@ -15,11 +15,11 @@
       flex-direction: column;
       gap: 10px;
 
-      .version{
+      .version {
         display: flex;
         flex-direction: row;
         height: auto;
-        
+
         padding: 15px;
         border-radius: 8px;
         cursor: pointer;
@@ -96,6 +96,12 @@
         color: themed("textColor");
         font-size: 14px;
         cursor: pointer;
+
+        display: block;
+        /* บังคับให้ขนาดเท่ากับ container */
+        overflow-wrap: break-word;
+        /* ตัดคำที่ยาวเกินไปขึ้นบรรทัดใหม่ */
+        word-break: break-all;
 
         &:hover {
           border-color: themed("button");

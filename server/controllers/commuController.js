@@ -487,5 +487,15 @@ exports.deleteCommunity = async (req, res) => {
 
   if (postsError) return res.status(500).json(postsError);
 
+  try {
+      await algoliaClient.deleteObject({
+        indexName: 'WebCommunity_Search',
+        objectID: `commu_${id}`,
+      });
+    } catch (algoliaErr) {
+      // ดักจับ error แยกส่วน เผื่อกรณีคีย์มีปัญหา ระบบลงทะเบียนหลักในฐานข้อมูลจะได้ไม่ล่มตามครับ
+      console.error("Algolia Delete Warning:", algoliaErr);
+    }
+
   return res.status(200).json("Community has been deleted.");
 };

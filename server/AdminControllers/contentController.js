@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const algoliaClient = require("../config/algolia");
 
 // ฟังก์ชันกลางสำหรับคำนวณ
 const formatDonutYearlyStats = async (rpcName) => {
@@ -329,7 +330,7 @@ exports.getItemsTable = async (req, res) => {
         created_at: latestUpdate?.created_at || null,
         username: item.users?.username || null,
         profilePic: item.users?.profilePic || null,
-      };  
+      };
     });
 
     formatted.sort( // .sort() ที่ formatted เรียง Item ทั้งหมด ตาม update ล่าสุด
@@ -338,7 +339,7 @@ exports.getItemsTable = async (req, res) => {
     );
 
     return res.json(formatted);
-    
+
   } catch (error) {
     console.error("Error fetching items:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -383,11 +384,42 @@ exports.updateCommunity = async (req, res) => {
         cover_img: cover_img,
       })
       .eq("communities_id", communityId)
-      .select();
+      .select()
+      .single();
 
     if (error) {
       return res.status(400).json({ error: error.message });
     }
+
+    if (status === "hide") {
+      try {
+        await algoliaClient.deleteObject({
+          indexName: "WebCommunity_Search", // ชื่อคลังที่คุณตั้งไว้บนเว็บ Algolia
+          objectID: `commu_${communityId}`, // ID อ้างอิงเดียวกับตอนที่คุณใช้เซฟข้อมูลขึ้นไป
+        });
+      } catch (algoliaErr) {
+        // แยก try/catch ไว้ป้องกันกรณีที่ผู้ใช้คนนี้ยังไม่เคยถูกบันทึกในคลัง Algolia
+        console.error("Algolia Delete Warning:", algoliaErr);
+      }
+    } else {
+      try {
+        await algoliaClient.saveObject({
+          indexName: 'WebCommunity_Search', // ชื่อดัชนีตรงกลางของคุณ
+          body: {
+            objectID: `commu_${communityId}`, // ใช้รูปแบบ commu_รหัส เพื่อแยกหมวดหมู่
+            title: data.name,
+            description: description,
+            img: cover_img, // แมป URL รูปภาพเข้าช่อง img (ถ้ามี)
+            type: 'community',
+            targetId: data.communities_id
+          }
+        });
+      } catch (algoliaErr) {
+        // ดักจับ error แยกส่วน เผื่อกรณีคีย์มีปัญหา ระบบลงทะเบียนหลักในฐานข้อมูลจะได้ไม่ล่มตามครับ
+        console.error("Algolia Insert Warning:", algoliaErr);
+      }
+    }
+
     return res
       .status(200)
       .json({ message: "Community updated successfully", data });
@@ -425,12 +457,43 @@ exports.updateItem = async (req, res) => {
         price: price,
         status: status,
         img: img,
-        category_id: finalCategoryId 
+        category_id: finalCategoryId
       })
       .eq("item_id", itemId)
       .select();
 
     if (error) return res.status(400).json({ error: error.message });
+
+    if (status === "hide") {
+      try {
+        await algoliaClient.deleteObject({
+          indexName: 'WebCommunity_Search',
+          objectID: `item_${itemId}`,
+        });
+      } catch (algoliaErr) {
+        // ดักจับ error แยกส่วน เผื่อกรณีคีย์มีปัญหา ระบบลงทะเบียนหลักในฐานข้อมูลจะได้ไม่ล่มตามครับ
+        console.error("Algolia Delete Warning:", algoliaErr);
+      }
+    } else {
+      // 2. ถ้าไม่ได้ซ่อน (โชว์ปกติ) ให้อัปเดตข้อมูลใหม่ลง Algolia ด้วย
+      try {
+        await algoliaClient.saveObject({
+          indexName: 'WebCommunity_Search',
+          body: {
+            objectID: `item_${itemId}`,
+            title: modelName, // อัปเดตชื่อใหม่
+            description: description, // อัปเดตรายละเอียดใหม่
+            img: img, // รูปใหม่ (ถ้ามี)
+            price: price,
+            type: 'item',
+            targetId: itemId
+          }
+        });
+      } catch (algoliaErr) {
+        console.error("Algolia Update Warning:", algoliaErr);
+      }
+    }
+
     return res.status(200).json({ message: "Item updated", data });
   } catch (err) {
     console.error("Update Item Error:", err);
@@ -441,8 +504,8 @@ exports.updateItem = async (req, res) => {
 exports.getCategories = async (req, res) => { // เพิ่มฟังก์ชันดึง Category ทั้งหมดไปแสดงที่ Dropdown หน้าบ้าน
   try {
     const { data, error } = await db
-    .from("categories")
-    .select("*");
+      .from("categories")
+      .select("*");
 
     if (error) throw error;
     return res.status(200).json(data);
