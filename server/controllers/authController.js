@@ -609,10 +609,11 @@ exports.getUserById = async (req, res) => {
       .from("users")
       .select("user_id, username, name, profilePic, balance")
       .eq("user_id", userId)
+      .eq("isdelete", "active")
       .single(); // ใช้ .single() เพื่อให้ได้ object เดียวแทนที่จะเป็น array
 
     if (error || !user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found or deleted" });
     }
 
     return res.status(200).json(user);

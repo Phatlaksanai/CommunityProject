@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+// import { Routes, Route } from "react-router-dom";
+
+import { useQuery } from "@tanstack/react-query";
+import { makeRequest } from "./api/axios";
+import NotFound from "./components/NotFound/notFound";
+import Loading from "./components/NotFound/loading";
+
 // import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from "./pages/home/Home1";
 import Login from './pages/login/Login1'
@@ -31,7 +37,7 @@ import Setting from "./pages/setting/Setting";
 import ChangePassword from "./pages/changepassword/ChangePassword";
 import DeleteAccount from "./pages/deleteaccount/DeleteAccount";
 import Chat from "./pages/chat/chat";
-import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet, Navigate, useParams } from "react-router-dom";
 // import NotFound from "./404";
 
 //ระบบใหม่++++++++++++++++++++++
@@ -59,6 +65,35 @@ function App() {
   const currentUser = true; // สถานะผู้ใช้ false วาปหน้าไม่ได้ true วาปหน้าได้
 
   const ProfileUser = () => {
+    const { id } = useParams();
+
+    // ✅ ดึงข้อมูลผู้ใช้เพื่อเช็คว่าบัญชียังอยู่ไหม
+    const { isLoading, error } = useQuery({
+      queryKey: ["user", id],
+      queryFn: () => makeRequest.get(`/friends/userprofile/${id}`).then((res) => res.data),
+      retry: false, // ปิด retry เพื่อให้รู้ทันทีว่าบัญชีโดนลบ
+    });
+
+    if (isLoading) {
+      return (
+        <div className={`theme-${darkMode ? "dark" : "light"}`}>
+          <Navbar />
+          <Loading />
+        </div>
+      );
+    }
+
+    // ✅ ถ้าดึงแล้วติด Error (เช่น 404 บัญชีโดนลบ) ให้แสดงหน้า NotFound คลุมทับไปเลย
+    if (error) {
+      return (
+        <div className={`theme-${darkMode ? "dark" : "light"}`}>
+          <Navbar />
+          <NotFound/>
+        </div>
+      );
+    }
+
+    // ✅ ถ้าบัญชียังปกติ ค่อยแสดง ProfileDetail และ Outlet (หน้าย่อย)
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
@@ -71,6 +106,7 @@ function App() {
       </div>
     )
   }
+
   const Layout = () => {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
@@ -328,7 +364,7 @@ function App() {
         <DescriptionCommu />
       ),
       children: [
-        { 
+        {
           index: true,
           element: <DescCommu />
         },

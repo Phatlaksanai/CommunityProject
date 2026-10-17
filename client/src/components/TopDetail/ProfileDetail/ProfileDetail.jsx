@@ -31,6 +31,7 @@ const ProfileDetail = () => {
   const { isLoading, error: userError, data: userData } = useQuery({
     queryKey: ["user", id],
     queryFn: () => makeRequest.get(`/friends/userprofile/${id}`).then((res) => res.data),
+    retry: false,
   });
 
   const { data: friendsList } = useQuery({
@@ -171,6 +172,15 @@ const ProfileDetail = () => {
       console.log(err);
     }
   };
+
+  if (isLoading) {
+    return <div style={{ minHeight: "100vh" }}></div>;
+  }
+
+  // ✅ เพิ่มบรรทัดนี้เพื่อไม่ให้มันพยายามเรนเดอร์หน้าโปรไฟล์ถ้าไม่พบ User (404)
+  if (userError || !userData) {
+    return null; // ให้ Layout ตัวนอกจัดการโชว์หน้า NotFound แทน
+  }
 
   const MAX_LENGTH = 15;
   const desc = userData?.description || "";

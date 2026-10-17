@@ -5,6 +5,8 @@ import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import { ClipLoader } from "react-spinners";
+import NotFound from "../../components/NotFound/notFound";
+import Loading from "../../components/NotFound/loading";
 
 const EditItem = () => {
     //---------------------------------------------------------- 
@@ -28,11 +30,12 @@ const EditItem = () => {
 
     const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
-    const { data: items } = useQuery({
-        queryKey: ["item", item_id],
-        queryFn: () =>
-            makeRequest.get(`/items/${item_id}`).then(res => res.data),
-    });
+    const { data: items, isLoading, error: itemsError } = useQuery({
+        queryKey: ["item", item_id, "edit"],
+        // เปลี่ยน URL จาก /items/ เป็น /items/edit/
+        queryFn: () => makeRequest.get(`/items/edit/${item_id}`).then(res => res.data),
+        retry: false,
+    });   
 
     const { data: categories } = useQuery({
         queryKey: ["categories"],
@@ -124,6 +127,20 @@ const EditItem = () => {
             setIsLoadingSpinner(false);
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="loading-container" style={{ minHeight: "100vh" }}>
+                <Loading />
+            </div>
+        );
+    }
+
+     if (itemsError || !items) {
+        return (
+            <NotFound />
+        );
+    }
 
     return (
         <div className="edit-item">

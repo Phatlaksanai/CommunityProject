@@ -29,9 +29,10 @@ const CommuDetail = () => {
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   // ดึงข้อมูล Community
-  const { data: community } = useQuery({
+  const { data: community, isLoading, error } = useQuery({
     queryKey: ["community", id],
     queryFn: () => makeRequest.get(`communities/${id}`).then((res) => res.data),
+    retry: false, // ✅ ปิด retry เพื่อให้รู้ทันทีว่ากลุ่มโดนลบ
   });
 
   // ✅ ดึงข้อมูลคนติดตาม (สมมติว่า API ตอบกลับมาเป็น Array ของ user_id คล้ายระบบ Like)
@@ -83,7 +84,10 @@ const CommuDetail = () => {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [deleteOpen || openReport]);
+  }, [deleteOpen, openReport]);
+
+  if (isLoading) return <div className="commudetail" style={{ minHeight: "200px" }}></div>;
+  if (error || !community) return null;
 
   return (
     <div className="commudetail">
