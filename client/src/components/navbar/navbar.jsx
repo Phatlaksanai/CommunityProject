@@ -14,6 +14,7 @@ import { makeRequest } from "../../api/axios";
 import ReportModal from "../report/ReportModal";
 import { useQuery, } from "@tanstack/react-query";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 // 🚀 [ปรับการ Import: เอา Hits ออก แล้วนำ useHits กับ useSearchBox มาจัดการเอง]
 import { InstantSearch, SearchBox, useSearchBox, useHits, Configure } from 'react-instantsearch';
@@ -204,7 +205,6 @@ const Navbar = () => {
           <h1 className="Logo">PM</h1>
         </Link>
         <HomeOutlinedIcon onClick={() => navigate("/")} style={{ cursor: "pointer" }} />
-
         <StorefrontIcon onClick={() => navigate("/market")} style={{ cursor: "pointer" }} />
         <DownloadIcon
           onClick={() => {
@@ -294,6 +294,13 @@ const Navbar = () => {
         }}
           style={{ cursor: "pointer" }}
         />
+
+        <SettingsIcon 
+          className="mobile-setting-icon" 
+          onClick={() => navigate(`/setting/${currentUser?.user_id}`)}
+          style={{ cursor: "pointer" }}
+        />
+
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
           <span className="custom-tooltip" data-tip={displayName}>

@@ -8,6 +8,8 @@
 
     @include mobile {
       padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     @include tablet{

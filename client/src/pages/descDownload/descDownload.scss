@@ -9,6 +9,9 @@
 
     @include mobile {
       padding: 10px;
+      width: 100%;      /* บังคับความกว้างให้พอดีจอ */
+      box-sizing: border-box;
+      overflow-x: hidden;
     }
 
     @include tablet {
@@ -19,14 +22,37 @@
       width: 100%;
       display: flex;
       flex-direction: column;
+
+      @include mobile {
+        width: 100%;
+      }
+
+      .table-responsive-wrapper {
+        width: 100%;
+        overflow-x: auto; 
+        
+        @include mobile {
+          width: 100%;
+        }
+      }
     }
 
+    .table-header-sticky,
+    hr,
+    .table-scroll-body {
+      @include mobile {
+        min-width: 900px; /* ยิ่งคอลัมน์เยอะ ตัวเลขนี้ต้องยิ่งสูง เพื่อให้มันยาวออกไปด้านข้าง (ปรับได้ตามความเหมาะสม) */
+      }
+    }
+    
     .table-header-sticky {
       width: 100%;
       position: sticky;
       top: 0;
       z-index: 2;
-      background-color: themed("bg"); // ใช้สีพื้นหลังกล่องเพื่อบังข้อมูลเวลาเลื่อนผ่าน
+      background-color: themed(
+        "bg"
+      ); // ใช้สีพื้นหลังกล่องเพื่อบังข้อมูลเวลาเลื่อนผ่าน
     }
 
     // ส่วนเนื้อหาที่เปิดให้เลื่อนแนวตั้งได้
@@ -43,7 +69,7 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background: #A0C46E;
+        background: #a0c46e;
         border-radius: 4px;
       }
     }
@@ -103,10 +129,15 @@
         background: themed("buttonBg");
         color: white;
 
-        transition: .2s;
+        transition: 0.2s;
 
         &:hover {
           background: themed("AbuttonBg");
+        }
+
+        @include mobile {
+          min-width: 80px; /* ลดขนาดปุ่มลงมาหน่อย */
+          padding: 0 10px;
         }
       }
 
@@ -217,6 +248,11 @@
           opacity: 0.8;
         }
       }
+    }
+
+    @include mobile {
+       width: 90%; /* บนมือถือให้กล่องรีวิวกว้างตามจอ ไม่ฟิกซ์ที่ 450px */
+       padding: 15px;
     }
   }
 }

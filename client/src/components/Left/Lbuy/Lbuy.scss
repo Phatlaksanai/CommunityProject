@@ -1,7 +1,5 @@
 @use "../../../style.scss" as *;
 
-@use "../../../style.scss" as *;
-
 .Lbuy {
   @include themify($themes) {
     flex: 3;
@@ -12,10 +10,16 @@
     background-color: themed("bgSoft");
 
     @include mobile{
-      display: none;
+      position: relative; /* ยกเลิก sticky บนมือถือเพื่อให้เลื่อนตามจอได้ */
+      top: 0;
+      height: auto;
+      overflow: visible;
     }
     @include tablet{
-      display: none;
+      position: relative;
+      top: 0;
+      height: auto;
+      overflow: visible;
     }
 
     &::-webkit-scrollbar {

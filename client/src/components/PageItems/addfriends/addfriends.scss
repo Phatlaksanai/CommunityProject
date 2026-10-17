@@ -1,5 +1,11 @@
+@use "../../../style.scss" as *;
+
 .addfriends {
   display: grid;
   grid-template-columns: repeat(3, 1fr); // 5 column
   gap: 10px;
+
+  @include mobile {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

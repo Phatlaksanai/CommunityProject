@@ -15,10 +15,20 @@
     color: themed("textColor");
     z-index: 999;
 
+    @include mobile {
+      padding: 10px;
+    }
+
     .left {
       display: flex;
       align-items: center;
       gap: 30px;
+
+      @include mobile {
+        gap: 15px;
+        width: 100%;
+        justify-content: space-between;
+      }
 
       .Logo::first-letter {
         font-size: 2em;
@@ -47,7 +57,10 @@
         }
 
         @include mobile {
-          display: none;
+          display: block;
+          width: auto;
+          min-width: 100px; /* ป้องกันไม่ให้กล่องเล็กเกินไปจนพิมพ์ไม่ได้ */
+          margin: 0 5px;
         }
 
         .search-box-wrapper {
@@ -58,9 +71,18 @@
           border-radius: 5px;
           padding: 5px 10px;
 
+          @include mobile {
+            padding: 4px 8px;
+            gap: 5px;
+          }
+
           .search-icon-inside {
             color: gray;
             font-size: 20px;
+
+            @include mobile {
+              font-size: 16px;
+            }
           }
 
           .ais-SearchBox-input {
@@ -74,6 +96,10 @@
             font-family: inherit;
             font-size: 14px;
             padding: 0;
+
+            @include mobile {
+              font-size: 12px;
+            }
 
             &::placeholder {
               color: gray;
@@ -101,6 +127,12 @@
           overflow-y: auto;
           z-index: 1000;
           box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
+
+          @include mobile {
+            width: 280px; 
+            left: 50%;
+            transform: translateX(-50%); /* จัดกึ่งกลางเทียบกับช่องค้นหา */
+          }
 
           &::-webkit-scrollbar {
             width: 6px;
@@ -229,6 +261,12 @@
         align-items: center;
         width: 200px;
 
+        @include mobile {
+          width: auto;
+          flex: 1; // ขยายให้พอดีกับพื้นที่ที่เหลือ
+          min-width: 100px;
+        }
+
         select {
           width: 100%;
           background-color: themed("bg");
@@ -240,6 +278,11 @@
           outline: none;
           appearance: none; // ปิดลูกศรเดิมของเบราว์เซอร์
           cursor: pointer;
+
+          @include mobile {
+            padding: 6px 20px 6px 8px; // ลด padding ให้กะทัดรัดขึ้น
+            font-size: 12px;
+          }
         }
 
         .dropdown-icon {
@@ -247,6 +290,11 @@
           right: 10px;
           color: themed("logo");
           pointer-events: none; // ให้คลิกทะลุไปโดน select ได้
+
+          @include mobile {
+            right: 5px;
+            font-size: 18px;
+          }
         }
       }
     }
@@ -257,9 +305,28 @@
       gap: 20px;
 
       @include mobile {
-        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background-color: themed("bg");
+        border-top: 1px solid themed("border");
+        justify-content: space-around; // กระจายไอคอนให้ห่างเท่าๆ กัน
+        padding: 0 10px;
+        box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        gap: 0;
       }
 
+      .mobile-setting-icon {
+        display: none; /* ซ่อนในจอคอมพิวเตอร์และแท็บเล็ต */
+
+        @include mobile {
+          display: block; /* แสดงเฉพาะบนจอมือถือ */
+        }
+      }
+      
       .user {
         display: flex;
         align-items: center;
@@ -267,7 +334,13 @@
         font-weight: 500;
 
         @include tablet {
-          display: none;
+          display: flex;
+        }
+
+        @include mobile {
+          span.custom-tooltip {
+            display: none; 
+          }
         }
 
         img {
@@ -310,6 +383,14 @@
           margin-top: 30px;
           z-index: 10;
           gap: 3px;
+          
+          @include mobile {
+            // เมื่อเมนูอยู่ด้านล่างจอ ต้องให้ popup เด้งขึ้นด้านบนแทน
+            top: auto;
+            bottom: 50px;
+            right: 10px;
+            margin-top: 0;
+          }
 
           button {
             padding: 8px 18px;

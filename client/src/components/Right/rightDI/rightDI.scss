@@ -12,7 +12,11 @@
     border-radius: 10px;
 
     @include mobile {
-      display: none;
+      display: block; // เปลี่ยนจาก display: none เป็น block
+      position: relative; // เอา sticky ออก ไม่ต้องล็อคติดจอ
+      top: 0;
+      height: auto; // ให้ความสูงยืดตามเนื้อหาด้านใน
+      overflow: visible;
     }
 
     &::-webkit-scrollbar {

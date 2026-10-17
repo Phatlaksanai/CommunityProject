@@ -82,9 +82,35 @@ exports.getCommunityById = async (req, res) => {
 
     const { data, error } = await db
       .from("communities")
+      .select(`*,
+        community_members!inner(user_id, status)
+        `)
+      .eq("communities_id", id)
+      .eq("status", "show")
+      .eq("community_members.user_id", req.user.user_id)
+      .eq("community_members.status", "active")
+      .single();
+
+    if (error || !data) {
+      return res.status(404).json({ message: "Community not found or deleted" });
+    }
+
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getCommunityForEdit = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data, error } = await db
+      .from("communities")
       .select()
       .eq("communities_id", id)
       .eq("status", "show")
+      .eq("user_id", req.user.user_id)
       .single();
 
     if (error || !data) {
@@ -346,6 +372,8 @@ exports.getMembersByCommunityId = async (req, res) => {
       .from("communities")
       .select("user_id")
       .eq("communities_id", id)
+      .eq("status", "show")
+      .eq("user_id", req.user.user_id)
       .maybeSingle(); // ใช้ maybeSingle เพื่อป้องกัน error กรณีไม่พบข้อมูล
 
     if (commuError) {
@@ -369,6 +397,7 @@ exports.getMembersByCommunityId = async (req, res) => {
         )
       `)
       .eq("community_id", id)
+      // .eq("user_id", req.user.user_id)
       .neq("user_id", ownerId); // กรองเจ้าของกลุ่มออก
 
     if (error) {

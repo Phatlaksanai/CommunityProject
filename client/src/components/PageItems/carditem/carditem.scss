@@ -5,7 +5,7 @@
     overflow: scroll;
 
     @include mobile {
-      display: none;
+      display: block; // ใส่เป็น block แทน เพื่อให้แสดงผลปกติ
     }
 
     &::-webkit-scrollbar {

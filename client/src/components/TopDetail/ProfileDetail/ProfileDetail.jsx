@@ -5,6 +5,8 @@ import { NavLink, useParams, useNavigate } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { makeRequest } from "../../../api/axios";
 
 import ReportModal from "../../report/ReportModal";
@@ -21,6 +23,8 @@ const ProfileDetail = () => {
 
   const [error, setError] = useState("");
   const [openModal, setOpenModal] = useState(false);
+
+  const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
   const isOwner = currentUser?.user_id == id;
 
@@ -292,9 +296,53 @@ const ProfileDetail = () => {
           <NavLink to={`/profile/${id}/projects`}>Projects</NavLink>
 
           {isOwner && (
-            <button onClick={() => navigate(`/profile/${id}/projects/addproject`)} style={{ cursor: "pointer" }}>
+            <>
+            <button 
+            className="desktop-createProject"
+            onClick={() => navigate(`/profile/${id}/projects/addproject`)} style={{ cursor: "pointer" }}>
               Create Project
             </button>
+
+            <div className="rightSide mobile-only">
+              
+                {createMenuOpen ? (
+                  <KeyboardArrowUpIcon
+                    onClick={() => setCreateMenuOpen(false)}
+                    style={{ cursor: "pointer" }}
+                  />
+                ) : (
+                  <KeyboardArrowDownIcon
+                    onClick={() => setCreateMenuOpen(true)}
+                    style={{ cursor: "pointer" }}
+                  />
+                )}
+
+                {createMenuOpen && (
+                  <div className="moreMenu">
+                    <button
+                      onClick={() => {
+                        if (!currentUser?.user_id) {
+                          navigate("/login");
+                          return;
+                        }
+                        navigate("/addcommu");
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
+                      Create Community
+                    </button>
+
+                    <button
+                      onClick={() => navigate(`/profile/${id}/projects/addproject`)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      Create Project
+                    </button>
+                  </div>
+                )}
+              </div>
+
+            </>
           )}
 
         </div>

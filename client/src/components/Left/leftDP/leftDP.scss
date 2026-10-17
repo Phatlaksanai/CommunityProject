@@ -10,11 +10,19 @@
     background-color: themed("bgSoft");
 
     @include mobile {
-      display: none;
+      display: block; 
+      position: relative; // ยกเลิก sticky บนหน้าจอเล็ก
+      top: 0;
+      height: auto; // ให้ความสูงพอดีกับเนื้อหา ไม่ฟิกซ์ตายตัว
+      overflow: visible;
     }
 
     @include tablet {
-      display: none;
+      display: block; 
+      position: relative; // ยกเลิก sticky บนหน้าจอเล็ก
+      top: 0;
+      height: auto; // ให้ความสูงพอดีกับเนื้อหา ไม่ฟิกซ์ตายตัว
+      overflow: visible;
     }
 
     &::-webkit-scrollbar {
@@ -23,6 +31,13 @@
 
     .container {
       padding: 20px;
+
+      @include tablet {
+        padding: 0;
+      }
+      @include mobile {
+        padding: 0;
+      }
 
       .item {
         -webkit-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);

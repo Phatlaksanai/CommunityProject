@@ -50,8 +50,8 @@ const Projects = ({ userId, isProfile }) => {
         {isFetchingNextPage
           ? "Loading..."
           : hasNextPage
-            ? "Scroll down to see more posts"
-            : "No more posts to load"}
+            ? "Scroll down to see more projects"
+            : "No more projects to load"}
     </div>
   </div>
 

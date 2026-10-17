@@ -6,5 +6,10 @@
     display: grid;
     font-weight: bold;
     gap: 10px;
+
+    @include mobile {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
   }
 }

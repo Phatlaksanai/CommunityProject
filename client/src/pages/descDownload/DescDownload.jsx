@@ -81,97 +81,99 @@ const DescDownload = () => {
     return (
         <div className="descDownload">
             <div className="container">
-                <div className="table-header-sticky">
-                    <div className="Header">
-                        <h2>Item</h2>
-                        <h2>Price</h2>
-                        <h2>Date</h2>
-                        <h2>Version</h2> {/* เพิ่มคอลัมน์ Version */}
-                        <h2>Type</h2>
-                        <h2>Download</h2>
-                        <h2>Review</h2>
+                <div className="table-responsive-wrapper">
+                    <div className="table-header-sticky">
+                        <div className="Header">
+                            <h2>Item</h2>
+                            <h2>Price</h2>
+                            <h2>Date</h2>
+                            <h2>Version</h2> {/* เพิ่มคอลัมน์ Version */}
+                            <h2>Type</h2>
+                            <h2>Download</h2>
+                            <h2>Review</h2>
+                        </div>
                     </div>
-                </div>
-                <hr />
-                <div className="table-scroll-body">
-                    <div className="content">
-                        {downloads.map(item => {
-                            // 1. หา Index ของเวอร์ชันที่ถูกเลือก (ค่าเริ่มต้นคือ 0 หรือเวอร์ชันล่าสุด)
-                            const currentVersionIdx = selectedVersions[item.order_item_id] || 0;
-                            // 2. ดึงข้อมูลโมเดลของเวอร์ชันนั้นๆ ออกมา
-                            const currentModel = item.items?.update_models?.[currentVersionIdx];
-                            // 3. กำหนดประเภทไฟล์ปัจจุบัน
-                            const currentType = fileTypes[item.order_item_id] || getDefaultFileType(currentModel);
+                    <hr />
+                    <div className="table-scroll-body">
+                        <div className="content">
+                            {downloads.map(item => {
+                                // 1. หา Index ของเวอร์ชันที่ถูกเลือก (ค่าเริ่มต้นคือ 0 หรือเวอร์ชันล่าสุด)
+                                const currentVersionIdx = selectedVersions[item.order_item_id] || 0;
+                                // 2. ดึงข้อมูลโมเดลของเวอร์ชันนั้นๆ ออกมา
+                                const currentModel = item.items?.update_models?.[currentVersionIdx];
+                                // 3. กำหนดประเภทไฟล์ปัจจุบัน
+                                const currentType = fileTypes[item.order_item_id] || getDefaultFileType(currentModel);
 
-                            return (
-                                <div className="row" key={item.order_item_id}>
-                                    <h3>{item.items?.modelName}</h3>
-                                    <span>฿{item.items?.price}</span>
-                                    <span>{new Date(item.orders.created_at).toLocaleDateString()}</span>
+                                return (
+                                    <div className="row" key={item.order_item_id}>
+                                        <h3>{item.items?.modelName}</h3>
+                                        <span>฿{item.items?.price}</span>
+                                        <span>{new Date(item.orders.created_at).toLocaleDateString()}</span>
 
-                                    {/* Dropdown 1: เลือก Version */}
-                                    <select
-                                        className="file-type-select"
-                                        value={currentVersionIdx}
-                                        onChange={(e) => {
-                                            const newIdx = e.target.value;
-                                            setSelectedVersions({
-                                                ...selectedVersions,
-                                                [item.order_item_id]: newIdx
-                                            });
-                                            // รีเซ็ต Type กลับเป็นค่า Default ของเวอร์ชันใหม่ที่เพิ่งเลือก
-                                            const newModel = item.items?.update_models?.[newIdx];
-                                            setFileTypes({
-                                                ...fileTypes,
-                                                [item.order_item_id]: getDefaultFileType(newModel)
-                                            });
-                                        }}
-                                    >
-                                        {item.items?.update_models?.map((model, idx) => (
-                                            <option key={model.id || idx} value={idx}>
-                                                {model.version || `${item.items.update_models.length - idx}`}
-                                            </option>
-                                        ))}
-                                    </select>
-
-                                    {/* Dropdown 2: เลือก Type (แสดงเฉพาะฟอร์แมตที่มีในเวอร์ชันที่เลือก) */}
-                                    <select
-                                        className="file-type-select"
-                                        value={currentType}
-                                        onChange={(e) =>
-                                            setFileTypes({
-                                                ...fileTypes,
-                                                [item.order_item_id]: e.target.value
-                                            })
-                                        }
-                                    >
-                                        {currentModel?.obj && <option value="obj">OBJ</option>}
-                                        {currentModel?.fbx && <option value="fbx">FBX</option>}
-                                        {currentModel?.blend && <option value="blend">BLEND</option>}
-                                        {currentModel?.usdz && <option value="usdz">USDZ</option>}
-                                        {currentModel?.gltf && <option value="gltf">GLTF</option>}
-                                    </select>
-
-                                    <button onClick={() => {
-                                        // ส่ง ID ของโมเดลเวอร์ชันที่เลือก ไปให้ API ดาวน์โหลด
-                                        handleDownload(currentModel?.update_models_id, currentType);
-                                    }}>Download</button>
-
-                                    {item.is_reviewed ? (
-                                        <span className="review-complete">Complete</span>
-                                    ) : (
-                                        <button className="review-btn"
-                                            onClick={() => {
-                                                setSelectedItemId(item.items.item_id);
-                                                setOpenReview(true);
+                                        {/* Dropdown 1: เลือก Version */}
+                                        <select
+                                            className="file-type-select"
+                                            value={currentVersionIdx}
+                                            onChange={(e) => {
+                                                const newIdx = e.target.value;
+                                                setSelectedVersions({
+                                                    ...selectedVersions,
+                                                    [item.order_item_id]: newIdx
+                                                });
+                                                // รีเซ็ต Type กลับเป็นค่า Default ของเวอร์ชันใหม่ที่เพิ่งเลือก
+                                                const newModel = item.items?.update_models?.[newIdx];
+                                                setFileTypes({
+                                                    ...fileTypes,
+                                                    [item.order_item_id]: getDefaultFileType(newModel)
+                                                });
                                             }}
                                         >
-                                            Review
-                                        </button>
-                                    )}
-                                </div>
-                            );
-                        })}
+                                            {item.items?.update_models?.map((model, idx) => (
+                                                <option key={model.id || idx} value={idx}>
+                                                    {model.version || `${item.items.update_models.length - idx}`}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        {/* Dropdown 2: เลือก Type (แสดงเฉพาะฟอร์แมตที่มีในเวอร์ชันที่เลือก) */}
+                                        <select
+                                            className="file-type-select"
+                                            value={currentType}
+                                            onChange={(e) =>
+                                                setFileTypes({
+                                                    ...fileTypes,
+                                                    [item.order_item_id]: e.target.value
+                                                })
+                                            }
+                                        >
+                                            {currentModel?.obj && <option value="obj">OBJ</option>}
+                                            {currentModel?.fbx && <option value="fbx">FBX</option>}
+                                            {currentModel?.blend && <option value="blend">BLEND</option>}
+                                            {currentModel?.usdz && <option value="usdz">USDZ</option>}
+                                            {currentModel?.gltf && <option value="gltf">GLTF</option>}
+                                        </select>
+
+                                        <button onClick={() => {
+                                            // ส่ง ID ของโมเดลเวอร์ชันที่เลือก ไปให้ API ดาวน์โหลด
+                                            handleDownload(currentModel?.update_models_id, currentType);
+                                        }}>Download</button>
+
+                                        {item.is_reviewed ? (
+                                            <span className="review-complete">Complete</span>
+                                        ) : (
+                                            <button className="review-btn"
+                                                onClick={() => {
+                                                    setSelectedItemId(item.items.item_id);
+                                                    setOpenReview(true);
+                                                }}
+                                            >
+                                                Review
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>

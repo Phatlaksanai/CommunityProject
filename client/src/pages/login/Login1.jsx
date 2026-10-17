@@ -80,6 +80,11 @@ const Login = () => {
               forgot password
             </Link>
             <button type="submit" className="login-btn">login</button>
+
+            <div className="mobile-switch">
+              Don't have an account? <Link to="/register">Register</Link>
+            </div>
+            
           </form>
         </div>
       </div>
