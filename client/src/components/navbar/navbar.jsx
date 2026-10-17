@@ -206,7 +206,16 @@ const Navbar = () => {
         <HomeOutlinedIcon onClick={() => navigate("/")} style={{ cursor: "pointer" }} />
 
         <StorefrontIcon onClick={() => navigate("/market")} style={{ cursor: "pointer" }} />
-        <DownloadIcon onClick={() => navigate(`/download/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
+        <DownloadIcon
+          onClick={() => {
+            if (!currentUser?.user_id) {
+              navigate("/login");
+              return;
+            }
+            navigate(`/download/${currentUser.user_id}`);
+          }}
+          style={{ cursor: "pointer" }}
+        />
 
         {/* ============================================================ */}
         {/* โครงสร้างก้อนค้นหา Algolia เวอร์ชันเสถียรที่สุด ไร้อาการหลุดโฟกัส และไร้อาการแวบ */}
@@ -258,9 +267,33 @@ const Navbar = () => {
       </div>
 
       <div className="right">
-        <AddShoppingCartIcon onClick={() => navigate(`/cart/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
-        <PeopleIcon onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
-        <ForumIcon onClick={() => navigate(`/boxchat/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
+        <AddShoppingCartIcon onClick={() => {
+          if (!currentUser?.user_id) {
+            navigate("/login");
+            return;
+          }
+          navigate(`/cart/${currentUser?.user_id}`)
+        }}
+          style={{ cursor: "pointer" }}
+        />
+        <PeopleIcon onClick={() => {
+          if (!currentUser?.user_id) {
+            navigate("/login");
+            return;
+          }
+          navigate(`/managefriends/${currentUser?.user_id}`)
+        }}
+          style={{ cursor: "pointer" }}
+        />
+        <ForumIcon onClick={() => {
+          if (!currentUser?.user_id) {
+            navigate("/login");
+            return;
+          }
+          navigate(`/boxchat/${currentUser?.user_id}`)
+        }}
+          style={{ cursor: "pointer" }}
+        />
         <div className="user">
           <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} style={{ cursor: "pointer" }} />
           <span className="custom-tooltip" data-tip={displayName}>
@@ -269,7 +302,7 @@ const Navbar = () => {
               <p>{currentUser?.balance?.toFixed(2) || "0.00"} $</p>
             </div>
           </span>
-          {!currentUser && <button onClick={handleLogin}>Login</button>}
+          {!currentUser && <button onClick={handleLogin} className="loginbtn">Login</button>}
           {currentUser &&
             <div className="more-container">
               <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} style={{ cursor: "pointer" }} />

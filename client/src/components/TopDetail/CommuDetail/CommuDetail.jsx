@@ -138,7 +138,13 @@ const CommuDetail = () => {
                 <div className="moreMenu">
                   <button
                     className="followBtn"
-                    onClick={handleFollow}
+                    onClick={() => {
+                      if (!currentUser?.user_id) {
+                        navigate("/login");
+                        return;
+                      }
+                      handleFollow();
+                    }}
                     style={{ backgroundColor: isFollowing ? "#C0903B" : "#A0C46E", cursor: "pointer" }}
                   >
 
@@ -146,7 +152,15 @@ const CommuDetail = () => {
                     {isFollowing ? "Unfollow" : "Follow"}
                   </button>
 
-                  <button onClick={() => setOpenReport(true)} style={{ backgroundColor: "#C0903B", cursor: "pointer" }}>
+                  <button onClick={() => {
+                    if (!currentUser?.user_id) {
+                      navigate("/login");
+                      return;
+                    }
+                    setOpenReport(true);
+                  }}
+                    style={{ backgroundColor: "#C0903B", cursor: "pointer" }}
+                  >
                     <ReportProblemIcon style={{ width: "15px", height: "15px" }} />
                     Report
                   </button>

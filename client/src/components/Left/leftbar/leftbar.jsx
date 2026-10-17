@@ -52,16 +52,30 @@ const LeftBar = () => {
       <div className="container">
         <div className="menu">
           <div className="user">
-            <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)}/>
+            <img src={currentUser?.profilePic || defaultPic} alt="" onClick={() => navigate(`/profile/${currentUser?.user_id}`)} />
             <p className="custom-tooltip" data-tip={displayName} onClick={() => navigate(`/profile/${currentUser?.user_id}`)}>
               {truncatedName}
             </p>
           </div>
-          <div className="item" onClick={() => navigate(`/managefriends/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
+          <div className="item" onClick={() => {
+            if (!currentUser?.user_id) {
+              navigate("/login");
+              return;
+            }
+            navigate(`/managefriends/${currentUser?.user_id}`);
+          }}
+            style={{ cursor: "pointer" }}>
             <PeopleIcon />
             <span>Friends</span>
           </div>
-          <div className="item" onClick={() => navigate(`/boxchat/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
+          <div className="item" onClick={() => {
+            if (!currentUser?.user_id) {
+              navigate("/login");
+              return;
+            }
+            navigate(`/boxchat/${currentUser?.user_id}`);
+          }}
+            style={{ cursor: "pointer" }}>
             <ForumIcon />
             <span>Messenger</span>
           </div>
@@ -69,7 +83,14 @@ const LeftBar = () => {
             <StorefrontIcon />
             <span>Market</span>
           </div>
-          <div className="item" onClick={() => navigate(`/download/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
+          <div className="item" onClick={() => {
+            if (!currentUser?.user_id) {
+              navigate("/login");
+              return;
+            }
+            navigate(`/download/${currentUser?.user_id}`);
+          }}
+            style={{ cursor: "pointer" }}>
             <DownloadIcon />
             <span>Download</span>
           </div>
@@ -79,7 +100,15 @@ const LeftBar = () => {
         <div className="menu">
           <div className="menu-header">
             <span>My Communities</span>
-            <button onClick={() => navigate("/addcommu")} style={{ cursor: "pointer" }}>Create</button>
+            <button onClick={() => {
+              if (!currentUser?.user_id) {
+                navigate("/login");
+                return;
+              }
+              navigate("/addcommu")
+            }}
+              style={{ cursor: "pointer" }}
+            >Create</button>
           </div>
 
           <div className="community-list-wrapper">
@@ -114,7 +143,7 @@ const LeftBar = () => {
         <hr />
         <div className="menu">
           <div className="menu-header"><span>Other</span></div>
-          
+
           <div className="item" onClick={() => navigate(`/setting/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
             <SettingsIcon />
             <span>Settings</span>

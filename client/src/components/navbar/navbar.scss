@@ -283,6 +283,24 @@
           color: themed("textColorSoft");
         }
 
+        .loginbtn {
+          
+          padding: 8px 18px;
+          max-height: 35px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          color: white;
+          background-color: themed("buttonBg");
+
+          &:hover {
+            opacity: 0.8;
+          }
+        }
         .moreMenu {
           display: flex;
           flex-direction: column;
@@ -304,7 +322,7 @@
             align-items: center;
             gap: 5px;
             color: white;
-            background-color: #a0c46e;
+            background-color: themed("buttonBg");
 
             &:hover {
               opacity: 0.8;

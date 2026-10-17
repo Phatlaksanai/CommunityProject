@@ -24,7 +24,7 @@ const Project = ({ project, isProfile }) => {
       </div>
       <div className="price">
         <p>{dayjs(project.created_at).format("D MMM YYYY")}</p>
-        {isProfile && project.user_id === currentUser.user_id && (
+        {isProfile && project.user_id === currentUser?.user_id && (
           <SettingsIcon onClick={() => navigate(`/editproject/${project.project_id}`)} style={{ cursor: "pointer" , color: "#A0C46E"}} />
         )}
       </div>

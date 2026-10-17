@@ -76,7 +76,7 @@ const Item = ({ item, isProfile, isShop }) => {
           
           </div>
           {isShop && (<ControlPointIcon onClick={handleAddToCart} style={{ cursor: "pointer", color: "#A0C46E" }} />)}
-          {isProfile && item.user_id === currentUser.user_id &&
+          {isProfile && item.user_id === currentUser?.user_id &&
             <div className="more-container">
               <SettingsIcon onClick={() => setMenuOpen(!menuOpen)} style={{ cursor: "pointer", color: "#A0C46E" }} />
               {menuOpen && (

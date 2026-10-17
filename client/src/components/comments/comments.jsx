@@ -157,6 +157,7 @@
 import "./comments.scss";
 import PhotoIcon from '@mui/icons-material/Photo';
 import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query"; // เปลี่ยน useQuery เป็น useInfiniteQuery
 import { makeRequest } from "../../api/axios";
@@ -169,6 +170,7 @@ const Comments = ({ postId }) => {
   const [files, setFiles] = useState([]);
   const [filePreviews, setFilePreviews] = useState([]);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
@@ -254,17 +256,31 @@ const Comments = ({ postId }) => {
   return (
     <div className="comments">
       <div className="write">
-        <img src={currentUser.profilePic || defaultPic} alt="" />
+        <img src={currentUser?.profilePic || defaultPic} alt="" />
 
         <input
           type="file"
           id={`file-${postId}`}
           style={{ display: "none" }}
           accept=".jpg,.png,.jpeg,.gif"
-          onChange={handleFileChange}
+          onChange={(e) => {
+            if (!currentUser?.user_id) {
+              navigate("/login");
+              return;
+            }
+            handleFileChange(e);
+          }}
         />
 
-        <label htmlFor={`file-${postId}`} className="item">
+        <label htmlFor={`file-${postId}`}
+          className="item"
+          onClick={(e) => {
+            if (!currentUser?.user_id) {
+              e.preventDefault();
+              navigate("/login");
+            }
+          }}
+        >
           <PhotoIcon />
         </label>
 
