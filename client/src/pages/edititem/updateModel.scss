@@ -8,12 +8,46 @@
     background-color: themed("bg");
     color: themed("textSoft");
 
+    @include tablet {
+      flex-direction: column; // เรียงซ้ายขวา เป็น บนล่าง
+      align-items: center;
+    }
+
+    @include mobile {
+      flex-direction: column; // เรียงเป็น บนล่าง
+      padding: 15px 15px 80px 15px;
+      align-items: flex-start;
+      overflow-y: auto;
+   
+    }
+
     .L {
       padding: 15px;
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 10px;
+
+      @include tablet {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 100%;
+        overflow-x: auto; // ถ้าเวอร์ชันเยอะให้เลื่อนซ้ายขวาได้
+        padding: 0 0 15px 0;
+      }
+
+      @include mobile {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 100%;
+        overflow-x: auto;
+        padding: 0 0 15px 0;
+        
+        // ซ่อน scrollbar เพื่อความสวยงาม
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
 
       .version{
         display: flex;
@@ -51,6 +85,10 @@
         display: flex;
         flex-direction: column;
         gap: 18px;
+
+        @include mobile {
+          padding: 20px;
+        }
       }
 
       &__title {

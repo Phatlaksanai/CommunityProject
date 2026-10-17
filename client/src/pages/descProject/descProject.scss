@@ -1,6 +1,6 @@
 @use "../../style.scss" as *;
 
-.descProject{
+.descProject {
   display: flex;
   gap: 10px;
   @include themify($themes) {
@@ -10,19 +10,29 @@
 
     @include mobile {
       padding: 10px;
+      flex-direction: column;
+      gap: 15px;
     }
 
-    @include tablet{
-      padding: 20px;
+    @include tablet {
+      padding: 20px 5%;
+      flex-direction: column;
     }
   }
 
-   .descProjectleft {
-      flex: 1;
-    }
+  .descProjectleft {
+    flex: 1;
+  }
 
-    .descProjectRight {
-      flex: 1;
-      padding-top: 20px;
+  .descProjectRight {
+    flex: 1;
+    padding-top: 20px;
+
+    @include tablet {
+      padding-top: 0;
     }
+    @include mobile {
+      padding-top: 0;
+    }
+  }
 }

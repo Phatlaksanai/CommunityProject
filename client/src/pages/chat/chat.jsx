@@ -1,11 +1,12 @@
 import LeftChat from "../../components/Left/leftChat/leftChat"
-import {useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AuthContext } from "../../context/authContext";
 import dayjs from "dayjs";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
 
 import "./chat.scss"
 import ImageIcon from '@mui/icons-material/Image';
@@ -19,7 +20,6 @@ const Chat = () => {
     const { currentUser } = useContext(AuthContext);
     const navigate = useNavigate();
     const [currentChat, setCurrentChat] = useState(location.state?.selectedChat || null);
-    const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
 
     const [files, setFiles] = useState([]);
@@ -31,6 +31,11 @@ const Chat = () => {
     const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
     const queryClient = useQueryClient();
     const scrollRef = useRef();
+    const chatContentRef = useRef(null); // ref ของกล่อง Chat สำหรับตรวจสอบและควบคุมตำแหน่ง Scroll
+    const previousScrollHeightRef = useRef(0); // เก็บความสูงของ Chat ก่อนโหลดข้อความเก่า เพื่อรักษาตำแหน่ง Scroll เดิม
+    const keepScrollPositionRef = useRef(false); // ตรวจสอบว่ากำลังรักษาตำแหน่ง Scroll หลังโหลดข้อความเก่าอยู่หรือไม่
+    const hasUserScrolledRef = useRef(false); // ตรวจสอบว่าผู้ใช้เริ่มเลื่อน Chat แล้วหรือยัง
+    const { ref: loadMoreRef, inView } = useInView(); // ตรวจสอบว่าจุดโหลดข้อความเก่าด้านบนอยู่ในหน้าจอหรือไม่
     // const initialChatId = location.state?.activeChatId || null; // ดึงค่าจาก state มาเป็นค่าเริ่มต้น (ถ้าเข้ามาทาง RightBar จะมีค่านี้)
 
     // useEffect(() => { // ดักไว้เผื่อกรณีที่ผู้ใช้อยู่หน้า Chat อยู่แล้ว แต่ไปกดเพื่อนคนอื่นจาก RightBar
@@ -45,27 +50,81 @@ const Chat = () => {
         queryFn: () => makeRequest.get(`/friends/${id}`).then((res) => res.data),
     });
 
-    useEffect(() => {
-        const fetchMessages = async () => {
-            if (!currentChat) return; // ถ้ายังไม่ได้เลือกใคร ให้หยุดไว้ก่อน
-            try {
-                const res = await makeRequest.get(`/chats/${currentChat.conversation_id}/messages`);
-                setMessages(res.data);
+    const {
+        data: messagesData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useInfiniteQuery({
+        queryKey: ["messages", currentChat?.conversation_id],
 
-                await makeRequest.put(`/chats/${currentChat.conversation_id}/read`, {
-                    userId: id
+        queryFn: ({ pageParam = 0 }) => {
+            return makeRequest
+                .get(`/chats/${currentChat.conversation_id}/messages?page=${pageParam}`)
+                .then((res) => res.data);
+        },
+
+        enabled: !!currentChat,
+
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.length === 15
+                ? allPages.length
+                : undefined;
+        },
+    });
+
+    useEffect(() => {
+        if (!currentChat) return;
+
+        const markAsRead = async () => {
+            try {
+                await makeRequest.put(
+                    `/chats/${currentChat.conversation_id}/read`,
+                    {
+                        userId: id
+                    }
+                );
+
+                queryClient.invalidateQueries({
+                    queryKey: ["chats", id]
                 });
-                queryClient.invalidateQueries({ queryKey: ["chats", id] });
             } catch (err) {
                 console.log(err);
             }
         };
-        fetchMessages();
+
+        markAsRead();
     }, [currentChat, id, queryClient]);
 
-    useEffect(() => { // สั่งให้เลื่อนจออัตโนมัติ ทุกครั้งที่ตัวแปร messages มีการอัปเดต
-        scrollRef.current?.scrollIntoView({ behavior: "smooth" }); // เช็คว่ามี ref หรือยัง ถ้ามีให้เลื่อนลงมาหาแบบนุ่มนวล (smooth)
-    }, [messages, filePreviews]);
+    const handleLoadMore = async () => {
+        if (!chatContentRef.current || !hasNextPage || isFetchingNextPage) return;
+
+        previousScrollHeightRef.current = chatContentRef.current.scrollHeight;
+        keepScrollPositionRef.current = true;
+
+        await fetchNextPage();
+    };
+
+    useEffect(() => {
+        if (inView && hasNextPage && !isFetchingNextPage && hasUserScrolledRef.current) {
+            handleLoadMore();
+        }
+    }, [inView, hasNextPage, isFetchingNextPage]);
+
+    useEffect(() => {
+        if (!chatContentRef.current || !messagesData) return;
+
+        if (keepScrollPositionRef.current) {
+            const newScrollHeight = chatContentRef.current.scrollHeight;
+
+            chatContentRef.current.scrollTop =
+                newScrollHeight - previousScrollHeightRef.current;
+
+            keepScrollPositionRef.current = false;
+        } else {
+            scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messagesData, filePreviews]);
 
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
@@ -132,8 +191,7 @@ const Chat = () => {
                     }
                 }
 
-                const updatedMessages = await makeRequest.get(`/chats/${currentChat.conversation_id}/messages`);
-                setMessages(updatedMessages.data);
+                queryClient.invalidateQueries({ queryKey: ["messages", currentChat.conversation_id] });
 
                 // 4. ล้างหน่วยความจำของรูปพรีวิว (ป้องกัน Memory Leak)
                 filePreviews.forEach(url => URL.revokeObjectURL(url));
@@ -160,10 +218,7 @@ const Chat = () => {
                 is_read: "sent"
             });
 
-            // ดึงข้อความใหม่มาอัปเดตหน้าจอเหมือนตอนส่งข้อความปกติ
-            const updatedMessages = await makeRequest.get(`/chats/${currentChat.conversation_id}/messages`);
-            setMessages(updatedMessages.data);
-
+            queryClient.invalidateQueries({ queryKey: ["messages", currentChat.conversation_id] });
             queryClient.invalidateQueries({ queryKey: ["chats", id] });
         } catch (err) {
             console.log("Error sending like:", err);
@@ -173,8 +228,8 @@ const Chat = () => {
     // ฟังก์ชันกรองรายชื่อเพื่อนตามคำที่พิมพ์ค้นหา
     const filteredFriends = myFriends?.filter(friend => {
         if (!searchQuery) return false; // ถ้าไม่ได้พิมพ์อะไรเลย ก็ไม่ต้องโชว์
-        return friend.username.toLowerCase().includes(searchQuery.toLowerCase()) || 
-               friend.name.toLowerCase().includes(searchQuery.toLowerCase());
+        return friend.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            friend.name.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
     const handleConversation = async (friend) => {
@@ -237,7 +292,7 @@ const Chat = () => {
 
                     {searchQuery && filteredFriends?.length === 0 && (
                         <div className="search-dropdown-results">
-                            <div className="search-hit-item" style={{ textAlign: "center", color: "gray" , fontWeight: "bold" }}>
+                            <div className="search-hit-item" style={{ textAlign: "center", color: "gray", fontWeight: "bold" }}>
                                 No friends found
                             </div>
                         </div>
@@ -264,47 +319,66 @@ const Chat = () => {
                 </div>
 
                 {/* ส่วนเนื้อหาแชทที่เลื่อนได้ */}
-                <div className="chatContent">
+                <div className="chatContent" ref={chatContentRef} onScroll={() => {hasUserScrolledRef.current = true;}}>
                     {currentChat ? (
                         <>
-                            {messages.map((chat, index) => (
-                                // เช็คว่าใครเป็นคนส่ง เพื่อสลับฝั่งซ้ายขวา (ปรับ m.sender_id ให้ตรงกับ column ใน DB ของคุณ)
-                                <div
-                                    key={chat.id || index}
-                                    className={chat.sender_id === parseInt(id) ? "message own" : "message"}
-                                >
-                                    <div className="messageWrapper">
-                                        {chat.sender_id !== parseInt(id) && (
-                                            <>
-                                                <div className="messageContent">
-                                                    {chat.imgs && chat.imgs.length > 0 && (
-                                                        <img src={chat.imgs[0].img} alt="attachment" className="chatImageMessage" />
-                                                    )}
-                                                    {chat.text && <p>{chat.text}</p>}
-                                                </div>
-                                                <div className="messageInfo">
-                                                    <span>{dayjs(chat.created_at).format("h:mm A")}</span>
-                                                </div>
-                                            </>
-                                        )}
+                            <div
+                                ref={loadMoreRef}
+                                style={{
+                                    padding: "20px",
+                                    textAlign: "center",
+                                    color: "#ffffff"
+                                }}
+                            >
+                                {isFetchingNextPage
+                                    ? "Loading..."
+                                    : hasNextPage
+                                        ? "Scroll up to load older messages"
+                                        : "No more older messages"}
+                            </div>
 
-                                        {chat.sender_id === parseInt(id) && (
-                                            <>
-                                                <div className="messageInfo">
-                                                    <span>{chat.is_read === "read" ? "Read" : "Sent"}</span>
-                                                    <span>{dayjs(chat.created_at).format("h:mm A")}</span>
-                                                </div>
-                                                <div className="messageContent">
-                                                    {chat.imgs && chat.imgs.length > 0 && (
-                                                        <img src={chat.imgs[0].img} alt="attachment" className="chatImageMessage" />
-                                                    )}
-                                                    {chat.text && <p>{chat.text}</p>}
-                                                </div>
-                                            </>
-                                        )}
+                            {/* [...] ตรงนี้ใช้สำหรับสร้าง Array ใหม่ จาก messagesData.pages แล้วค่อย .reverse() เพื่อให้ข้อความเก่าอยู่ด้านบน ข้อความใหม่อยู่ด้านล่าง */}
+                            {[...(messagesData?.pages || [])].reverse().map((page) =>
+                                page.map((chat, index) => (
+                                    // เช็คว่าใครเป็นคนส่ง เพื่อสลับฝั่งซ้ายขวา (ปรับ m.sender_id ให้ตรงกับ column ใน DB ของคุณ)
+                                    <div
+                                        key={chat.id || index}
+                                        className={chat.sender_id === parseInt(id) ? "message own" : "message"}
+                                    >
+                                        <div className="messageWrapper">
+                                            {chat.sender_id !== parseInt(id) && (
+                                                <>
+                                                    <div className="messageContent">
+                                                        {chat.imgs && chat.imgs.length > 0 && (
+                                                            <img src={chat.imgs[0].img} alt="attachment" className="chatImageMessage" />
+                                                        )}
+                                                        {chat.text && <p>{chat.text}</p>}
+                                                    </div>
+                                                    <div className="messageInfo">
+                                                        <span>{dayjs(chat.created_at).format("h:mm A")}</span>
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {chat.sender_id === parseInt(id) && (
+                                                <>
+                                                    <div className="messageInfo">
+                                                        <span>{chat.is_read === "read" ? "Read" : "Sent"}</span>
+                                                        <span>{dayjs(chat.created_at).format("h:mm A")}</span>
+                                                    </div>
+                                                    <div className="messageContent">
+                                                        {chat.imgs && chat.imgs.length > 0 && (
+                                                            <img src={chat.imgs[0].img} alt="attachment" className="chatImageMessage" />
+                                                        )}
+                                                        {chat.text && <p>{chat.text}</p>}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                )
+                                ))}
+
                             <div ref={scrollRef} />
                         </>
                     ) : (
@@ -344,7 +418,7 @@ const Chat = () => {
                                 style={{ display: "none" }}
                             />
                             <label htmlFor="chatImageInput">
-                                <ImageIcon style={{ cursor: "pointer" , color: "#6A9043"}} />
+                                <ImageIcon style={{ cursor: "pointer", color: "#6A9043" }} />
                             </label>
                             <div className="search">
                                 <textarea
@@ -357,7 +431,7 @@ const Chat = () => {
                                     className="chatTextArea"
                                 />
                             </div>
-                            <ThumbUpAltIcon onClick={handleLikeSubmit} style={{ cursor: "pointer" , color: "#A0C46E"}} />
+                            <ThumbUpAltIcon onClick={handleLikeSubmit} style={{ cursor: "pointer", color: "#A0C46E" }} />
                         </div>
                     )
                 ) : null}

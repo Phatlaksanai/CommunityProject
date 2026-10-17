@@ -168,6 +168,10 @@ const Register = () => {
                 <button type="button" onClick={nextStep}>
                   Next
                 </button>
+
+                <div className="mobile-switch">
+                  Already have an account? <Link to="/login">Login</Link>
+                </div>
               </>
             )}
 
@@ -188,7 +192,7 @@ const Register = () => {
                   onChange={(e) => setOtp(e.target.value)}
                 />
 
-                <div style={{ display: "flex", gap: "10px" }}>
+                <div className="step2-buttons">
                   <button
                     type="button"
                     onClick={sendOTP}
@@ -203,6 +207,10 @@ const Register = () => {
                   <button type="submit">
                     Register
                   </button>
+                </div>
+
+                <div className="mobile-switch">
+                  Already have an account? <Link to="/login">Login</Link>
                 </div>
               </>
             )}

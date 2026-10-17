@@ -9,6 +9,11 @@
     background-color: themed("bg");
     color: themed("textSoft");
 
+    @include mobile {
+      padding: 20px 10px 100px 10px;
+      align-items: center;
+    }
+
     &__form {
       width: 100%;
       max-width: 520px;
@@ -19,6 +24,10 @@
       display: flex;
       flex-direction: column;
       gap: 18px;
+
+      @include mobile {
+        padding: 20px 15px; // ลดขอบบนมือถือ
+      }
     }
 
     &__title {
@@ -26,6 +35,10 @@
       font-size: 26px;
       font-weight: 600;
       margin-bottom: 10px;
+
+      @include mobile {
+        font-size: 22px;
+      }
     }
 
     .form-group {
@@ -59,6 +72,12 @@
         justify-content: center;
         align-items: center;
         gap: 100px;
+
+        @include mobile {
+        flex-direction: column;
+        gap: 20px; 
+        width: 100%;
+      }
     }
 
     .file-input {
@@ -133,6 +152,11 @@
       &:hover {
         transform: translateY(-1px);
       }
+
+      @include mobile {
+        width: 100%;
+        margin-top: 0;
+      }
     }
     .Deleteaccount{
       margin-top: 15px;
@@ -148,6 +172,11 @@
 
       &:hover {
         transform: translateY(-1px);
+      }
+
+      @include mobile {
+        width: 100%;
+        margin-top: 0;
       }
     }
   }

@@ -97,6 +97,10 @@
       flex: 1; // กินพื้นที่ส่วนที่เหลือทั้งหมด
       padding: 20px;
       overflow-y: auto; // สร้าง Scrollbar ฝั่งขวา
+
+      @include mobile {
+        padding: 10px;
+      }
     }
 
     .cartItem {
@@ -147,6 +151,11 @@
       padding: 20px;
       display: flex;
       justify-content: center;
+
+      @include mobile {
+        padding: 10px;
+        margin-bottom: 30px;
+      }
 
       @include themify($themes) {
         border-top: 1px solid themed("border");

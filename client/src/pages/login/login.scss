@@ -1,6 +1,8 @@
+@use "../../style.scss" as *;
+
 .login {
   height: 100vh;
-  background-color: #A0C46E;
+  background-color: #a0c46e;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,9 +15,16 @@
     min-height: 600px;
     overflow: hidden;
 
+    @include mobile {
+      width: 90%; // ให้การ์ดกว้างขึ้นบนมือถือ
+      min-height: auto; // ปรับความสูงตามเนื้อหา
+      flex-direction: column;
+    }
+
     .left {
       flex: 1;
-      background: linear-gradient(#3F5428, hsla(89, 35%, 24%, 0.16)),
+      background:
+        linear-gradient(#3f5428, hsla(89, 35%, 24%, 0.16)),
         url("https://images.pexels.com/photos/461049/pexels-photo-461049.jpeg")
           center;
       background-size: cover;
@@ -28,12 +37,26 @@
       h1 {
         font-size: 100px;
         line-height: 100px;
+
+        @include mobile {
+          margin: 0;
+        }
       }
 
-      span {
-        font-size: 14px;
+      p {
+        @include mobile {
+          display: none;
+        }
       }
       
+      span {
+        font-size: 14px;
+
+        @include mobile {
+          display: none;
+        }
+      }
+
       button {
         width: 50%;
         padding: 10px;
@@ -42,6 +65,10 @@
         color: #2b3a4b;
         font-weight: bold;
         cursor: pointer;
+
+        @include mobile {
+          display: none;
+        }
       }
     }
 
@@ -54,18 +81,18 @@
       justify-content: center;
 
       h1 {
-      color: #555;
+        color: #555;
       }
-      
+
       form {
         display: flex;
         flex-direction: column;
         gap: 30px;
-        
+
         input {
-        border: none;
-        border-bottom: 1px solid lightgray;
-        padding: 20px 10px;
+          border: none;
+          border-bottom: 1px solid lightgray;
+          padding: 20px 10px;
         }
 
         .forgot {
@@ -74,7 +101,7 @@
           text-align: right;
           cursor: pointer;
         }
-        
+
         button {
           width: 50%;
           padding: 10px;
@@ -83,6 +110,28 @@
           color: white;
           font-weight: bold;
           cursor: pointer;
+        }
+
+        .mobile-switch {
+          display: none;
+          text-align: center;
+          margin-top: 15px;
+          font-size: 14px;
+          color: #555;
+          
+          @include mobile {
+            display: block; // แสดงปุ่มสลับหน้าเฉพาะบนมือถือ
+          }
+          
+          a {
+            color: #597b2a;
+            font-weight: bold;
+            text-decoration: none;
+            
+            &:hover {
+              text-decoration: underline;
+            }
+          }
         }
       }
     }

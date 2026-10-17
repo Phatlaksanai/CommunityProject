@@ -9,6 +9,7 @@
 
         @include mobile {
             padding: 10px;
+            height: auto;
         }
 
         @include tablet {
@@ -20,12 +21,31 @@
             display: flex;
             flex-direction: row;
             gap: 50px;
+
+            @include mobile {
+                flex-direction: column;
+                gap: 20px;
+            }
         }
 
-        .L {
-            flex: 2;
+        .L, .R { /* รวบ .L และ .R ไว้ด้วยกันเพื่อให้เลื่อนตารางได้ */
+            flex: 2; /* .R อาจจะใช้ flex: 1; แต่ใส่ไว้ด้วยกันเพื่อจัดการ container */
             display: flex;
             flex-direction: column;
+
+            /* ให้ตารางข้างในเลื่อนซ้ายขวาได้บนมือถือ */
+            .container {
+                @include mobile {
+                    overflow-x: auto;
+                }
+            }
+            
+            /* ดันไม่ให้ตารางหดเล็กเกินไปบนมือถือ */
+            .table-header-sticky, .table-scroll-body {
+               @include mobile {
+                   min-width: 500px;
+               }
+            }
         }
 
         .R {
@@ -150,6 +170,12 @@
                 align-items: center;
                 padding: 20px 0px;
 
+                @include mobile {
+                    flex-wrap: wrap;
+                    gap: 10px;
+                    justify-content: center;
+                }
+
                 .box {
                     width: 250px;
                     height: 100%;
@@ -158,6 +184,19 @@
                     border-radius: 10px;
                     justify-items: center;
 
+                    @include mobile {
+                        width: 45%; /* ให้ความกว้างเหลือครึ่งจอ */
+                        padding: 15px 5px;
+                        
+                        .title {
+                            font-size: 14px;
+                            text-align: center;
+                        }
+                        .number {
+                            font-size: 15px;
+                        }
+                    }
+                    
                     .title {
                         font-size: 20px;
                         color: themed("textColorSoft");

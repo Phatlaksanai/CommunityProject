@@ -1,3 +1,5 @@
+@use "../../style.scss" as *;
+
 .register {
   height: 100vh;
   background-color: #A0C46E;
@@ -14,6 +16,12 @@
     min-height: 600px;
     overflow: hidden;
 
+    @include mobile {
+      width: 90%; // ให้การ์ดกว้างขึ้นบนมือถือ
+      min-height: auto; // ปรับความสูงตามเนื้อหา
+      flex-direction: column;
+    }
+
     .left {
       flex: 1;
       background: linear-gradient(#3F5428, #3F542829),
@@ -29,10 +37,23 @@
       h1 {
         font-size: 100px;
         line-height: 100px;
+
+        @include mobile {
+          margin: 0;
+        }
+      }
+
+      p {
+        @include mobile {
+          display: none;
+        }
       }
 
       span {
         font-size: 14px;
+        @include mobile {
+          display: none;
+        }
       }
       
       button {
@@ -43,6 +64,9 @@
         color: #2b3a4b;
         font-weight: bold;
         cursor: pointer;
+        @include mobile {
+          display: none;
+        }
       }
     }
 
@@ -77,6 +101,42 @@
           color: white;
           font-weight: bold;
           cursor: pointer;
+
+          @include mobile {
+            width: 100%;
+          }
+        }
+
+        .step2-buttons {
+          display: flex; 
+          gap: 10px;
+          
+          @include mobile {
+            flex-direction: row; // เรียงปุ่มแนวตั้งบนมือถือ
+            gap: 15px;
+          }
+        }
+        
+        .mobile-switch {
+          display: none;
+          text-align: center;
+          margin-top: 15px;
+          font-size: 14px;
+          color: #555;
+          
+          @include mobile {
+            display: block; // แสดงเฉพาะบนมือถือ
+          }
+          
+          a {
+            color: #597b2a;
+            font-weight: bold;
+            text-decoration: none;
+            
+            &:hover {
+              text-decoration: underline;
+            }
+          }
         }
       }
     }

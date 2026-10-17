@@ -7,15 +7,17 @@
 
     h3 {
       color: themed("textColorSoft");
-      margin-Bottom: 20px;
+      margin-bottom: 20px;
     }
 
     .friends {
       display: grid;
       grid-template-columns: repeat(3, 1fr); // 5 column
       gap: 10px;
+
+      @include mobile {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
-
   }
-
 }

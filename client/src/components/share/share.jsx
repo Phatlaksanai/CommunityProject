@@ -251,12 +251,12 @@ const Share = ({ isDescCommu, commuId }) => {
           </div>
           {error && <p style={{ color: "red", fontSize: "14px" }}>{error}</p>}
           <div className="right">
-            <button onClick={() => {
+            <button onClick={(e) => {
               if (!currentUser?.user_id) {
                 navigate("/login");
                 return;
               }
-              handleClick();
+              handleClick(e);
             }}
               disabled={isLoadingSpinner}
             >

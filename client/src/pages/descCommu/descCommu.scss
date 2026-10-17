@@ -2,6 +2,7 @@
 
 .descCommu{
   display: flex;
+  
   @include themify($themes) {
     padding: 20px 10%;
     background-color: themed("bgSoft");
@@ -9,18 +10,28 @@
 
     @include mobile {
       padding: 10px;
+      flex-direction: column;
     }
 
     @include tablet{
       padding: 20px;
+      flex-direction: column;
     }
   }
  }
  .descCommuleft {
   margin-top: -20px;
   flex: 1;
+
+  @include mobile {
+    margin-top: 0; 
+  }
 }
 
 .descCommuright {
   flex: 1.5;
+
+  @include mobile {
+    width: 100%;
+  }
 }

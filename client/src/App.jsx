@@ -143,8 +143,8 @@ function App() {
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
         <DownloadDetail />
-        <div style={{ display: "flex" }}>
-          <div style={{ flex: 6 }}>
+        <div style={{ display: "flex", width: "100%" }}>
+          <div style={{ flex: 6, minWidth: 0, width: "100%" }}>
             <Outlet />
           </div>
         </div>

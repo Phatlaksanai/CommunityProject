@@ -10,10 +10,15 @@
     min-height: 100vh;
 
     @include mobile {
+      @include mobile {
+      flex-direction: column-reverse; /* บนมือถือ ให้สลับเอาสรุปยอด (Rbuyitem) ขึ้นด้านบน และการชำระเงิน (Lbuyitem) ลงด้านล่าง */
       padding: 10px;
+      gap: 15px;
+    }
     }
 
     @include tablet {
+      flex-direction: column-reverse;
       padding: 20px;
     }
   }
@@ -21,10 +26,18 @@
 
 .Lbuyitem {
   flex: 2.5;
+
+  @include mobile {
+     width: 100%;
+  }
 }
 
 .Rbuyitem {
   flex: 1;
+
+  @include mobile {
+     width: 100%; /* ให้กว้างเต็มจอ */
+  }
 
   .Rbuy {
     @include themify($themes) {
@@ -38,7 +51,10 @@
       border-radius: 10px;
 
       @include mobile {
-        display: none;
+        position: relative; /* ยกเลิก sticky เพื่อให้เลื่อนได้ปกติ */
+        top: 0;
+        height: auto; /* ให้ความสูงยืดตามข้อมูลข้างใน */
+        overflow: visible;
       }
 
       &::-webkit-scrollbar {

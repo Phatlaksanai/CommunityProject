@@ -8,12 +8,18 @@
     background-color: themed("bgSoft");
     color: themed("textColor");
 
+    @include mobile {
+       width: 100%; 
+       overflow-x: hidden;
+    }
+
     &::-webkit-scrollbar {
       display: none;
     }
 
     .container {
       padding: 0;
+      width: 100%;
     }
 
     .Header {
@@ -23,11 +29,19 @@
       gap: 10px;
       background-color: themed("bgSoft");
 
+      @include mobile {
+        padding: 20px;
+      }
+
       h1 {
         margin: 0;
         font-size: 28px;
         font-weight: 600;
         color: themed("textColorSoft");
+
+        @include mobile {
+          font-size: 24px;
+        }
       }
 
       span {
@@ -40,6 +54,10 @@
         display: flex;
         align-items: center;
         gap: 30px;
+
+        @include mobile {
+          gap: 15px;
+        }
 
         span {
           cursor: pointer;

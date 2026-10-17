@@ -9,17 +9,41 @@
 
     @include mobile {
       padding: 10px;
+      flex-direction: column; // เรียงจากบนลงล่างบนจอมือถือ
+      gap: 20px; // เพิ่มระยะห่างระหว่างชิ้นซ้ายกับขวา
     }
 
     @include tablet{
+      @include tablet {
       padding: 20px;
+      flex-direction: column; // ให้เรียงแนวตั้งบนจอแท็บเล็ตด้วย
+      gap: 20px;
+    }
     }
   }
  }
  .descItemleft {
   flex: 2.5;
+
+  @include mobile {
+    flex: none; // ยกเลิกสัดส่วนความกว้าง
+    width: 100%; // ให้กว้างเต็มจอ
+  }
+  @include tablet {
+    flex: none; 
+    width: 100%; 
+  }
 }
 
 .descItemright {
   flex: 1;
+
+  @include mobile {
+    flex: none; // ยกเลิกสัดส่วนความกว้าง
+    width: 100%; // ให้กว้างเต็มจอ
+  }
+  @include tablet {
+    flex: none; 
+    width: 100%; 
+  }
 }

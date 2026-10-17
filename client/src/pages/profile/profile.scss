@@ -11,11 +11,16 @@
     }
 
     @include tablet {
-      padding: 20px;
+      padding: 20px 5%;
     }
 
     .all {
       display: flex;
+
+      @include mobile {
+        flex-direction: column-reverse;
+        gap: 15px;
+      }
 
       .L {
         flex: 2;
