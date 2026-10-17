@@ -22,7 +22,8 @@ exports.getItems = async (req, res) => {
             type
           )`
         )
-        .order("item_id", { ascending: false });
+        .order("item_id", { ascending: false })
+        .eq("status", "show");
 
       if (user_id) {
         query = query.neq("user_id", user_id);
@@ -179,6 +180,7 @@ exports.getItemsById = async (req, res) => {
     `,
     )
     .eq("item_id", id)
+    .eq("status", "show")
     .single();
 
   if (error) return res.status(404).json({ error: "Item not found" });
@@ -229,6 +231,7 @@ exports.getItemsByProjectId = async (req, res) => {
     `,
     )
     .eq("project_id", id)
+    .eq("status", "show");
 
   if (error) return res.status(500).json(error);
 
@@ -263,6 +266,7 @@ exports.getItemsByUserIdAvailable = async (req, res) => {
     .select(`*, 
       update_models(created_at) 
       `)
+    .eq("status", "show")
     .eq("user_id", id)
     .is("project_id", null);
 
@@ -306,13 +310,14 @@ exports.getItemsByUserId = async (req, res) => {
           created_at
         )
       `)
-      .eq("user_id", id);
+      .eq("user_id", id)
+      .eq("status", "show");
 
     if (error) return res.status(500).json(error);
 
     // 3. หาวันที่อัปเดตล่าสุด
     const formatted = data.map((item) => {
-      const latestUpdate = [...(item.update_models || [])].sort( 
+      const latestUpdate = [...(item.update_models || [])].sort(
         (update1, update2) =>
           new Date(update2.created_at) - new Date(update1.created_at)
       )[0];
@@ -324,7 +329,7 @@ exports.getItemsByUserId = async (req, res) => {
     });
 
     // 4. เรียง Item ทั้งหมด ตามเวลา update ล่าสุด
-    formatted.sort((item1, item2) => 
+    formatted.sort((item1, item2) =>
       new Date(item2.created_at || 0) - new Date(item1.created_at || 0)
     );
 
@@ -338,7 +343,7 @@ exports.getItemsByUserId = async (req, res) => {
 
     // 6. ดึงข้อมูลยอดสั่งซื้อเฉพาะ "15 ชิ้น" ที่ผ่านการตัดมาแล้ว
     const itemIds = paginatedItems.map((item) => item.item_id);
-    let orderItems = []; 
+    let orderItems = [];
 
     if (itemIds.length > 0) {
       const { data: completedOrders, error: orderError } = await db
@@ -361,8 +366,8 @@ exports.getItemsByUserId = async (req, res) => {
 
     // นับจำนวน order
     const orderCountMap = {};
-    orderItems.forEach((orderItem) => { 
-      const itemId = orderItem.item_id; 
+    orderItems.forEach((orderItem) => {
+      const itemId = orderItem.item_id;
       orderCountMap[itemId] = (orderCountMap[itemId] || 0) + 1;
     });
 
@@ -485,6 +490,7 @@ exports.addItem = async (req, res) => {
 };
 
 exports.editItem = async (req, res) => {
+  const userid = req.user.user_id;
   const {
     itemId, modelName, description, price, img, category_id, imgPublicId // เพิ่ม imgPublicId ตรงนี้
   } = req.body;
@@ -495,6 +501,8 @@ exports.editItem = async (req, res) => {
       .from("items")
       .select("*")
       .eq("item_id", itemId)
+      .eq("user_id", userid)
+      .eq("status", "show")
       .single();
 
     if (fetchError || !items) {
@@ -582,8 +590,10 @@ exports.updateVersion = async (req, res) => {
       // กรณีสร้างใหม่ ดึงเวอร์ชันล่าสุดมาเป็น Base สำหรับ fallback ข้อมูล (ตามลอจิกเดิม)
       const { data, error } = await db
         .from("update_models")
-        .select("*, imgs(*)")
+        .select("*, imgs(*), items!inner(status,user_id)")
         .eq("item_id", itemId)
+        .eq("items.status", "show")
+        .eq("items.user_id", req.user.user_id)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -598,8 +608,10 @@ exports.updateVersion = async (req, res) => {
 
       const { data, error } = await db
         .from("update_models")
-        .select("*, imgs(*)")
+        .select("*, imgs(*), items!inner(status, user_id)")
         .eq("update_models_id", updateModelsId)
+        .eq("items.status", "show")
+        .eq("items.user_id", req.user.user_id)
         .maybeSingle();
 
       if (error) return res.status(500).json({ error: error.message });
@@ -776,6 +788,7 @@ exports.getItemsForEditProject = async (req, res) => {
   const { data, error } = await db
     .from("items")
     .select("*")
+    .eq("status", "show")
     .or(
       `project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`,
     );
@@ -790,7 +803,7 @@ exports.getLatestItems = async (req, res) => {
       .from("items") // เปลี่ยนชื่อตารางตามที่คุณใช้
       .select(`*,
         update_models(created_at)
-        `);
+        `).eq("status", "show");
 
     if (error) throw error;
 
@@ -829,7 +842,8 @@ exports.getItemsByCategory = async (req, res) => {
       .select(`item_id, modelName, description, img, price, user_id,
         update_models(created_at)
         `) // เลือกเฉพาะฟิลด์ที่ใช้แสดงใน Card
-      .eq("category_id", categoryId);
+      .eq("category_id", categoryId)
+      .eq("status", "show");
 
     if (error) {
       return res.status(500).json(error);
@@ -988,4 +1002,48 @@ exports.getItemTimeline = async (req, res) => {
     console.error("getItemTimeline error:", err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
+};
+
+exports.getItemForEdit = async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await db
+    .from("items")
+    .select(`
+      *,
+      update_models (
+        model, obj, blend, fbx, usdz, gltf, polygon_count,
+        has_textures, is_rigged, is_uv_mapped, version,
+        created_at, update_summary
+      )
+    `)
+    .eq("item_id", id)
+    .eq("status", "show")
+    .eq("user_id", req.user.user_id) // ตรวจสอบว่าเป็นเจ้าของสินค้าจริง
+    .single();
+
+  if (error || !data) return res.status(404).json({ error: "Item not found or unauthorized" });
+
+  const latestUpdate = data.update_models?.sort(
+    (update1, update2) => new Date(update2.created_at) - new Date(update1.created_at),
+  )[0];
+
+  const formatted = {
+    ...data,
+    model: latestUpdate?.model || null,
+    obj: latestUpdate?.obj || null,
+    blend: latestUpdate?.blend || null,
+    fbx: latestUpdate?.fbx || null,
+    usdz: latestUpdate?.usdz || null,
+    gltf: latestUpdate?.gltf || null,
+    polygon_count: latestUpdate?.polygon_count || null,
+    has_textures: latestUpdate?.has_textures || false,
+    is_rigged: latestUpdate?.is_rigged || false,
+    is_uv_mapped: latestUpdate?.is_uv_mapped || false,
+    version: latestUpdate?.version || null,
+    update_summary: latestUpdate?.update_summary || null,
+    created_at: latestUpdate?.created_at || null,
+  };
+
+  return res.json(formatted);
 };

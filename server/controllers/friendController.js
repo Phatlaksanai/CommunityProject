@@ -215,6 +215,7 @@ exports.getUserProfile = async (req, res) => {
       .from('users')
       .select('user_id, username, name, profilePic, coverPic, description, city, website')
       .eq('user_id', id)
+      .eq("isdelete", "active")
       .single(); // ใช้ .single() เพื่อให้ส่งกลับมาเป็น Object อันเดียว
 
     if (error) {

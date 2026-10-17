@@ -7,6 +7,8 @@ import { AuthContext } from "../../../context/authContext";
 import { useContext } from "react";
 import { useInView } from "react-intersection-observer"; // เพิ่มเข้ามา
 import { useEffect } from "react";
+import NotFound from "../../NotFound/notFound";
+import Loading from "../../NotFound/loading";
 
 const Items = ({ userId, filters, isProfile, isShop }) => {
   const { currentUser } = useContext(AuthContext);
@@ -57,10 +59,10 @@ const Items = ({ userId, filters, isProfile, isShop }) => {
     }
   }, [inView, hasNextPage, fetchNextPage]);
 
-  if (isLoading) return <div className="posts">Loading...</div>;
+  if (isLoading) return <Loading />;
 
   // เพิ่มตรงนี้: ถ้า error หรือ data ยังไม่มาจริงๆ ให้หยุดตรงนี้ก่อน ไม่ให้ไปบรรทัด map
-  if (error || !data) return <div className="posts">Something went wrong or No data.</div>;
+  if (error || !data) return <NotFound />;
 
   return <div className="items">
     {data?.pages?.map((page) =>

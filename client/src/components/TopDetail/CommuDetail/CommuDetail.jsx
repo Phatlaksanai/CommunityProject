@@ -29,9 +29,10 @@ const CommuDetail = () => {
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   // ดึงข้อมูล Community
-  const { data: community } = useQuery({
+  const { data: community, isLoading, error } = useQuery({
     queryKey: ["community", id],
     queryFn: () => makeRequest.get(`communities/${id}`).then((res) => res.data),
+    retry: false, // ✅ ปิด retry เพื่อให้รู้ทันทีว่ากลุ่มโดนลบ
   });
 
   // ✅ ดึงข้อมูลคนติดตาม (สมมติว่า API ตอบกลับมาเป็น Array ของ user_id คล้ายระบบ Like)
@@ -68,7 +69,7 @@ const CommuDetail = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["communities"]);
       // ย้าย navigate มาไว้ตรงนี้ เพื่อให้แน่ใจว่าลบสำเร็จก่อนค่อยเปลี่ยนหน้า
-      navigate("/"); 
+      navigate("/");
     },
   });
 
@@ -76,14 +77,17 @@ const CommuDetail = () => {
     deleteMutation.mutate(id);
   };
 
-useEffect(() => {
-  if (deleteOpen || openReport) {
-    document.body.style.overflow = "hidden";
-  } 
-  return () => {
-    document.body.style.overflow = "auto";
-  };
-}, [deleteOpen || openReport]);
+  useEffect(() => {
+    if (deleteOpen || openReport) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [deleteOpen, openReport]);
+
+  if (isLoading) return <div className="commudetail" style={{ minHeight: "200px" }}></div>;
+  if (error || !community) return null;
 
   return (
     <div className="commudetail">
@@ -119,7 +123,7 @@ useEffect(() => {
                     <SettingsIcon style={{ width: "15px", height: "15px" }} />
                     Edit Community
                   </button>
-                  <button onClick={() => navigate(`/manage/${community?.communities_id}`)} style={{  backgroundColor: "#C0903B", cursor: "pointer" }}>
+                  <button onClick={() => navigate(`/manage/${community?.communities_id}`)} style={{ backgroundColor: "#C0903B", cursor: "pointer" }}>
                     <BlockIcon style={{ width: "15px", height: "15px" }} />
                     Manage Users & Posts
                   </button>
