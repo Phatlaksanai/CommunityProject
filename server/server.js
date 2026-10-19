@@ -34,7 +34,7 @@ if (!process.env.JWT_SECRETKEY) {
 
 
 app.use(cookieParser());
-app.use(cors({origin: ["http://localhost:5173","http://localhost:5174"],credentials: true, }));//new+++++
+app.use(cors({origin: ["http://localhost:5173","http://localhost:5174","https://pm-vdyh.onrender.com"],credentials: true, }));//new+++++
 
 app.post("/api/payments/webhook", express.raw({ type: 'application/json' }), paymentController.stripeWebhook);
 
@@ -70,6 +70,20 @@ app.use(express.static(path.join(__dirname, 'public')))
 // app.get(/(.*)/, (req, res) => {
 //   res.sendFile(path.join(clientBuildPath, 'index.html'))
 // })
+
+// ===== SERVE ADMIN (เข้าผ่าน https://pm-vdyh.onrender.com/admin) =====
+const adminBuildPath = path.join(__dirname, '../admin/dist');
+app.use('/admin', express.static(adminBuildPath));
+app.get(/^\/admin(\/.*)?$/, (req, res) => {
+  res.sendFile(path.join(adminBuildPath, 'index.html'));
+});
+
+// ===== SERVE CLIENT (เข้าผ่าน https://pm-vdyh.onrender.com) =====
+const clientBuildPath = path.join(__dirname, '../client/dist');
+app.use(express.static(clientBuildPath));
+app.get(/(.*)/, (req, res) => {
+  res.sendFile(path.join(clientBuildPath, 'index.html'));
+});
 
 app.use((req, res) => {
     res.status(404).json({ error: "API route not found" });
