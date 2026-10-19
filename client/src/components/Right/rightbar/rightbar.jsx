@@ -1,4 +1,4 @@
-import "./rightBar.scss";
+import "./rightbar.scss";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
