@@ -3,7 +3,6 @@ import { useContext } from "react";
 import { AuthContext } from "../../../context/authContext";
 import { makeRequest } from "../../../api/axios";
 import { useQuery } from "@tanstack/react-query";
-import HomeFilledIcon from '@mui/icons-material/HomeFilled';
 import PaidIcon from '@mui/icons-material/Paid';
 import PeopleIcon from '@mui/icons-material/People';
 import PersonIcon from '@mui/icons-material/Person';

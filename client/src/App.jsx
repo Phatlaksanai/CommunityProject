@@ -16,7 +16,7 @@ import AddItem from './pages/additem/Additem';
 import AddProject from './pages/addproject/addproject';
 import AddCommu from './pages/addcommu/Addcommu';
 import DescItem from './pages/descItem/DescItem';
-import DescProject from './pages/descProject/DescProject';
+import DescProject from './pages/descProject/descProject';
 import DescCommu from './pages/descCommu/DescCommu';
 import DescDownload from './pages/descDownload/DescDownload';
 import Earn_Pay from './pages/descDownload/Earn_Pay';

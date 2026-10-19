@@ -92,11 +92,26 @@ const SearchHit = ({ hit }) => {
 const CustomSearchBox = ({ searchText, setSearchText, onFocus, onBlur }) => {
   const { refine } = useSearchBox();
 
-  // ทุกครั้งที่ searchText ของเราเปลี่ยน (หรือ filter เปลี่ยนแล้ว InstantSearch รีเซ็ต)
-  // ให้ส่งคำค้นหาเดิมเข้า Algolia ซ้ำเสมอ
   useEffect(() => {
-    refine(searchText);
-  }, [searchText, refine]); // refine เป็นฟังก์ชันที่ได้จาก hook useSearchBox() เก็บคำค้นหาไว้แล้วส่งไป Algolia
+    if (!searchText.trim()) {
+      refine(""); // ถ้าช่องว่างเปล่า ก็ส่งค่าว่างไป
+      return;
+    }
+
+    // 1. เรียกใช้ตัวตัดคำภาษาไทยที่มีอยู่ใน Browser (ไม่ต้อง npm install)
+    const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+    
+    // 2. หั่นข้อความจากผู้ใช้ แล้วจับมาต่อกันใหม่ด้วยเว้นวรรค (Space)
+    // ตัวอย่าง: "ไก่ย่าง5ดาว" -> จะถูกแปลงเป็น "ไก่ ย่าง 5 ดาว"
+    const tokenizedText = Array.from(segmenter.segment(searchText))
+      .map(segmentObj => segmentObj.segment)
+      .join(' ');
+
+    // 3. ส่งคำที่ "เว้นวรรคแล้ว" เข้า Algolia 
+    // (UI ในกล่องพิมพ์ยังแสดง searchText แบบติดกันปกติ แต่ Algolia ได้รับแบบเว้นวรรค)
+    refine(tokenizedText);
+    
+  }, [searchText, refine]);
 
   return (
     <input

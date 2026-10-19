@@ -1,11 +1,9 @@
 import "./reportStats.scss"
-import { useContext, useState } from "react";
-import { AuthContext } from "../../../context/authContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import PendingIcon from '@mui/icons-material/Pending';
@@ -16,11 +14,9 @@ import ReportPopup from "../../Right/reportPopup/reportPopup";
 const ReportStats = () => {
     const navigate = useNavigate();
     const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
-    const { currentUser, setUser } = useContext(AuthContext);
     const [searchTerm, setSearchTerm] = useState("");
     const queryClient = useQueryClient();
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
 
     // ---- State สำหรับ Modal ---- //
     const [selectedReport, setSelectedReport] = useState(null);
@@ -74,6 +70,9 @@ const ReportStats = () => {
         },
         onError: (err) => {
             setError("Error updating report: " + err.message);
+            setTimeout(() => {
+                setError("");
+            }, 3000);
         }
     });
 

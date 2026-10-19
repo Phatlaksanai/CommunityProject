@@ -1,6 +1,5 @@
 import "./contentStats.scss"
-import { useContext, useState } from "react";
-import { AuthContext } from "../../../context/authContext";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -295,6 +294,18 @@ const ContentStats = () => {
         }
         addCategoryMutation.mutate(newCategoryData);
     };
+
+    // ถ้า error หรือ success มีค่า ให้ตั้งเวลานับถอยหลังลบค่าทิ้ง
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => setSuccess(""), 3000);
+            return () => clearTimeout(timer); // คืนค่าเมมโมรี่เผื่อผู้ใช้เปลี่ยนหน้าก่อนครบ 3 วิ
+        }
+        if (error) {
+            const timer = setTimeout(() => setError(""), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [success, error]);
 
     if (summaryLoading || chartLoading || tableLoading || donutYearlyLoading || donutDistributionLoading) return <div className="loading">Loading dashboard...</div>;
     if (isSummaryError || isChartError || isTableError || isDonutYearlyError || isDonutDistributionError) return <div className="error">Error loading dashboard data.</div>;
@@ -602,7 +613,7 @@ const ContentStats = () => {
                                     </div>
                                     <div className="input-group">
                                         <label>Price</label>
-                                        <input type="number" name="price" value={formData.price || ""} onChange={handleChange} />
+                                        <input type="number" name="price" value={formData.price || "0"} onChange={handleChange} />
                                     </div>
                                     <div className="input-group">
                                         <label>Status</label>

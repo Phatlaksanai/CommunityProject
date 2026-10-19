@@ -1,12 +1,11 @@
 import "./userStats.scss"
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../../context/authContext";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PersonIcon from '@mui/icons-material/Person';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import SystemUpdateAltOutlinedIcon from '@mui/icons-material/SystemUpdateAltOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import DonutChart from "../../Right/donutChart/donutChart"
 import ReportPopup from "../../Right/reportPopup/reportPopup";
@@ -204,6 +203,18 @@ const UserStats = () => {
         }
         addAdminMutation.mutate(newAdminData);
     };
+
+    // ถ้า error หรือ success มีค่า ให้ตั้งเวลานับถอยหลังลบค่าทิ้ง
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => setSuccess(""), 3000);
+            return () => clearTimeout(timer); // คืนค่าเมมโมรี่เผื่อผู้ใช้เปลี่ยนหน้าก่อนครบ 3 วิ
+        }
+        if (error) {
+            const timer = setTimeout(() => setError(""), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [success, error]);
 
     if (summaryLoading || chartLoading || usertableLoading || userRegistrationsLoading || roleLoading) return <div className="loading">Loading dashboard...</div>;
     if (isSummaryError || isChartError || usertableError || userRegistrationsError || roleError) return <div className="error">Error loading dashboard data.</div>;
