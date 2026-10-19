@@ -2,6 +2,19 @@ const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const algoliaClient = require("../config/algolia");
 
+// Intl.Segmenter ตัดคำไทยใส่ช่องว่างก่อนส่งเข้า Algolia
+const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+
+function tokenizeThai(text) {
+  if (!text) return "";
+  const segments = segmenter.segment(String(text));
+  // แยกคำแล้วเอามาต่อกันด้วยช่องว่าง (Space) เพื่อให้ Algolia มองเป็นคนละคำ
+  return Array.from(segments)
+    .map(s => s.segment.trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
 exports.getuserRegistrations = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_yearly_user_stats");
@@ -157,6 +170,8 @@ exports.updateUser = async (req, res) => {
             title: name || username,
             img: data.profilePic ,
             description: description || "",
+            searchable_title: tokenizeThai(name || username),
+            searchable_description: tokenizeThai(description || ""),
             type: "user",
             targetId: userId,
           },

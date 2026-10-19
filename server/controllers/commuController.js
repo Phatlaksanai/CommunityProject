@@ -2,6 +2,19 @@ const db = require("../config/db");
 const cloudinary = require("../config/cloudinary");
 const algoliaClient = require("../config/algolia");
 
+// Intl.Segmenter ตัดคำไทยใส่ช่องว่างก่อนส่งเข้า Algolia
+const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+
+function tokenizeThai(text) {
+  if (!text) return "";
+  const segments = segmenter.segment(String(text));
+  // แยกคำแล้วเอามาต่อกันด้วยช่องว่าง (Space) เพื่อให้ Algolia มองเป็นคนละคำ
+  return Array.from(segments)
+    .map(s => s.segment.trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
 exports.addCommunity = async (req, res) => {
   const { CommunityName, description, img, public_id } = req.body;
   const userId = req.user.user_id;
@@ -45,6 +58,8 @@ exports.addCommunity = async (req, res) => {
           objectID: `commu_${newCommunity.communities_id}`, // ใช้รูปแบบ commu_รหัส เพื่อแยกหมวดหมู่
           title: newCommunity.name,
           description: newCommunity.description,
+          searchable_title: tokenizeThai(newCommunity.name),
+          searchable_description: tokenizeThai(newCommunity.description),
           img: newCommunity.cover_img, // แมป URL รูปภาพเข้าช่อง img (ถ้ามี)
           type: 'community',
           targetId: newCommunity.communities_id
@@ -243,6 +258,8 @@ exports.updateCommunity = async (req, res) => {
           objectID: `commu_${communityId}`, // อ้างอิง ID แถวเดิมให้ตรงกัน ระบบจะสลับข้อมูลไส้ในให้เองอัตโนมัติ
           title: name,
           description: description,
+          searchable_title: tokenizeThai(name),
+          searchable_description: tokenizeThai(description),
           img: img, // แมป URL รูปภาพเข้าช่อง img (ถ้ามี)
           type: 'community',
           targetId: communityId

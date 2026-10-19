@@ -120,6 +120,12 @@ exports.createConversation = async (req, res) => {
 exports.getMessages = async (req, res) => {
     const { conversationId } = req.params;
     try {
+
+        const page = parseInt(req.query.page) || 0;
+        const limit = 15;
+        const from = page * limit;
+        const to = from + limit - 1;
+
         const { data, error } = await db
             .from("messages")
             .select(`
@@ -127,11 +133,16 @@ exports.getMessages = async (req, res) => {
                 imgs ( img ) 
             `)
             .eq("conversation_id", conversationId)
-            .order("created_at", { ascending: true });
+            .order("created_at", { ascending: false })
+            .range(from, to);
 
         if (error) throw error;
 
-        return res.status(200).json(data);
+        // ส่งกลับจากเก่า → ใหม่
+        // เพื่อให้หน้า Chat แสดงตามลำดับเวลา
+        const messages = data ? [...data].reverse() : [];
+
+        return res.status(200).json(messages);
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }

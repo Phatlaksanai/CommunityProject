@@ -1,6 +1,19 @@
 const db = require("../config/db");
 const algoliaClient = require("../config/algolia");
 
+// Intl.Segmenter ตัดคำไทยใส่ช่องว่างก่อนส่งเข้า Algolia
+const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+
+function tokenizeThai(text) {
+  if (!text) return "";
+  const segments = segmenter.segment(String(text));
+  // แยกคำแล้วเอามาต่อกันด้วยช่องว่าง (Space) เพื่อให้ Algolia มองเป็นคนละคำ
+  return Array.from(segments)
+    .map(s => s.segment.trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
 // ฟังก์ชันกลางสำหรับคำนวณ
 const formatDonutYearlyStats = async (rpcName) => {
   const { data, error } = await db.rpc(rpcName);
@@ -409,6 +422,8 @@ exports.updateCommunity = async (req, res) => {
             objectID: `commu_${communityId}`, // ใช้รูปแบบ commu_รหัส เพื่อแยกหมวดหมู่
             title: data.name,
             description: description,
+            searchable_title: tokenizeThai(data.name),
+            searchable_description: tokenizeThai(description),
             img: cover_img, // แมป URL รูปภาพเข้าช่อง img (ถ้ามี)
             type: 'community',
             targetId: data.communities_id
@@ -483,6 +498,8 @@ exports.updateItem = async (req, res) => {
             objectID: `item_${itemId}`,
             title: modelName, // อัปเดตชื่อใหม่
             description: description, // อัปเดตรายละเอียดใหม่
+            searchable_title: tokenizeThai(modelName),
+            searchable_description: tokenizeThai(description),
             img: img, // รูปใหม่ (ถ้ามี)
             price: price,
             type: 'item',

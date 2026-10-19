@@ -5,6 +5,19 @@ const nodemailer = require("nodemailer");
 const cloudinary = require("../config/cloudinary");
 const algoliaClient = require("../config/algolia");
 
+// Intl.Segmenter ตัดคำไทยใส่ช่องว่างก่อนส่งเข้า Algolia
+const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+
+function tokenizeThai(text) {
+  if (!text) return "";
+  const segments = segmenter.segment(String(text));
+  // แยกคำแล้วเอามาต่อกันด้วยช่องว่าง (Space) เพื่อให้ Algolia มองเป็นคนละคำ
+  return Array.from(segments)
+    .map(s => s.segment.trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -168,6 +181,7 @@ exports.register = async (req, res) => {
         body: {
           objectID: `user_${user.user_id}`, // ใช้ prefix user_ นำหน้า
           title: username, // ผู้ใช้ใหม่ยังไม่มี DisplayName ให้เอา username ไปใช้ค้นหาก่อน
+          searchable_title: tokenizeThai(username),
           img: null, // ยังไม่มีรูปโปรไฟล์
           type: "user", // ระบุประเภทเป็น user
           targetId: user.user_id,
@@ -419,6 +433,8 @@ exports.updateProfile = async (req, res) => {
 
     if (updateError) return res.status(500).json(updateError);
 
+    finalname = updateData.name || user.name || user.username;
+    finaldescription = updateData.description || user.description || "";
     // ============================================================
     // 🚀 [เพิ่มคำสั่ง Algolia v5] อัปเดตข้อมูลผู้ใช้บนคลังค้นหา
     // ============================================================
@@ -428,9 +444,11 @@ exports.updateProfile = async (req, res) => {
         body: {
           objectID: `user_${userId}`, // ทับ objectID เดิม
           // ถ้าตั้ง Display Name แล้วให้ใช้คู่กับ Username เพื่อให้เสิร์ชเจอทั้งสองแบบ
-          title: updateData.name || user.name || user.username,
+          title: finalname,
+          description: finaldescription,
+          searchable_title: tokenizeThai(finalname),
+          searchable_description: tokenizeThai(finaldescription),
           img: updateData.profilePic || user.profilePic, // โยน URL รูปโปรไฟล์ล่าสุดเข้าไป
-          description: updateData.description || user.description || "",
           type: "user",
           targetId: userId,
         },

@@ -2,6 +2,19 @@ const db = require("../config/db");
 const cloudinary = require("../config/cloudinary");
 const algoliaClient = require("../config/algolia");
 
+// Intl.Segmenter ตัดคำไทยใส่ช่องว่างก่อนส่งเข้า Algolia
+const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+
+function tokenizeThai(text) {
+  if (!text) return "";
+  const segments = segmenter.segment(String(text));
+  // แยกคำแล้วเอามาต่อกันด้วยช่องว่าง (Space) เพื่อให้ Algolia มองเป็นคนละคำ
+  return Array.from(segments)
+    .map(s => s.segment.trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
 exports.getItems = async (req, res) => {
   try {
     const { category_id, date, user_id } = req.query;
@@ -470,6 +483,8 @@ exports.addItem = async (req, res) => {
           objectID: `item_${itemData.item_id}`,
           title: itemData.modelName,
           description: itemData.description,
+          searchable_title: tokenizeThai(itemData.modelName), // เพิ่มฟิลด์ที่ตัดคำแล้วให้ Algolia ค้นหา
+          searchable_description: tokenizeThai(itemData.description), // เพิ่มฟิลด์ที่ตัดคำแล้วให้ Algolia ค้นหา
           img: itemData.img,
           type: 'item',
           category: category?.type,
@@ -540,14 +555,19 @@ exports.editItem = async (req, res) => {
       .eq("category_id", finalCategoryId)
       .single();
 
+    const finalTitle = updateData.modelName || items.modelName;
+    const finalDescription = updateData.description !== undefined ? updateData.description : items.description;
+    
     // 4. อัปเดตข้อมูลบน Algolia v5
     try {
       await algoliaClient.saveObject({
         indexName: "WebCommunity_Search",
         body: {
           objectID: `item_${itemId}`,
-          title: updateData.modelName || items.modelName,
-          description: updateData.description !== undefined ? updateData.description : items.description,
+          title: finalTitle,
+          description: finalDescription,
+          searchable_title: tokenizeThai(finalTitle), // อัปเดตคำที่ตัดใหม่เมื่อมีการแก้ไขชื่อ
+          searchable_description: tokenizeThai(finalDescription), // อัปเดตคำที่ตัดใหม่เมื่อมีการแก้ไขคำอธิบาย
           img: updateData.img || items.img,
           type: "item",
           category: category?.type,
