@@ -39,6 +39,7 @@ npm install @mui/icons-material @mui/material @emotion/styled @emotion/react
 npm install -D sass
 npm install @tanstack/react-query
 npm install three
+npm install react-spinners
 ```
 
 ## Client
@@ -47,7 +48,6 @@ npm install three
 npm install swiper
 npm install react-intersection-observer
 npm install algoliasearch react-instantsearch
-npm install react-spinners
 ```
 
 ## Admin

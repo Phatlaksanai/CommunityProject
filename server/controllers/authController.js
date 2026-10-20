@@ -18,6 +18,10 @@ function tokenizeThai(text) {
     .join(" ");
 }
 
+exports.awakeRender = async (req, res) => {
+  return res.json({message: "Hello world"})
+};
+
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -257,15 +261,6 @@ exports.sendOtpRegister = async (req, res) => {
         user: process.env.NODEMAIL_USER,
         pass: process.env.NODEMAIL_PASS,
       },
-
-      // จำกัดเวลารอ เพื่อให้เห็นปัญหาเร็วขึ้น
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 20000,
-
-  // เปิด Log แต่ไม่บันทึกเนื้อหาอีเมลทั้งหมด
-  logger: true,
-  debug: false,
     });
 
     await transporter.sendMail({
