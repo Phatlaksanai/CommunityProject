@@ -66,6 +66,7 @@ npm install dayjs
 npm install cloudinary multer
 npm install @supabase/supabase-js
 npm install algoliasearch
+npm install express-rate-limit
 ```
 
 ## Client + Server

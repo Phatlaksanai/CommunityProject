@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const cloudinary = require("../config/cloudinary");
 const algoliaClient = require("../config/algolia");
+const rateLimit = require("express-rate-limit");
 
 // Intl.Segmenter ตัดคำไทยใส่ช่องว่างก่อนส่งเข้า Algolia
 const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
@@ -18,9 +19,19 @@ function tokenizeThai(text) {
     .join(" ");
 }
 
-exports.awakeRender = async (req, res) => {
+const awakeRenderLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 นาที
+  limit: 5,            // จำกัด 5 ครั้งต่อ IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    message: "Too many requests. Please try again later.",
+  },
+});
+
+exports.awakeRender = [awakeRenderLimiter, async (req, res) => {
   return res.json({message: "Hello world"})
-};
+}];
 
 exports.login = async (req, res) => {
   try {
