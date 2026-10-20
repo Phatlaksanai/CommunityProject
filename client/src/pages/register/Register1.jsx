@@ -64,7 +64,7 @@ const Register = () => {
     if (otpCooldown > 0 || otpLoading) return;
     setError("");
     setSuccess("");
-    
+
 
     if (!email.trim()) {
       setError("Please enter your email before requesting OTP");
@@ -83,7 +83,11 @@ const Register = () => {
         setError(data.error || "OTP sending failed");
       }
     } catch (err) {
-      setError("Connect to server failed");
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error); // จะแสดง error จาก backend
+      } else {
+        setError("Connect to server failed");
+      }
     } finally {
       setOtpLoading(false);
     }
@@ -168,10 +172,14 @@ const Register = () => {
                   onChange={(e) => setPassword2(e.target.value)}
                   required
                 />
-                <button type="button" onClick={nextStep}>
-                  Next
-                </button>
-                <button onClick={()=>setisshowpassword(!isshowpassword)}>show password</button>
+                <div className="step1-buttons">
+                  <button type="button" onClick={nextStep}>
+                    Next
+                  </button>
+                  <button type="button" onClick={() => setisshowpassword(!isshowpassword)} >
+                    {isshowpassword ? "Hide password" : "Show password"}
+                  </button>
+                </div>
                 <div className="mobile-switch">
                   Already have an account? <Link to="/login">Login</Link>
                 </div>

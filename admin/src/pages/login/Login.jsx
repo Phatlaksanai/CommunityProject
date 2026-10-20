@@ -18,6 +18,8 @@ const Login = () => {
   const [otpCooldown, setOtpCooldown] = useState(0);
   const [otpLoading, setOtpLoading] = useState(false);
 
+  const [isshowpassword, setisshowpassword] = useState(false)
+
   useEffect(() => {
     if (otpCooldown <= 0) return;
 
@@ -73,7 +75,11 @@ const Login = () => {
         setError(data.error || "OTP sending failed");
       }
     } catch (err) {
-      setError(err.response?.data?.error || "Connect to server failed");
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error); // จะแสดง error จาก backend
+      } else {
+        setError("Connect to server failed");
+      }
     } finally {
       setOtpLoading(false);
     }
@@ -107,7 +113,7 @@ const Login = () => {
               required
             />
             <input
-              type="password"
+              type={isshowpassword ? "text" : "password"}
               value={password}
               placeholder="Password"
               name="password"
@@ -122,7 +128,7 @@ const Login = () => {
               onChange={(e) => setOtp(e.target.value)}
               required
             />
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div className="btn" style={{ display: "flex", gap: "10px" }}>
               <button
                 type="button"
                 onClick={sendOTP}
@@ -135,6 +141,9 @@ const Login = () => {
                 ) : (
                   "OTP"
                 )}
+              </button>
+              <button type="button" onClick={() => setisshowpassword(!isshowpassword)} >
+                {isshowpassword ? "Hide password" : "Show password"}
               </button>
               <button type="submit" className="login-btn">login</button>
             </div>
