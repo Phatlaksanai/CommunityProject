@@ -121,27 +121,54 @@ exports.sendOtpAdmin = async (req, res) => {
 
         if (otpError) throw otpError;
 
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 465,
-            secure: true,
-            connectionTimeout: 60000,
-            greetingTimeout: 30000,
-            socketTimeout: 60000,
-            auth: { user: process.env.NODEMAIL_ADMIN, pass: process.env.NODEMAIL_PASS_ADMIN },
-        });
+        // const transporter = nodemailer.createTransport({
+        //     host: "smtp.gmail.com",
+        //     port: 465,
+        //     secure: true,
+        //     connectionTimeout: 60000,
+        //     greetingTimeout: 30000,
+        //     socketTimeout: 60000,
+        //     auth: { user: process.env.NODEMAIL_ADMIN, pass: process.env.NODEMAIL_PASS_ADMIN },
+        // });
 
-        await transporter.sendMail({
-            from: process.env.NODEMAIL_ADMIN,
-            to: user.email,
-            subject: "PM Request OTP",
-            html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
-        });
+        // await transporter.sendMail({
+        //     from: process.env.NODEMAIL_ADMIN,
+        //     to: user.email,
+        //     subject: "PM Request OTP",
+        //     html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
+        // });
 
-        return res.json({ success: true });
+    // ส่ง Email (Brevo API)
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "api-key": process.env.BREVO_API_KEY,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        sender: {
+          name: "PM Admin",
+          email: "patlaksanai2548@gmail.com",
+        },
+        to: [{ email: email.trim() }],
+        subject: "PM Request OTP",
+        htmlContent: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Brevo API Error:", errorData);
+      return res
+        .status(500)
+        .json({ success: false, error: "Failed to send OTP email" });
+    }
+
+    return res.json({ success: true });
 
     } catch (err) {
-        console.error("Detailed Error:", err);
+        console.error("Fetch Error:", err);
         return res.status(500).json({ success: false, error: "Failed to send OTP" });
     }
 };

@@ -48,7 +48,7 @@
           display: none;
         }
       }
-      
+
       span {
         font-size: 14px;
 
@@ -118,20 +118,34 @@
           margin-top: 15px;
           font-size: 14px;
           color: #555;
-          
+
           @include mobile {
             display: block; // แสดงปุ่มสลับหน้าเฉพาะบนมือถือ
           }
-          
+
           a {
             color: #597b2a;
             font-weight: bold;
             text-decoration: none;
-            
+
             &:hover {
               text-decoration: underline;
             }
           }
+        }
+      }
+
+      .btn {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        width: 100%;
+
+        button {
+          flex: 1;
+          width: auto;
+          min-width: 0;
+          padding: 10px 5px;
         }
       }
     }

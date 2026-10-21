@@ -20,33 +20,33 @@ const ResetPassword = () => {
   const [otpCooldown, setOtpCooldown] = useState(0);
   const [otpLoading, setOtpLoading] = useState(false);
 
-  useEffect(() => { 
-      if (otpCooldown <= 0) return;
-  
-      const timer = setInterval(() => {
-        setOtpCooldown((prev) => prev - 1);
-      }, 1000);
-  
-      return () => clearInterval(timer);
+  useEffect(() => {
+    if (otpCooldown <= 0) return;
+
+    const timer = setInterval(() => {
+      setOtpCooldown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, [otpCooldown]);
-  
+
   const nextStep = async () => {
     setError("");
     setSuccess("");
-  try {
-    const res = await makeRequest.post("/verify-otp-resetpassword", {
-      email: Email,
-      otp: OTP
-    });
-    const data = res.data;
-    if (data.success) {
-      setStep(2);
-    } else {
-      setError("OTP is incorrect");
+    try {
+      const res = await makeRequest.post("/verify-otp-resetpassword", {
+        email: Email,
+        otp: OTP
+      });
+      const data = res.data;
+      if (data.success) {
+        setStep(2);
+      } else {
+        setError("OTP is incorrect");
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || "OTP is incorrect");
     }
-  } catch (err) {
-    setError(err.response?.data?.error || "OTP is incorrect");
-  }
   };
 
   const prevStep = () => {
@@ -59,19 +59,23 @@ const ResetPassword = () => {
     setSuccess("");
     setOtpLoading(true);
     try {
-    const res = await makeRequest.post("/send-otp-resetpassword", { email: Email });
-    const data = res.data;
-    if (data.success) {
-      setSuccess("Sent OTP Successfully");
-      setOtpCooldown(8);
-    } else {
-      setError(data.error || "OTP sending failed");
+      const res = await makeRequest.post("/send-otp-resetpassword", { email: Email });
+      const data = res.data;
+      if (data.success) {
+        setSuccess("Sent OTP Successfully");
+        setOtpCooldown(8);
+      } else {
+        setError(data.error || "OTP sending failed");
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error); // จะแสดง error จาก backend
+      } else {
+        setError("OTP sending failed");
+      }
+    } finally {
+      setOtpLoading(false);
     }
-  } catch (err) {
-    setError("OTP sending failed");
-  } finally {
-    setOtpLoading(false);
-  }
   };
 
   const handleResetPassword = async (e) => {
@@ -86,9 +90,9 @@ const ResetPassword = () => {
       });
       const data = res.data;
       if (data.success) {
-      setSuccess("Reset password success");
-      navigate("/login");
-    }
+        setSuccess("Reset password success");
+        navigate("/login");
+      }
     } catch (err) {
       setError(err.response?.data?.error || "Reset password failed");
     }
@@ -118,53 +122,53 @@ const ResetPassword = () => {
           <form onSubmit={handleResetPassword} className="form-login">
             {step === 1 && (
               <>
-            <input
-              type="text"
-              value={Email}
-              placeholder="Email"
-              name="Email"
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <input
-              type="text"
-              value={OTP}
-              placeholder="OTP"
-              name="OTP"
-              onChange={(e) => setOTP(e.target.value)}
-              required
-            />
-            <div className="button-group">
-                <button type="button" onClick={handleSendOTP} disabled={otpCooldown > 0 || otpLoading}>
+                <input
+                  type="text"
+                  value={Email}
+                  placeholder="Email"
+                  name="Email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <input
+                  type="text"
+                  value={OTP}
+                  placeholder="OTP"
+                  name="OTP"
+                  onChange={(e) => setOTP(e.target.value)}
+                  required
+                />
+                <div className="button-group">
+                  <button type="button" onClick={handleSendOTP} disabled={otpCooldown > 0 || otpLoading}>
                     {otpCooldown > 0 ? `Resend OTP (${otpCooldown} s)` : "OTP"}
-                </button>
-                <button type="button" onClick={nextStep}>Confirm</button>
-            </div>           
-            </>
+                  </button>
+                  <button type="button" onClick={nextStep}>Confirm</button>
+                </div>
+              </>
             )}
 
             {step === 2 && (
               <>
-            <input
-              type="password"
-              value={password}
-              placeholder="New Password"
-              name="password"
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              value={confirmpassword}
-              placeholder="Confirm Password"
-              name="confirmpassword"
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-            <div className="button-group">
-                <button type="submit" className="login-btn">Confirm</button>
-            </div>
-            </>
+                <input
+                  type="password"
+                  value={password}
+                  placeholder="New Password"
+                  name="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <input
+                  type="password"
+                  value={confirmpassword}
+                  placeholder="Confirm Password"
+                  name="confirmpassword"
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <div className="button-group">
+                  <button type="submit" className="login-btn">Confirm</button>
+                </div>
+              </>
             )}
           </form>
         </div>

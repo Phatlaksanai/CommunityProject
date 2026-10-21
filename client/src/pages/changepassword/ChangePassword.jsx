@@ -67,7 +67,11 @@ const ChangePassword = () => {
                 setError(data.error || "OTP sending failed");
             }
         } catch (err) {
-            setError("OTP sending failed");
+            if (err.response && err.response.data && err.response.data.error) {
+                setError(err.response.data.error); // จะแสดง error จาก backend
+            } else {
+                setError("OTP sending failed");
+            }
         } finally {
             setOtpLoading(false);
         }

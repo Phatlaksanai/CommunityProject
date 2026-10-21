@@ -14,7 +14,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-
+  const [isshowpassword, setisshowpassword] = useState(false)
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -69,7 +69,7 @@ const Login = () => {
               required
             />
             <input
-              type="password"
+              type={isshowpassword ? "text" : "password"}
               value={password}
               placeholder="Password"
               name="password"
@@ -79,12 +79,18 @@ const Login = () => {
             <Link to="/resetpassword" className="forgot">
               forgot password
             </Link>
-            <button type="submit" className="login-btn">login</button>
+
+            <div className="btn">
+              <button type="button" onClick={() => setisshowpassword(!isshowpassword)} >
+                {isshowpassword ? "Hide password" : "Show password"}
+              </button>
+              <button type="submit" className="login-btn">login</button>
+            </div>
 
             <div className="mobile-switch">
               Don't have an account? <Link to="/register">Register</Link>
             </div>
-            
+
           </form>
         </div>
       </div>

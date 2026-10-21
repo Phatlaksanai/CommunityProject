@@ -9,7 +9,7 @@
     "build": "npm install --prefix client && npm run build --prefix client && npm install --prefix admin && npm run build --prefix admin",
     "server": "npm start --prefix server",
     "client": "npm run dev --prefix client",
-    "admin" : "npm run dev --prefix admin",
+    "admin": "npm run dev --prefix admin",
     "dev": "concurrently \"npm run server\" \"npm run client\" \"npm run admin\""
   },
   "keywords": [],

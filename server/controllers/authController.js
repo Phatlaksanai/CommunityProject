@@ -7,21 +7,21 @@ const algoliaClient = require("../config/algolia");
 const rateLimit = require("express-rate-limit");
 
 // Intl.Segmenter ตัดคำไทยใส่ช่องว่างก่อนส่งเข้า Algolia
-const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+const segmenter = new Intl.Segmenter("th", { granularity: "word" });
 
 function tokenizeThai(text) {
   if (!text) return "";
   const segments = segmenter.segment(String(text));
   // แยกคำแล้วเอามาต่อกันด้วยช่องว่าง (Space) เพื่อให้ Algolia มองเป็นคนละคำ
   return Array.from(segments)
-    .map(s => s.segment.trim())
+    .map((s) => s.segment.trim())
     .filter(Boolean)
     .join(" ");
 }
 
 const awakeRenderLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 นาที
-  limit: 5,            // จำกัด 5 ครั้งต่อ IP
+  limit: 5, // จำกัด 5 ครั้งต่อ IP
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -29,9 +29,12 @@ const awakeRenderLimiter = rateLimit({
   },
 });
 
-exports.awakeRender = [awakeRenderLimiter, async (req, res) => {
-  return res.json({message: "Hello world"})
-}];
+exports.awakeRender = [
+  awakeRenderLimiter,
+  async (req, res) => {
+    return res.json({ message: "Hello world" });
+  },
+];
 
 exports.login = async (req, res) => {
   try {
@@ -111,11 +114,9 @@ exports.register = async (req, res) => {
     }
     username = username.trim();
     if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9_ ]+$/.test(username)) {
-      return res
-        .status(400)
-        .json({
-          error: "Username can only contain letters, numbers, and underscores",
-        });
+      return res.status(400).json({
+        error: "Username can only contain letters, numbers, and underscores",
+      });
     }
     if (username.length < 3 || username.length > 35) {
       return res
@@ -129,12 +130,10 @@ exports.register = async (req, res) => {
     }
 
     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$/.test(password)) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Password must contain at least one uppercase letter, one lowercase letter, and one special character",
-        });
+      return res.status(400).json({
+        error:
+          "Password must contain at least one uppercase letter, one lowercase letter, and one special character",
+      });
     }
     if (password !== password2) {
       return res.status(400).json({ error: "Passwords don't match" });
@@ -264,36 +263,62 @@ exports.sendOtpRegister = async (req, res) => {
     if (otpError) throw otpError;
 
     // --- 4. ส่ง Email (Nodemailer) ---
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.NODEMAIL_USER,
-        pass: process.env.NODEMAIL_PASS,
+    // const transporter = nodemailer.createTransport({
+    //   host: "smtp.gmail.com",
+    //   port: 587,
+    //   secure: false,
+    //   auth: {
+    //     user: process.env.NODEMAIL_USER,
+    //     pass: process.env.NODEMAIL_PASS,
+    //   },
+    // });
+
+    // await transporter.sendMail({
+    //   from: process.env.NODEMAIL_USER,
+    //   to: email,
+    //   subject: "PM Request OTP",
+    //   html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
+    // });
+
+    // ส่ง Email (Brevo API)
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "api-key": process.env.BREVO_API_KEY,
+        "content-type": "application/json",
       },
+      body: JSON.stringify({
+        sender: {
+          name: "PM Admin",
+          email: "patlaksanai2548@gmail.com",
+        },
+        to: [{ email: email.trim() }],
+        subject: "PM Request OTP",
+        htmlContent: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
+      }),
     });
 
-    await transporter.sendMail({
-      from: process.env.NODEMAIL_USER,
-      to: email,
-      subject: "PM Request OTP",
-      html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
-    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Brevo API Error:", errorData);
+      return res
+        .status(500)
+        .json({ success: false, error: "Failed to send OTP email" });
+    }
 
     return res.json({ success: true });
   } catch (err) {
-    console.error("Detailed Error:", err);
+    console.error("Fetch Error:", err);
     return res
       .status(500)
-      .json({ success: false, error: "Failed to send OTP" });
+      .json({ success: false, error: "Failed to send OTP email" });
   }
 };
 
 exports.sendOtpResetPassword = async (req, res) => {
   try {
     const { email } = req.body;
-
     // เช็คว่ามี user นี้จริงไหม
     const { data: user, error: userError } = await db
       .from("users")
@@ -322,22 +347,49 @@ exports.sendOtpResetPassword = async (req, res) => {
     if (otpError) throw otpError;
 
     // ส่ง email
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.NODEMAIL_USER,
-        pass: process.env.NODEMAIL_PASS,
+    // const transporter = nodemailer.createTransport({
+    //   host: "smtp.gmail.com",
+    //   port: 587,
+    //   secure: false,
+    //   auth: {
+    //     user: process.env.NODEMAIL_USER,
+    //     pass: process.env.NODEMAIL_PASS,
+    //   },
+    // });
+
+    // await transporter.sendMail({
+    //   from: process.env.NODEMAIL_USER,
+    //   to: email,
+    //   subject: "Reset Password OTP",
+    //   html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
+    // });
+
+    // ส่ง Email (Brevo API)
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "api-key": process.env.BREVO_API_KEY,
+        "content-type": "application/json",
       },
+      body: JSON.stringify({
+        sender: {
+          name: "PM Admin",
+          email: "patlaksanai2548@gmail.com",
+        },
+        to: [{ email: email.trim() }],
+        subject: "PM Request OTP",
+        htmlContent: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
+      }),
     });
 
-    await transporter.sendMail({
-      from: process.env.NODEMAIL_USER,
-      to: email,
-      subject: "Reset Password OTP",
-      html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
-    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Brevo API Error:", errorData);
+      return res
+        .status(500)
+        .json({ success: false, error: "Failed to send OTP email" });
+    }
 
     return res.json({ success: true });
   } catch (err) {
@@ -502,12 +554,10 @@ exports.resetPassword = async (req, res) => {
       .json({ error: "Password must be between 10 and 20 characters" });
   }
   if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$/.test(password)) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "Password must contain at least one uppercase letter, one lowercase letter, and one special character",
-      });
+    return res.status(400).json({
+      error:
+        "Password must contain at least one uppercase letter, one lowercase letter, and one special character",
+    });
   }
 
   try {
@@ -650,7 +700,6 @@ exports.getUserById = async (req, res) => {
     }
 
     return res.status(200).json(user);
-
   } catch (err) {
     console.error("Error fetching user:", err);
     return res.status(500).json({ error: "Failed to fetch user data" });
