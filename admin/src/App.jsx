@@ -1,6 +1,7 @@
 import "./style.scss";
 import { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+
+// import { makeRequest } from "./api/axios";
 
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
@@ -12,20 +13,17 @@ import Report from "./pages/report/Report";
 import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/Left/leftbar/leftbar";
 import RightBar from "./components/Right/rightbar/rightbar";
-import DonutChart from "./components/Right/donutChart/donutChart";
 
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "./context/authContext";
-import { DarkModeContext } from "./context/darkModeContext";
 
 function App() {
-  const { darkMode } = useContext(DarkModeContext);
   const { currentUser } = useContext(AuthContext);
 
   const LayoutDashboard = () => {
     return (
-      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+      <div className={"theme-dark"}>
         <Navbar />
         <div style={{ display: "flex" }}>
           <LeftBar />
@@ -39,7 +37,7 @@ function App() {
   }
   const Layout = () => {
     return (
-      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+      <div className={"theme-dark"}>
         <Navbar />
         <div style={{ display: "flex" }}>
           <LeftBar />
@@ -50,6 +48,14 @@ function App() {
       </div>
     )
   }
+
+  // useEffect(() => {
+  //   if (currentUser) {
+  //     localStorage.setItem("user", JSON.stringify(currentUser));
+  //   } else {
+  //     localStorage.removeItem("user");
+  //   }
+  // }, [currentUser]);
 
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
@@ -80,7 +86,10 @@ function App() {
     {
       path: "/users",
       element: (
-        <Layout />
+        // 🚀 เพิ่ม ProtectedRoute ครอบ Layout ตรงนี้
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
       ),
       children: [
         {
@@ -92,7 +101,10 @@ function App() {
     {
       path: "/content&assets",
       element: (
-        <Layout />
+        // 🚀 เพิ่ม ProtectedRoute ครอบ Layout ตรงนี้
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
       ),
       children: [
         {
@@ -104,7 +116,10 @@ function App() {
     {
       path: "/transactions",
       element: (
-        <Layout />
+        // 🚀 เพิ่ม ProtectedRoute ครอบ Layout ตรงนี้
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
       ),
       children: [
         {
@@ -116,7 +131,10 @@ function App() {
     {
       path: "/reports",
       element: (
-        <Layout />
+        // 🚀 เพิ่ม ProtectedRoute ครอบ Layout ตรงนี้
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
       ),
       children: [
         {
