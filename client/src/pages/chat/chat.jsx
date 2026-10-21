@@ -228,8 +228,14 @@ const Chat = () => {
     // ฟังก์ชันกรองรายชื่อเพื่อนตามคำที่พิมพ์ค้นหา
     const filteredFriends = myFriends?.filter(friend => {
         if (!searchQuery) return false; // ถ้าไม่ได้พิมพ์อะไรเลย ก็ไม่ต้องโชว์
-        return friend.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            friend.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+        const username = (friend.username ?? "").toLowerCase();
+        const name = (friend.name ?? "").toLowerCase();
+        const query = searchQuery.toLowerCase();
+
+        return username.includes(query) || name.includes(query);
+        // return friend.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        //     friend.name.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
     const handleConversation = async (friend) => {
@@ -319,7 +325,7 @@ const Chat = () => {
                 </div>
 
                 {/* ส่วนเนื้อหาแชทที่เลื่อนได้ */}
-                <div className="chatContent" ref={chatContentRef} onScroll={() => {hasUserScrolledRef.current = true;}}>
+                <div className="chatContent" ref={chatContentRef} onScroll={() => { hasUserScrolledRef.current = true; }}>
                     {currentChat ? (
                         <>
                             <div
