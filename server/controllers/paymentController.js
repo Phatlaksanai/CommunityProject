@@ -489,14 +489,20 @@ exports.getDownloadFile = async (req, res) => {
 exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โดยอัตโนมัติจากฝั่ง Stripe"
   const sig = req.headers["stripe-signature"];
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const connectEndpointSecret = process.env.STRIPE_CONNECT_WEBHOOK_SECRET;
 
   let event;
 
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
   } catch (err) {
-    console.error("Webhook signature verification failed:", err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    try {
+      if (!connectEndpointSecret) throw new Error("STRIPE_CONNECT_WEBHOOK_SECRET is not defined");
+      event = stripe.webhooks.constructEvent(req.body, sig, connectEndpointSecret);
+    } catch (connectErr) {
+      console.error("Webhook signature verification failed for both secrets.");
+      return res.status(400).send(`Webhook Error: Verification failed`);
+    }
   }
 
   if (event.type === "payment_intent.succeeded") {
@@ -683,6 +689,7 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
 
 exports.CheckStripeId = async (req, res) => {
   const { userId } = req.params;
+  const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
   try {
     const { data, error } = await db
@@ -709,8 +716,8 @@ exports.CheckStripeId = async (req, res) => {
       // ถ้ามี ID แต่กรอกฟอร์มไม่ครบ ให้สร้างลิงก์ให้ไปทำต่อจากจุดเดิม
       const accountLink = await stripe.accountLinks.create({
         account: data.stripe_connect_id,
-        refresh_url: "http://localhost:5173/market",
-        return_url: "http://localhost:5173/market",
+        refresh_url: `${CLIENT_URL}/market`,
+        return_url: `${CLIENT_URL}/market`,
         type: "account_onboarding",
       });
       return res.status(200).json({ isSetupComplete: false, url: accountLink.url });
@@ -723,7 +730,8 @@ exports.CheckStripeId = async (req, res) => {
 
 exports.CreateStripeAccount = async (req, res) => {
   const { userId, email } = req.body;
-
+  const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+  
   try {
     const account = await stripe.accounts.create({
       type: "standard",
@@ -743,8 +751,8 @@ exports.CreateStripeAccount = async (req, res) => {
     // ใช้ AccountLinks (V1) สร้าง URL เพื่อให้ Frontend พาเด้งไปได้
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
-      refresh_url: "http://localhost:5173/market",
-      return_url: "http://localhost:5173/market",
+      refresh_url: `${CLIENT_URL}/market`,
+      return_url: `${CLIENT_URL}/market`,
       type: "account_onboarding",
     });
 

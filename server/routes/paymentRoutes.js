@@ -3,6 +3,7 @@ const router = express.Router();
 const paymentController = require("../controllers/paymentController");
 const { verifyToken } = require("../middleware/verifyToken");
 
+router.post("/webhook", express.raw({ type: "application/json" }), paymentController.stripeWebhook);
 router.post("/createpayment", verifyToken, paymentController.createPayment);
 router.post("/addToCart", verifyToken, paymentController.addItemToCart);
 router.post("/addToDownload", verifyToken, paymentController.addItemToDownload);
