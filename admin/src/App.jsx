@@ -143,7 +143,9 @@ function App() {
         },
       ]
     },
-  ]);
+  ],{
+    basename: "/admin" 
+  });
 
   const [user, setUser] = useState(() => {
     try {

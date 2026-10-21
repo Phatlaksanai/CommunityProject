@@ -1,7 +1,8 @@
-import { useContext, useState ,useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { makeRequest } from "../../api/axios";
+import { ClipLoader } from "react-spinners";
 import "./login.scss";
 
 const Login = () => {
@@ -16,6 +17,8 @@ const Login = () => {
   const [otp, setOtp] = useState("");
   const [otpCooldown, setOtpCooldown] = useState(0);
   const [otpLoading, setOtpLoading] = useState(false);
+
+  const [isshowpassword, setisshowpassword] = useState(false)
 
   useEffect(() => {
     if (otpCooldown <= 0) return;
@@ -50,32 +53,37 @@ const Login = () => {
   };
 
   const sendOTP = async () => {
-      if (otpCooldown > 0) return;
-      setError("");
-      setSuccess("");
-      setOtpLoading(true);
-  
-      if (!email.trim()) {
-        setError("Please enter your email before requesting OTP");
-        setOtpLoading(false);
-        return;
+
+    if (otpCooldown > 0 || otpLoading) return;
+    setError("");
+    setSuccess("");
+
+    if (!email.trim()) {
+      setError("Please enter your email before requesting OTP");
+      return;
+    }
+
+    setOtpLoading(true);
+
+    try {
+      const res = await makeRequest.post("/admin/send-otp", { email });
+      const data = res.data;
+      if (data.success) {
+        setSuccess("Send OTP Successfully");
+        setOtpCooldown(8);
+      } else {
+        setError(data.error || "OTP sending failed");
       }
-  
-      try {
-        const res = await makeRequest.post("/admin/send-otp", { email });
-        const data = res.data;
-        if (data.success) {
-          setSuccess("Send OTP Successfully");
-          setOtpCooldown(8);
-        } else {
-          setError(data.error || "OTP sending failed");
-        }
-      } catch (err) {
-        setError(err.response?.data?.error || "Connect to server failed");
-      } finally {
-        setOtpLoading(false);
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error); // จะแสดง error จาก backend
+      } else {
+        setError("Connect to server failed");
       }
-    };
+    } finally {
+      setOtpLoading(false);
+    }
+  };
 
   return (
     <div className="login">
@@ -105,7 +113,7 @@ const Login = () => {
               required
             />
             <input
-              type="password"
+              type={isshowpassword ? "text" : "password"}
               value={password}
               placeholder="Password"
               name="password"
@@ -120,15 +128,24 @@ const Login = () => {
               onChange={(e) => setOtp(e.target.value)}
               required
             />
-            <div style={{ display: "flex", gap: "10px" }}>
-                <button
-                    type="button"
-                    onClick={sendOTP}
-                    disabled={otpCooldown > 0 || otpLoading}
-                >
-                    {otpCooldown > 0 ? `Resend OTP (${otpCooldown} s)` : "OTP"}
-                </button>
-                <button type="submit" className="login-btn">login</button>
+            <div className="btn" style={{ display: "flex", gap: "10px" }}>
+              <button
+                type="button"
+                onClick={sendOTP}
+                disabled={otpLoading || otpCooldown > 0}
+              >
+                {otpLoading ? (
+                  <ClipLoader size={16} color="#ffffff" />
+                ) : otpCooldown > 0 ? (
+                  `Resend OTP (${otpCooldown} s)`
+                ) : (
+                  "OTP"
+                )}
+              </button>
+              <button type="button" onClick={() => setisshowpassword(!isshowpassword)} >
+                {isshowpassword ? "Hide password" : "Show password"}
+              </button>
+              <button type="submit" className="login-btn">login</button>
             </div>
           </form>
         </div>

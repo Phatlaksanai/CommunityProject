@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
+import { ClipLoader } from "react-spinners";
 import "./register.scss";
 
 const Register = () => {
@@ -24,6 +25,7 @@ const Register = () => {
   const [otpCooldown, setOtpCooldown] = useState(0);
   const [otpLoading, setOtpLoading] = useState(false);
 
+  const [isshowpassword, setisshowpassword] = useState(false)
   useEffect(() => { // นับถอยหลัง cooldown OTP
     if (otpCooldown <= 0) return;
 
@@ -59,16 +61,17 @@ const Register = () => {
 
   // ================= SEND OTP =================
   const sendOTP = async () => {
-    if (otpCooldown > 0) return;
+    if (otpCooldown > 0 || otpLoading) return;
     setError("");
     setSuccess("");
-    setOtpLoading(true);
+
 
     if (!email.trim()) {
       setError("Please enter your email before requesting OTP");
-      setOtpLoading(false);
       return;
     }
+
+    setOtpLoading(true);
 
     try {
       const res = await makeRequest.post("/send-otp-register", { email });
@@ -80,7 +83,11 @@ const Register = () => {
         setError(data.error || "OTP sending failed");
       }
     } catch (err) {
-      setError("Connect to server failed");
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error); // จะแสดง error จาก backend
+      } else {
+        setError("Connect to server failed");
+      }
     } finally {
       setOtpLoading(false);
     }
@@ -152,23 +159,27 @@ const Register = () => {
                   required
                 />
                 <input
-                  type="password"
+                  type={isshowpassword ? "text" : "password"}
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
                 <input
-                  type="password"
+                  type={isshowpassword ? "text" : "password"}
                   placeholder="Confirm Password"
                   value={password2}
                   onChange={(e) => setPassword2(e.target.value)}
                   required
                 />
-                <button type="button" onClick={nextStep}>
-                  Next
-                </button>
-
+                <div className="step1-buttons">
+                  <button type="button" onClick={nextStep}>
+                    Next
+                  </button>
+                  <button type="button" onClick={() => setisshowpassword(!isshowpassword)} >
+                    {isshowpassword ? "Hide password" : "Show password"}
+                  </button>
+                </div>
                 <div className="mobile-switch">
                   Already have an account? <Link to="/login">Login</Link>
                 </div>
@@ -196,9 +207,15 @@ const Register = () => {
                   <button
                     type="button"
                     onClick={sendOTP}
-                    disabled={otpCooldown > 0 || otpLoading}
+                    disabled={otpLoading || otpCooldown > 0}
                   >
-                    {otpCooldown > 0 ? `Resend OTP (${otpCooldown} s)` : "OTP"}
+                    {otpLoading ? (
+                      <ClipLoader size={16} color="#ffffff" />
+                    ) : otpCooldown > 0 ? (
+                      `Resend OTP (${otpCooldown} s)`
+                    ) : (
+                      "OTP"
+                    )}
                   </button>
 
                   <button type="button" onClick={prevStep}>

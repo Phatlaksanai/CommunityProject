@@ -123,8 +123,11 @@ exports.sendOtpAdmin = async (req, res) => {
 
         const transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
-            port: 587,
-            secure: false,
+            port: 465,
+            secure: true,
+            connectionTimeout: 60000,
+            greetingTimeout: 30000,
+            socketTimeout: 60000,
             auth: { user: process.env.NODEMAIL_ADMIN, pass: process.env.NODEMAIL_PASS_ADMIN },
         });
 

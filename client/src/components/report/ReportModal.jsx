@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { makeRequest } from "../../api/axios"; // ปรับ path ให้ตรงกับโฟลเดอร์ที่เก็บไฟล์นี้
-import "./ReportModal.scss";
+import "./reportModal.scss";
 
 const ReportModal = ({ isOpen, onClose, targetId, entityType, navbar }) => {
   const [type, setType] = useState(navbar ? "technical_issue" : "copyright");

@@ -2,7 +2,7 @@
 
 .register {
   height: 100vh;
-  background-color: #A0C46E;
+  background-color: #a0c46e;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,7 +24,8 @@
 
     .left {
       flex: 1;
-      background: linear-gradient(#3F5428, #3F542829),
+      background:
+        linear-gradient(#3f5428, #3f542829),
         url("https://images.pexels.com/photos/3194519/pexels-photo-3194519.jpeg")
           center;
       background-size: cover;
@@ -55,7 +56,7 @@
           display: none;
         }
       }
-      
+
       button {
         width: 50%;
         padding: 10px;
@@ -79,20 +80,20 @@
       justify-content: center;
 
       h1 {
-      color: #555;
+        color: #555;
       }
-      
+
       form {
         display: flex;
         flex-direction: column;
         gap: 30px;
-        
+
         input {
-        border: none;
-        border-bottom: 1px solid lightgray;
-        padding: 20px 10px;
+          border: none;
+          border-bottom: 1px solid lightgray;
+          padding: 20px 10px;
         }
-        
+
         button {
           width: 50%;
           padding: 10px;
@@ -107,32 +108,46 @@
           }
         }
 
-        .step2-buttons {
-          display: flex; 
+        .step1-buttons {
+          display: flex;
+          flex-direction: row;
           gap: 10px;
-          
+          width: 100%;
+
+          button {
+            flex: 1;
+            width: auto;
+            min-width: 0;
+            padding: 10px 5px;
+          }
+        }
+
+        .step2-buttons {
+          display: flex;
+          gap: 10px;
+
           @include mobile {
             flex-direction: row; // เรียงปุ่มแนวตั้งบนมือถือ
             gap: 15px;
           }
         }
-        
+
         .mobile-switch {
           display: none;
           text-align: center;
           margin-top: 15px;
           font-size: 14px;
           color: #555;
-          
+
           @include mobile {
             display: block; // แสดงเฉพาะบนมือถือ
           }
-          
+
           a {
             color: #597b2a;
             font-weight: bold;
             text-decoration: none;
-            
+
             &:hover {
               text-decoration: underline;
             }
