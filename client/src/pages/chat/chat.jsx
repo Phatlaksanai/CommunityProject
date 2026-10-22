@@ -81,7 +81,7 @@ const Chat = () => {
         const intervalId = setInterval(() => {
             // สั่งให้ React Query รีเฟรชข้อมูลแชทของห้องปัจจุบัน
             queryClient.invalidateQueries({ queryKey: ["messages", currentChat.conversation_id] });
-        }, 3000); // เปลี่ยนเป็น 5000 ms หากต้องการ 5 วินาที
+        }, 3000); // 3 วินาที
 
         // Cleanup interval ออกเมื่อผู้ใช้เปลี่ยนห้องแชทหรือออกนอกหน้า
         return () => clearInterval(intervalId);
@@ -107,7 +107,20 @@ const Chat = () => {
             }
         };
 
-        markAsRead();
+        markAsRead(); // เรียกทำงานทันทีครั้งแรกที่เปิดแชท
+
+        // ตั้งค่า Polling ดึงข้อความแชทใหม่ และอัปเดตสถานะ "อ่านแล้ว" ทุกๆ 3 วินาที
+        const intervalId = setInterval(() => {
+            // สั่งให้ React Query รีเฟรชข้อมูลข้อความแชท (เพื่อให้สถานะฝั่งคนส่งเปลี่ยนเป็น Read)
+            queryClient.invalidateQueries({ queryKey: ["messages", currentChat.conversation_id] });
+
+            // ส่งคำสั่งอัปเดตสถานะการอ่าน (เพื่อให้คนส่งรู้ว่าเราอ่านข้อความใหม่ที่เพิ่งเข้ามาแล้ว)
+            markAsRead();
+        }, 3000);
+
+        // Cleanup interval ออกเมื่อผู้ใช้เปลี่ยนห้องแชทหรือออกนอกหน้า
+        return () => clearInterval(intervalId);
+
     }, [currentChat, id, queryClient]);
 
     const handleLoadMore = async () => {
