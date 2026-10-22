@@ -46,9 +46,14 @@ const Login = () => {
             Ready for your next project? Log in to connect with fellow developers and showcase your latest work.
           </p>
           <span>Don't you have an account?</span>
-          <Link to="/register">
-            <button>Register</button>
-          </Link>
+          <div className="btn-register">
+            <Link to="/register">
+              <button>Register</button>
+            </Link>
+            <Link to="/">
+              <button>Explore as Guest</button>
+            </Link>
+          </div>
         </div>
         <div className="right">
           <h1>Login</h1>

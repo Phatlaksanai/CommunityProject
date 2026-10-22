@@ -38,6 +38,18 @@ const Register = () => {
 
   // ================= STEP CONTROL =================
   const nextStep = () => {
+
+    const trimmedUsername = username.trim();
+
+    if (!/^(?=(?:.*[a-zA-Z]){3})[a-zA-Z0-9_ ]+$/.test(trimmedUsername)) {
+      setError("Username must contain at least 3 letters and can only letters, include numbers, spaces, and underscores");
+      return;
+    }
+    if (trimmedUsername.length < 3 || trimmedUsername.length > 35) {
+      setError("Username must be between 3 and 35 characters");
+      return;
+    }
+
     if (password !== password2) {
       setError("Passwords are not same");
       return;
@@ -135,9 +147,14 @@ const Register = () => {
             Join our community of creators! Whether you're developing games or crafting 3D models, this is the perfect place to unleash your creativity.
           </p>
           <span>Join us now!</span>
-          <Link to="/login">
-            <button>Login</button>
-          </Link>
+          <div className="btn-login">
+            <Link to="/login">
+              <button>Login</button>
+            </Link>
+            <Link to="/">
+              <button>Explore as Guest</button>
+            </Link>
+          </div>
         </div>
 
         {/* RIGHT */}

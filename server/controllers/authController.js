@@ -113,9 +113,9 @@ exports.register = async (req, res) => {
         .json({ error: "Please enter all required fields" });
     }
     username = username.trim();
-    if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9_ ]+$/.test(username)) {
+    if (!/^(?=(?:.*[a-zA-Z]){3})[a-zA-Z0-9_ ]+$/.test(username)) {
       return res.status(400).json({
-        error: "Username can only contain letters, numbers, and underscores",
+        error: "Username must contain at least 3 letters and can only letters, include numbers, spaces, and underscores",
       });
     }
     if (username.length < 3 || username.length > 35) {

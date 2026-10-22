@@ -70,6 +70,27 @@
           display: none;
         }
       }
+
+      .btn-register {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        width: 100%;
+
+        a {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          text-decoration: none;
+        }
+
+        button {
+          flex: 1;
+          width: 100%;
+          min-width: 0;
+          padding: 10px 5px;
+        }
+      }
     }
 
     .right {
