@@ -40,6 +40,7 @@ npm install -D sass
 npm install @tanstack/react-query
 npm install three
 npm install react-spinners
+npm install sweetalert2
 ```
 
 ## Client
