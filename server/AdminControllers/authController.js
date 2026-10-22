@@ -57,14 +57,14 @@ exports.loginAdmin = async (req, res) => {
         const token = jwt.sign(
             { user_id: user.user_id, username: user.username },
             process.env.JWT_SECRETKEY,
-            { expiresIn: "30d" }
+            { expiresIn: "1d" }
         );
 
         res.cookie("accessToken", token, {
             httpOnly: true,
             sameSite: "lax",
             secure: process.env.NODE_ENV === "production",
-            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 วัน (หน่วยเป็นมิลลิวินาที)
+            maxAge: 24 * 60 * 60 * 1000 // 1 วัน (หน่วยเป็นมิลลิวินาที)
         })
             .status(200)
             .json({
