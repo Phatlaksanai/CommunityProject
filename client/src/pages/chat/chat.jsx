@@ -71,7 +71,21 @@ const Chat = () => {
                 ? allPages.length
                 : undefined;
         },
+        refetchInterval: 3000, // เพิ่มบรรทัดนี้เพื่อดึงข้อมูลซ้ำอัตโนมัติทุกๆ 3 วินาที (3000 ms)
     });
+
+    useEffect(() => {
+        if (!currentChat) return;
+
+        // ตั้งค่า Polling ดึงข้อความแชททุกๆ 3 วินาที
+        const intervalId = setInterval(() => {
+            // สั่งให้ React Query รีเฟรชข้อมูลแชทของห้องปัจจุบัน
+            queryClient.invalidateQueries({ queryKey: ["messages", currentChat.conversation_id] });
+        }, 3000); // เปลี่ยนเป็น 5000 ms หากต้องการ 5 วินาที
+
+        // Cleanup interval ออกเมื่อผู้ใช้เปลี่ยนห้องแชทหรือออกนอกหน้า
+        return () => clearInterval(intervalId);
+    }, [currentChat, queryClient]);
 
     useEffect(() => {
         if (!currentChat) return;
