@@ -53,6 +53,7 @@ import DownloadDetail from "./components/TopDetail/DownloadDetail/DownloadDetail
 import Projects from "./components/PageItems/projects/projects"
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
+import { AuthContext } from "./context/authContext";
 import { DarkModeContext } from "./context/darkModeContext";
 // import "./index.css";
 import "./style.scss";
@@ -62,7 +63,7 @@ import "./style.scss";
 function App() {
   //ระบบใหม่++++++++++++++++++++++
   const { darkMode } = useContext(DarkModeContext);//newwwwwwwwwwwwwwwwwww
-  const currentUser = true; // สถานะผู้ใช้ false วาปหน้าไม่ได้ true วาปหน้าได้
+  const { currentUser } = useContext(AuthContext);
 
   const ProfileUser = () => {
     const { id } = useParams();
@@ -211,9 +212,7 @@ function App() {
     {
       path: "/",
       element: (
-        <ProtectedRoute>
           <Layout />
-        </ProtectedRoute>
       ),
       children: [
         {
@@ -242,7 +241,7 @@ function App() {
         },
         {
           path: "projects/addproject",
-          element: <AddProject />
+          element: <ProtectedRoute><AddProject /></ProtectedRoute>
         },
       ]
     },
@@ -258,18 +257,18 @@ function App() {
         },
         {
           path: "changepassword",
-          element: <ChangePassword />
+          element: <ProtectedRoute><ChangePassword /></ProtectedRoute>
         },
         {
           path: "deleteaccount",
-          element: <DeleteAccount />
+          element: <ProtectedRoute><DeleteAccount /></ProtectedRoute>
         },
       ]
     },
     {
       path: "/managefriends/:id",
       element: (
-        <Friend />
+        <ProtectedRoute><Friend /></ProtectedRoute>
       ),
       children: [
         {
@@ -309,7 +308,7 @@ function App() {
     {
       path: "/additem",
       element: (
-        <LayoutNavbar />
+        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
       ),
       children: [
         {
@@ -321,7 +320,7 @@ function App() {
     {
       path: "/addcommu",
       element: (
-        <LayoutNavbar />
+        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
       ),
       children: [
         {
@@ -345,7 +344,7 @@ function App() {
     {
       path: "/download/:id",
       element: (
-        <DescriptionDownload />
+        <ProtectedRoute><DescriptionDownload /></ProtectedRoute>
       ),
       children: [
         {
@@ -361,7 +360,7 @@ function App() {
     {
       path: "/desccommu/:id",
       element: (
-        <DescriptionCommu />
+        <ProtectedRoute><DescriptionCommu /></ProtectedRoute>
       ),
       children: [
         {
@@ -385,7 +384,7 @@ function App() {
     {
       path: "/editproject/:id",
       element: (
-        <LayoutNavbar />
+        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
       ),
       children: [
         {
@@ -397,7 +396,7 @@ function App() {
     {
       path: "/editprofile/:id",
       element: (
-        <LayoutNavbar />
+        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
       ),
       children: [
         {
@@ -409,7 +408,7 @@ function App() {
     {
       path: "/edititem/:id",
       element: (
-        <LayoutNavbar />
+        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
       ),
       children: [
         {
@@ -421,7 +420,7 @@ function App() {
     {
       path: "/updatemodel/:id",
       element: (
-        <LayoutNavbar />
+        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
       ),
       children: [
         {
@@ -433,7 +432,7 @@ function App() {
     {
       path: "/editcommu/:id",
       element: (
-        <LayoutNavbar />
+        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
       ),
       children: [
         {
@@ -445,7 +444,7 @@ function App() {
     {
       path: "/manage/:id",
       element: (
-        <LayoutNavbar />
+        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
       ),
       children: [
         {
@@ -457,7 +456,7 @@ function App() {
     {
       path: "/buyitem/:id",
       element: (
-        <LayoutNavbar />
+        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
       ),
       children: [
         {
@@ -469,7 +468,7 @@ function App() {
     {
       path: "/cart/:id",
       element: (
-        <LayoutNavbar />
+        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
       ),
       children: [
         {
@@ -481,7 +480,7 @@ function App() {
     {
       path: "/boxchat/:id",
       element: (
-        <LayoutNavbar />
+        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
       ),
       children: [
         {
