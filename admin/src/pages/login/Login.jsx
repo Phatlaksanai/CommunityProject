@@ -1,13 +1,13 @@
 import { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
-import { makeRequest } from "../../api/axios";
+import { makeAdminRequest } from "../../api/axios";
 import { ClipLoader } from "react-spinners";
 import "./login.scss";
 
 const Login = () => {
   const navigate = useNavigate()
-  const { setUser } = useContext(AuthContext); // ใช้ context ตรง ๆ
+  const { setAdmin } = useContext(AuthContext); // ใช้ context ตรง ๆ
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,7 +35,7 @@ const Login = () => {
     setError("");
     setSuccess("");
     try {
-      const res = await makeRequest.post("/admin/login-admin", {
+      const res = await makeAdminRequest.post("/admin/login-admin", {
         email,
         password,
         otp
@@ -43,8 +43,8 @@ const Login = () => {
       const data = res.data;
       // Backend ส่งของ user data มาให้
       if (data.success) {
-        setUser(data);
-        localStorage.setItem("user", JSON.stringify(data));
+        setAdmin(data);
+        localStorage.setItem("admin", JSON.stringify(data));
         navigate("/dashboard");
       }
     } catch (err) {
@@ -66,7 +66,7 @@ const Login = () => {
     setOtpLoading(true);
 
     try {
-      const res = await makeRequest.post("/admin/send-otp", { email });
+      const res = await makeAdminRequest.post("/admin/send-otp", { email });
       const data = res.data;
       if (data.success) {
         setSuccess("Send OTP Successfully");

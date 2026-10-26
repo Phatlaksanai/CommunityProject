@@ -1,7 +1,7 @@
 import "./contentStats.scss"
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { makeRequest } from "../../../api/axios";
+import { makeAdminRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PersonIcon from '@mui/icons-material/Person';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -45,7 +45,7 @@ const ContentStats = () => {
             else if (activeTab === "Communities") endpoint = "/admin/content/communitySummary";
             else if (activeTab === "Items") endpoint = "/admin/content/itemSummary";
 
-            const res = await makeRequest.get(endpoint);
+            const res = await makeAdminRequest.get(endpoint);
             return res.data;
         }
     });
@@ -59,7 +59,7 @@ const ContentStats = () => {
             else if (activeTab === "Communities") endpoint = `/admin/content/weeklyCommunities`;
             else if (activeTab === "Items") endpoint = `/admin/content/weeklyItems`;
 
-            const res = await makeRequest.get(endpoint);
+            const res = await makeAdminRequest.get(endpoint);
 
             // กราฟ Recharts ใช้ dataKey="total_count" 
             // จึงต้อง map ชื่อคอลัมน์จาก RPC ให้กลายเป็น total_count
@@ -78,7 +78,7 @@ const ContentStats = () => {
             else if (activeTab === "Communities") endpoint = "/admin/content/communitiesTable";
             else if (activeTab === "Items") endpoint = "/admin/content/itemsTable";
 
-            const res = await makeRequest.get(endpoint);
+            const res = await makeAdminRequest.get(endpoint);
             return res.data;
         }
     });
@@ -91,7 +91,7 @@ const ContentStats = () => {
             else if (activeTab === "Communities") endpoint = "/admin/content/donutYearlyCommunities";
             else if (activeTab === "Items") endpoint = "/admin/content/donutYearlyItems";
 
-            const res = await makeRequest.get(endpoint);
+            const res = await makeAdminRequest.get(endpoint);
             return res.data;
         }
     });
@@ -116,7 +116,7 @@ const ContentStats = () => {
             else if (activeTab === "Communities") endpoint = "/admin/content/donutDistributionCommunity";
             else if (activeTab === "Items") endpoint = "/admin/content/donutDistributionItem";
 
-            const res = await makeRequest.get(endpoint);
+            const res = await makeAdminRequest.get(endpoint);
             return res.data;
         }
     });
@@ -144,7 +144,7 @@ const ContentStats = () => {
     // ดึงข้อมูล Categories มาทำ Dropdown
     const { data: categoriesData } = useQuery({
         queryKey: ["categoriesList"],
-        queryFn: () => makeRequest.get("/admin/content/categories").then(res => res.data)
+        queryFn: () => makeAdminRequest.get("/admin/content/categories").then(res => res.data)
     });
 
     const updateMutation = useMutation({
@@ -155,7 +155,7 @@ const ContentStats = () => {
             else if (activeTab === "Communities") updateEndpoint = `/admin/content/updateCommunity/${updatedData.id}`;
             else if (activeTab === "Items") updateEndpoint = `/admin/content/updateItem/${updatedData.id}`;
 
-            return makeRequest.put(updateEndpoint, updatedData);
+            return makeAdminRequest.put(updateEndpoint, updatedData);
         },
         onSuccess: () => {
             // โหลดตารางคอนเทนต์ใหม่หลังอัปเดตเสร็จ
@@ -268,7 +268,7 @@ const ContentStats = () => {
 
     const addCategoryMutation = useMutation({
         mutationFn: (newCategory) => {
-            return makeRequest.post(`/admin/content/addNewCategory`, newCategory);
+            return makeAdminRequest.post(`/admin/content/addNewCategory`, newCategory);
         },
         onSuccess: () => {
             setIsAddCategoryOpen(false); // ปิดหน้าต่าง Add Category

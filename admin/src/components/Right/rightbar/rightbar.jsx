@@ -1,10 +1,6 @@
 import "./rightbar.scss";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../../api/axios";
-import { AuthContext } from "../../../context/authContext";
-import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import HomeFilledIcon from '@mui/icons-material/HomeFilled';
+import { useQuery } from "@tanstack/react-query";
+import { makeAdminRequest } from "../../../api/axios";
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import PendingIcon from '@mui/icons-material/Pending';
@@ -12,18 +8,15 @@ import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 
 const RightBar = () => {
-  const { currentUser } = useContext(AuthContext);
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
   const { isLoading: ordersLoading, error: ordersError, data: orders } = useQuery({
     queryKey: ["orders"],
-    queryFn: () => makeRequest.get("/admin/dashboard/orders").then((res) => res.data),
+    queryFn: () => makeAdminRequest.get("/admin/dashboard/orders").then((res) => res.data),
   });
-  const { isLoading: reportsLoading, error: reportsError, data: reports } = useQuery({
+  const { data: reports } = useQuery({
     queryKey: ["reports"],
-    queryFn: () => makeRequest.get("/admin/dashboard/countReportsType").then((res) => res.data),
+    queryFn: () => makeAdminRequest.get("/admin/dashboard/countReportsType").then((res) => res.data),
   });
 
   return (

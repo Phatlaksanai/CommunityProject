@@ -60,7 +60,7 @@ exports.loginAdmin = async (req, res) => {
             { expiresIn: "1d" }
         );
 
-        res.cookie("accessToken", token, {
+        res.cookie("accessTokenAdmin", token, {
             httpOnly: true,
             sameSite: "lax",
             secure: process.env.NODE_ENV === "production",
@@ -85,6 +85,13 @@ exports.loginAdmin = async (req, res) => {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
+};
+
+exports.logoutAdmin = (req, res) => {
+  res
+    .clearCookie("accessTokenAdmin", { httpOnly: true, sameSite: "lax" })
+    .status(200)
+    .json({ success: true });
 };
 
 exports.sendOtpAdmin = async (req, res) => {

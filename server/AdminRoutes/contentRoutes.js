@@ -1,30 +1,30 @@
 const express = require("express");
 const router = express.Router();
 const contentController = require("../AdminControllers/contentController");
-const { verifyToken } = require("../middleware/verifyToken");
+const { verifyAdminToken } = require("../middleware/verifyToken");
 
-router.get("/donutYearlyPosts", verifyToken, contentController.getDonutYearlyPostStats);
-router.get("/donutYearlyCommunities", verifyToken, contentController.getDonutYearlyCommunityStats);
-router.get("/donutYearlyItems", verifyToken, contentController.getDonutYearlyItemStats);
-router.get("/donutDistributionPost", verifyToken, contentController.getDonutDistributionPost);
-router.get("/donutDistributionCommunity", verifyToken, contentController.getDonutDistributionCommunity);
-router.get("/donutDistributionItem", verifyToken, contentController.getDonutDistributionItem);
+router.get("/donutYearlyPosts", verifyAdminToken, contentController.getDonutYearlyPostStats);
+router.get("/donutYearlyCommunities", verifyAdminToken, contentController.getDonutYearlyCommunityStats);
+router.get("/donutYearlyItems", verifyAdminToken, contentController.getDonutYearlyItemStats);
+router.get("/donutDistributionPost", verifyAdminToken, contentController.getDonutDistributionPost);
+router.get("/donutDistributionCommunity", verifyAdminToken, contentController.getDonutDistributionCommunity);
+router.get("/donutDistributionItem", verifyAdminToken, contentController.getDonutDistributionItem);
 
-router.get("/postSummary", verifyToken, contentController.getPostSummary);
-router.get("/communitySummary", verifyToken, contentController.getCommunitySummary);
-router.get("/itemSummary", verifyToken, contentController.getItemSummary);
+router.get("/postSummary", verifyAdminToken, contentController.getPostSummary);
+router.get("/communitySummary", verifyAdminToken, contentController.getCommunitySummary);
+router.get("/itemSummary", verifyAdminToken, contentController.getItemSummary);
 
-router.get("/weeklyPosts", verifyToken, contentController.getWeeklyPosts);
-router.get("/weeklyCommunities", verifyToken, contentController.getWeeklyCommunities);
-router.get("/weeklyItems", verifyToken, contentController.getWeeklyItems);
+router.get("/weeklyPosts", verifyAdminToken, contentController.getWeeklyPosts);
+router.get("/weeklyCommunities", verifyAdminToken, contentController.getWeeklyCommunities);
+router.get("/weeklyItems", verifyAdminToken, contentController.getWeeklyItems);
 
-router.get("/postsTable", verifyToken, contentController.getPostsTable);
-router.get("/communitiesTable", verifyToken, contentController.getCommunitiesTable);
-router.get("/itemsTable", verifyToken, contentController.getItemsTable);
-router.put("/updatePost/:postId", verifyToken, contentController.updatePost);
-router.put("/updateCommunity/:communityId", verifyToken, contentController.updateCommunity);
-router.put("/updateItem/:itemId", verifyToken, contentController.updateItem);
-router.get("/categories", verifyToken, contentController.getCategories);
-router.post("/addNewCategory", verifyToken, contentController.addNewCategory);
+router.get("/postsTable", verifyAdminToken, contentController.getPostsTable);
+router.get("/communitiesTable", verifyAdminToken, contentController.getCommunitiesTable);
+router.get("/itemsTable", verifyAdminToken, contentController.getItemsTable);
+router.put("/updatePost/:postId", verifyAdminToken, contentController.updatePost);
+router.put("/updateCommunity/:communityId", verifyAdminToken, contentController.updateCommunity);
+router.put("/updateItem/:itemId", verifyAdminToken, contentController.updateItem);
+router.get("/categories", verifyAdminToken, contentController.getCategories);
+router.post("/addNewCategory", verifyAdminToken, contentController.addNewCategory);
 
 module.exports = router;

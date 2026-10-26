@@ -1,6 +1,6 @@
 import "./transactionStats.scss"
 import { useState } from "react";
-import { makeRequest } from "../../../api/axios";
+import { makeAdminRequest } from "../../../api/axios";
 import { useQuery, } from "@tanstack/react-query";
 import PersonIcon from '@mui/icons-material/Person';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -16,28 +16,28 @@ const TransactionStats = () => {
     const { isLoading: summaryLoading, data: summaryData, isError: isSummaryError, } = useQuery({
         queryKey: ["transactionSummary"],
         queryFn: () => {
-            return makeRequest.get(`/admin/transactions/transactionSummary`).then(res => res.data); // ผู้ใช้ทั้งหมด ✅
+            return makeAdminRequest.get(`/admin/transactions/transactionSummary`).then(res => res.data); // ผู้ใช้ทั้งหมด ✅
         }
     });
 
     const { isLoading: chartLoading, data: chartData, isError: isChartError } = useQuery({
         queryKey: ["WeeklyOrders"],
-        queryFn: () => makeRequest.get(`/admin/transactions/WeeklyOrders`).then(res => res.data) // ผู้ใช้อาทิตนี้ ✅
+        queryFn: () => makeAdminRequest.get(`/admin/transactions/WeeklyOrders`).then(res => res.data) // ผู้ใช้อาทิตนี้ ✅
     });
 
     const { isLoading: ordertableLoading, isError: ordertableError, data: ordertable } = useQuery({
         queryKey: ["getTransactionsTable"],
-        queryFn: () => makeRequest.get("/admin/transactions/transactionsTable").then(res => res.data) //ดึงตารางผู้ใช้ทั้งหมด
+        queryFn: () => makeAdminRequest.get("/admin/transactions/transactionsTable").then(res => res.data) //ดึงตารางผู้ใช้ทั้งหมด
     });
 
     const { isLoading: salesChartLoading, data: salesChartData, isError: isSalesChartError } = useQuery({
         queryKey: ["WeeklySales"],
-        queryFn: () => makeRequest.get(`/admin/transactions/WeeklySales`).then(res => res.data) //อันบน
+        queryFn: () => makeAdminRequest.get(`/admin/transactions/WeeklySales`).then(res => res.data) //อันบน
     });
 
     const { isLoading: RangeLoading, isError: RangeError, data: RangeData } = useQuery({
         queryKey: ["OrderByRange"],
-        queryFn: () => makeRequest.get("/admin/transactions/OrderByRange").then(res => res.data) //วงล่าง
+        queryFn: () => makeAdminRequest.get("/admin/transactions/OrderByRange").then(res => res.data) //วงล่าง
     });
 
     const formatDate = (dateString) => {

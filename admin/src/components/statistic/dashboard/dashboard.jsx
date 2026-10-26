@@ -1,7 +1,7 @@
 import "./dashboard.scss";
 import { useContext } from "react";
 import { AuthContext } from "../../../context/authContext";
-import { makeRequest } from "../../../api/axios";
+import { makeAdminRequest } from "../../../api/axios";
 import { useQuery } from "@tanstack/react-query";
 import PaidIcon from '@mui/icons-material/Paid';
 import PeopleIcon from '@mui/icons-material/People';
@@ -10,18 +10,18 @@ import ViewInArIcon from '@mui/icons-material/ViewInAr';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const Dashboard = () => {
-    const { currentUser } = useContext(AuthContext);
+    const { currentAdmin } = useContext(AuthContext);
 
     const { isLoading: summaryLoading, data: summaryData, isError: isSummaryError, } = useQuery({
         queryKey: ["dashboardSummary"],
         queryFn: () => {
-            return makeRequest.get(`/admin/dashboard/statistics`).then(res => res.data);
+            return makeAdminRequest.get(`/admin/dashboard/statistics`).then(res => res.data);
         }
     });
 
     const { isLoading: chartLoading, data: chartData, isError: isChartError } = useQuery({
         queryKey: ["weeklySales"],
-        queryFn: () => makeRequest.get(`/admin/dashboard/revenueOverview`).then(res => res.data)
+        queryFn: () => makeAdminRequest.get(`/admin/dashboard/revenueOverview`).then(res => res.data)
     });
 
     // ฟังก์ชันช่วยใส่ลูกน้ำ (Comma) ให้ตัวเลข
@@ -36,7 +36,7 @@ const Dashboard = () => {
         <div className="dashboard">
             <div className="container">
                 <div className="header-title">
-                    <h1>Welcome back, {currentUser?.name || currentUser?.username || "Admin"}</h1>
+                    <h1>Welcome back, {currentAdmin?.name || currentAdmin?.username || "Admin"}</h1>
                     <p>Here’s what’s happening with your marketplace today.</p>
                 </div>
 

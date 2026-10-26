@@ -1,32 +1,13 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 
-export const makeRequest = axios.create({
-  baseURL: "https://pm-vdyh.onrender.com/api", 
-  // baseURL: "http://localhost:8080/api",
+export const makeAdminRequest = axios.create({
+  // baseURL: "https://pm-vdyh.onrender.com/api", 
+  baseURL: "http://localhost:8080/api",
   withCredentials: true, //  ส่ง cookie ทุก request
 });
 
-// makeRequest.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response && error.response.status === 401) {
-
-//       // 1. เคลียร์ข้อมูลแอดมินออกจาก LocalStorage
-//       localStorage.removeItem("adminUser");
-//       localStorage.removeItem("accessToken");
-
-//       // 2. แจ้งเตือน
-//       alert("เซสชันผู้ดูแลระบบหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง");
-
-//       // 3. เด้งกลับไปที่หน้า "/" ซึ่งเป็นหน้า Login ของแอดมิน
-//       window.location.href = "/";
-//     }
-//     return Promise.reject(error);
-//   }
-// );
-
-makeRequest.interceptors.response.use(
+makeAdminRequest.interceptors.response.use(
   (response) => {
     return response;
   },
@@ -35,13 +16,14 @@ makeRequest.interceptors.response.use(
       error.response &&
       (error.response.status === 401 || error.response.status === 403)
     ) {
+
       // เช็คก่อนว่ามีข้อมูล User อยู่ในระบบหรือไม่
-      const storedUser = localStorage.getItem("user");
+      const storedUser = localStorage.getItem("admin");
 
       // ถ้ามีข้อมูล user แปลว่าเซสชันหมดอายุจริงๆ ค่อยเด้งแจ้งเตือน
       if (storedUser && storedUser !== "undefined") {
-        localStorage.removeItem("user");
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem("admin");
+        localStorage.removeItem("accessTokenAdmin");
 
         Swal.fire({
           title: "Session Expired",
@@ -50,7 +32,7 @@ makeRequest.interceptors.response.use(
           confirmButtonColor: "#6A9043",
           confirmButtonText: "Confirm",
           allowOutsideClick: false,
-          scrollbarPadding: false ,        // เพิ่มบรรทัดนี้เพื่อแก้ปัญหาหน้าจอขยับ
+          scrollbarPadding: false,        // เพิ่มบรรทัดนี้เพื่อแก้ปัญหาหน้าจอขยับ
         }).then((result) => {
           if (result.isConfirmed) {
             window.location.href = "/admin";

@@ -1,6 +1,5 @@
 import "./leftbar.scss";
 import { useNavigate, useLocation } from "react-router-dom";
-import { AuthContext } from "../../../context/authContext";
 import { useContext } from "react";
 import HomeFilledIcon from '@mui/icons-material/HomeFilled';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
@@ -11,7 +10,6 @@ import OutlinedFlagIcon from '@mui/icons-material/OutlinedFlag';
 const LeftBar = () => {
   const navigate = useNavigate();
   const location = useLocation(); // เรียกใช้ useLocation เพื่อดู URL ปัจจุบัน
-  const { currentUser } = useContext(AuthContext);
 
   // ฟังก์ชันเช็กว่า URL ปัจจุบันตรงกับเมนูหรือไม่
   const isActive = (path) => location.pathname.includes(path);

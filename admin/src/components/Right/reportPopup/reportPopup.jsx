@@ -1,7 +1,7 @@
 import "./reportPopup.scss";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../../api/axios";
+import { makeAdminRequest } from "../../../api/axios";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
@@ -21,7 +21,7 @@ const ReportPopup = ({ report, onClose }) => {
 
     const updateMutation = useMutation({
         mutationFn: (updatedData) => {
-            return makeRequest.put(`/admin/reports/updateReport/${updatedData.report_id}`, { status: updatedData.status });
+            return makeAdminRequest.put(`/admin/reports/updateReport/${updatedData.report_id}`, { status: updatedData.status });
         },
         onSuccess: () => {
             queryClient.invalidateQueries(["getReportsTable"]); // เผื่อกลับไปหน้า Reports จะได้เห็นข้อมูลล่าสุด

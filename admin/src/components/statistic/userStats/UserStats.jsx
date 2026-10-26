@@ -2,7 +2,7 @@ import "./userStats.scss"
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../../context/authContext";
 import { useLocation } from "react-router-dom";
-import { makeRequest } from "../../../api/axios";
+import { makeAdminRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PersonIcon from '@mui/icons-material/Person';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -17,7 +17,7 @@ const UserStats = () => {
     // ถ้ามาจากการกดแถวใน Reports จะมี report แปะมาด้วย ให้เอามาโชว์เป็น popup มุมล่างขวาของหน้านี้เลย
     const [reportPopupData, setReportPopupData] = useState(location.state?.reportPopup ?? null);
 
-    const { currentUser, setUser } = useContext(AuthContext);
+    const { currentAdmin, setAdmin } = useContext(AuthContext);
     const [searchTerm, setSearchTerm] = useState("");
     const queryClient = useQueryClient();
     const [error, setError] = useState("");
@@ -38,28 +38,28 @@ const UserStats = () => {
     const { isLoading: summaryLoading, data: summaryData, isError: isSummaryError, } = useQuery({
         queryKey: ["userSummary"],
         queryFn: () => {
-            return makeRequest.get(`/admin/users/userSummary`).then(res => res.data);
+            return makeAdminRequest.get(`/admin/users/userSummary`).then(res => res.data);
         }
     });
 
     const { isLoading: chartLoading, data: chartData, isError: isChartError } = useQuery({
         queryKey: ["weeklyUsers"],
-        queryFn: () => makeRequest.get(`/admin/users/WeeklyUsers`).then(res => res.data)
+        queryFn: () => makeAdminRequest.get(`/admin/users/WeeklyUsers`).then(res => res.data)
     });
 
     const { isLoading: usertableLoading, isError: usertableError, data: usertable } = useQuery({
         queryKey: ["getUsersTable"],
-        queryFn: () => makeRequest.get("/admin/users/usersTable").then(res => res.data)
+        queryFn: () => makeAdminRequest.get("/admin/users/usersTable").then(res => res.data)
     });
 
     const { isLoading: userRegistrationsLoading, isError: userRegistrationsError, data: userRegistrations } = useQuery({
         queryKey: ["userRegistrations"],
-        queryFn: () => makeRequest.get("/admin/users/userRegistrations").then(res => res.data)
+        queryFn: () => makeAdminRequest.get("/admin/users/userRegistrations").then(res => res.data)
     });
 
     const { isLoading: roleLoading, isError: roleError, data: roleData } = useQuery({
         queryKey: ["userRolesProportion"],
-        queryFn: () => makeRequest.get("/admin/users/RoleUsers").then(res => res.data)
+        queryFn: () => makeAdminRequest.get("/admin/users/RoleUsers").then(res => res.data)
     });
 
     // คำนวณหาปีเพื่อใช้ทำหัวข้อกราฟ
@@ -85,24 +85,24 @@ const UserStats = () => {
 
     const updateMutation = useMutation({
         mutationFn: (updatedData) => {
-            return makeRequest.put(`/admin/users/updateUser/${updatedData.user_id}`, updatedData);
+            return makeAdminRequest.put(`/admin/users/updateUser/${updatedData.user_id}`, updatedData);
         },
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries(["getUsersTable"]); // โหลดตารางใหม่หลังอัปเดตเสร็จ
             setSelectedUser(null); // ปิด Modal
 
-            if (currentUser && variables.user_id === currentUser.user_id) { // variables คือข้อมูล formData (เช่น username, name, email) ที่เพิ่งกดส่งไปให้ Backend
-                const updatedCurrentUser = {
-                    ...currentUser,
+            if (currentAdmin && variables.user_id === currentAdmin.user_id) { // variables คือข้อมูล formData (เช่น username, name, email) ที่เพิ่งกดส่งไปให้ Backend
+                const updatedCurrentAdmin = {
+                    ...currentAdmin,
                     username: variables.username,
                     name: variables.name
                 };
 
                 // อัปเดต Context ทำให้ Navbar เปลี่ยนทันที
-                setUser(updatedCurrentUser);
+                setAdmin(updatedCurrentAdmin);
 
                 // อัปเดต LocalStorage ด้วย (อ้างอิงจากตอน Logout ที่คุณใช้ LocalStorage)
-                localStorage.setItem("user", JSON.stringify(updatedCurrentUser));
+                localStorage.setItem("admin", JSON.stringify(updatedCurrentAdmin));
             }
         },
         onError: (err) => {
@@ -112,7 +112,7 @@ const UserStats = () => {
 
     const addAdminMutation = useMutation({
         mutationFn: (newAdmin) => {
-            return makeRequest.post(`/admin/users/addAdmin`, newAdmin);
+            return makeAdminRequest.post(`/admin/users/addAdmin`, newAdmin);
         },
         onSuccess: () => {
             queryClient.invalidateQueries(["getUsersTable"]);

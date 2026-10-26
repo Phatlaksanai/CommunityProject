@@ -1,7 +1,7 @@
 import "./reportStats.scss"
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { makeRequest } from "../../../api/axios";
+import { makeAdminRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
@@ -25,44 +25,44 @@ const ReportStats = () => {
     const { isLoading: topPostsLoading, isError: topPostsError, data: topPosts } = useQuery({
         queryKey: ["topReportedPosts"],
         queryFn: () => {
-            return makeRequest.get("/admin/reports/topPosts").then(res => res.data)
+            return makeAdminRequest.get("/admin/reports/topPosts").then(res => res.data)
         }
     });
 
     const { isLoading: topCommunitiesLoading, isError: topCommunitiesError, data: topCommunities } = useQuery({
         queryKey: ["topReportedCommunities"],
         queryFn: () => {
-            return makeRequest.get("/admin/reports/topCommunities").then(res => res.data)
+            return makeAdminRequest.get("/admin/reports/topCommunities").then(res => res.data)
         }
     });
 
     const { isLoading: topReportedUsersLoading, isError: topReportedUsersError, data: topReportedUsers } = useQuery({
         queryKey: ["topReportedUsers"],
         queryFn: () => {
-            return makeRequest.get("/admin/reports/topReportedUsers").then(res => res.data)
+            return makeAdminRequest.get("/admin/reports/topReportedUsers").then(res => res.data)
         }
     });
 
     const { isLoading: topReportingUsersLoading, isError: topReportingUsersError, data: topReportingUsers } = useQuery({
         queryKey: ["topReportingUsers"],
         queryFn: () => {
-            return makeRequest.get("/admin/reports/topReportingUsers").then(res => res.data)
+            return makeAdminRequest.get("/admin/reports/topReportingUsers").then(res => res.data)
         }
     });
 
     const { isLoading: reportsLoading, error: reportsError, data: reports } = useQuery({
         queryKey: ["countReports"],
-        queryFn: () => makeRequest.get("/admin/reports/countReportsType").then((res) => res.data),
+        queryFn: () => makeAdminRequest.get("/admin/reports/countReportsType").then((res) => res.data),
     });
 
     const { isLoading: reportsTableLoading, isError: reportsTableError, data: reportsTable } = useQuery({
         queryKey: ["getReportsTable"],
-        queryFn: () => makeRequest.get("/admin/reports/reportsTable").then(res => res.data)
+        queryFn: () => makeAdminRequest.get("/admin/reports/reportsTable").then(res => res.data)
     });
 
     const updateMutation = useMutation({
         mutationFn: (updatedData) => {
-            return makeRequest.put(`/admin/reports/updateReport/${updatedData.report_id}`, { status: updatedData.status });
+            return makeAdminRequest.put(`/admin/reports/updateReport/${updatedData.report_id}`, { status: updatedData.status });
         },
         onSuccess: () => {
             queryClient.invalidateQueries(["getReportsTable"]);

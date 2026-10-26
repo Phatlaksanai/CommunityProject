@@ -19,7 +19,7 @@ import { useContext } from "react";
 import { AuthContext } from "./context/authContext";
 
 function App() {
-  const { currentUser } = useContext(AuthContext);
+  const { currentAdmin } = useContext(AuthContext);
 
   const LayoutDashboard = () => {
     return (
@@ -49,16 +49,18 @@ function App() {
     )
   }
 
+   // useEffect ปล่อยว่างไว้ก่อนได้ถ้ายังไม่มี API เช็ค Token
   // useEffect(() => {
-  //   if (currentUser) {
-  //     localStorage.setItem("user", JSON.stringify(currentUser));
-  //   } else {
-  //     localStorage.removeItem("user");
+  //   const token = localStorage.getItem('accessTokenAdmin');
+  //   if (token) {
+  //     return <Navigate to="/" />
   //   }
-  // }, [currentUser]);
+  //   return children;
+
+  // }, []);
 
   const ProtectedRoute = ({ children }) => {
-    if (!currentUser) {
+    if (!currentAdmin) {
       return <Navigate to="/" />
     }
     return children;
@@ -147,29 +149,22 @@ function App() {
     basename: "/admin" 
   });
 
-  const [user, setUser] = useState(() => {
-    try {
-      const savedUser = localStorage.getItem("user");
-      // เช็คว่ามีข้อมูล และไม่ใช่อักษรว่าง หรือคำว่า "undefined"
-      if (savedUser && savedUser !== "undefined") {
-        return JSON.parse(savedUser);
-      }
-      return null;
-    } catch (error) {
-      console.error("Error parsing user from localStorage:", error);
-      localStorage.removeItem("user"); // ถ้าพังให้ล้างทิ้งเลย
-      return null;
-    }
-  });
+  // const [user, setUser] = useState(() => {
+  //   try {
+  //     const savedUser = localStorage.getItem("user");
+  //     // เช็คว่ามีข้อมูล และไม่ใช่อักษรว่าง หรือคำว่า "undefined"
+  //     if (savedUser && savedUser !== "undefined") {
+  //       return JSON.parse(savedUser);
+  //     }
+  //     return null;
+  //   } catch (error) {
+  //     console.error("Error parsing user from localStorage:", error);
+  //     localStorage.removeItem("user"); // ถ้าพังให้ล้างทิ้งเลย
+  //     return null;
+  //   }
+  // });
 
-  // useEffect ปล่อยว่างไว้ก่อนได้ถ้ายังไม่มี API เช็ค Token
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      // อนาคตค่อยใส่ api.get("/me") ตรงนี้
-    }
-
-  }, []);
+ 
   return (
     <div>
       <RouterProvider router={router} />

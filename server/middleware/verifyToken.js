@@ -1,22 +1,3 @@
-// const jwt = require("jsonwebtoken");
-
-// const verifyToken = (req, res, next) => {
-//   const token = req.cookies.accessToken;
-
-//   if (!token) {
-//     return res.status(401).json("Not logged in");
-//   }
-
-//   jwt.verify(token, process.env.JWT_SECRETKEY, (err, userInfo) => {
-//     if (err) {
-//       return res.status(403).json("Token is invalid");
-//     }
-
-//     req.user = userInfo; // user.id จะอยู่ตรงนี้
-//     next();
-//   });
-// };
-
 // module.exports = verifyToken;
 const jwt = require("jsonwebtoken");
 
@@ -57,5 +38,27 @@ const checkUserOptional = (req, res, next) => {
   });
 };
 
-// ส่งออกทั้งคู่
-module.exports = { verifyToken, checkUserOptional };
+// 3. 🌟 ตัวใหม่: สำหรับ Admin เท่านั้น 🌟
+const verifyAdminToken = (req, res, next) => {
+  // ดึงคุกกี้ accessTokenAdmin แทนที่จะเป็น accessToken
+  const token = req.cookies.accessTokenAdmin;
+
+  if (!token) {
+    return res.status(401).json("Admin not logged in");
+  }
+
+  jwt.verify(token, process.env.JWT_SECRETKEY, (err, adminInfo) => {
+    if (err) {
+      return res.status(401).json("Admin token is invalid or expired");
+    }
+
+    // รีเช็ค Role อีกรอบเพื่อความชัวร์ (ถ้าใน Token มีแนบ role: "admin" มาตอน Login)
+    // if (adminInfo.role !== "admin") return res.status(403).json("Not authorized");
+
+    req.admin = adminInfo; // เก็บข้อมูล admin ลง req ไว้ใช้ใน Controller
+    next();
+  });
+};
+
+// ส่งออกทั้งหมด 3 ตัว
+module.exports = { verifyToken, checkUserOptional, verifyAdminToken };

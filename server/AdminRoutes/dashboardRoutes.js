@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const dashboardController = require("../AdminControllers/dashboardController");
-const { verifyToken } = require("../middleware/verifyToken");
+const { verifyAdminToken } = require("../middleware/verifyToken");
 
-router.get("/statistics", verifyToken, dashboardController.getStatistics);
-router.get("/revenueOverview", verifyToken, dashboardController.getRevenueOverview);
-router.get("/orders", verifyToken, dashboardController.getOrder);
-router.get("/countReportsType", verifyToken, dashboardController.getCountReportsType);
+router.get("/statistics", verifyAdminToken, dashboardController.getStatistics);
+router.get("/revenueOverview", verifyAdminToken, dashboardController.getRevenueOverview);
+router.get("/orders", verifyAdminToken, dashboardController.getOrder);
+router.get("/countReportsType", verifyAdminToken, dashboardController.getCountReportsType);
 
 module.exports = router;

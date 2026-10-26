@@ -3,9 +3,9 @@ import { createContext, useEffect, useState } from "react";
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-  const [currentUser, setUser] = useState(() => {
+  const [currentAdmin, setAdmin] = useState(() => {
   try {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem("admin");
     if (!storedUser || storedUser === "undefined") return null;
     return JSON.parse(storedUser);
   } catch (err) {
@@ -15,15 +15,15 @@ export const AuthContextProvider = ({ children }) => {
 });
 
   useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem("user", JSON.stringify(currentUser));
+    if (currentAdmin) {
+      localStorage.setItem("admin", JSON.stringify(currentAdmin));
     } else {
-      localStorage.removeItem("user");
+      localStorage.removeItem("admin");
     }
-  }, [currentUser]);
+  }, [currentAdmin]);
 
   return (
-    <AuthContext.Provider value={{ currentUser, setUser }}>
+    <AuthContext.Provider value={{ currentAdmin, setAdmin }}>
       {children}
     </AuthContext.Provider>
   );

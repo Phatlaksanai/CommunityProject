@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../AdminControllers/userController");
-const { verifyToken } = require("../middleware/verifyToken");
+const { verifyAdminToken } = require("../middleware/verifyToken");
 
-router.get("/userRegistrations", verifyToken, userController.getuserRegistrations);
-router.get("/usersTable", verifyToken, userController.getUsersTable);
-router.put("/updateUser/:userId", verifyToken, userController.updateUser);
-router.get("/userSummary", verifyToken, userController.getUserSummary);
-router.get("/WeeklyUsers", verifyToken, userController.getWeeklyUsers);
-router.get("/RoleUsers", verifyToken, userController.getUserRolesProportion);
-router.post("/addAdmin", verifyToken, userController.addAdmin);
+router.get("/userRegistrations", verifyAdminToken, userController.getuserRegistrations);
+router.get("/usersTable", verifyAdminToken, userController.getUsersTable);
+router.put("/updateUser/:userId", verifyAdminToken, userController.updateUser);
+router.get("/userSummary", verifyAdminToken, userController.getUserSummary);
+router.get("/WeeklyUsers", verifyAdminToken, userController.getWeeklyUsers);
+router.get("/RoleUsers", verifyAdminToken, userController.getUserRolesProportion);
+router.post("/addAdmin", verifyAdminToken, userController.addAdmin);
 
 module.exports = router;

@@ -27,7 +27,6 @@ const Earn_Pay = () => {
                         <div className="table-header-sticky">
                             <div className="Header">
                                 <h2>Item</h2>
-                                <h2>Price</h2>
                                 <h2>Quantity</h2>
                                 <h2>Total</h2>
                             </div>
@@ -47,9 +46,8 @@ const Earn_Pay = () => {
                                                 {item.model_name.length > 10 ? `${item.model_name.substring(0, 10)}...` : item.model_name}
                                             </h3>
                                         </div>
-                                        <span>฿{item.total_amount / item.quantity}</span>
                                         <span>{item.quantity}</span>
-                                        <span>฿{item.total_amount}</span>
+                                        <span>฿ {item.total_amount}</span>
                                     </div>
                                 ))}
                             </div>

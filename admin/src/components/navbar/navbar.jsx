@@ -2,19 +2,19 @@ import "./navbar.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
-import { makeRequest } from "../../api/axios";
+import { makeAdminRequest } from "../../api/axios";
 
 const Navbar = () => {
-  const { currentUser, setUser } = useContext(AuthContext);
+  const { currentAdmin, setAdmin } = useContext(AuthContext);
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await makeRequest.post("/logout");
-      localStorage.removeItem("user");
-      localStorage.removeItem("accessToken");
-      setUser(null);
+      await makeAdminRequest.post("/admin/logout-admin");
+      localStorage.removeItem("admin");
+      localStorage.removeItem("accessTokenAdmin");
+      setAdmin(null);
       navigate("/");
     } catch (err) {
       console.error(err);
@@ -31,7 +31,7 @@ const Navbar = () => {
     }
   };
 
-  const displayName = currentUser?.name || currentUser?.username || "Guest";
+  const displayName = currentAdmin?.name || currentAdmin?.username || "Guest";
   const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName;
 
   return (
@@ -44,15 +44,15 @@ const Navbar = () => {
 
       <div className="right">
         <div className="user">
-          <img src={currentUser?.profilePic || defaultPic} alt="" />
+          <img src={currentAdmin?.profilePic || defaultPic} alt="" />
           <div className="user-info">
             <span className="custom-tooltip" data-tip={displayName}>
               {truncatedName}
             </span>
-            <span>id: {currentUser?.user_id}</span>
+            <span>id: {currentAdmin?.user_id}</span>
           </div>
-          {!currentUser && <button onClick={handleLogin}>Login</button>}
-          {currentUser && <button onClick={handleLogout}>Logout</button>}
+          {!currentAdmin && <button onClick={handleLogin}>Login</button>}
+          {currentAdmin && <button onClick={handleLogout}>Logout</button>}
         </div>
       </div>
     </div>
