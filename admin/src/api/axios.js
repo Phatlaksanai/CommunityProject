@@ -2,8 +2,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 export const makeAdminRequest = axios.create({
-  // baseURL: "https://pm-vdyh.onrender.com/api", 
-  baseURL: "http://localhost:8080/api",
+  baseURL: "https://pm-vdyh.onrender.com/api", 
+  // baseURL: "http://localhost:8080/api",
   withCredentials: true, //  ส่ง cookie ทุก request
 });
 

@@ -104,6 +104,12 @@ const EditItem = () => {
                 finalImgPublicId = res.public_id;
             }
 
+            if (price < 0 || (price > 0 && price < 10)){   
+                setError("Minimum price amount is 10 THB");
+                setIsLoadingSpinner(false);
+                return;
+            }
+
             await makeRequest.put("/items/edit-item", {
                 itemId: items?.item_id,
                 modelName,
