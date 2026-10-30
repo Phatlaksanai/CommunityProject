@@ -36,13 +36,6 @@ const Chat = () => {
     const keepScrollPositionRef = useRef(false); // ตรวจสอบว่ากำลังรักษาตำแหน่ง Scroll หลังโหลดข้อความเก่าอยู่หรือไม่
     const hasUserScrolledRef = useRef(false); // ตรวจสอบว่าผู้ใช้เริ่มเลื่อน Chat แล้วหรือยัง
     const { ref: loadMoreRef, inView } = useInView(); // ตรวจสอบว่าจุดโหลดข้อความเก่าด้านบนอยู่ในหน้าจอหรือไม่
-    // const initialChatId = location.state?.activeChatId || null; // ดึงค่าจาก state มาเป็นค่าเริ่มต้น (ถ้าเข้ามาทาง RightBar จะมีค่านี้)
-
-    // useEffect(() => { // ดักไว้เผื่อกรณีที่ผู้ใช้อยู่หน้า Chat อยู่แล้ว แต่ไปกดเพื่อนคนอื่นจาก RightBar
-    //     if (location.state?.activeChatId) {
-    //         setCurrentChatId(location.state.activeChatId);
-    //     }
-    // }, [location.state?.activeChatId]);
 
     // ดึงรายชื่อเพื่อนทั้งหมด เพื่อเอามาใช้เสิร์ช
     const { data: myFriends } = useQuery({
@@ -276,9 +269,6 @@ const Chat = () => {
 
         <div className="chat">
             <div className="Lchat">
-                {/* <div className="search">
-                    <input type="text" placeholder="Search..." />
-                </div> */}
                 <div className="search-container-local">
                     <div className="search-box-wrapper">
                         <SearchOutlinedIcon className="search-icon-inside" />

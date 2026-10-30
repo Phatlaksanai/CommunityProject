@@ -227,33 +227,6 @@ const ProfileDetail = () => {
                 {truncatedName}
               </h1>
 
-              {/* {isOwner && (
-                <div className="actions">
-                  <button className="followBtn" onClick={() => navigate(`/editprofile/${userData?.user_id}`)} style={{ cursor: "pointer" }}>Edit Profile</button>
-                </div>
-              )}
-
-              {!isOwner && (
-                <div className="actions">
-                  <button
-                    className="followBtn"
-                    onClick={handleFollow}
-                    style={{
-                      backgroundColor: isFollowing ? "#bababa" : "#5271ff",
-                      cursor: "pointer"
-                    }}
-                  >
-                    {isFollowing ? "Following" : "Follow"}
-                  </button>
-                </div>
-              )}
-  
-              {!isOwner && (
-                <div className="actions">
-                  <button className="followBtn" onClick={() => handleConversation(userData)} style={{ cursor: "pointer" }}>Message</button>
-                </div>
-              )} */}
-
               {isOwner ? (
                 <div className="actions">
                   <button className="followBtn" onClick={() => navigate(`/editprofile/${userData?.user_id}`)}>Edit Profile</button>

@@ -74,15 +74,6 @@ const EditProject = () => {
     setError("");
   };
 
-  // const uploadFile = async (file) => {
-  //   if (!file) return null;
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-  //   // ปรับ URL ให้ตรงกับ API ของคุณ (เช่น /upload)
-  //   const res = await makeRequest.post("/upload/project", formData); 
-  //   return res.data; // สมมติว่าคืนค่าเป็นชื่อไฟล์หรือ URL
-  // };
-
   // ✅ 2. รวมฟังก์ชัน Submit สำหรับการ Update
   const handleUpdateProject = async (e) => {
     e.preventDefault();

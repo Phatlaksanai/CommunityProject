@@ -128,23 +128,6 @@ exports.sendOtpAdmin = async (req, res) => {
 
         if (otpError) throw otpError;
 
-        // const transporter = nodemailer.createTransport({
-        //     host: "smtp.gmail.com",
-        //     port: 465,
-        //     secure: true,
-        //     connectionTimeout: 60000,
-        //     greetingTimeout: 30000,
-        //     socketTimeout: 60000,
-        //     auth: { user: process.env.NODEMAIL_ADMIN, pass: process.env.NODEMAIL_PASS_ADMIN },
-        // });
-
-        // await transporter.sendMail({
-        //     from: process.env.NODEMAIL_ADMIN,
-        //     to: user.email,
-        //     subject: "PM Request OTP",
-        //     html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
-        // });
-
     // ส่ง Email (Brevo API)
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",

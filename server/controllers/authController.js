@@ -262,24 +262,6 @@ exports.sendOtpRegister = async (req, res) => {
 
     if (otpError) throw otpError;
 
-    // --- 4. ส่ง Email (Nodemailer) ---
-    // const transporter = nodemailer.createTransport({
-    //   host: "smtp.gmail.com",
-    //   port: 587,
-    //   secure: false,
-    //   auth: {
-    //     user: process.env.NODEMAIL_USER,
-    //     pass: process.env.NODEMAIL_PASS,
-    //   },
-    // });
-
-    // await transporter.sendMail({
-    //   from: process.env.NODEMAIL_USER,
-    //   to: email,
-    //   subject: "PM Request OTP",
-    //   html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
-    // });
-
     // ส่ง Email (Brevo API)
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
@@ -345,24 +327,6 @@ exports.sendOtpResetPassword = async (req, res) => {
     );
 
     if (otpError) throw otpError;
-
-    // ส่ง email
-    // const transporter = nodemailer.createTransport({
-    //   host: "smtp.gmail.com",
-    //   port: 587,
-    //   secure: false,
-    //   auth: {
-    //     user: process.env.NODEMAIL_USER,
-    //     pass: process.env.NODEMAIL_PASS,
-    //   },
-    // });
-
-    // await transporter.sendMail({
-    //   from: process.env.NODEMAIL_USER,
-    //   to: email,
-    //   subject: "Reset Password OTP",
-    //   html: `<h2>Your OTP Code</h2><h1>${otp}</h1>`,
-    // });
 
     // ส่ง Email (Brevo API)
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {

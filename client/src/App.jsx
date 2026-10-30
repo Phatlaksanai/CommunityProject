@@ -123,20 +123,6 @@ function App() {
     )
   }
 
-  // const TopTab = () => {
-  //   return (
-  //     <div className={`theme-${darkMode ? "dark" : "light"}`}>
-  //       <Navbar />
-  //       <div style={{ display: "flex" }}>
-  //         {/* <LeftBarDL /> */}
-  //         <div style={{ flex: 6 }}>
-  //           <Outlet />
-  //         </div>
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
   const LayoutNavbar = () => {
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
@@ -515,18 +501,6 @@ function App() {
       // อนาคตค่อยใส่ api.get("/me") ตรงนี้
     }
   }, []);
-  //----------------------------------------------------------------------------Naw refash ไม่หาย
-  // return (
-  //   <BrowserRouter>
-  //     <Routes>
-  //       <Route path="/" element={<Home />} />
-  //       {/* { <Route path="/" element={<Home user={user} setUser={setUser} />} /> }
-  //       { <Route path="/login" element={<Login setUser={setUser} />} /> */}
-  //       <Route path="/register" element={<Register />} />
-  //       {/* <Route path="*" element={<NotFound />} /> } */}
-  //     </Routes>
-  //   </BrowserRouter>
-  // );
   return (
     <div>
       <RouterProvider router={router} />
