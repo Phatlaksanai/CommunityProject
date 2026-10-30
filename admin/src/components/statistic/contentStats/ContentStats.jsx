@@ -259,13 +259,23 @@ const ContentStats = () => {
     };
 
     const handleUpdate = () => {
+
+        const price = Number(formData.price);
+
+        if (price < 0 || (price > 0 && price < 10)) {
+            setError("Minimum price amount is 10 THB");
+            return;
+        }
+        setError("");
+
         const payload = {
-            ...formData
+            ...formData,
+            price: price
         };
 
         updateMutation.mutate(payload);
     };
-
+    
     const addCategoryMutation = useMutation({
         mutationFn: (newCategory) => {
             return makeAdminRequest.post(`/admin/content/addNewCategory`, newCategory);
@@ -612,8 +622,8 @@ const ContentStats = () => {
                                         <input type="text" name="modelName" value={formData.modelName || ""} onChange={handleChange} />
                                     </div>
                                     <div className="input-group">
-                                        <label>Price</label>
-                                        <input type="number" name="price" value={formData.price || "0"} onChange={handleChange} />
+                                        <label>Price (Price must be 0 or more than 10 THB)</label>
+                                        <input type="number" name="price" value={formData.price || 0 } onChange={handleChange} />
                                     </div>
                                     <div className="input-group">
                                         <label>Status</label>

@@ -67,7 +67,7 @@ const Item = ({ item, isProfile, isShop }) => {
         </div>
         <div className="price">
           <div className="price-info">
-            <p>$ {item.price === 0 ? "Free" : item.price}</p>
+            <p>฿ {item.price === 0 ? "Free" : item.price}</p>
            
               <div className="order-count">
                 <DownloadIcon />

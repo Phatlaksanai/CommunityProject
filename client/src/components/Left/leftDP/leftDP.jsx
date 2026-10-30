@@ -52,7 +52,7 @@ const LeftDP = ({ project }) => {
                 {/* <img src={item.img} alt="" /> */}
                 <p><strong>Name :</strong> {item.modelName}</p>
                 <p><strong>Description :</strong> {item.description}</p>
-                <p><strong>Price :</strong> {item.price}</p>
+                <p><strong>Price :</strong> {item.price === 0 ? "Free" : item.price}</p>
                 <span>
                   <strong>Created At :</strong> {" "}
                   {dayjs(item.created_at)

@@ -132,6 +132,11 @@ const AddItem = () => {
       return;
     }
 
+    if (price < 0 || (price > 0 && price < 10)) {
+      setError("Minimum price amount is 10 THB");
+      setIsLoadingSpinner(false);
+      return;
+    }
 
 
     try {
@@ -178,7 +183,7 @@ const AddItem = () => {
         has_textures: hasTextures,
         is_rigged: isRigged,
         is_uv_mapped: isUvMapped,
-        isFree : isFree,
+        isFree: isFree,
       });
 
       setSuccess("add item success");
@@ -215,7 +220,7 @@ const AddItem = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="price">Price</label>
+            <label htmlFor="price">Price (Price must be 0 or more than 10 THB)</label>
             <div className="price-input">
               <input type="number" id="price" placeholder="Price"
                 value={price}
