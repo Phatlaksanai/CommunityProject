@@ -37,7 +37,7 @@ const Register = () => {
   }, [otpCooldown]);
 
   // ================= STEP CONTROL =================
-  const nextStep = () => {
+  const nextStep = async () => {
 
     const trimmedUsername = username.trim();
 
@@ -47,6 +47,21 @@ const Register = () => {
     }
     if (trimmedUsername.length < 3 || trimmedUsername.length > 35) {
       setError("Username must be between 3 and 35 characters");
+      return;
+    }
+
+    // เช็ก Username ซ้ำ
+    try {
+      const res = await makeRequest.post("/check-username", {
+        username: trimmedUsername
+      });
+
+      if (res.data.exists) {
+        setError("Username already exists");
+        return;
+      }
+    } catch (err) {
+      setError("Unable to check username. Please try again.");
       return;
     }
 
@@ -77,6 +92,12 @@ const Register = () => {
     setError("");
     setSuccess("");
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email.trim())) {
+      setError("Please enter a valid email address");
+      return;
+    }
 
     if (!email.trim()) {
       setError("Please enter your email before requesting OTP");

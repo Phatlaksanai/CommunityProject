@@ -103,6 +103,30 @@ exports.logout = (req, res) => {
     .json({ success: true });
 };
 
+exports.checkUsername = async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    const { data, error } = await db
+      .from("users")
+      .select("user_id")
+      .eq("username", username)
+      .maybeSingle();
+
+    if (error) {
+      return res.status(500).json({ message: "Database error" });
+    }
+
+    if (data) {
+      return res.status(200).json({ exists: true });
+    }
+
+    return res.status(200).json({ exists: false });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 exports.register = async (req, res) => {
   try {
     let { username, password, password2, email, otp, isdelete } = req.body;
@@ -115,7 +139,8 @@ exports.register = async (req, res) => {
     username = username.trim();
     if (!/^(?=(?:.*[a-zA-Z]){3})[a-zA-Z0-9_ ]+$/.test(username)) {
       return res.status(400).json({
-        error: "Username must contain at least 3 letters and can only letters, include numbers, spaces, and underscores",
+        error:
+          "Username must contain at least 3 letters and can only letters, include numbers, spaces, and underscores",
       });
     }
     if (username.length < 3 || username.length > 35) {
