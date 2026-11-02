@@ -16,7 +16,8 @@ const Lbuy = () => {
         const result = await stripe.confirmPayment({
             elements,
             confirmParams:{
-                return_url:`https://pm-vdyh.onrender.com/download/${currentUser.user_id}`
+                // return_url:`https://pm-vdyh.onrender.com/download/${currentUser.user_id}`
+                return_url:`http://localhost:5173/download/${currentUser.user_id}`
             }
         });
         if(result.error){

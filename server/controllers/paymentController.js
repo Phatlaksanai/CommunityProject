@@ -605,9 +605,6 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
         }
       }
 
-      console.log(
-        `Payment successful and DB updated for Order ID: ${order.order_id}`,
-      );
     } catch (dbError) {
       console.error("Database update failed during webhook:", dbError);
       return res.status(500).json({ error: "Failed to update DB" });
