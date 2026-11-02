@@ -413,10 +413,6 @@ exports.addItem = async (req, res) => {
     return res.status(400).json({ error: "Price must be number" });
   }
 
-  if (!isFree && price < 10) {
-    return res.status(400).json({ error: "Price must be at least 10" });
-  }
-
   try {
     // 1. Insert ข้อมูลลงตาราง "item" ก่อน
     const { data: itemData, error: itemError } = await db

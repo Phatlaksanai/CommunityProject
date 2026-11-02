@@ -16,6 +16,37 @@ const Item = ({ item, isProfile, isShop }) => {
   const { currentUser } = useContext(AuthContext);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const handleAddToDownload = async () => {
+    if (!currentUser) {
+      setError("Please login to add items to your cart.");
+      return;
+    }
+    if (item.user_id === currentUser.user_id) {
+      setError("You cannot add your own item to the cart.");
+      return;
+    }
+
+    try {
+      const res = await makeRequest.post("/payments/addToDownload", {
+        item_id: item.item_id,
+      });
+      const data = res.data;
+
+      if (data.success) {
+        setSuccess("Add to download success");
+      } else {
+        setError(data.error || "Failed to add item to download");
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Failed to connect to server");
+      }
+    }
+
+  }
+
   const handleAddToCart = async () => {
     if (!currentUser) {
       setError("Please log in to add items to your cart.");
@@ -68,14 +99,20 @@ const Item = ({ item, isProfile, isShop }) => {
         <div className="price">
           <div className="price-info">
             <p>฿ {item.price === 0 ? "Free" : item.price}</p>
-           
-              <div className="order-count">
-                <DownloadIcon />
-                <span>{item.order_count}</span>
-              </div>
-          
+
+            <div className="order-count">
+              <DownloadIcon />
+              <span>{item.order_count}</span>
+            </div>
+
           </div>
-          {isShop && (<ControlPointIcon onClick={handleAddToCart} style={{ cursor: "pointer", color: "#A0C46E" }} />)}
+
+          {isShop && item.price > 0 ? (
+            <ControlPointIcon onClick={handleAddToCart} style={{ cursor: "pointer", color: "#A0C46E" }} />
+          ) : (
+            <ControlPointIcon onClick={handleAddToDownload} style={{ cursor: "pointer", color: "#A0C46E" }} />
+          )}
+
           {isProfile && item.user_id === currentUser?.user_id &&
             <div className="more-container">
               <SettingsIcon onClick={() => setMenuOpen(!menuOpen)} style={{ cursor: "pointer", color: "#A0C46E" }} />
