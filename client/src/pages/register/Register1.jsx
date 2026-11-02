@@ -92,6 +92,12 @@ const Register = () => {
     setError("");
     setSuccess("");
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email.trim())) {
+      setError("Please enter a valid email address");
+      return;
+    }
 
     if (!email.trim()) {
       setError("Please enter your email before requesting OTP");
