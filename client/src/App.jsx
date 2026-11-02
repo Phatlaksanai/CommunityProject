@@ -37,7 +37,7 @@ import Setting from "./pages/setting/Setting";
 import ChangePassword from "./pages/changepassword/ChangePassword";
 import DeleteAccount from "./pages/deleteaccount/DeleteAccount";
 import Chat from "./pages/chat/chat";
-import { createBrowserRouter, RouterProvider, Outlet, Navigate, useParams } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet, Navigate, useParams, useLocation } from "react-router-dom";
 // import NotFound from "./404";
 
 //ระบบใหม่++++++++++++++++++++++
@@ -189,10 +189,30 @@ function App() {
   }
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
-      return <Navigate to="/login" />
+      return <Navigate to="/login" replace />
     }
     return children;
   }
+
+  const ProtectedUserRoute = ({ children }) => {
+    const { id } = useParams();
+    const location = useLocation();
+
+    if (!currentUser) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (id && Number(id) !== Number(currentUser.user_id)) {
+        const newPath = location.pathname.replace(
+            `/${id}`,
+            `/${currentUser.user_id}`
+        );
+
+        return <Navigate to={newPath} replace />;
+    }
+
+    return children;
+};
 
   const router = createBrowserRouter([
     {
@@ -227,7 +247,7 @@ function App() {
         },
         {
           path: "projects/addproject",
-          element: <ProtectedRoute><AddProject /></ProtectedRoute>
+          element: <ProtectedUserRoute><AddProject /></ProtectedUserRoute>
         },
       ]
     },
@@ -243,18 +263,18 @@ function App() {
         },
         {
           path: "changepassword",
-          element: <ProtectedRoute><ChangePassword /></ProtectedRoute>
+          element: <ProtectedUserRoute><ChangePassword /></ProtectedUserRoute>
         },
         {
           path: "deleteaccount",
-          element: <ProtectedRoute><DeleteAccount /></ProtectedRoute>
+          element: <ProtectedUserRoute><DeleteAccount /></ProtectedUserRoute>
         },
       ]
     },
     {
       path: "/managefriends/:id",
       element: (
-        <ProtectedRoute><Friend /></ProtectedRoute>
+        <ProtectedUserRoute><Friend /></ProtectedUserRoute>
       ),
       children: [
         {
@@ -330,7 +350,7 @@ function App() {
     {
       path: "/download/:id",
       element: (
-        <ProtectedRoute><DescriptionDownload /></ProtectedRoute>
+        <ProtectedUserRoute><DescriptionDownload /></ProtectedUserRoute>
       ),
       children: [
         {
@@ -442,7 +462,7 @@ function App() {
     {
       path: "/buyitem/:id",
       element: (
-        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
+        <ProtectedUserRoute><LayoutNavbar /></ProtectedUserRoute>
       ),
       children: [
         {
@@ -454,7 +474,7 @@ function App() {
     {
       path: "/cart/:id",
       element: (
-        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
+        <ProtectedUserRoute><LayoutNavbar /></ProtectedUserRoute>
       ),
       children: [
         {
@@ -466,7 +486,7 @@ function App() {
     {
       path: "/boxchat/:id",
       element: (
-        <ProtectedRoute><LayoutNavbar /></ProtectedRoute>
+        <ProtectedUserRoute><LayoutNavbar /></ProtectedUserRoute>
       ),
       children: [
         {
