@@ -8,7 +8,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import { ClipLoader } from "react-spinners";
 import ReportModal from "../../report/ReportModal";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -34,7 +34,7 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
   const navigate = useNavigate();
 
   const [openReport, setOpenReport] = useState(false);
-
+  const [LoadingSpin, setLoadingSpin] = useState(false);
   // --- [เพิ่มสเตตัสสำหรับ Lightbox] ---
   const [activeImageIndex, setActiveImageIndex] = useState(null);
 
@@ -83,18 +83,25 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
 
   const mutation = useMutation({
     mutationFn: async (liked) => {
+      setLoadingSpin(true);
       if (liked) {
         return await makeRequest.delete(`/posts/likes/post/${post.post_id}`);
       } else {
         return await makeRequest.post("/posts/likes", { post_id: post.post_id });
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["likes", post.post_id]);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(["likes", post.post_id]);
+      setLoadingSpin(false);
+    },
+    onError: () => {
+      setLoadingSpin(false); 
     },
   });
 
   const handleLike = () => {
+    if (LoadingSpin) return;
+
     const isAlreadyLiked = !!data?.includes(currentUser?.user_id);
     mutation.mutate(isAlreadyLiked);
   };
@@ -187,10 +194,10 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
 
         <div className="info">
           <div className="item">
-            {isLoading ? (
-              "loading"
+            {isLoading || LoadingSpin ? (
+              <ClipLoader size={16} color="#ffffff" />
             ) : data?.includes(currentUser?.user_id) ? (
-              <FavoriteOutlinedIcon style={{ color: '#A0C46E' }} onClick={handleLike} />
+              <FavoriteOutlinedIcon style={{ color: '#A0C46E' }} disabled={LoadingSpin} onClick={handleLike} />
             ) : (
               <FavoriteBorderOutlinedIcon onClick={handleLike} />
             )}
