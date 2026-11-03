@@ -14,7 +14,7 @@ makeRequest.interceptors.response.use(
   (error) => {
     if (
       error.response &&
-      (error.response.status === 401 || error.response.status === 403)
+      (error.response.status === 401)
     ) {
 
       // เช็คก่อนว่ามีข้อมูล User อยู่ในระบบหรือไม่
