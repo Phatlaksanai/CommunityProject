@@ -20,6 +20,7 @@ const ResetPassword = () => {
 
   const [otpCooldown, setOtpCooldown] = useState(0);
   const [otpLoading, setOtpLoading] = useState(false);
+  const [isshowpassword, setisshowpassword] = useState(false)
 
   useEffect(() => {
     if (otpCooldown <= 0) return;
@@ -161,7 +162,7 @@ const ResetPassword = () => {
             {step === 2 && (
               <>
                 <input
-                  type="password"
+                  type={isshowpassword ? "text" : "password"}
                   value={password}
                   placeholder="New Password"
                   name="password"
@@ -169,7 +170,7 @@ const ResetPassword = () => {
                   required
                 />
                 <input
-                  type="password"
+                  type={isshowpassword ? "text" : "password"}
                   value={confirmpassword}
                   placeholder="Confirm Password"
                   name="confirmpassword"
@@ -177,6 +178,9 @@ const ResetPassword = () => {
                   required
                 />
                 <div className="button-group">
+                  <button type="button" onClick={() => setisshowpassword(!isshowpassword)} >
+                    {isshowpassword ? "Hide password" : "Show password"}
+                  </button>
                   <button type="submit" className="login-btn">Confirm</button>
                 </div>
               </>
