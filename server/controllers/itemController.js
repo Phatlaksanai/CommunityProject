@@ -33,10 +33,14 @@ exports.getItems = async (req, res) => {
           categories(
             category_id,
             type
+          ),
+          users!inner(
+            isdelete
           )`
         )
         .order("item_id", { ascending: false })
-        .eq("status", "show");
+        .eq("status", "show")
+        .eq("users.isdelete", "active");
 
       if (user_id) {
         query = query.neq("user_id", user_id);
@@ -188,7 +192,8 @@ exports.getItemsById = async (req, res) => {
       users (
         username,
         name,
-        profilePic
+        profilePic,
+        isdelete
       )
     `,
     )
@@ -207,6 +212,7 @@ exports.getItemsById = async (req, res) => {
     username: data.users?.username || null,
     name: data.users?.name || null,
     profilePic: data.users?.profilePic || null,
+    isdelete: data.users?.isdelete || null,
     model: latestUpdate?.model || null,
     obj: latestUpdate?.obj || null,
     blend: latestUpdate?.blend || null,
@@ -553,7 +559,7 @@ exports.editItem = async (req, res) => {
 
     const finalTitle = updateData.modelName || items.modelName;
     const finalDescription = updateData.description !== undefined ? updateData.description : items.description;
-    
+
     // 4. อัปเดตข้อมูลบน Algolia v5
     try {
       await algoliaClient.saveObject({

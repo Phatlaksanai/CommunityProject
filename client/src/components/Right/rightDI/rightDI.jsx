@@ -168,40 +168,44 @@ const RightDI = ({ item }) => {
         </div>
         <div className="menu">
           <div className="buttons">
-            {item.price === 0 ? (
-              <button onClick={() => {
-                if (!currentUser?.user_id) {
-                  navigate("/login");
-                  return;
-                }
-                handleAddToDownload();
-              }}
-                style={{ cursor: "pointer" }}
-                disabled={isLoadingSpinner}
-              >
-                {isLoadingSpinner ? (
-                  <ClipLoader size={16} color="#ffffff" />
-                ) : (
-                  "Add to Download"
-                )}
-              </button>
-            ) : (
-              <button onClick={() => {
-                if (!currentUser?.user_id) {
-                  navigate("/login");
-                  return;
-                }
-                handleAddToCart();
-              }}
-                style={{ cursor: "pointer" }}
-                disabled={isLoadingSpinner}
-              >
-                {isLoadingSpinner ? (
-                  <ClipLoader size={16} color="#ffffff" />
-                ) : (
-                  "Add to Cart"
-                )}
-              </button>
+            {item.isdelete === "active" && (
+              item.price === 0 ? (
+                <button
+                  onClick={() => {
+                    if (!currentUser?.user_id) {
+                      navigate("/login");
+                      return;
+                    }
+                    handleAddToDownload();
+                  }}
+                  style={{ cursor: "pointer" }}
+                  disabled={isLoadingSpinner}
+                >
+                  {isLoadingSpinner ? (
+                    <ClipLoader size={16} color="#ffffff" />
+                  ) : (
+                    "Add to Download"
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    if (!currentUser?.user_id) {
+                      navigate("/login");
+                      return;
+                    }
+                    handleAddToCart();
+                  }}
+                  style={{ cursor: "pointer" }}
+                  disabled={isLoadingSpinner}
+                >
+                  {isLoadingSpinner ? (
+                    <ClipLoader size={16} color="#ffffff" />
+                  ) : (
+                    "Add to Cart"
+                  )}
+                </button>
+              )
             )}
           </div>
           {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}

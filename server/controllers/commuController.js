@@ -100,10 +100,12 @@ exports.getCommunityById = async (req, res) => {
       .from("communities")
       .select(`
         *,
-        community_members(user_id, status)
+        community_members(user_id, status),
+        users!inner(isdelete)
       `)
       .eq("communities_id", id)
-      .eq("status", "show");
+      .eq("status", "show")
+      .eq("users.isdelete", "active");
 
     // ถ้าล็อกอินอยู่ ให้กรองตาราง community_members เฉพาะของ user คนนี้
     if (userId) {

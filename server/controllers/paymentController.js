@@ -258,9 +258,16 @@ exports.getCardItems = async (req, res) => {
         cart_items_id,
         cart_id,
         carts!inner ( user_id ),
-        items ( item_id, modelName, price, img, users ( username, name, profilePic ) )`,
+        items!inner ( 
+          item_id, 
+          modelName, 
+          price, 
+          img, 
+          users!inner ( username, name, profilePic, isdelete ) 
+        )`
       )
-      .eq("carts.user_id", userId);
+      .eq("carts.user_id", userId)
+      .eq("items.users.isdelete", "active");
 
     if (error) {
       throw error;

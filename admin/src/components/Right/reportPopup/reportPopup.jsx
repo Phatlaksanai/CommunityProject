@@ -53,10 +53,10 @@ const ReportPopup = ({ report, onClose }) => {
     // ฟังก์ชันสำหรับกำหนด Title ของ Popup ตามเงื่อนไข
     const renderPopupTitle = () => {
         const parts = [];
-        if (report.target_id) parts.push(`User -${report.target_id}`);
-        if (report.post_id) parts.push(`Post -${report.post_id}`);
-        if (report.community_id) parts.push(`Community -${report.community_id}`);
-        if (report.item_id) parts.push(`Item -${report.item_id}`);
+        if (report.target_id) parts.push(`User - ${report.target_id}`);
+        if (report.post_id) parts.push(`Post - ${report.post_id}`);
+        if (report.community_id) parts.push(`Community - ${report.community_id}`);
+        if (report.item_id) parts.push(`Item - ${report.item_id}`);
 
         // ถ้ามีข้อมูลเป้าหมายอย่างน้อย 1 อย่าง ให้นำมาต่อกัน (เผื่อกรณีที่ report มีหลาย target พร้อมกัน)
         if (parts.length > 0) {
