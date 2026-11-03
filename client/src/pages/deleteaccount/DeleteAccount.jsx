@@ -3,6 +3,7 @@ import { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { AuthContext } from "../../context/authContext";
+import { ClipLoader } from "react-spinners";
 
 const DeleteAccount = () => {
     const navigate = useNavigate();
@@ -30,7 +31,7 @@ const DeleteAccount = () => {
 
     const handleSendOTP = async () => {
 
-        if (otpCooldown > 0) return;
+        if (otpCooldown > 0 || otpLoading) return;
         setError("");
         setSuccess("");
         setOtpLoading(true);
@@ -112,8 +113,19 @@ const DeleteAccount = () => {
                     </div>
 
                     <div className="btn-group">
-                        <button type="button" className="OTP" onClick={handleSendOTP} disabled={otpCooldown > 0 || otpLoading}>
-                            {otpCooldown > 0 ? `Resend OTP (${otpCooldown} s)` : "OTP"}
+                        <button
+                            type="button"
+                            className="OTP"
+                            onClick={handleSendOTP}
+                            disabled={otpLoading || otpCooldown > 0}
+                        >
+                            {otpLoading ? (
+                                <ClipLoader size={16} color="#ffffff" />
+                            ) : otpCooldown > 0 ? (
+                                `Resend OTP (${otpCooldown} s)`
+                            ) : (
+                                "OTP"
+                            )}
                         </button>
                         <input type="submit" value="Delete" className="submit" />
 

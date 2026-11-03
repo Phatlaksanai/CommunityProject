@@ -2,6 +2,7 @@ import { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { makeRequest } from "../../api/axios";
+import { ClipLoader } from "react-spinners";
 import "./resetpassword.scss";
 
 const ResetPassword = () => {
@@ -54,7 +55,7 @@ const ResetPassword = () => {
   };
 
   const handleSendOTP = async () => {
-    if (otpCooldown > 0) return;
+    if (otpCooldown > 0 || otpLoading) return;
     setError("");
     setSuccess("");
     setOtpLoading(true);
@@ -139,8 +140,18 @@ const ResetPassword = () => {
                   required
                 />
                 <div className="button-group">
-                  <button type="button" onClick={handleSendOTP} disabled={otpCooldown > 0 || otpLoading}>
-                    {otpCooldown > 0 ? `Resend OTP (${otpCooldown} s)` : "OTP"}
+                  <button
+                    type="button"
+                    onClick={handleSendOTP}
+                    disabled={otpLoading || otpCooldown > 0}
+                  >
+                    {otpLoading ? (
+                      <ClipLoader size={16} color="#ffffff" />
+                    ) : otpCooldown > 0 ? (
+                      `Resend OTP (${otpCooldown} s)`
+                    ) : (
+                      "OTP"
+                    )}
                   </button>
                   <button type="button" onClick={nextStep}>Confirm</button>
                 </div>
