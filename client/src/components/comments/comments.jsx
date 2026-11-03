@@ -7,6 +7,7 @@ import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-q
 import { makeRequest } from "../../api/axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { ClipLoader } from "react-spinners";
 
 const Comments = ({ postId }) => {
   const { currentUser } = useContext(AuthContext);
@@ -15,6 +16,7 @@ const Comments = ({ postId }) => {
   const [filePreviews, setFilePreviews] = useState([]);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
@@ -59,12 +61,15 @@ const Comments = ({ postId }) => {
       setDesc("");
       setFiles([]);
       setFilePreviews([]);
+      setIsLoadingSpinner(false);
     },
   });
 
   const handleClick = async (e) => {
     e.preventDefault();
     if (desc.trim() === "" && files.length === 0) return;
+
+    setIsLoadingSpinner(true);
 
     let imgUrl = null;
     if (files[0]) {
@@ -144,7 +149,21 @@ const Comments = ({ postId }) => {
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
         />
-        <button onClick={handleClick}>Send</button>
+        <button onClick={(e) => {
+          if (!currentUser?.user_id) {
+            navigate("/login");
+            return;
+          }
+          handleClick(e);
+        }}
+          disabled={isLoadingSpinner}
+        >
+          {isLoadingSpinner ? (
+            <ClipLoader size={16} color="#ffffff" />
+          ) : (
+            "Send"
+          )}
+        </button>
       </div>
 
       <div className="box-comment">
