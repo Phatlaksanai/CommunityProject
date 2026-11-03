@@ -77,9 +77,7 @@ const Manage = () => {
       setSuccessMember("Ban Successful!");
       setSelectedUsers([]);
       setIsLoadingSpinBan(false);
-      setTimeout(() => {
-        navigate(`/desccommu/${community_id}`);
-      }, 1500);
+      navigate(`/desccommu/${community_id}`);
     },
     onError: (err) => {
       setErrorMember("Ban Failed");
@@ -106,9 +104,7 @@ const Manage = () => {
       setSelectedPosts([]);
       setShowPostModal(false);
       setIsLoadingSpinPost(false);
-      setTimeout(() => {
-        navigate(`/desccommu/${community_id}`);
-      }, 1500);
+      navigate(`/desccommu/${community_id}`);
     },
     onError: (err) => {
       setErrorPost(err.response?.data?.error || "Delete Post Failed");

@@ -141,7 +141,7 @@ const EditProfile = () => {
       });
 
       setSuccess("Update profile success");
-      setTimeout(() => navigate(`/profile/${currentUser?.user_id}`), 1000);
+      navigate(`/profile/${currentUser?.user_id}`);
     } catch (err) {
       console.error(err);
       if (err.response && err.response.data && err.response.data.error) {

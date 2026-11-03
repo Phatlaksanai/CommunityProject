@@ -93,9 +93,7 @@ const ChangePassword = () => {
             const data = res.data;
             if (data.success) {
                 setSuccess("Change password success");
-                setTimeout(() => {
-                    navigate(`/setting/${currentUser.id}`);
-                }, 1500);
+                navigate(`/setting/${currentUser.id}`);
             }
         } catch (err) {
             console.error(err);
