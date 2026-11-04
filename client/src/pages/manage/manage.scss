@@ -11,14 +11,14 @@
     padding: 40px 20px;
     background-color: themed("bg");
     color: themed("textSoft");
-    overflow-y: auto; 
+    overflow-y: auto;
 
     @include mobile {
       padding: 20px 10px 80px 10px;
       gap: 20px;
     }
 
-    &__form {
+    .container {
       width: 100%;
       max-width: 520px;
       padding: 30px;
@@ -32,153 +32,113 @@
       @include mobile {
         padding: 20px 15px;
       }
-    }
 
-    &__title {
-      text-align: center;
-      font-size: 26px;
-      font-weight: 600;
-      margin-bottom: 10px;
+      h1 {
+        text-align: center;
+        font-size: 26px;
+        font-weight: 600;
+        margin-bottom: 10px;
 
-      @include mobile {
-        font-size: 22px;
-      }
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-
-      .post-list {
-        margin-top: 10px;
-        max-height: 300px;
-        overflow-y: auto;
-        border: 1px solid #333;
-        border-radius: 6px;
-        padding: 8px;
-
-        &::-webkit-scrollbar {
-          width: 5px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-          background: themed("buttonBg");
-          border-radius: 4px;
+        @include mobile {
+          font-size: 22px;
         }
       }
 
-      .community-item {
+      .form-group {
         display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 6px;
-        cursor: pointer;
-        img {
-          width: 40px;
-          height: 40px;
-          object-fit: cover;
-          background-color: rgb(82, 135, 200);
+        flex-direction: column;
+        gap: 6px;
+
+        .post-list {
+          margin-top: 10px;
+          max-height: 300px;
+          overflow-y: auto;
+          border: 1px solid #333;
+          border-radius: 6px;
+          padding: 8px;
+
+          &::-webkit-scrollbar {
+            width: 5px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: themed("buttonBg");
+            border-radius: 4px;
+          }
         }
-        span {
-          flex: 1;
-          min-width: 0;
 
-          display: -webkit-box;
-          -webkit-line-clamp: 1;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
+        .community-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 6px;
+          cursor: pointer;
+          img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            background-color: rgb(82, 135, 200);
+          }
+          span {
+            flex: 1;
+            min-width: 0;
 
-          word-break: break-all;
-          overflow-wrap: anywhere;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
 
-          @include mobile {
-            font-size: 14px;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+
+            @include mobile {
+              font-size: 14px;
+            }
+          }
+        }
+
+        .post-item:hover {
+          background: #222;
+        }
+
+        label {
+          font-size: 14px;
+          font-weight: 500;
+        }
+
+        input[type="text"] {
+          padding: 10px 12px;
+          border-radius: 8px;
+          border: 1px solid themed("border");
+          background-color: transparent;
+          color: themed("textColor");
+          font-size: 14px;
+
+          &:focus {
+            outline: none;
+            border-color: themed("button");
           }
         }
       }
 
-      .post-item:hover {
-        background: #222;
-      }
-
-      label {
-        font-size: 14px;
-        font-weight: 500;
-      }
-
-      input[type="text"],
-      input[type="file"] {
-        padding: 10px 12px;
-        border-radius: 8px;
-        border: 1px solid themed("border");
-        background-color: transparent;
-        color: themed("textColor");
-        font-size: 14px;
-
-        &:focus {
-          outline: none;
-          border-color: themed("button");
-        }
-      }
-    }
-
-    .file-input {
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid themed("border");
-      background-color: transparent;
-      color: themed("textColor");
-      font-size: 14px;
-      cursor: pointer;
-
-      &:hover {
-        border-color: themed("button");
-      }
-    }
-
-    .category {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-
-      &__title {
-        font-size: 14px;
-        font-weight: 600;
-      }
-
-      &__select {
-        padding: 10px 12px;
+      .submit {
+        margin-top: 15px;
+        padding: 12px;
         border-radius: 10px;
-        border: 1px solid themed("border");
-        background-color: themed("bg");
-        color: themed("textColor");
-        font-size: 14px;
+        border: none;
         cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        background-color: themed("button");
+        color: themed("buttonText");
+        transition: transform 0.15s ease;
 
-        &:focus {
-          outline: none;
-          border-color: themed("button");
+        &:hover {
+          transform: translateY(-1px);
         }
       }
     }
 
-    &__submit {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: 600;
-      background-color: themed("button");
-      color: themed("buttonText");
-      transition: transform 0.15s ease;
-
-      &:hover {
-        transform: translateY(-1px);
-      }
-    }
     /* Modal Overlay ทำให้พื้นหลังมืดลง */
     .custom-modal-overlay {
       position: fixed;
@@ -191,77 +151,77 @@
       justify-content: center;
       align-items: center;
       z-index: 1000; /* ให้อยู่บนสุด */
-    }
 
-    /* กล่องเนื้อหา Pop-up */
-    .custom-modal-content {
-      background-color: themed("bgSoft");
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
-
-      @include mobile {
-        padding: 20px 15px; // ลดขอบ pop-up บนมือถือ
-        width: 100%; // ให้ขยายเต็มพื้นที่ที่จำกัดไว้ (90% + padding)
-      }
-
-      h3 {
-        margin-top: 0;
-        color: themed("textColor");
-      }
-
-      p {
-        color: themed("textColor");
-        margin: 20px 0;
+      /* กล่องเนื้อหา Pop-up */
+      .custom-modal-content {
+        background-color: themed("bgSoft");
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
 
         @include mobile {
-          font-size: 14px;
-        }
-      }
-
-      /* จัดปุ่มกดยืนยัน / ยกเลิก */
-      .modal-buttons {
-        display: flex;
-        justify-content: space-between;
-        gap: 15px;
-
-        @include mobile {
-          gap: 10px; // ลดช่องว่างระหว่างปุ่มในมือถือ
+          padding: 20px 15px; // ลดขอบ pop-up บนมือถือ
+          width: 100%; // ให้ขยายเต็มพื้นที่ที่จำกัดไว้ (90% + padding)
         }
 
-        button {
-          flex: 1;
-          padding: 10px;
-          border: none;
-          border-radius: 5px;
-          font-size: 16px;
-          cursor: pointer;
-          font-weight: bold;
-          transition: background-color 0.2s;
+        h3 {
+          margin-top: 0;
+          color: themed("textColor");
+        }
+
+        p {
+          color: themed("textColor");
+          margin: 20px 0;
 
           @include mobile {
             font-size: 14px;
-            padding: 8px;
           }
         }
 
-        .btn-cancel {
-          background-color: #e0e0e0;
-          color: #333;
-          &:hover {
-            background-color: themed("bgHover");
+        /* จัดปุ่มกดยืนยัน / ยกเลิก */
+        .modal-buttons {
+          display: flex;
+          justify-content: space-between;
+          gap: 15px;
+
+          @include mobile {
+            gap: 10px; // ลดช่องว่างระหว่างปุ่มในมือถือ
           }
-        }
 
-        .btn-confirm {
-          background-color: #dc3545; /* สีแดงสื่อถึงการลบ/แบน */
-          color: white;
+          button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
 
-          &:hover {
-            background-color: #c82333;
+            @include mobile {
+              font-size: 14px;
+              padding: 8px;
+            }
+          }
+
+          .btn-cancel {
+            background-color: #e0e0e0;
+            color: #333;
+            &:hover {
+              background-color: themed("bgHover");
+            }
+          }
+
+          .btn-confirm {
+            background-color: #dc3545; /* สีแดงสื่อถึงการลบ/แบน */
+            color: white;
+
+            &:hover {
+              background-color: #c82333;
+            }
           }
         }
       }

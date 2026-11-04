@@ -150,8 +150,8 @@ const EditItem = () => {
 
     return (
         <div className="edit-item">
-            <div className="add-item__form">
-                <h1 className="add-item__title">Edit Item</h1>
+            <div className="container">
+                <h1>Edit Item</h1>
                 <form onSubmit={handleUpdateitem}>
                     <div className="form-group">
                         <label htmlFor="itemName">Item Name</label>
@@ -237,7 +237,7 @@ const EditItem = () => {
                         </select>
                     </div>
 
-                    <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+                    <button type="submit" className="submit" disabled={isLoadingSpinner}
                     >
                         {isLoadingSpinner ? (
                             <ClipLoader size={16} color="#ffffff" />

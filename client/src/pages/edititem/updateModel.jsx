@@ -387,9 +387,9 @@ const UpdateModel = () => {
                 ))}
             </div>
             <div className="R">
-                <div className="add-item__form">
-                    {isNewVersion && <h1 className="add-item__title">Add New Version</h1>}
-                    {!isNewVersion && <h1 className="add-item__title">Update Model</h1>}
+                <div className="container">
+                    {isNewVersion && <h1 className="title">Add New Version</h1>}
+                    {!isNewVersion && <h1 className="title">Update Model</h1>}
                     <form onSubmit={handleUpdateitem}>
 
                         <div className="form-group">
@@ -591,7 +591,7 @@ const UpdateModel = () => {
                         )}
 
                         {isNewVersion &&
-                            <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+                            <button type="submit" className="submit" disabled={isLoadingSpinner}
                             >
                                 {isLoadingSpinner ? (
                                     <ClipLoader size={16} color="#ffffff" />
@@ -601,7 +601,7 @@ const UpdateModel = () => {
                             </button>
                         }
                         {!isNewVersion &&
-                            <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+                            <button type="submit" className="submit" disabled={isLoadingSpinner}
                             >
                                 {isLoadingSpinner ? (
                                     <ClipLoader size={16} color="#ffffff" />

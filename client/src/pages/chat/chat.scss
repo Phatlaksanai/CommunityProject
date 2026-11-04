@@ -1,62 +1,60 @@
 @use "../../style.scss" as *;
 
 .chat {
-    display: flex;
-    height: calc(100vh - 60px);
-    overflow: hidden; // กันตัวแม่เลื่อน
-    box-sizing: border-box;
+  display: flex;
+  height: calc(100vh - 60px);
+  overflow: hidden; // กันตัวแม่เลื่อน
+  box-sizing: border-box;
 
-    @include themify($themes) {
-        background-color: themed("bgSoft");
+  @include themify($themes) {
+    background-color: themed("bgSoft");
 
-        @include mobile {
-            padding: 0px;
-            flex-direction: column;
-            height: calc(100vh - 130px);
-        }
+    @include mobile {
+      padding: 0px;
+      flex-direction: column;
+      height: calc(100vh - 130px);
+    }
 
-        @include tablet {
-            padding: 20px;
-        }
+    @include tablet {
+      padding: 20px;
+    }
 
+    .Lchat {
+      background-color: themed("bg");
+      flex: 1;
+      padding: 20px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
 
-        .Lchat {
-            background-color: themed("bg");
-            flex: 1;
-            padding: 20px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+      @include mobile {
+        order: 2; // ย้ายลงมาอยู่ลำดับที่ 2 (ใต้ชื่อและโปรไฟล์เพื่อน)
+        flex: none;
+        height: auto; // ให้ความสูงพอดีกับกล่อง Search ไม่มีช่องว่างสีดำ
+        padding: 8px 15px;
+        overflow: visible; // ให้ Dropdown รายชื่อเพื่อนลอยทับลงมาได้
+        border-bottom: 1px solid themed("border");
+        z-index: 20;
+      }
 
-            @include mobile {
-                order: 2; // ย้ายลงมาอยู่ลำดับที่ 2 (ใต้ชื่อและโปรไฟล์เพื่อน)
-                flex: none;
-                height: auto; // ให้ความสูงพอดีกับกล่อง Search ไม่มีช่องว่างสีดำ
-                padding: 8px 15px;
-                overflow: visible; // ให้ Dropdown รายชื่อเพื่อนลอยทับลงมาได้
-                border-bottom: 1px solid themed("border");
-                z-index: 20;
-            }
-        }
-        // ในไฟล์ chat.scss ฝั่งซ้าย (.Lchat)
-.search-container-local {
-    position: relative;
-    width: 100%;
+      .search-container-local {
+        position: relative;
+        width: 100%;
 
-    .search-box-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        border: 1px solid themed("border");
-        border-radius: 5px;
-        padding: 5px 10px;
+        .search-box-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          border: 1px solid themed("border");
+          border-radius: 5px;
+          padding: 5px 10px;
 
-        .search-icon-inside {
+          .search-icon-inside {
             color: gray;
             font-size: 20px;
-        }
+          }
 
-        .local-search-input {
+          .local-search-input {
             border: none;
             outline: none;
             background-color: transparent;
@@ -64,28 +62,35 @@
             color: themed("textColor");
             font-family: inherit;
             font-size: 14px;
+          }
         }
-    }
 
-    // 🎨 ดรอปดาวน์แสดงรายการผลลัพธ์
-    .search-dropdown-results {
-        position: absolute;
-        top: 115%;
-        left: 0;
-        right: 0;
-        background-color: themed("bg");
-        border: 1px solid themed("border");
-        border-radius: 8px;
-        max-height: 350px;
-        overflow-y: auto;
-        z-index: 1000;
-        box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
+        // 🎨 ดรอปดาวน์แสดงรายการผลลัพธ์
+        .search-dropdown-results {
+          position: absolute;
+          top: 115%;
+          left: 0;
+          right: 0;
+          background-color: themed("bg");
+          border: 1px solid themed("border");
+          border-radius: 8px;
+          max-height: 350px;
+          overflow-y: auto;
+          z-index: 1000;
+          box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
 
-        &::-webkit-scrollbar { width: 6px; }
-        &::-webkit-scrollbar-track { background: transparent; }
-        &::-webkit-scrollbar-thumb { background-color: rgba(128, 128, 128, 0.3); border-radius: 4px; }
+          &::-webkit-scrollbar {
+            width: 6px;
+          }
+          &::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          &::-webkit-scrollbar-thumb {
+            background-color: rgba(128, 128, 128, 0.3);
+            border-radius: 4px;
+          }
 
-        .search-hit-item {
+          .search-hit-item {
             display: block;
             padding: 12px;
             text-decoration: none;
@@ -93,381 +98,386 @@
             border-bottom: 1px solid themed("border");
             transition: background 0.2s ease;
 
-            &:hover { background-color: rgba(128, 128, 128, 0.12); }
-            &:last-child { border-bottom: none; }
+            &:hover {
+              background-color: rgba(128, 128, 128, 0.12);
+            }
+            &:last-child {
+              border-bottom: none;
+            }
 
             .hit-content {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              gap: 12px;
+
+              .hit-image {
+                width: 40px;
+                height: 40px;
+                object-fit: cover;
+                border-radius: 50%;
+                flex-shrink: 0;
+                border: 1px solid themed("border");
+              }
+
+              .hit-info {
                 display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 12px;
+                flex-direction: column;
+                gap: 4px;
+                overflow: hidden;
 
-                .hit-image {
-                    width: 40px;
-                    height: 40px;
-                    object-fit: cover;
-                    border-radius: 50%;
-                    flex-shrink: 0;
-                    border: 1px solid themed("border");
+                .badge {
+                  align-self: flex-start;
+                  font-size: 9px;
+                  font-weight: bold;
+                  padding: 2px 6px;
+                  border-radius: 4px;
+                  color: white;
+                  background-color: #3f51b5;
                 }
 
-                .hit-info {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 4px;
-                    overflow: hidden;
-
-                    .badge {
-                        align-self: flex-start;
-                        font-size: 9px;
-                        font-weight: bold;
-                        padding: 2px 6px;
-                        border-radius: 4px;
-                        color: white;
-                        background-color: #3f51b5; 
-                    }
-
-                    .hit-title {
-                        margin: 0;
-                        font-size: 13px;
-                        font-weight: 600;
-                        white-space: nowrap; 
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
+                .hit-title {
+                  margin: 0;
+                  font-size: 13px;
+                  font-weight: 600;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
                 }
+              }
             }
+          }
         }
+      }
     }
-}
 
-        .Rchat {
-            flex: 5;
-            display: flex;
-            flex-direction: column; // เรียงจากบนลงล่าง
-            height: 100%;
-            background-color: themed("bgSoft");
-            overflow: hidden;
+    .Rchat {
+      flex: 5;
+      display: flex;
+      flex-direction: column; // เรียงจากบนลงล่าง
+      height: 100%;
+      background-color: themed("bgSoft");
+      overflow: hidden;
+
+      @include mobile {
+        display: contents;
+      }
+
+      .chatHeader {
+        padding: 20px;
+        background-color: themed("bg");
+        box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+        z-index: 10; // ให้อยู่เหนือ Posts
+        flex-shrink: 0;
+
+        @include mobile {
+          order: 1;
+          padding: 10px 15px; // ลดขนาด Header ลงในหน้าจอมือถือ
+          border-bottom: 1px solid themed("border");
+        }
+
+        .userInfo {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          position: relative;
+          color: themed("textColor");
+
+          img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+          }
+
+          .online {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            // background-color: limegreen;
+            position: absolute;
+            top: 0;
+            left: 30px;
+          }
+
+          span {
+            font-weight: bold;
+            color: themed("textColorSoft");
 
             @include mobile {
-                display: contents;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+          }
+        }
+      }
+
+      .chatContent {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column-reverse; // ให้ข้อความเรียงจากบนลงล่าง
+        gap: 20px; // ระยะห่างระหว่างกล่องข้อความแต่ละอัน
+
+        @include mobile {
+          order: 3; // เนื้อหาแชทอยู่ลำดับที่ 3 (ต่อจากช่อง Search Friends)
+          min-height: 0; // ป้องกันไม่ให้เนื้อหาดันช่องพิมพ์ด้านล่างตกขอบจอ
+          padding: 15px 10px;
+        }
+
+        &::-webkit-scrollbar {
+          width: 5px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background-color: #ccc;
+          border-radius: 10px;
+        }
+
+        // 🟢 เพิ่มใหม่: CSS สำหรับกล่องข้อความ
+        .message {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start; // ข้อความคนอื่นชิดซ้าย
+          width: 100%; // ไม่ให้กล่องข้อความยาวทะลุขอบจอ
+
+          .chatImageMessage {
+            max-width: 250px;
+            max-height: 250px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+
+            @include mobile {
+              max-width: 180px;
+              max-height: 180px;
+            }
+          }
+
+          .messageWrapper {
+            display: flex;
+            align-items: flex-end; // ให้ฐานด้านล่างเท่ากัน
+            gap: 8px; // ระยะห่างระหว่างกล่องข้อความกับเวลา
+            max-width: 70%; // ไม่ให้ยาวทะลุจอ
+
+            @include mobile {
+              max-width: 85%;
+            }
+          }
+
+          // ส่วนที่แสดง Read / เวลา
+          .messageInfo {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; // ฝั่งคนอื่น เวลาชิดซ้าย
+            margin-bottom: 2px; // ยกขึ้นนิดนึงให้สวยงาม
+            gap: 2px; // ระยะห่างระหว่างคำว่า Read กับ เวลา
+
+            span {
+              font-size: 11px;
+              color: themed("textColor");
+              opacity: 0.6; // ให้สีดูจางลง เป็นข้อความรอง
+              white-space: nowrap; // ไม่ให้ตัวหนังสือขึ้นบรรทัดใหม่
+            }
+          }
+
+          p {
+            padding: 10px 15px;
+            background-color: #a0c46e; // สีพื้นหลังของเพื่อน
+            color: white;
+            border-radius: 0px 15px 15px 15px; // ทำมุมเหลี่ยมด้านซ้ายบน (หางจุก)
+            margin: 0;
+            word-wrap: break-word; // ถ้าพิมพ์ติดกันยาวๆ ให้ตัดขึ้นบรรทัดใหม่
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); // เพิ่มมิติเล็กน้อย
+            max-width: 100%;
+
+            /* บังคับตัดคำยาวๆ หรือข้อความที่ไม่มีการเว้นวรรค (เช่น ลิงก์) */
+            overflow-wrap: break-word;
+            word-break: break-word;
+
+            /* คงรูปแบบการเว้นวรรคและการกด Enter ( \n ) ของข้อความเดิมไว้ และตัดบรรทัดเมื่อชนขอบ */
+            white-space: pre-wrap;
+          }
+
+          span {
+            font-size: 12px;
+            color: themed("textColor");
+            margin-top: 2px;
+          }
+
+          // 🟢 ถ้าเป็นข้อความของเราเอง (มีคลาส own)
+          &.own {
+            align-items: flex-end; // ดันทั้งกลุ่มข้อความไปอยู่ฝั่งขวา
+
+            // จัด messageWrapper ให้เรียงซ้ายไปขวาตามปกติ
+            .messageWrapper {
+              flex-direction: row;
             }
 
-            .chatHeader {
-                padding: 20px;
-                background-color: themed("bg");
-                box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
-                z-index: 10; // ให้อยู่เหนือ Posts
-                flex-shrink: 0;
+            // 🟢 ดันข้อความสถานะ (Read/Sent) และเวลา ให้ "ชิดขวา"
+            .messageInfo {
+              align-items: flex-end;
 
-                @include mobile {
-                    order: 1;
-                    padding: 10px 15px; // ลดขนาด Header ลงในหน้าจอมือถือ
-                    border-bottom: 1px solid themed("border");
-                }
-                
-                .userInfo {
-                    display: flex;
-                    align-items: center;
-                    gap: 20px;
-                    position: relative;
-                    color: themed("textColor");
-
-                    img {
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 10px;
-                        object-fit: cover;
-                    }
-
-                    .online {
-                        width: 12px;
-                        height: 12px;
-                        border-radius: 50%;
-                        // background-color: limegreen;
-                        position: absolute;
-                        top: 0;
-                        left: 30px;
-                    }
-
-                    span {
-                        font-weight: bold;
-                        color: themed("textColorSoft");
-
-                        @include mobile {
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            white-space: nowrap;
-                        }
-                    }
-                }
+              span {
+                text-align: right; // บังคับตัวอักษรชิดขวา
+              }
             }
 
-            .chatContent {
-                flex: 1;
-                overflow-y: auto;
-                padding: 20px;
-                display: flex;
-                flex-direction: column-reverse; // ให้ข้อความเรียงจากบนลงล่าง
-                gap: 20px; // ระยะห่างระหว่างกล่องข้อความแต่ละอัน
-
-                @include mobile {
-                    order: 3; // เนื้อหาแชทอยู่ลำดับที่ 3 (ต่อจากช่อง Search Friends)
-                    min-height: 0; // ป้องกันไม่ให้เนื้อหาดันช่องพิมพ์ด้านล่างตกขอบจอ
-                    padding: 15px 10px;
-                }
-
-                &::-webkit-scrollbar {
-                    width: 5px;
-                }
-
-                &::-webkit-scrollbar-thumb {
-                    background-color: #ccc;
-                    border-radius: 10px;
-                }
-
-                // 🟢 เพิ่มใหม่: CSS สำหรับกล่องข้อความ
-                .message {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: flex-start; // ข้อความคนอื่นชิดซ้าย
-                    width: 100%; // ไม่ให้กล่องข้อความยาวทะลุขอบจอ
-
-                    .chatImageMessage {
-                        max-width: 250px;
-                        max-height: 250px;
-                        border-radius: 15px;
-                        object-fit: cover;
-                        margin-bottom: 5px;
-                        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-
-                        @include mobile {
-                            max-width: 180px;
-                            max-height: 180px;
-                        }
-                    }
-
-                    .messageWrapper {
-                        display: flex;
-                        align-items: flex-end; // ให้ฐานด้านล่างเท่ากัน
-                        gap: 8px; // ระยะห่างระหว่างกล่องข้อความกับเวลา
-                        max-width: 70%; // ไม่ให้ยาวทะลุจอ
-
-                        @include mobile {
-                            max-width: 85%;
-                        }
-                    }
-
-                    // ส่วนที่แสดง Read / เวลา
-                    .messageInfo {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: flex-start; // ฝั่งคนอื่น เวลาชิดซ้าย
-                        margin-bottom: 2px; // ยกขึ้นนิดนึงให้สวยงาม
-                        gap: 2px; // ระยะห่างระหว่างคำว่า Read กับ เวลา
-
-                        span {
-                            font-size: 11px;
-                            color: themed("textColor");
-                            opacity: 0.6; // ให้สีดูจางลง เป็นข้อความรอง
-                            white-space: nowrap; // ไม่ให้ตัวหนังสือขึ้นบรรทัดใหม่
-                        }
-                    }
-
-                    p {
-                        padding: 10px 15px;
-                        background-color: #A0C46E; // สีพื้นหลังของเพื่อน
-                        color: white;
-                        border-radius: 0px 15px 15px 15px; // ทำมุมเหลี่ยมด้านซ้ายบน (หางจุก)
-                        margin: 0;
-                        word-wrap: break-word; // ถ้าพิมพ์ติดกันยาวๆ ให้ตัดขึ้นบรรทัดใหม่
-                        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); // เพิ่มมิติเล็กน้อย
-                        max-width: 100%;
-
-                        /* บังคับตัดคำยาวๆ หรือข้อความที่ไม่มีการเว้นวรรค (เช่น ลิงก์) */
-                        overflow-wrap: break-word;
-                        word-break: break-word;
-
-                        /* คงรูปแบบการเว้นวรรคและการกด Enter ( \n ) ของข้อความเดิมไว้ และตัดบรรทัดเมื่อชนขอบ */
-                        white-space: pre-wrap;
-                    }
-
-                    span {
-                        font-size: 12px;
-                        color: themed("textColor");
-                        margin-top: 2px;
-                    }
-
-                    // 🟢 ถ้าเป็นข้อความของเราเอง (มีคลาส own)
-                    &.own {
-                        align-items: flex-end; // ดันทั้งกลุ่มข้อความไปอยู่ฝั่งขวา
-
-                        // จัด messageWrapper ให้เรียงซ้ายไปขวาตามปกติ
-                        .messageWrapper {
-                            flex-direction: row;
-                        }
-
-                        // 🟢 ดันข้อความสถานะ (Read/Sent) และเวลา ให้ "ชิดขวา"
-                        .messageInfo {
-                            align-items: flex-end;
-
-                            span {
-                                text-align: right; // บังคับตัวอักษรชิดขวา
-                            }
-                        }
-
-                        // สีและรูปร่างกล่องข้อความฝั่งเรา
-                        .messageContent {
-                            p {
-                                background-color: #6a9043; // สีฟ้าน้ำทะเล
-                                color: white;
-                                border-radius: 15px 0px 15px 15px; // หางจุกด้านขวาบน
-                            }
-                        }
-                    }
-                }
-
-                // CSS สำหรับข้อความตอนยังไม่ได้เลือกห้องแชท
-                .noConversationText {
-                    text-align: center;
-                    color: gray;
-                    margin-top: auto;
-                    margin-bottom: auto; // ให้อยู่กึ่งกลางจอ
-                    font-size: 20px;
-                }
+            // สีและรูปร่างกล่องข้อความฝั่งเรา
+            .messageContent {
+              p {
+                background-color: #6a9043; // สีฟ้าน้ำทะเล
+                color: white;
+                border-radius: 15px 0px 15px 15px; // หางจุกด้านขวาบน
+              }
             }
+          }
+        }
 
-            .imagePreviewContainer {
-                padding: 10px 20px;
-                display: flex;
-                gap: 10px;
-                background-color: themed("bgSoft"); // ใช้ธีมสีให้กลืนไปกับแชท
+        // CSS สำหรับข้อความตอนยังไม่ได้เลือกห้องแชท
+        .noConversationText {
+          text-align: center;
+          color: gray;
+          margin-top: auto;
+          margin-bottom: auto; // ให้อยู่กึ่งกลางจอ
+          font-size: 20px;
+        }
+      }
 
-                @include mobile {
-                    order: 4; // อยู่เหนือกล่องพิมพ์ข้อความ
-                    padding: 8px 15px;
-                    overflow-x: auto;
-                    flex-shrink: 0;
-                }
+      .imagePreviewContainer {
+        padding: 10px 20px;
+        display: flex;
+        gap: 10px;
+        background-color: themed("bgSoft"); // ใช้ธีมสีให้กลืนไปกับแชท
 
-                .previewItem {
-                    position: relative;
+        @include mobile {
+          order: 4; // อยู่เหนือกล่องพิมพ์ข้อความ
+          padding: 8px 15px;
+          overflow-x: auto;
+          flex-shrink: 0;
+        }
 
-                    img {
-                        width: 60px;
-                        height: 60px;
-                        object-fit: cover;
-                        border-radius: 10px;
-                        border: 2px solid themed("border");
-                    }
+        .previewItem {
+          position: relative;
 
-                    button {
-                        position: absolute;
-                        top: -5px;
-                        right: -5px;
-                        background-color: rgba(0, 0, 0, 0.6);
-                        color: white;
-                        border: none;
-                        border-radius: 50%;
-                        width: 20px;
-                        height: 20px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        cursor: pointer;
-                        padding: 2px;
+          img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid themed("border");
+          }
 
-                        &:hover {
-                            background-color: red;
-                        }
-                    }
-                }
+          button {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 2px;
+
+            &:hover {
+              background-color: red;
             }
+          }
+        }
+      }
 
-            .chatInputDisabled {
-                background-color: themed("bg");
-                padding: 15px;
-                text-Align: center;
-                color: themed("textColor");
-                font-Size: 14px;
+      .chatInputDisabled {
+        background-color: themed("bg");
+        padding: 15px;
+        text-align: center;
+        color: themed("textColor");
+        font-size: 14px;
 
-                @include mobile {
-                    order: 5;
-                    flex-shrink: 0;
-                }
-            }
+        @include mobile {
+          order: 5;
+          flex-shrink: 0;
+        }
+      }
 
-            .chatInput {
-                color: gray;
-                font-weight: bold;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                padding: 20px;
-                background-color: themed("bg");
-                box-shadow: 0px -5px 15px 1px rgba(0, 0, 0, 0.05); // เงาด้านบน
-                flex-shrink: 0;
+      .chatInput {
+        color: gray;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px;
+        background-color: themed("bg");
+        box-shadow: 0px -5px 15px 1px rgba(0, 0, 0, 0.05); // เงาด้านบน
+        flex-shrink: 0;
 
-                @include mobile {
-                    order: 5; // ช่องพิมพ์อยู่ล่างสุด (เหนือแถบ Navbar ล่าง)
-                    padding: 10px 15px;
-                }
-            }
+        @include mobile {
+          order: 5; // ช่องพิมพ์อยู่ล่างสุด (เหนือแถบ Navbar ล่าง)
+          padding: 10px 15px;
         }
 
         .search {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid themed("border");
-            border-radius: 5px;
-            padding: 5px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          border: 1px solid themed("border");
+          border-radius: 5px;
+          padding: 5px;
+
+          @include mobile {
+            flex: 1; // ขยายช่องพิมพ์ให้เต็มพื้นที่ระหว่างปุ่มรูปภาพและปุ่ม Like
+          }
+
+          input {
+            border: none;
+            width: 500px;
+            background-color: transparent;
+            color: themed("textColor");
 
             @include mobile {
-                flex: 1; // ขยายช่องพิมพ์ให้เต็มพื้นที่ระหว่างปุ่มรูปภาพและปุ่ม Like
+              display: block;
+              width: 100%;
             }
 
-            input {
-                border: none;
-                width: 500px;
-                background-color: transparent;
-                color: themed("textColor");
+            @include tablet {
+              width: 200px;
+            }
+          }
 
-                @include mobile {
-                    display: block;
-                    width: 100%;
-                }
+          .chatTextArea {
+            border: none;
+            width: 500px;
+            background-color: transparent;
+            color: themed("textColor");
+            resize: none; // ❌ ปิดไม่ให้ผู้ใช้ดึงมุมขยายขนาดกล่องได้
+            outline: none; // เอาขอบสีดำตอนกดคลิกออก
+            font-family: inherit; // ใช้ฟอนต์เดียวกับเว็บ
+            padding-top: 8px; // ดันข้อความลงมาให้ตรงกลางพอดี
 
-                @include tablet {
-                    width: 200px;
-                }
+            // ซ่อน Scrollbar ถ้าไม่อยากให้เห็น
+            &::-webkit-scrollbar {
+              display: none;
             }
 
-            .chatTextArea {
-                border: none;
-                width: 500px;
-                background-color: transparent;
-                color: themed("textColor");
-                resize: none; // ❌ ปิดไม่ให้ผู้ใช้ดึงมุมขยายขนาดกล่องได้
-                outline: none; // เอาขอบสีดำตอนกดคลิกออก
-                font-family: inherit; // ใช้ฟอนต์เดียวกับเว็บ
-                padding-top: 8px; // ดันข้อความลงมาให้ตรงกลางพอดี
-
-                // ซ่อน Scrollbar ถ้าไม่อยากให้เห็น
-                &::-webkit-scrollbar {
-                    display: none;
-                }
-
-                @include mobile {
-                    display: block; // แสดงช่องพิมพ์ข้อความตามปกติ (ไม่ซ่อนแล้ว)
-                    width: 100%;
-                }
-
-                @include tablet {
-                    width: 200px;
-                }
+            @include mobile {
+              display: block; // แสดงช่องพิมพ์ข้อความตามปกติ (ไม่ซ่อนแล้ว)
+              width: 100%;
             }
+
+            @include tablet {
+              width: 200px;
+            }
+          }
         }
+      }
     }
+  }
 }

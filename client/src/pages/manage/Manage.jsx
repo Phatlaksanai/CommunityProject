@@ -156,8 +156,8 @@ const Manage = () => {
 
   return (
     <div className="manage">
-      <div className="add-item__form">
-        <h1 className="add-item__title">Ban Member</h1>
+      <div className="container">
+        <h1>Ban Member</h1>
         <form onSubmit={handleBanMember}>
           <div className="form-group">
             <label>Search Members</label>
@@ -189,7 +189,7 @@ const Manage = () => {
             </div>
           </div>
 
-          <button type="submit" className="add-item__submit" disabled={isLoadingSpinBan}
+          <button type="submit" className="submit" disabled={isLoadingSpinBan}
           >
             {isLoadingSpinBan ? (
               <ClipLoader size={16} color="#ffffff" />
@@ -223,8 +223,8 @@ const Manage = () => {
       )}
 
       {/* ส่วนจัดการโพสต์ */}
-      <div className="add-item__form">
-        <h1 className="add-item__title">Delete Posts</h1>
+      <div className="container">
+        <h1>Delete Posts</h1>
         <form onSubmit={handleDeletePosts}>
           <div className="form-group">
             <label>Search by Name or Username</label>
@@ -266,7 +266,7 @@ const Manage = () => {
                 ))}
             </div>
           </div>
-          <button type="submit" className="add-item__submit" disabled={isLoadingSpinPost}
+          <button type="submit" className="submit" disabled={isLoadingSpinPost}
           >
             {isLoadingSpinPost ? (
               <ClipLoader size={16} color="#ffffff" />

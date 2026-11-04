@@ -160,7 +160,7 @@ const Register = () => {
 
   return (
     <div className="register">
-      <div className="card">
+      <div className="container">
         {/* LEFT */}
         <div className="left">
           <h1>PM.</h1>

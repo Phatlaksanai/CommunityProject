@@ -148,8 +148,8 @@ const EditProject = () => {
 
   return (
     <div className="editProject">
-      <div className="add-item__form">
-        <h1 className="add-item__title">Edit Project</h1>
+      <div className="container">
+        <h1>Edit Project</h1>
         {/* ✅ เรียกใช้ handleUpdateProject */}
         <form onSubmit={handleUpdateProject}>
           <div className="form-group">
@@ -232,7 +232,7 @@ const EditProject = () => {
             </div>
           </div>
 
-          <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+          <button type="submit" className="submit" disabled={isLoadingSpinner}
           >
             {isLoadingSpinner ? (
               <ClipLoader size={16} color="#ffffff" />

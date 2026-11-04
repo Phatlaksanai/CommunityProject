@@ -158,8 +158,8 @@ const EditProfile = () => {
 
   return (
     <div className="edit-profile">
-      <div className="edit-profile__form">
-        <h1 className="edit-profile__title">Edit Profile</h1>
+      <div className="container">
+        <h1>Edit Profile</h1>
         <form onSubmit={handleUpdateProfile}>
           <div className="form-group">
             <label htmlFor="displayName">Display Name</label>
@@ -235,7 +235,7 @@ const EditProfile = () => {
             />
           </div>
 
-          <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+          <button type="submit" className="submit" disabled={isLoadingSpinner}
           >
             {isLoadingSpinner ? (
               <ClipLoader size={16} color="#ffffff" />

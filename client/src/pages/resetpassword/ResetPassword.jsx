@@ -101,7 +101,7 @@ const ResetPassword = () => {
   };
   return (
     <div className="resetpassword">
-      <div className="card">
+      <div className="container">
         <div className="left">
           <h1>PM.</h1>
           <p>

@@ -74,7 +74,6 @@ const Cart = () => {
     return (
         <div className="cart">
             <div className="container">
-
                 <div className="leftPane">
                     {sellers.map((seller) => {
                         const displayName = seller.name || seller.username;

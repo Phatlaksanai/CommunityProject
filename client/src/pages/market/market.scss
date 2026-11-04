@@ -1,6 +1,6 @@
 @use "../../style.scss" as *;
 
-.market{
+.market {
   display: flex;
   gap: 20px;
   @include themify($themes) {
@@ -12,13 +12,13 @@
       padding: 10px;
     }
 
-    @include tablet{
+    @include tablet {
       padding: 20px;
     }
   }
 
-/* content ฝั่งขวา */
-.content {
-  flex: 1;
+  /* content ฝั่งขวา */
+  .content {
+    flex: 1;
+  }
 }
- }

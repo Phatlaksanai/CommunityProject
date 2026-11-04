@@ -238,7 +238,6 @@ const Chat = () => {
     };
 
     return (
-
         <div className="chat">
             <div className="Lchat">
                 <div className="search-container-local">
@@ -304,6 +303,7 @@ const Chat = () => {
                         <>
                             {/*วนลูปข้อความ โดยเอาข้อความใหม่ล่าสุดไว้บนสุดของโค้ด (ซึ่งจะไปแสดงล่างสุดของจอ) */}
                             {messagesData?.pages?.map((page, pageIndex) => (
+                                // Fragment เอาไว้แทน div คือไม่มีแท็กครอบ
                                 <Fragment key={pageIndex}>
                                     {[...page].reverse().map((chat, index) => (
                                         <div
@@ -416,7 +416,6 @@ const Chat = () => {
                 ) : null}
             </div>
         </div>
-
     )
 }
 

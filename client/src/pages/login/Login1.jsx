@@ -39,7 +39,7 @@ const Login = () => {
 
   return (
     <div className="login">
-      <div className="card">
+      <div className="container">
         <div className="left">
           <h1>PM.</h1>
           <p>

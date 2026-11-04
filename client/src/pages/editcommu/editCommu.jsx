@@ -121,8 +121,8 @@ const EditCommu = () => {
 
     return (
         <div className="edit-commu">
-            <div className="add-item__form">
-                <h1 className="add-item__title">Edit Community</h1>
+            <div className="container">
+                <h1>Edit Community</h1>
                 <form onSubmit={handleUpdateCommu}>
                     <div className="form-group">
                         <label htmlFor="CommunityName">Name</label>
@@ -161,7 +161,7 @@ const EditCommu = () => {
                         />
                     </div>
 
-                    <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+                    <button type="submit" className="submit" disabled={isLoadingSpinner}
                     >
                         {isLoadingSpinner ? (
                             <ClipLoader size={16} color="#ffffff" />

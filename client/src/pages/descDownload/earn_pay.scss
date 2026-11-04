@@ -1,216 +1,220 @@
 @use "../../style.scss" as *;
 
 .transection {
-    @include themify($themes) {
-        padding: 50px;
-        background-color: themed("bg");
-        height: 80vh;
-        color: themed("textColor");
+  @include themify($themes) {
+    padding: 50px;
+    background-color: themed("bg");
+    height: 80vh;
+    color: themed("textColor");
 
-        @include mobile {
-            padding: 10px;
-            height: auto;
-        }
+    @include mobile {
+      padding: 10px;
+      height: auto;
+    }
 
-        @include tablet {
-            padding: 20px;
-        }
+    @include tablet {
+      padding: 20px;
+    }
 
-        .top {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            gap: 50px;
+    .top {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      gap: 50px;
 
-            @include mobile {
-                flex-direction: column;
-                gap: 20px;
-            }
-        }
+      @include mobile {
+        flex-direction: column;
+        gap: 20px;
+      }
 
-        .L, .R { /* รวบ .L และ .R ไว้ด้วยกันเพื่อให้เลื่อนตารางได้ */
-            flex: 2; /* .R อาจจะใช้ flex: 1; แต่ใส่ไว้ด้วยกันเพื่อจัดการ container */
-            display: flex;
-            flex-direction: column;
+      .L,
+      .R {
+        /* รวบ .L และ .R ไว้ด้วยกันเพื่อให้เลื่อนตารางได้ */
+        flex: 2; /* .R อาจจะใช้ flex: 1; แต่ใส่ไว้ด้วยกันเพื่อจัดการ container */
+        display: flex;
+        flex-direction: column;
 
-            /* ให้ตารางข้างในเลื่อนซ้ายขวาได้บนมือถือ */
-            .container {
-                @include mobile {
-                    overflow-x: auto;
-                }
-            }
-            
-            /* ดันไม่ให้ตารางหดเล็กเกินไปบนมือถือ */
-            .table-header-sticky, .table-scroll-body {
-               @include mobile {
-                   min-width: 500px;
-               }
-            }
-        }
-
-        .R {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-
-            .Header,
-            .row {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
+        /* ให้ตารางข้างในเลื่อนซ้ายขวาได้บนมือถือ */
         .container {
-            width: 100%;
-            background-color: themed("bgSoft");
-            border-radius: 20px;
-            padding: 20px 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-
-            .title {
-                font-size: 20px;
-                font-weight: bold;
-                color: themed("textColorSoft");
-                margin-bottom: 20px;
-            }
+          @include mobile {
+            overflow-x: auto;
+          }
         }
 
-        // ล็อคส่วนหัวตารางให้อยู่กับที่
-        .table-header-sticky {
-            width: 100%;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-            background-color: themed("bgSoft"); // ใช้สีพื้นหลังกล่องเพื่อบังข้อมูลเวลาเลื่อนผ่าน
-        }
-
-        // ส่วนเนื้อหาที่เปิดให้เลื่อนแนวตั้งได้
+        /* ดันไม่ให้ตารางหดเล็กเกินไปบนมือถือ */
+        .table-header-sticky,
         .table-scroll-body {
-            width: 100%;
-            max-height: 350px; // ปรับความสูงสูงสุดตามต้องการ
-            overflow-y: auto;
-            overflow-x: hidden;
-
-            // ตกแต่ง Scrollbar ตามสไตล์ที่คุณต้องการ
-            &::-webkit-scrollbar {
-                width: 5px;
-                height: 5px;
-            }
-
-            &::-webkit-scrollbar-thumb {
-                background: #A0C46E;
-                border-radius: 4px;
-            }
+          @include mobile {
+            min-width: 500px;
+          }
         }
+      }
+
+      .R {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
 
         .Header,
         .row {
-            display: grid;
-            width: 100%;
-            grid-template-columns: 1fr 1fr 1fr;
-            justify-items: center;
-            align-items: center;
-            gap: 20px;
-            padding: 18px 10px;
-
-            .item-info {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                justify-self: start;
-                width: 100%;
-                padding-left: 20px;
-
-                .img {
-                    width: 45px;
-                    height: 45px;
-                    flex-shrink: 0;
-
-                    img {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: cover;
-                        border-radius: 8px;
-                    }
-                }
-            }
+          grid-template-columns: 1fr 1fr;
         }
+      }
+
+      .container {
+        width: 100%;
+        background-color: themed("bgSoft");
+        border-radius: 20px;
+        padding: 20px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .title {
+          font-size: 20px;
+          font-weight: bold;
+          color: themed("textColorSoft");
+          margin-bottom: 20px;
+        }
+      }
+
+      // ล็อคส่วนหัวตารางให้อยู่กับที่
+      .table-header-sticky {
+        width: 100%;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background-color: themed(
+          "bgSoft"
+        ); // ใช้สีพื้นหลังกล่องเพื่อบังข้อมูลเวลาเลื่อนผ่าน
 
         .Header {
-            h2 {
-                margin: 0;
-                color: themed("textSoft");
-                font-size: 15px;
-            }
+          h2 {
+            margin: 0;
+            color: themed("textSoft");
+            font-size: 15px;
+          }
+        }
+      }
+
+      // ส่วนเนื้อหาที่เปิดให้เลื่อนแนวตั้งได้
+      .table-scroll-body {
+        width: 100%;
+        max-height: 350px; // ปรับความสูงสูงสุดตามต้องการ
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        // ตกแต่ง Scrollbar ตามสไตล์ที่คุณต้องการ
+        &::-webkit-scrollbar {
+          width: 5px;
+          height: 5px;
         }
 
-        hr {
-            border: 0;
-            border-bottom: 1px solid #666;
-            margin: 0;
+        &::-webkit-scrollbar-thumb {
+          background: #a0c46e;
+          border-radius: 4px;
         }
 
         .row {
-            border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+          border-bottom: 1px solid rgba(128, 128, 128, 0.2);
 
-            h3 {
-                margin: 0;
-                font-size: 15px;
-                font-weight: bold;
-                color: themed("textSoft");
-            }
+          h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: bold;
+            color: themed("textSoft");
+          }
         }
+      }
 
-        .bottom {
-            .All {
-                display: flex;
-                width: 100%;
-                justify-content: space-between;
-                align-items: center;
-                padding: 20px 0px;
+      .Header,
+      .row {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 1fr 1fr 1fr;
+        justify-items: center;
+        align-items: center;
+        gap: 20px;
+        padding: 18px 10px;
 
-                @include mobile {
-                    flex-wrap: wrap;
-                    gap: 10px;
-                    justify-content: center;
-                }
+        .item-info {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          justify-self: start;
+          width: 100%;
+          padding-left: 20px;
 
-                .box {
-                    width: 250px;
-                    height: 100%;
-                    background-color: themed("bgSoft");
-                    padding: 10px;
-                    border-radius: 10px;
-                    justify-items: center;
+          .img {
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
 
-                    @include mobile {
-                        width: 45%; /* ให้ความกว้างเหลือครึ่งจอ */
-                        padding: 15px 5px;
-                        
-                        .title {
-                            font-size: 14px;
-                            text-align: center;
-                        }
-                        .number {
-                            font-size: 15px;
-                        }
-                    }
-                    
-                    .title {
-                        font-size: 20px;
-                        color: themed("textColorSoft");
-                    }
-
-                    .number {
-                        margin: 0;
-                        font-size: 17px;
-                        font-weight: 500;
-                        color: themed("textSoft");
-                    }
-                }
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              border-radius: 8px;
             }
-
+          }
         }
+      }
+
+      hr {
+        border: 0;
+        border-bottom: 1px solid #666;
+        margin: 0;
+      }
     }
+
+    .bottom {
+      .All {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0px;
+
+        @include mobile {
+          flex-wrap: wrap;
+          gap: 10px;
+          justify-content: center;
+        }
+
+        .box {
+          width: 250px;
+          height: 100%;
+          background-color: themed("bgSoft");
+          padding: 10px;
+          border-radius: 10px;
+          justify-items: center;
+
+          @include mobile {
+            width: 45%; /* ให้ความกว้างเหลือครึ่งจอ */
+            padding: 15px 5px;
+
+            .title {
+              font-size: 14px;
+              text-align: center;
+            }
+            .number {
+              font-size: 15px;
+            }
+          }
+
+          .title {
+            font-size: 20px;
+            color: themed("textColorSoft");
+          }
+
+          .number {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 500;
+            color: themed("textSoft");
+          }
+        }
+      }
+    }
+  }
 }

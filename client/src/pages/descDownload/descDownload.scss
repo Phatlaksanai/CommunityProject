@@ -9,7 +9,7 @@
 
     @include mobile {
       padding: 10px;
-      width: 100%;      /* บังคับความกว้างให้พอดีจอ */
+      width: 100%; /* บังคับความกว้างให้พอดีจอ */
       box-sizing: border-box;
       overflow-x: hidden;
     }
@@ -29,131 +29,129 @@
 
       .table-responsive-wrapper {
         width: 100%;
-        overflow-x: auto; 
-        
+        overflow-x: auto;
+
         @include mobile {
           width: 100%;
         }
-      }
-    }
 
-    .table-header-sticky,
-    hr,
-    .table-scroll-body {
-      @include mobile {
-        min-width: 900px; /* ยิ่งคอลัมน์เยอะ ตัวเลขนี้ต้องยิ่งสูง เพื่อให้มันยาวออกไปด้านข้าง (ปรับได้ตามความเหมาะสม) */
-      }
-    }
-    
-    .table-header-sticky {
-      width: 100%;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      background-color: themed(
-        "bg"
-      ); // ใช้สีพื้นหลังกล่องเพื่อบังข้อมูลเวลาเลื่อนผ่าน
-    }
-
-    // ส่วนเนื้อหาที่เปิดให้เลื่อนแนวตั้งได้
-    .table-scroll-body {
-      width: 100%;
-      max-height: 350px; // ปรับความสูงสูงสุดตามต้องการ
-      overflow-y: auto;
-      overflow-x: hidden;
-
-      // ตกแต่ง Scrollbar ตามสไตล์ที่คุณต้องการ
-      &::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: #a0c46e;
-        border-radius: 4px;
-      }
-    }
-
-    .Header,
-    .row {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1.3fr 1fr 1fr 1fr 1fr;
-      justify-items: center;
-      align-items: center;
-      gap: 20px;
-      padding: 18px 10px;
-    }
-
-    .Header {
-      h2 {
-        margin: 0;
-        color: themed("textColorSoft");
-        font-size: 18px;
-      }
-    }
-
-    hr {
-      border: 0;
-      border-bottom: 1px solid #666;
-      margin: 0;
-    }
-
-    .row {
-      border-bottom: 1px solid rgba(128, 128, 128, 0.2);
-
-      h3 {
-        margin: 0;
-        font-size: 15px;
-        font-weight: bold;
-        color: themed("textColorSoft");
-      }
-
-      button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        min-width: 110px;
-        height: 42px;
-
-        padding: 0 18px;
-
-        border: none;
-        border-radius: 20px;
-
-        cursor: pointer;
-
-        font-size: 14px;
-        font-weight: 600;
-
-        background: themed("buttonBg");
-        color: white;
-
-        transition: 0.2s;
-
-        &:hover {
-          background: themed("AbuttonBg");
+        .table-header-sticky,
+        hr,
+        .table-scroll-body {
+          @include mobile {
+            min-width: 900px; /* ยิ่งคอลัมน์เยอะ ตัวเลขนี้ต้องยิ่งสูง เพื่อให้มันยาวออกไปด้านข้าง (ปรับได้ตามความเหมาะสม) */
+          }
         }
 
-        @include mobile {
-          min-width: 80px; /* ลดขนาดปุ่มลงมาหน่อย */
-          padding: 0 10px;
+        .table-header-sticky {
+          width: 100%;
+          position: sticky;
+          top: 0;
+          z-index: 2;
+          background-color: themed("bg");
+
+          .Header {
+            h2 {
+              margin: 0;
+              color: themed("textColorSoft");
+              font-size: 18px;
+            }
+          }
         }
-      }
 
-      .review-btn {
-        background: themed("buttonBg");
-        color: white;
+        // ส่วนเนื้อหาที่เปิดให้เลื่อนแนวตั้งได้
+        .table-scroll-body {
+          width: 100%;
+          max-height: 350px; // ปรับความสูงสูงสุดตามต้องการ
+          overflow-y: auto;
+          overflow-x: hidden;
 
-        &:hover {
-          background: themed("AbuttonBg");
+          // ตกแต่ง Scrollbar ตามสไตล์ที่คุณต้องการ
+          &::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: #a0c46e;
+            border-radius: 4px;
+          }
+
+          .row {
+            border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+
+            h3 {
+              margin: 0;
+              font-size: 15px;
+              font-weight: bold;
+              color: themed("textColorSoft");
+            }
+
+            button {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              min-width: 110px;
+              height: 42px;
+
+              padding: 0 18px;
+
+              border: none;
+              border-radius: 20px;
+
+              cursor: pointer;
+
+              font-size: 14px;
+              font-weight: 600;
+
+              background: themed("buttonBg");
+              color: white;
+
+              transition: 0.2s;
+
+              &:hover {
+                background: themed("AbuttonBg");
+              }
+
+              @include mobile {
+                min-width: 80px; /* ลดขนาดปุ่มลงมาหน่อย */
+                padding: 0 10px;
+              }
+            }
+
+            .review-btn {
+              background: themed("buttonBg");
+              color: white;
+
+              &:hover {
+                background: themed("AbuttonBg");
+              }
+            }
+
+            .review-complete {
+              color: themed("textColorSoft");
+              font-size: 15px;
+              font-weight: bold;
+            }
+          }
         }
-      }
 
-      .review-complete {
-        color: themed("textColorSoft");
-        font-size: 15px;
-        font-weight: bold;
+        .Header,
+        .row {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1.3fr 1fr 1fr 1fr 1fr;
+          justify-items: center;
+          align-items: center;
+          gap: 20px;
+          padding: 18px 10px;
+        }
+
+        hr {
+          border: 0;
+          border-bottom: 1px solid #666;
+          margin: 0;
+        }
       }
     }
 
@@ -171,22 +169,22 @@
         border-color: rgb(150, 150, 150);
       }
     }
+
+    .ReviewModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.3);
+      // background-color: themed("bg");
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
   }
-}
-
-.ReviewModal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.3);
-  // background-color: themed("bg");
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
 }
 
 .ReviewModal .modalContainer {
@@ -251,8 +249,8 @@
     }
 
     @include mobile {
-       width: 90%; /* บนมือถือให้กล่องรีวิวกว้างตามจอ ไม่ฟิกซ์ที่ 450px */
-       padding: 15px;
+      width: 90%; /* บนมือถือให้กล่องรีวิวกว้างตามจอ ไม่ฟิกซ์ที่ 450px */
+      padding: 15px;
     }
   }
 }

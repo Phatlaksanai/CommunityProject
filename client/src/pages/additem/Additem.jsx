@@ -200,8 +200,8 @@ const AddItem = () => {
 
   return (
     <div className="add-item">
-      <div className="add-item__form">
-        <h1 className="add-item__title">Add Item</h1>
+      <div className="container">
+        <h1>Add Item</h1>
         <form onSubmit={handleAdditem}>
           <div className="form-group">
             <label htmlFor="itemName">Item Name</label>
@@ -388,7 +388,7 @@ const AddItem = () => {
             </div>
           )}
 
-          <button type="submit" className="add-item__submit" disabled={isLoadingSpinner}
+          <button type="submit" className="submit" disabled={isLoadingSpinner}
           >
             {isLoadingSpinner ? (
               <ClipLoader size={16} color="#ffffff" />
