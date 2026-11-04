@@ -208,7 +208,7 @@
                 overflow-y: auto;
                 padding: 20px;
                 display: flex;
-                flex-direction: column; // ให้ข้อความเรียงจากบนลงล่าง
+                flex-direction: column-reverse; // ให้ข้อความเรียงจากบนลงล่าง
                 gap: 20px; // ระยะห่างระหว่างกล่องข้อความแต่ละอัน
 
                 @include mobile {
