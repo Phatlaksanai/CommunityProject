@@ -16,6 +16,9 @@ const Friend = ({ user, isfriend }) => {
     const displayName = user.name || user.username;
     const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName;
 
+    const displayUsername = user.username;
+    const truncatedUsername = displayUsername.length > 10 ? `${displayUsername.substring(0, 10)}...` : displayUsername;
+
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationFn: (userId) => {
@@ -124,7 +127,7 @@ const Friend = ({ user, isfriend }) => {
                     <h3 className="h3 custom-tooltip" data-tip={displayName} onClick={() => navigate(`/profile/${user.user_id}`)} style={{ cursor: "pointer" }}>
                         {truncatedName}
                     </h3>
-                    <p>@{user.username}</p>
+                    <p className="custom-tooltip" data-tip={displayUsername}>@{truncatedUsername}</p>
                 </div>
             </div>
             <div className="actions">

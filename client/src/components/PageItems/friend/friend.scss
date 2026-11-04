@@ -44,6 +44,8 @@
       }
 
       .desc {
+        display: flex;
+        flex-direction: column;
         p {
           color: themed("textColor");
           margin: 0;
