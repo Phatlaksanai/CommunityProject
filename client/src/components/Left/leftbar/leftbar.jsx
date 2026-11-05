@@ -7,10 +7,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/authContext";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { makeRequest } from "../../../api/axios";
 import { useQuery } from "@tanstack/react-query";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const LeftBar = () => {
   const navigate = useNavigate();
@@ -63,8 +62,7 @@ const LeftBar = () => {
               return;
             }
             navigate(`/managefriends/${currentUser?.user_id}`);
-          }}
-            style={{ cursor: "pointer" }}>
+          }}>
             <PeopleIcon />
             <span>Friends</span>
           </div>
@@ -98,7 +96,7 @@ const LeftBar = () => {
 
         <hr />
         <div className="menu">
-          <div className="menu-header">
+          <div className="community">
             <span>My Communities</span>
             <button onClick={() => {
               if (!currentUser?.user_id) {
@@ -107,22 +105,21 @@ const LeftBar = () => {
               }
               navigate("/addcommu")
             }}
-              style={{ cursor: "pointer" }}
             >Create</button>
           </div>
 
-          <div className="community-list-wrapper">
+          <div className="community-list">
             {isLoading ? (
               <span>Loading...</span>
             ) : (
               displayedCommunities.map((commu) => (
                 <div
-                  className="item community-item"
+                  className="community-item"
                   key={commu.communities_id}
                   onClick={() => navigate(`/desccommu/${commu.communities_id}`)}
                 >
                   <img src={commu.cover_img || defaultPic} alt="" />
-                  <span className="community-name">{commu.name.length > 20 ? `${commu.name.substring(0, 17)}...` : commu.name}</span>
+                  <span>{commu.name.length > 20 ? `${commu.name.substring(0, 17)}...` : commu.name}</span>
 
                   {commu.user_id === currentUser.user_id && (
                     <MilitaryTechIcon className="owner-badge" />
@@ -134,7 +131,7 @@ const LeftBar = () => {
 
           {/* 4. ปุ่ม Load More */}
           {!showAll && communities.length > 3 && (
-            <div className="load-more" onClick={() => setShowAll(true)}>
+            <div className="see-more" onClick={() => setShowAll(true)}>
               <span>See more</span>
             </div>
           )}
@@ -142,11 +139,12 @@ const LeftBar = () => {
 
         <hr />
         <div className="menu">
-          <div className="menu-header"><span>Other</span></div>
-
-          <div className="item" onClick={() => navigate(`/setting/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
-            <SettingsIcon />
-            <span>Settings</span>
+          <div className="Other">
+            <span className="title">Other</span>
+            <div className="list" onClick={() => navigate(`/setting/${currentUser?.user_id}`)} style={{ cursor: "pointer" }}>
+              <SettingsIcon />
+              <span>Settings</span>
+            </div>
           </div>
         </div>
       </div>

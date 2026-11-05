@@ -1,8 +1,5 @@
 import "./leftChat.scss";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../../context/authContext";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { makeRequest } from "../../../api/axios";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import dayjs from "dayjs"; // moment to dayjs
@@ -12,8 +9,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { useInView } from "react-intersection-observer";
 
 const LeftChat = ({ userId, currentChat, setCurrentChat }) => {
-    const navigate = useNavigate();
-    const { currentUser } = useContext(AuthContext);
     const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
     // 2. เรียกใช้ useInView สำหรับสร้าง ref แปะล่างสุดของแชท
@@ -66,7 +61,7 @@ const LeftChat = ({ userId, currentChat, setCurrentChat }) => {
                                     <img src={chat?.profilePic || defaultPic} alt="" />
 
                                     <div className="userDetails" >
-                                        <span className="name custom-tooltip" data-tip={chat?.name || chat?.username || "Guest"}>
+                                        <span className="custom-tooltip" data-tip={chat?.name || chat?.username || "Guest"}>
                                             {chat?.name?.length > 17 || chat?.username?.length > 17
                                                 ? `${(chat.name || chat.username).substring(0, 17)}...`
                                                 : chat?.name || chat?.username || "Guest"}
@@ -74,9 +69,9 @@ const LeftChat = ({ userId, currentChat, setCurrentChat }) => {
 
                                         <div className="details">
 
-                                            <p className="lastMessage">
-                                                {chat?.last_message && (chat.last_message.length > 35)
-                                                    ? `${(chat?.last_message).substring(0, 35)}...`
+                                            <p>
+                                                {chat?.last_message && (chat.last_message.length > 10)
+                                                    ? `${(chat?.last_message).substring(0, 10)}...`
                                                     : chat?.last_message || "Started a conversation"}
                                             </p>
 
@@ -96,7 +91,7 @@ const LeftChat = ({ userId, currentChat, setCurrentChat }) => {
             ))}
 
             {/* 4. จุดล่างสุดที่ใช้ตรวจจับการเลื่อน */}
-            <div ref={ref} style={{ padding: "10px", textAlign: "center", fontSize: "12px", color: "gray" , fontWeight: "bold"}}>
+            <div ref={ref} style={{ padding: "10px", textAlign: "center", fontSize: "12px", color: "gray", fontWeight: "bold" }}>
                 {isFetchingNextPage
                     ? "Loading more..."
                     : hasNextPage

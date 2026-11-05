@@ -35,9 +35,7 @@
         padding: 10px 0; // ลดขอบลงเพื่อให้มีพื้นที่แสดงรูปมากขึ้น
       }
 
-      .item {
-        -webkit-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
-        -moz-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+      .gallery {
         box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
         padding: 20px;
         margin-bottom: 20px;
@@ -72,11 +70,11 @@
             grid-auto-rows: min-content;
 
             &::-webkit-scrollbar {
-              width: 5px;
+              width: 6px;
             }
 
             &::-webkit-scrollbar-thumb {
-              background: themed("textColor");
+              background: #A0C46E;
               border-radius: 4px;
             }
           }
@@ -99,6 +97,13 @@
             &:hover {
               opacity: 0.85;
             }
+            
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover; // ครอปตัดรูปภาพแบบจัตุรัสสวยงาม ไม่บิดเบี้ยว
+              display: block;
+            }
 
             &.empty-slot {
               border: 1px dashed themed("border");
@@ -120,20 +125,12 @@
               text-align: center;
               opacity: 0.7;
             }
-
-            // บังคับรูปภาพข้างในให้ครอปตัดพอดีทรงกล่อง ไม่ให้ขยายขนาดช่องพัง
-            img {
-              width: 100%;
-              height: 100%;
-              object-fit: cover; // ครอปตัดรูปภาพแบบจัตุรัสสวยงาม ไม่บิดเบี้ยว
-              display: block;
-            }
           }
-        
+
           @include mobile {
             max-width: 100%; // ให้กล่องรูปภาพกว้างเต็มจอ
           }
-          
+
         }
 
         h2 {
@@ -141,17 +138,17 @@
           color: themed("textColorSoft");
         }
 
-        
 
-          button {
-            border: none;
-            padding: 5px;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            background-color: themed("buttonBg");
-          }
-        
+
+        button {
+          border: none;
+          padding: 5px;
+          border-radius: 10px;
+          color: white;
+          cursor: pointer;
+          background-color: themed("buttonBg");
+        }
+
 
         .top {
           h2 {
@@ -235,85 +232,5 @@
         }
       }
     }
-  }
-}
-
-// --- หน้าต่างดูรูปใหญ่เต็มจอ (Lightbox) หลุดพ้นพันธนาการจากคลาสหลัก ลอยเด่นเหนือโรงภาพยนตร์มืด ---
-.lightboxOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.95);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100000 !important;
-
-  .lightboxCloseBtn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: none;
-    border: none;
-    color: #ffffff;
-    cursor: pointer;
-    opacity: 0.7;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-
-  .navBtn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.08);
-    border: none;
-    color: #ffffff;
-    padding: 15px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.25);
-    }
-
-    &.prev {
-      left: 30px;
-    }
-
-    &.next {
-      right: 30px;
-    }
-  }
-
-  .lightboxContent {
-    max-width: 80%;
-    max-height: 85vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    img {
-      max-width: 100%;
-      max-height: 85vh;
-      object-fit: contain;
-      border-radius: 4px;
-      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.6);
-    }
-  }
-
-  .imageCounter {
-    position: absolute;
-    bottom: 25px;
-    color: #b0b3b8;
-    font-size: 0.9rem;
   }
 }

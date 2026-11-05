@@ -94,6 +94,99 @@ body {
   border-color: #A0C46E;
 }
 
+.msg {
+  font-size: 14px;
+  font-weight: bold;
+
+  &.error {
+    color: #C0903B;
+  }
+
+  &.success {
+    color: #A0C46E;
+  }
+
+}
+
+// ดูรูปเต็ม
+.FullSizeImg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100000 !important;
+
+  .CloseBtn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .Btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #ffffff;
+    padding: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    &.prev {
+      left: 30px;
+    }
+
+    &.next {
+      right: 30px;
+    }
+  }
+
+  .img-container {
+    max-width: 80%;
+    max-height: 85vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      max-width: 100%;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 4px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  .imageCounter {
+    position: absolute;
+    bottom: 25px;
+    color: #b0b3b8;
+    font-size: 0.9rem;
+  }
+}
+
 $themes: (
   light: (textColor: #3e4144,
     bg: #FDFAF4,

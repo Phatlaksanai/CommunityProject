@@ -33,56 +33,16 @@
         flex-direction: column;
         gap: 5px;
 
-        .menu-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 5px;
-
-          span {
-            font-weight: 600;
-            color: themed("textColorSoft");
-          }
-
-          button {
-            padding: 4px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            background-color: themed("buttonBg");
-            color: white;
-            border: none;
-            font-size: 12px;
-          }
-        }
-
-        .community-list-wrapper {
-          max-height: 188px;
-          overflow-y: auto;
-          // ลบเงาหรือ background แปลกๆ ออกจาก wrapper
-          background: transparent;
-
-          &::-webkit-scrollbar {
-            width: 4px;
-          }
-
-          &::-webkit-scrollbar-thumb {
-            background-color: themed("border");
-            border-radius: 10px;
-          }
-        }
-
-        // ปรับแต่ง Item ทั้งหมด (รวม User, เมนูทั่วไป, และ See more)
-        .item,
         .user,
-        .load-more {
+        .item {
           display: flex;
           align-items: center;
           gap: 12px;
           padding: 8px 10px; // เพิ่ม padding ให้ดูโปร่งขึ้น
           border-radius: 8px; // มนกำลังดี
           cursor: pointer;
-          transition: all 0.2s ease;
-          background-color: transparent; // มั่นใจว่าไม่มีสีพื้นหลังแปลกๆ
+          // transition: all 0.2s ease;
+          // background-color: transparent; // มั่นใจว่าไม่มีสีพื้นหลังแปลกๆ
           box-shadow: none !important; // ปิดเงาที่ทำให้ดูเหมือนเฟดดำ
 
           &:hover {
@@ -110,32 +70,119 @@
           }
         }
 
-        // เฉพาะจุดของ See more ให้จัดกึ่งกลางสวยๆ
-        .load-more {
+        .community {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 5px;
+
+          span {
+            font-weight: 600;
+            color: themed("textColorSoft");
+          }
+
+          button {
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: themed("buttonBg");
+            color: white;
+            border: none;
+            font-size: 12px;
+          }
+        }
+
+        .community-list {
+          max-height: 188px;
+          overflow-y: auto;
+
+          &::-webkit-scrollbar {
+            width: 6px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background-color: themed("border");
+            border-radius: 10px;
+          }
+
+          .community-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+
+            &:hover {
+              background-color: themed("bgSoft");
+            }
+
+            img {
+              width: 32px;
+              height: 32px;
+              border-radius: 50%;
+              object-fit: cover;
+            }
+
+            span {
+              overflow: hidden;
+              font-size: 14px;
+              color: themed("textColor");
+            }
+
+            .owner-badge {
+              font-size: 18px;
+              color: #888;
+              margin-left: auto;
+            }
+          }
+        }
+
+        .see-more {
+          display: flex;
+          padding: 8px 10px;
+          border-radius: 8px;
+          cursor: pointer;
           justify-content: center;
           margin-top: 5px;
-          color: themed("textColorSoft");
-          font-weight: 500;
+          color: themed("textColor");
 
           span {
             font-size: 13px;
           }
+
+          &:hover {
+            background-color: themed("bgSoft");
+          }
         }
 
-        // จัดการชื่อกลุ่มที่ยาวเกินไป
-        .item.community-item {
-          .community-name {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .Other {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+
+          .title {
+            font-weight: bold;
+            color: themed("textColorSoft");
+            margin-bottom: 5px;
           }
 
-          .owner-badge {
-            font-size: 18px;
-            color: #888;
-            margin-left: auto;
-            flex-shrink: 0;
+          .list {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+
+            &:hover {
+              background-color: themed("bgSoft");
+            }
+
+            span {
+              font-size: 14px;
+              color: themed("textColor");
+            }
           }
         }
       }

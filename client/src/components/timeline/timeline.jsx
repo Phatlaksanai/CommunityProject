@@ -39,12 +39,11 @@ const Timeline = ({ itemId, onClose }) => {
 
     return createPortal(
         <div className={`timeline-overlay ${themeClass}`}>
-            <CloseIcon className="timeline-close" onClick={onClose} />
+            <CloseIcon className="closeBtn" fontSize="large" onClick={onClose} />
 
             {hasPrev && (
-                <div className="timeline-nav timeline-nav-prev">
+                <div className="timelineNav prev">
                     <ArrowBackIosIcon
-                        sx={{ fontSize: 60 }} // sx คือ prop ของ MUI ที่ใช้เขียน CSS ให้ component นั้นโดยตรง
                         onClick={(e) => {
                             e.stopPropagation();
                             goPrev();
@@ -99,9 +98,8 @@ const Timeline = ({ itemId, onClose }) => {
             </div>
 
             {hasNext && (
-                <div className="timeline-nav timeline-nav-next">
+                <div className="timelineNav next">
                     <ArrowForwardIosIcon
-                        sx={{ fontSize: 60 }}
                         onClick={(e) => {
                             e.stopPropagation();
                             goNext();

@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import Items from "../../components/PageItems/items/items"
-import LeftBarDownload from "../../components/Left/leftbarDL/leftbarDL";
+import LeftMarket from "../../components/Left/leftMarket/leftMarket";
 import ScrollToTop from "../../ScrollToTop";
 import "./market.scss"
 
@@ -12,7 +12,7 @@ const Market = () => {
   });
   return (
     <div className="market">
-      <LeftBarDownload filters={filters} setFilters={setFilters} />
+      <LeftMarket filters={filters} setFilters={setFilters} />
       <div className="content">
         <ScrollToTop />
         <Items filters={filters} isShop={true} />

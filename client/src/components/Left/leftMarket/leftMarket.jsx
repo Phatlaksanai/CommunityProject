@@ -1,12 +1,12 @@
-import "./leftbarDL.scss";
+import "./leftMarket.scss";
 import { AuthContext } from "../../../context/authContext";
-import { Link, useNavigate } from "react-router-dom";
-import { useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 import { ClipLoader } from "react-spinners";
 
-const LeftBarDownload = ({ filters = {}, setFilters }) => {
+const LeftMarket = ({ filters = {}, setFilters }) => {
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
@@ -16,7 +16,6 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
     ThisWeek: "This week",
     ThisDay: "This day",
   };
-  const [success, setSuccess] = useState("")
   const [error, setError] = useState("")
   const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
@@ -92,8 +91,8 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
   const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName;
 
   return (
-    <div className="leftBarDownload">
-      <div className="leftBarDownloadItem">
+    <div className="leftMarket">
+      <div className="userSection">
         <img src={currentUser?.profilePic || defaultPic} alt="profile" />
         <span className="custom-tooltip" data-tip={displayName}>
           {truncatedName}
@@ -131,6 +130,7 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
             <span>{category.type}</span>
           </div>
         ))}
+
         <hr />
         <p>Date</p>
         {Object.keys(dateLabels).map((item) => (
@@ -147,11 +147,9 @@ const LeftBarDownload = ({ filters = {}, setFilters }) => {
           </div>
         ))}
       </form>
-      <br></br>
-      {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
-      {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
+      {error && <span className="msg error">{error}</span>}
     </div>
   );
 };
 
-export default LeftBarDownload;
+export default LeftMarket;

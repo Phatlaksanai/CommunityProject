@@ -14,7 +14,7 @@ import ReportModal from "../../report/ReportModal";
 import { Link, useNavigate } from "react-router-dom";
 import Comments from "../../comments/comments";
 import { useState, useContext, useEffect } from "react";
-import { createPortal } from "react-dom"; // นำเข้า Portal สำหรับทำ Lightbox
+import { createPortal } from "react-dom";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
@@ -35,7 +35,7 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
 
   const [openReport, setOpenReport] = useState(false);
   const [LoadingSpin, setLoadingSpin] = useState(false);
-  // --- [เพิ่มสเตตัสสำหรับ Lightbox] ---
+
   const [activeImageIndex, setActiveImageIndex] = useState(null);
 
   // สร้าง Array สำหรับเก็บเฉพาะ URL ของรูปภาพ เพื่อเอาไว้ใช้ไล่ลำดับใน Lightbox
@@ -125,7 +125,7 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
     <div className="post">
       <div className="container">
         <div className="user">
-          <div className="userInfo" onClick={() => navigate(`/profile/${post.user_id}`)} style={{ cursor: "pointer" }}>
+          <div className="userInfo" onClick={() => navigate(`/profile/${post.user_id}`)}>
             <img src={post.profilePic || defaultPic} alt="" />
             <div className="details">
               <span className="name">{post.name || post.username}</span>
@@ -164,7 +164,6 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
                 slidesPerView={1}
                 navigation
                 pagination={{ clickable: true }}
-                className="mySwiper"
               >
                 {/* ส่วนของรูปภาพ (ผูก Event onClick เพื่อเปิด Lightbox) */}
                 {post.imgs?.map((item, index) => (
@@ -208,31 +207,27 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
             {commentLoading ? "..." : commentCount} Comments
           </div>
           {!isDescCommu && post.community_name && (
-            <div className="postCommunityInfo">
-              <img src={post.community_cover} alt="" onClick={() => navigate(`/desccommu/${post.community_id}`)} style={{ cursor: "pointer" }} />
-              <Link
-                className="community-link custom-tooltip"
-                data-tip={post.community_name}
-                to={`/desccommu/${post.community_id}`}
+            <div className="post-form">
+              <img src={post.community_cover} alt="" onClick={() => navigate(`/desccommu/${post.community_id}`)}/>
+              <div className="link custom-tooltip" data-tip={post.community_name}
+                onClick={() => navigate(`/desccommu/${post.community_id}`)}
               >
                 Shared in {post.community_name.length > 10
                   ? `${post.community_name.substring(0, 10)}...`
                   : post.community_name}
-              </Link>
+              </div>
             </div>
           )}
 
           {!isDescProject && post.project_name && (
-            <div className="postCommunityInfo">
-              <Link
-                className="community-link custom-tooltip"
-                data-tip={post.project_name}
-                to={`/descproject/${post.project_id}`}
+            <div className="post-form">
+              <div className="link custom-tooltip" data-tip={post.project_name}
+                onClick={() => navigate(`/descproject/${post.project_id}`)}
               >
                 Project : {post.project_name.length > 10
                   ? `${post.project_name.substring(0, 10)}...`
                   : post.project_name}
-              </Link>
+              </div>
             </div>
           )}
         </div>
@@ -241,24 +236,24 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
 
       {/* Img full screen */}
       {activeImageIndex !== null && imageList.length > 0 && createPortal(
-        <div className="lightboxOverlay" onClick={() => setActiveImageIndex(null)}>
-          <button className="lightboxCloseBtn" onClick={() => setActiveImageIndex(null)}>
+        <div className="FullSizeImg" onClick={() => setActiveImageIndex(null)}>
+          <button className="CloseBtn" onClick={() => setActiveImageIndex(null)}>
             <CloseIcon fontSize="large" />
           </button>
 
           {/* แสดงปุ่มนำทางเฉพาะเมื่อรูปในโพสต์มีมากกว่า 1 รูป */}
           {imageList.length > 1 && (
-            <button className="navBtn prev" onClick={handlePrevImage}>
+            <button className="Btn prev" onClick={handlePrevImage}>
               <ArrowBackIosNewIcon />
             </button>
           )}
 
-          <div className="lightboxContent" onClick={(e) => e.stopPropagation()}>
+          <div className="img-container" onClick={(e) => e.stopPropagation()}>
             <img src={imageList[activeImageIndex]} alt="Full view" />
           </div>
 
           {imageList.length > 1 && (
-            <button className="navBtn next" onClick={handleNextImage}>
+            <button className="Btn next" onClick={handleNextImage}>
               <ArrowForwardIosIcon />
             </button>
           )}

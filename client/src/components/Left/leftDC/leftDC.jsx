@@ -16,14 +16,14 @@ const LeftDC = ({ project, commuId, isProfile, userId }) => {
 
   // State สำหรับเก็บ Index ของรูปที่กำลังกดดูขนาดเต็ม (Lightbox)
   const [activeImageIndex, setActiveImageIndex] = useState(null);
-  
+
   const { data: latestImages = [], error, isLoading } = useQuery({
     queryKey: isProfile ? ["userImages", userId] : ["commuImages", commuId],
     queryFn: () => {
-      const endpoint = isProfile 
-        ? `/posts/user/${userId}/images` 
+      const endpoint = isProfile
+        ? `/posts/user/${userId}/images`
         : `/communities/${commuId}/images`;
-        
+
       return makeRequest.get(endpoint).then(res => res.data);
     },
     // ป้องกันไม่ให้ Query ทำงานถ้า ID ยังไม่มีค่า (เป็น Optional แต่แนะนำให้ใส่)
@@ -62,13 +62,13 @@ const LeftDC = ({ project, commuId, isProfile, userId }) => {
     <div className="leftDC">
       {/* --- ส่วนของหน้าจอปกติ --- */}
       <div className="container">
-        <div className="item">
+        <div className="gallery">
           <h2>Gallery ({latestImages.length})</h2>
 
           {/* เปิดระบบ Scroll แนวตั้งเฉพาะตอนที่เปิดสถานะ expanded เท่านั้น */}
           <div className={`img-container ${isExpanded ? "expanded" : ""}`}>
             {isLoading ? (
-              <div className="loading-text">Loading...</div>
+              <div>Loading...</div>
             ) : (
               displayImages.map((imgUrl, index) => (
                 <div className="img" key={index} onClick={() => setActiveImageIndex(index)}>
@@ -108,24 +108,24 @@ const LeftDC = ({ project, commuId, isProfile, userId }) => {
 
       {/* --- LIGHTBOX: หน้าต่างดูรูปใหญ่เต็มจอ ซ้อนทับอีกชั้น ยิงพอร์ทัลออกไปครอบสูงสุด --- */}
       {activeImageIndex !== null && createPortal(
-        <div className="lightboxOverlay" onClick={() => setActiveImageIndex(null)}>
+        <div className="FullSizeImg" onClick={() => setActiveImageIndex(null)}>
           {/* ปุ่มปิดรูปใหญ่ */}
-          <button className="lightboxCloseBtn" onClick={() => setActiveImageIndex(null)}>
+          <button className="CloseBtn" onClick={() => setActiveImageIndex(null)}>
             <CloseIcon fontSize="large" />
           </button>
 
           {/* ปุ่มเลื่อนซ้าย */}
-          <button className="navBtn prev" onClick={handlePrevImage}>
+          <button className="Btn prev" onClick={handlePrevImage}>
             <ArrowBackIosNewIcon />
           </button>
 
           {/* กล่องแสดงรูปใหญ่ */}
-          <div className="lightboxContent" onClick={(e) => e.stopPropagation()}>
+          <div className="img-container" onClick={(e) => e.stopPropagation()}>
             <img src={latestImages[activeImageIndex]} alt="Full view" />
           </div>
 
           {/* ปุ่มเลื่อนขวา */}
-          <button className="navBtn next" onClick={handleNextImage}>
+          <button className="Btn next" onClick={handleNextImage}>
             <ArrowForwardIosIcon />
           </button>
 

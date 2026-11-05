@@ -20,6 +20,7 @@ const ChangePassword = () => {
 
     const [otpCooldown, setOtpCooldown] = useState(0);
     const [otpLoading, setOtpLoading] = useState(false);
+    const [isshowpassword, setisshowpassword] = useState(false)
 
     useEffect(() => {
         if (otpCooldown <= 0) return;
@@ -108,8 +109,8 @@ const ChangePassword = () => {
 
     return (
         <div className="changepassword">
-            <div className="add-item__form">
-                <h1 className="add-item__title">Change Password</h1>
+            <div className="container">
+                <h1>Change Password</h1>
                 <form onSubmit={handleChangePassword}>
                     {step === 1 && (
                         <>
@@ -146,8 +147,8 @@ const ChangePassword = () => {
                                 </button>
                                 <button type="button" className="submit" onClick={nextStep}>Confirm</button>
 
-                                {error && <span style={{ color: "red" }}>{error}</span>}
-                                {success && <span style={{ color: "green" }}>{success}</span>}
+                                {error && <span className="msg error">{error}</span>}
+                                {success && <span className="msg success">{success}</span>}
                             </div>
                         </>
                     )}
@@ -155,7 +156,7 @@ const ChangePassword = () => {
                         <>
                             <div className="form-group">
                                 <label htmlFor="itemDetail">New Password</label>
-                                <input type="password" id="itemDetail" placeholder="New Password"
+                                <input type={isshowpassword ? "text" : "password"} id="itemDetail" placeholder="New Password"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     required />
@@ -163,7 +164,7 @@ const ChangePassword = () => {
 
                             <div className="form-group">
                                 <label htmlFor="itemDetail">Confirm Password</label>
-                                <input type="password" id="itemDetail" placeholder="Confirm Password"
+                                <input type={isshowpassword ? "text" : "password"} id="itemDetail" placeholder="Confirm Password"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     required />
@@ -172,9 +173,14 @@ const ChangePassword = () => {
                             <div className="btn-group">
                                 <input type="submit" value="Confirm" className="submit" />
 
-                                {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
-                                {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
+                                <button type="button" className="btn" onClick={() => setisshowpassword(!isshowpassword)} >
+                                    {isshowpassword ? "Hide password" : "Show password"}
+                                </button>
+
+                                {error && <span className="msg error">{error}</span>}
+                                {success && <span className="msg success">{success}</span>}
                             </div>
+
                         </>
                     )}
 

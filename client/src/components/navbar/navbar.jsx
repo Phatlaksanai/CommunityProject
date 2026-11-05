@@ -17,7 +17,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 // 🚀 [ปรับการ Import: เอา Hits ออก แล้วนำ useHits กับ useSearchBox มาจัดการเอง]
-import { InstantSearch, SearchBox, useSearchBox, useHits, Configure } from 'react-instantsearch';
+import { InstantSearch, useSearchBox, useHits, Configure } from 'react-instantsearch';
 import { searchClient } from "../../api/algoliaClient";
 
 // ============================================================
@@ -48,7 +48,7 @@ const CustomSearchResults = () => {
     <div className="search-dropdown-results">
       <ul className="ais-Hits-list" style={{ listStyle: "none", padding: 0, margin: 0 }}>
         {results.hits.map((hit) => (
-          <li key={hit.objectID} className="ais-Hits-item">
+          <li key={hit.objectID}>
             <SearchHit hit={hit} />
           </li>
         ))}
@@ -100,7 +100,7 @@ const CustomSearchBox = ({ searchText, setSearchText, onFocus, onBlur }) => {
 
     // 1. เรียกใช้ตัวตัดคำภาษาไทยที่มีอยู่ใน Browser (ไม่ต้อง npm install)
     const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
-    
+
     // 2. หั่นข้อความจากผู้ใช้ แล้วจับมาต่อกันใหม่ด้วยเว้นวรรค (Space)
     // ตัวอย่าง: "ไก่ย่าง5ดาว" -> จะถูกแปลงเป็น "ไก่ ย่าง 5 ดาว"
     const tokenizedText = Array.from(segmenter.segment(searchText))
@@ -110,7 +110,7 @@ const CustomSearchBox = ({ searchText, setSearchText, onFocus, onBlur }) => {
     // 3. ส่งคำที่ "เว้นวรรคแล้ว" เข้า Algolia 
     // (UI ในกล่องพิมพ์ยังแสดง searchText แบบติดกันปกติ แต่ Algolia ได้รับแบบเว้นวรรค)
     refine(tokenizedText);
-    
+
   }, [searchText, refine]);
 
   return (
@@ -216,21 +216,12 @@ const Navbar = () => {
   return (
     <div className="navbar">
       <div className="left">
-        <Link to="/" style={{ textDecoration: "none" }}>
+        <div onClick={() => navigate("/")}>
           <h1 className="Logo">PM</h1>
-        </Link>
-        <HomeOutlinedIcon onClick={() => navigate("/")} style={{ cursor: "pointer" }} />
-        <StorefrontIcon onClick={() => navigate("/market")} style={{ cursor: "pointer" }} />
-        <DownloadIcon
-          onClick={() => {
-            if (!currentUser?.user_id) {
-              navigate("/login");
-              return;
-            }
-            navigate(`/download/${currentUser.user_id}`);
-          }}
-          style={{ cursor: "pointer" }}
-        />
+        </div>
+        <HomeOutlinedIcon className="icons" onClick={() => navigate("/")} />
+        <StorefrontIcon className="icons" onClick={() => navigate("/market")} />
+        <DownloadIcon className="icons" onClick={() => { navigate(`/download/${currentUser?.user_id}`)}}/>
 
         {/* ============================================================ */}
         {/* โครงสร้างก้อนค้นหา Algolia เวอร์ชันเสถียรที่สุด ไร้อาการหลุดโฟกัส และไร้อาการแวบ */}
@@ -282,36 +273,12 @@ const Navbar = () => {
       </div>
 
       <div className="right">
-        <AddShoppingCartIcon onClick={() => {
-          if (!currentUser?.user_id) {
-            navigate("/login");
-            return;
-          }
-          navigate(`/cart/${currentUser?.user_id}`)
-        }}
-          style={{ cursor: "pointer" }}
-        />
-        <PeopleIcon onClick={() => {
-          if (!currentUser?.user_id) {
-            navigate("/login");
-            return;
-          }
-          navigate(`/managefriends/${currentUser?.user_id}`)
-        }}
-          style={{ cursor: "pointer" }}
-        />
-        <ForumIcon onClick={() => {
-          if (!currentUser?.user_id) {
-            navigate("/login");
-            return;
-          }
-          navigate(`/boxchat/${currentUser?.user_id}`)
-        }}
-          style={{ cursor: "pointer" }}
-        />
+        <AddShoppingCartIcon className="icons" onClick={() => { navigate(`/cart/${currentUser?.user_id}`)}}/>
+        <PeopleIcon className="icons" onClick={() => { navigate(`/managefriends/${currentUser?.user_id}`)}}/>
+        <ForumIcon className="icons" onClick={() => { navigate(`/boxchat/${currentUser?.user_id}`) }}/>
 
-        <SettingsIcon 
-          className="mobile-setting-icon" 
+        <SettingsIcon
+          className="mobile-setting-icon"
           onClick={() => navigate(`/setting/${currentUser?.user_id}`)}
           style={{ cursor: "pointer" }}
         />
@@ -326,7 +293,7 @@ const Navbar = () => {
           </span>
           {!currentUser && <button onClick={handleLogin} className="loginbtn">Login</button>}
           {currentUser &&
-            <div className="more-container">
+            <div>
               <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} style={{ cursor: "pointer" }} />
               {menuOpen && (
                 <div className="moreMenu">

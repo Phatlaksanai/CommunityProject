@@ -1,40 +1,39 @@
 @use "../../style.scss" as *;
 
-.model-placeholder {
+.model-viewer {
   @include themify($themes) {
-    width: 100%;
-    height: 400px;
-    margin-top: 10px;
-    border-radius: 10px;
-    background: themed("bg3D");
-    cursor: pointer;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    transition: background 0.2s ease;
-
-    &:hover {
-      background: themed("Abg3D");
-    }
-
-    .icon {
-      font-size: 50px;
-    }
-
-    .text {
-      margin-top: 10px;
-      font-weight: bold;
-      color: themed("textColorSoft");
-    }
-  }
-}
-
-  .model-viewer {
     position: relative;
     margin-top: 10px;
+
+    .model-placeholder {
+      width: 100%;
+      height: 400px;
+      margin-top: 10px;
+      border-radius: 10px;
+      background: themed("bg3D");
+      cursor: pointer;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: themed("Abg3D");
+      }
+
+      .icon {
+        font-size: 50px;
+      }
+
+      .text {
+        margin-top: 10px;
+        font-weight: bold;
+        color: themed("textColorSoft");
+      }
+    }
 
     .viewer-canvas {
       width: 100%;
@@ -59,3 +58,4 @@
       }
     }
   }
+}

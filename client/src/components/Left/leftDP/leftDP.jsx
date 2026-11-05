@@ -46,8 +46,8 @@ const LeftDP = ({ project }) => {
         {/* ===== ITEMS ===== */}
         {hasItems &&
           items.map(item => (
-            <div className="item" key={item.item_id}>
-              <div className="top">
+            <div className="box" key={item.item_id}>
+              <div>
                 {item.model && <ModelViewer modelUrl={item.model} />}
                 {/* <img src={item.img} alt="" /> */}
                 <p><strong>Name :</strong> {item.modelName}</p>
@@ -60,14 +60,14 @@ const LeftDP = ({ project }) => {
                 </span>
               </div>
               <div className="groupBtn">
-                <button className="timeline-button" onClick={() => setTimelineItemId(item.item_id)}>Timeline</button>
-                <button className="buy-button" onClick={() => navigate(`/descitem/${item.item_id}`)}>Buy</button>
+                <button onClick={() => setTimelineItemId(item.item_id)}>Timeline</button>
+                <button className="Buy" onClick={() => navigate(`/descitem/${item.item_id}`)}>Buy</button>
               </div>
             </div>
           ))}
 
         {/* ===== STATS (แสดงเสมอ แม้ไม่มี item) ===== */}
-        <div className="item">
+        <div className="box">
           <h2>Project Stats</h2>
           <p><strong>Development Duration</strong></p>
 

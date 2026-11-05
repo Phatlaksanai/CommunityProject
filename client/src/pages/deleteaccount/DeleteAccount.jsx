@@ -93,8 +93,8 @@ const DeleteAccount = () => {
 
     return (
         <div className="deleteaccount">
-            <div className="add-item__form">
-                <h1 className="add-item__title">Delete Account</h1>
+            <div className="container">
+                <h1>Delete Account</h1>
                 <form onSubmit={handleDeleteAccount}>
                     <div className="form-group">
                         <label htmlFor="itemDetail">Email</label>
@@ -129,8 +129,8 @@ const DeleteAccount = () => {
                         </button>
                         <input type="submit" value="Delete" className="submit" />
 
-                        {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
-                        {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
+                        {error && <span className="msg error">{error}</span>}
+                        {success && <span className="msg success">{success}</span>}
                     </div>
                 </form>
             </div>

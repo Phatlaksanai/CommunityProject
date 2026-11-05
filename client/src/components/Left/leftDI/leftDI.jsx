@@ -3,7 +3,7 @@ import ModelViewer from "../../modelViewer/model_viewer";
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/authContext";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import ReportModal from "../../report/ReportModal";
 
@@ -19,7 +19,12 @@ const LeftDI = ({ item }) => {
   const [openReport, setOpenReport] = useState(false);
 
   useEffect(() => {
-    makeRequest.get(`/items/reviews/${item.item_id}`).then(res => setItemReviews(res.data));
+    if (item?.item_id) {
+      makeRequest.get(`/items/reviews/${item.item_id}`).then(res => setItemReviews(res.data));
+    }
+  }, [item?.item_id]);
+
+  useEffect(() => {
     if (openReport) {
       document.body.style.overflow = "hidden";
     }
@@ -67,12 +72,13 @@ const LeftDI = ({ item }) => {
           <p>UV Mapped: {item.is_uv_mapped ? "Yes" : "No"}</p>
 
         </div>
+
         <div className="box">
           <h2>Related Categories</h2>
           {error ? "Something went wrong" : isLoading ? "Loading..." :
             relatedItems?.filter(related => related.item_id !== item.item_id).map((item) => (
-              <div className="user" key={item.item_id} onClick={() => navigate(`/descitem/${item.item_id}`)} style={{ cursor: "pointer" }}>
-                <div className="userInfo">
+              <div className="Related" key={item.item_id} onClick={() => navigate(`/descitem/${item.item_id}`)}>
+                <div className="itemPic">
                   <img src={item.img} alt="" />
                 </div>
                 <div className="text">
@@ -83,6 +89,7 @@ const LeftDI = ({ item }) => {
             ))
           }
         </div>
+
       </div>
       <div className="container">
         <div className="item">
@@ -91,7 +98,7 @@ const LeftDI = ({ item }) => {
           </div>
         </div>
         <div className="item">
-          <div className="user">
+          <div className="box">
             <h2>Description</h2>
             {item.user_id !== currentUser?.user_id && (
               <ReportProblemIcon style={{ cursor: "pointer" }}
@@ -110,13 +117,12 @@ const LeftDI = ({ item }) => {
 
         <div className="item">
           <h2>Owner</h2>
-          <div className="user">
-            <div className="userInfo" onClick={() => navigate(`/profile/${item.user_id}`)} style={{ cursor: "pointer" }}>
+          <div className="box">
+            <div className="boxInfo" onClick={() => navigate(`/profile/${item.user_id}`)}>
               <img
                 src={item.profilePic}
                 alt=""
               />
-              <div className="online" />
               <span>{item.name || item.username}</span>
             </div>
           </div>
@@ -126,12 +132,11 @@ const LeftDI = ({ item }) => {
           <h2>Review</h2>
           {itemReviews.length > 0 ? (
             itemReviews.map((review) => (
-              <div key={review.review_id} className="user">
-                <div className="userInfo">
+              <div key={review.review_id} className="box">
+                <div className="boxInfo">
                   <img
                     src={review.users.profilePic}
                     onClick={() => navigate(`/profile/${review?.user_id}`)}
-                    style={{ cursor: "pointer" }}
                     alt=""
                   />
                   <div className="review-info" >
@@ -139,7 +144,7 @@ const LeftDI = ({ item }) => {
                       {(() => {
                         const displayName = review.users.name || review.users.username;
                         return (
-                          <span onClick={() => navigate(`/profile/${review?.user_id}`)} style={{ cursor: "pointer" }}>
+                          <span onClick={() => navigate(`/profile/${review?.user_id}`)}>
                             {displayName.length > 10 ? `${displayName.substring(0, 10)}...` : displayName}
                           </span>
                         );

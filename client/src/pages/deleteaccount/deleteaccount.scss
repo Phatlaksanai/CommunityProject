@@ -9,145 +9,87 @@
     background-color: themed("bg");
     color: themed("textSoft");
 
-    &__form {
+    .container {
       width: 100%;
       max-width: 520px;
       padding: 30px;
       border-radius: 12px;
       background-color: themed("cardBg");
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
       display: flex;
       flex-direction: column;
       gap: 18px;
-    }
 
-    &__title {
-      text-align: center;
-      font-size: 26px;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-
-      label {
-        font-size: 14px;
-        font-weight: 500;
+      h1 {
+        text-align: center;
       }
-      input[type="email"],
-      input[type="text"],
-      input[type="file"] {
-        padding: 10px 12px;
-        border-radius: 8px;
-        border: 1px solid themed("border");
-        background-color: transparent;
-        color: themed("textColor");
-        font-size: 14px;
 
-        &:focus {
-          outline: none;
-          border-color: themed("button");
-        }
-      }
-    }
-
-    .btn-group{
+      .form-group {
         display: flex;
-        align-items: center; /* จัดให้ข้อความและปุ่มอยู่ตรงกลางในแนวตั้งเท่ากัน */
-        gap: 15px; /* ปรับ gap ให้กระชับขึ้นเล็กน้อยสำหรับสเปซแจ้งเตือน */
-        flex-wrap: wrap; /* ป้องกันกล่องฟอร์มเบี้ยวกรณีเปิดในมือถือจอเล็ก */
-        
-        .msg {
+        flex-direction: column;
+        gap: 6px;
+
+        label {
           font-size: 14px;
           font-weight: 500;
-          white-space: nowrap; /* ห้ามข้อความตัดขึ้นบรรทัดใหม่แบบไร้เหตุผล */
-          margin-left: 5px;
-          margin-top: 15px; /* ขยับลงมาให้บาลานซ์กับปุ่มที่มี margin-top */
         }
 
-        .error-msg {
-          color: #C0903B;
+        input[type="email"],
+        input[type="text"] {
+          padding: 10px 12px;
+          border-radius: 8px;
+          border: 1px solid themed("border");
+          background-color: transparent;
+          color: themed("textColor");
+          font-size: 14px;
+
+          &:focus {
+            outline: none;
+            border-color: themed("button");
+          }
         }
-
-        .success-msg {
-          color: #A0C46E; 
-        }
-    }
-
-    .file-input {
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid themed("border");
-      background-color: transparent;
-      color: themed("textColor");
-      font-size: 14px;
-      cursor: pointer;
-
-      &:hover {
-        border-color: themed("button");
       }
     }
 
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
 
-.category {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  &__title {
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  &__select {
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid themed("border");
-    background-color: themed("bg");
-    color: themed("textColor");
-    font-size: 14px;
-    cursor: pointer;
-
-    &:focus {
-      outline: none;
-      border-color: themed("button");
-    }
-  }
-}
-
-    .submit {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: 600;
-      background-color: #C0903B;;
-      color: #FFFFFF;
-      transition: transform 0.15s ease;
-
-      &:hover {
-        transform: translateY(-1px);
-      }
-    }
-    .OTP{
+      .OTP {
         margin-top: 15px;
-      padding: 12px 20px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: 600;
-      background-color: themed("button");
-      color: themed("buttonText");
-      transition: transform 0.15s ease;
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        background-color: themed("button");
+        color: themed("buttonText");
+        transition: transform 0.15s ease;
 
-      &:hover {
-        transform: translateY(-1px);
+        &:hover {
+          transform: translateY(-1px);
+        }
+      }
+
+      .submit {
+        margin-top: 15px;
+        padding: 12px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        background-color: #C0903B;
+        ;
+        color: #FFFFFF;
+        transition: transform 0.15s ease;
+
+        &:hover {
+          transform: translateY(-1px);
+        }
       }
     }
   }

@@ -38,24 +38,22 @@ import ChangePassword from "./pages/changepassword/ChangePassword";
 import DeleteAccount from "./pages/deleteaccount/DeleteAccount";
 import Chat from "./pages/chat/chat";
 import { createBrowserRouter, RouterProvider, Outlet, Navigate, useParams, useLocation } from "react-router-dom";
-// import NotFound from "./404";
 
 //ระบบใหม่++++++++++++++++++++++
 import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/Left/leftbar/leftbar";
-import LeftBarDL from "./components/Left/leftbarDL/leftbarDL";
 import RightBar from "./components/Right/rightbar/rightbar";
 import ProfileDetail from "./components/TopDetail/ProfileDetail/ProfileDetail";
 import ProjectDetail from "./components/TopDetail/ProjectDetail/ProjectDetail";
 import CommuDetail from "./components/TopDetail/CommuDetail/CommuDetail";
 import FriendDetail from "./components/TopDetail/FriendDetail/FriendDetail";
 import DownloadDetail from "./components/TopDetail/DownloadDetail/DownloadDetail";
-import Projects from "./components/PageItems/projects/projects"
+
 //ระบบใหม่++++++++++++++++++++++
 import { useContext } from "react";
 import { AuthContext } from "./context/authContext";
 import { DarkModeContext } from "./context/darkModeContext";
-// import "./index.css";
+
 import "./style.scss";
 
 

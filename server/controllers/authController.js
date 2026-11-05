@@ -111,6 +111,7 @@ exports.checkUsername = async (req, res) => {
       .from("users")
       .select("user_id")
       .eq("username", username)
+      .eq("isdelete", "active")
       .maybeSingle();
 
     if (error) {
@@ -613,12 +614,14 @@ exports.deleteAccount = async (req, res) => {
     // ผ่านทุกเงื่อนไข -> เตรียมแปลงอีเมลเพื่อหลบสัญญลักษณ์ UNIQUE ประจำคอลัมน์
     const timestamp = Date.now();
     const maskedEmail = `${user.email}_deleted_${timestamp}`;
+    const maskedUsername = `${user.username}_deleted_${timestamp}`;
 
     // ผ่านทุกเงื่อนไข -> ทำการเปลี่ยนสถานะเป็นลบบัญชี (Soft Delete)
     const { error: updateError } = await db
       .from("users")
       .update({
         email: maskedEmail,
+        username: maskedUsername,
         isdelete: "deleted",
       })
       .eq("user_id", user.user_id);

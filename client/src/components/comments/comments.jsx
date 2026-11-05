@@ -105,7 +105,7 @@ const Comments = ({ postId }) => {
   return (
     <div className="comments">
       <div className="write">
-        <img src={currentUser?.profilePic || defaultPic} alt="" />
+        <img className="profilePic" src={currentUser?.profilePic || defaultPic} alt="" />
 
         <input
           type="file"
@@ -122,7 +122,6 @@ const Comments = ({ postId }) => {
         />
 
         <label htmlFor={`file-${postId}`}
-          className="item"
           onClick={(e) => {
             if (!currentUser?.user_id) {
               e.preventDefault();
@@ -137,12 +136,11 @@ const Comments = ({ postId }) => {
           {filePreviews[0] && (
             <div className="preview">
               <img src={filePreviews[0]} alt="" />
-              <button onClick={removeFile} style={{ marginLeft: "10px", color: "red", border: "none", background: "none", cursor: "pointer" }}>
-                X
-              </button>
+              <button onClick={removeFile}>X</button>
             </div>
           )}
         </div>
+
         <input
           type="text"
           placeholder="write a comment"
@@ -177,7 +175,7 @@ const Comments = ({ postId }) => {
                 {/* วนลูปตามรายการคอมเมนต์ในหน้านั้นๆ */}
                 {page.map((comment) => (
                   <div className="comment" key={comment.comment_id}>
-                    <img src={comment?.profilePic || defaultPic} alt="" />
+                    <img src={comment?.profilePic || defaultPic} alt="" className="commentPf" />
                     <div className="content">
                       <div className="info">
                         <div className="top">
@@ -201,16 +199,6 @@ const Comments = ({ postId }) => {
                 className="loadMoreBtn"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  marginTop: "10px",
-                  border: "none",
-                  background: "none",
-                  color: "#5271ff",
-                  cursor: "pointer",
-                  fontWeight: "bold"
-                }}
               >
                 {isFetchingNextPage ? "Loading more..." : "See more comments"}
               </button>

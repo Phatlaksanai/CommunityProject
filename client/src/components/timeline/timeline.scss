@@ -20,13 +20,12 @@
     }
 
     &::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
+      width: 6px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: themed("buttonBg");
-      border-radius: 4px;
+      background: #A0C46E;
+      border-radius: 10px;
     }
 
     .timeline-item {
@@ -133,6 +132,7 @@
               .icon {
                 font-size: 50px;
               }
+
               .text {
                 margin-top: 10px;
                 font-weight: bold;
@@ -147,6 +147,7 @@
           }
         }
       }
+
       .desc {
         grid-column: 1 / -1;
 
@@ -188,28 +189,6 @@
   }
 }
 
-.timeline-close {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 70px;
-  height: 70px;
-  padding: 16px;
-  border-radius: 50%;
-  background-color: #c58a38;
-  color: #fff;
-  cursor: pointer;
-  z-index: 1100;
-
-  @include mobile {
-    top: 10px;
-    right: 10px;
-    width: 40px;
-    height: 40px;
-    padding: 8px;
-  }
-}
-
 .timeline-overlay {
   position: fixed;
   inset: 0;
@@ -219,7 +198,25 @@
   justify-content: center;
   z-index: 1000;
 
-  .timeline-nav {
+  .closeBtn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px;
+    color: #fff;
+    cursor: pointer;
+    z-index: 1100;
+
+    @include mobile {
+      top: 10px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+      padding: 8px;
+    }
+  }
+
+  .timelineNav {
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
@@ -248,7 +245,7 @@
       opacity: 1;
     }
 
-    &.timeline-nav-prev {
+    &.prev {
       left: 30px;
 
       @include mobile {
@@ -265,7 +262,7 @@
       }
     }
 
-    &.timeline-nav-next {
+    &.next {
       right: 30px;
 
       @include mobile {

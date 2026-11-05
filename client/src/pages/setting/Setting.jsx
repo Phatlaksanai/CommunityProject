@@ -1,5 +1,5 @@
 import "./setting.scss";
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { DarkModeContext } from "../../context/darkModeContext";
@@ -9,24 +9,15 @@ import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
 const Setting = () => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
     const { toggle, darkMode } = useContext(DarkModeContext);
     const { currentUser } = useContext(AuthContext);
 
     return (
         <div className="setting">
-            <div className="add-item__form">
-                <h1 className="add-item__title">Settings</h1>
-
-                {/* <div className="form-group">
-                    <label htmlFor="itemName">Text Sizes</label>
-                    <input type="text" id="itemName" placeholder="Text Size"
-                        required />
-                </div> */}
-
+            <div className="container">
+                <h1>Settings</h1>
                 <div className="btn-group">
-                    <button type="button" className="Changepassword"
+                    <button type="button" className="btn"
                         onClick={() => {
                             if (!currentUser?.user_id) {
                                 navigate("/login");
@@ -34,7 +25,6 @@ const Setting = () => {
                             }
                             navigate(`/setting/${id}/changepassword`);
                         }}
-                        style={{ cursor: "pointer" }}
                     >Change Password
                     </button>
 
@@ -44,7 +34,7 @@ const Setting = () => {
                         <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
                     )}
 
-                    <button type="button" className="Deleteaccount"
+                    <button type="button" className="btn delete"
                         onClick={() => {
                             if (!currentUser?.user_id) {
                                 navigate("/login");
@@ -54,10 +44,7 @@ const Setting = () => {
                         }}
                     >Delete Account
                     </button>
-
                 </div>
-                {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
-                {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
             </div>
         </div>
     );

@@ -10,17 +10,17 @@ const Lbuy = () => {
 
     const handleSubmit = async () => {
 
-        if(!stripe || !elements){
+        if (!stripe || !elements) {
             return;
         }
         const result = await stripe.confirmPayment({
             elements,
-            confirmParams:{
-                return_url:`https://pm-vdyh.onrender.com/download/${currentUser.user_id}`
+            confirmParams: {
+                return_url: `https://pm-vdyh.onrender.com/download/${currentUser.user_id}`
                 // return_url:`http://localhost:5173/download/${currentUser.user_id}`
             }
         });
-        if(result.error){
+        if (result.error) {
             console.log(result.error.message);
         }
     };
@@ -28,18 +28,12 @@ const Lbuy = () => {
     return (
         <div className="Lbuy">
             <div className="container">
-                <div className="item new-releases">
-                    <div className="item payment">
-                        <PaymentElement />
-                        {/* <p className="expire">Expire at 10.26 PM</p>
-                        <span className="desc">Please complete your payment before clicking comfirm.</span> */}
-                        <div className="confirmBox">
-                            <button onClick={handleSubmit}>Confirm</button>
-                        </div>
+                <div className="payment">
+                    <PaymentElement />
+                    <div className="confirmBox">
+                        <button onClick={handleSubmit}>Confirm</button>
                     </div>
-
                 </div>
-
             </div>
         </div>
     );
