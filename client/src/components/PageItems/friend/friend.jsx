@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
 import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 
 const Friend = ({ user, isfriend }) => {
 
@@ -102,13 +102,13 @@ const Friend = ({ user, isfriend }) => {
 
         if (user.status === 'accepted') {
             return (
-                <button 
+                <button
                     onClick={handleCancelFriend}
                     disabled={cancelMutation.isLoading}
-                    style={{ 
-                        backgroundColor: "#C0903B", 
-                        color: "white", 
-                        cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" 
+                    style={{
+                        backgroundColor: "#C0903B",
+                        color: "white",
+                        cursor: cancelMutation.isLoading ? "not-allowed" : "pointer"
                     }}
                 >
                     Unfriend
@@ -120,7 +120,7 @@ const Friend = ({ user, isfriend }) => {
     return (
         <div className="friend">
             <div className="container">
-                <div className="content" onClick={() => navigate(`/profile/${user.user_id}`)} style={{ cursor: "pointer" }}>
+                <div className="content" onClick={() => navigate(`/profile/${user.user_id}`)}>
                     <img src={user.profilePic || defaultPic} alt="" onError={(e) => { e.currentTarget.src = "https://placehold.co/600x400?text=Image+Error"; }} />
                 </div>
                 <div className="desc">

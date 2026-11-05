@@ -1,11 +1,10 @@
 import "./buyitem.scss";
 import Lbuy from "../../components/Left/Lbuy/Lbuy"
 import CardItems from "../../components/PageItems/cards/carditems"
-import { useLocation , useParams, useNavigate } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { useEffect, useState, useRef } from "react";
 import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
 import stripePromise from "../../api/stripe";
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -14,7 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 const Buyitem = () => {
     const { id } = useParams();
     const { state } = useLocation();
-    
+
     const cart_id = state?.cartId;
     const selectedSeller = state?.selectedSeller;
 
@@ -24,7 +23,7 @@ const Buyitem = () => {
     const [error, setError] = useState("");
 
     const { isLoading, error: cartItemsError, data: cartItems } = useQuery({
-        queryKey: ["carditems", id ],
+        queryKey: ["carditems", id],
         queryFn: () => {
             return makeRequest.get(`/payments/carditems/${id}`).then(res => res.data);
         }
@@ -36,14 +35,14 @@ const Buyitem = () => {
     let subtotal = 0;
     if (filteredItems.length > 0) {
         // นำ price ของเฉพาะชิ้นที่กรองแล้วมาบวกกัน
-        subtotal = filteredItems.reduce((sum, item) => sum + item.price, 0); 
+        subtotal = filteredItems.reduce((sum, item) => sum + item.price, 0);
     }
 
-    const platformFee = subtotal * 0.035; 
+    const platformFee = subtotal * 0.035;
     const netTarget = subtotal + platformFee; // ยอดสุทธิที่ต้องการให้เหลือหลังหัก Stripe
-    
+
     const effectiveFeeRate = 0.0165 * (1 + 0.07); // 0.017655 (ค่าธรรมเนียม Stripe + VAT)
-    
+
     const totalAmount = netTarget / (1 - effectiveFeeRate); // ยอดที่ต้องชาร์จจริง
     const paymentFee = totalAmount - netTarget; // ค่าธรรมเนียม Stripe ที่แสดงให้ฝั่ง Client เห็น
 
@@ -120,7 +119,7 @@ const Buyitem = () => {
 
                         <hr />
                         <div className="menu">
-                             <div className="row">
+                            <div className="row">
                                 <span>Total Amount</span> <span>฿{totalAmount.toFixed(2)}</span>
                             </div>
                         </div>

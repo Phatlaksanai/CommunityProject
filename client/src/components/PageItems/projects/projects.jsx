@@ -1,9 +1,8 @@
 import Project from "../project/project";
 import "./projects.scss";
-import { useQuery } from "@tanstack/react-query";
-import { useInfiniteQuery } from "@tanstack/react-query"; // เปลี่ยนมาใช้ตัวนี้
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
-import { useInView } from "react-intersection-observer"; // เพิ่มเข้ามา
+import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
 
 const Projects = ({ userId, isProfile }) => {
@@ -46,12 +45,12 @@ const Projects = ({ userId, isProfile }) => {
       ))
     ))}
 
-    <div ref={ref} style={{ padding: "20px", textAlign: "center", color: "#ffffff"}}>
-        {isFetchingNextPage
-          ? "Loading..."
-          : hasNextPage
-            ? "Scroll down to see more projects"
-            : "No more projects to load"}
+    <div ref={ref} style={{ padding: "20px", textAlign: "center", color: "#ffffff" }}>
+      {isFetchingNextPage
+        ? "Loading..."
+        : hasNextPage
+          ? "Scroll down to see more projects"
+          : "No more projects to load"}
     </div>
   </div>
 

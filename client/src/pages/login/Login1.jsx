@@ -7,7 +7,7 @@ import "./login.scss";
 const Login = () => {
 
   const navigate = useNavigate()
-  const { setUser } = useContext(AuthContext); // ใช้ context ตรง ๆ
+  const { setUser } = useContext(AuthContext);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +26,7 @@ const Login = () => {
         password,
       });
       const data = res.data;
-      // Backend ส่งของ user data มาให้
+      
       if (data.success) {
         setUser(data);
         localStorage.setItem("user", JSON.stringify(data));

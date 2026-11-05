@@ -10,14 +10,12 @@ import { makeRequest } from "../../api/axios";
 const DescItem = () => {
     const { id } = useParams();
 
-    // ✅ 1. เปลี่ยนมาใช้ React Query เพื่อการจัดการ State ที่ดีขึ้นและแคชข้อมูลได้
     const { isLoading, error, data: item } = useQuery({
         queryKey: ["item", id],
-        queryFn: () => makeRequest.get(`/items/${id}`).then((res) => res.data), // เช็ค Path API ของคุณให้ตรงด้วยนะครับ
+        queryFn: () => makeRequest.get(`/items/${id}`).then((res) => res.data),
         retry: false,
     });
 
-    // ✅ 2. ดักสถานะกำลังโหลด
     if (isLoading) {
         return (
             <div className="loading-container" style={{ minHeight: "100vh" }}>
@@ -26,22 +24,20 @@ const DescItem = () => {
         );
     }
 
-    // ✅ 3. ดัก Error หรือหาสินค้าไม่พบ (ถูกลบ/ซ่อน)
     if (error || !item) {
         return (
             <NotFound />
         );
     }
 
-    // ✅ 4. โชว์ข้อมูลเมื่อโหลดสำเร็จ
     return (
         <div className="descItem">
             <div className="descItemleft">
-                <LeftDI item={item}/>
+                <LeftDI item={item} />
             </div>
-            
+
             <div className="descItemright">
-                <RightDI item={item}/>
+                <RightDI item={item} />
             </div>
         </div>
     );

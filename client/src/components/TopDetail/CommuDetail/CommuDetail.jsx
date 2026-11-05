@@ -8,13 +8,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import SettingsIcon from '@mui/icons-material/Settings';
 import BlockIcon from '@mui/icons-material/Block';
-
 import dayjs from "dayjs";
-
 import ReportModal from "../../report/ReportModal";
 
 const CommuDetail = () => {
@@ -28,14 +25,13 @@ const CommuDetail = () => {
   const queryClient = useQueryClient();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
 
-  // ดึงข้อมูล Community
   const { data: community, isLoading, error } = useQuery({
     queryKey: ["community", id],
     queryFn: () => makeRequest.get(`communities/${id}`).then((res) => res.data),
-    retry: false, // ✅ ปิด retry เพื่อให้รู้ทันทีว่ากลุ่มโดนลบ
+    retry: false, // ปิด retry เพื่อให้รู้ทันทีว่ากลุ่มโดนลบ
   });
 
-  // ✅ ดึงข้อมูลคนติดตาม (สมมติว่า API ตอบกลับมาเป็น Array ของ user_id คล้ายระบบ Like)
+  // ดึงข้อมูลคนติดตาม
   const { data: followers } = useQuery({
     queryKey: ["commuFollowers", id],
     queryFn: () => makeRequest.get(`/communities/followers/${id}`).then((res) => res.data),
@@ -44,7 +40,7 @@ const CommuDetail = () => {
   // เช็คว่า user ปัจจุบัน กดติดตามหรือยัง
   const isFollowing = !!followers?.includes(currentUser?.user_id);
 
-  // ✅ ระบบกดติดตาม / เลิกติดตาม
+  // ระบบกดติดตาม / เลิกติดตาม
   const followMutation = useMutation({
     mutationFn: (following) => {
       if (following) {
@@ -68,7 +64,6 @@ const CommuDetail = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["communities"]);
-      // ย้าย navigate มาไว้ตรงนี้ เพื่อให้แน่ใจว่าลบสำเร็จก่อนค่อยเปลี่ยนหน้า
       navigate("/");
     },
   });
@@ -100,7 +95,6 @@ const CommuDetail = () => {
           />
         </div>
         <div className="profileHeader">
-
           <div className="leftSide">
             <h1 className="custom-tooltip" data-tip={community?.name}>
               {community?.name.length > 40 ? `${community?.name.substring(0, 40)}...` : community?.name}

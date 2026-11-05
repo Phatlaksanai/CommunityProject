@@ -8,9 +8,7 @@ import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { makeRequest } from "../../../api/axios";
-
 import ReportModal from "../../report/ReportModal";
-
 
 const ProfileDetail = () => {
   const { currentUser } = useContext(AuthContext);
@@ -45,8 +43,7 @@ const ProfileDetail = () => {
 
   const addMutation = useMutation({
     mutationFn: () => {
-      // แก้ไขจาก receiver_id: userId เป็น id (อิงจาก useParams)
-      return makeRequest.post(`/friends/addfriend`, { receiver_id: id });
+      return makeRequest.post(`/friends/addfriend`, { receiver_id: id }); // receiver_id: id อิงจาก useParams
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["friendships", currentUser?.user_id]);
@@ -60,9 +57,7 @@ const ProfileDetail = () => {
 
   const cancelMutation = useMutation({
     mutationFn: () => {
-      return makeRequest.delete("/friends/declinefriend", {
-        data: { targetId: id }
-      });
+      return makeRequest.delete("/friends/declinefriend", { data: { targetId: id } });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["friendships", currentUser?.user_id]);
@@ -121,7 +116,7 @@ const ProfileDetail = () => {
         <div className="actions">
           <button
             className="followBtn"
-            onClick={() => cancelMutation.mutate()} // สามารถใช้ API ปฏิเสธคำขอได้ถ้าต้องการแยก
+            onClick={() => cancelMutation.mutate()}
             disabled={cancelMutation.isLoading}
             style={{ backgroundColor: "#C0903B", color: "white", cursor: cancelMutation.isLoading ? "not-allowed" : "pointer" }}
           >
@@ -155,7 +150,6 @@ const ProfileDetail = () => {
     try {
       const res = await makeRequest.post("/chats/createconversation", { user2Id: userData.user_id });
 
-      // จัดรูปแบบ Object ให้ตรงกับที่ระบบแชทต้องการ
       const chatData = {
         conversation_id: res.data.conversation_id,
         partner_id: userData.user_id,
@@ -166,7 +160,6 @@ const ProfileDetail = () => {
 
       queryClient.invalidateQueries(["rightBar", currentUser?.user_id]);
 
-      // ส่งข้อมูล state ไปกับ navigate
       navigate(`/boxchat/${currentUser?.user_id}`, { state: { selectedChat: chatData } });
     } catch (err) {
       console.log(err);
@@ -177,7 +170,7 @@ const ProfileDetail = () => {
     return <div style={{ minHeight: "100vh" }}></div>;
   }
 
-  // ✅ เพิ่มบรรทัดนี้เพื่อไม่ให้มันพยายามเรนเดอร์หน้าโปรไฟล์ถ้าไม่พบ User (404)
+  // ดักไม่ให้มันพยายามเรนเดอร์หน้าโปรไฟล์ถ้าไม่พบ User (404)
   if (userError || !userData) {
     return null; // ให้ Layout ตัวนอกจัดการโชว์หน้า NotFound แทน
   }
@@ -270,14 +263,14 @@ const ProfileDetail = () => {
 
           {isOwner && (
             <>
-            <button 
-            className="desktop-createProject"
-            onClick={() => navigate(`/profile/${id}/projects/addproject`)} style={{ cursor: "pointer" }}>
-              Create Project
-            </button>
+              <button
+                className="desktop-createProject"
+                onClick={() => navigate(`/profile/${id}/projects/addproject`)} >
+                Create Project
+              </button>
 
-            <div className="rightSide mobile-only">
-              
+              <div className="rightSide mobile-only">
+
                 {createMenuOpen ? (
                   <KeyboardArrowUpIcon
                     onClick={() => setCreateMenuOpen(false)}
@@ -300,21 +293,16 @@ const ProfileDetail = () => {
                         }
                         navigate("/addcommu");
                       }}
-                      style={{ cursor: "pointer" }}
                     >
                       Create Community
                     </button>
 
-                    <button
-                      onClick={() => navigate(`/profile/${id}/projects/addproject`)}
-                      style={{ cursor: "pointer" }}
-                    >
+                    <button onClick={() => navigate(`/profile/${id}/projects/addproject`)}>
                       Create Project
                     </button>
                   </div>
                 )}
               </div>
-
             </>
           )}
 

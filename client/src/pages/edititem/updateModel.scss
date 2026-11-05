@@ -9,12 +9,12 @@
     color: themed("textSoft");
 
     @include tablet {
-      flex-direction: column; // เรียงซ้ายขวา เป็น บนล่าง
+      flex-direction: column;
       align-items: center;
     }
 
     @include mobile {
-      flex-direction: column; // เรียงเป็น บนล่าง
+      flex-direction: column;
       padding: 15px 15px 80px 15px;
       align-items: flex-start;
       overflow-y: auto;
@@ -31,7 +31,7 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         max-width: 100%;
-        overflow-x: auto; // ถ้าเวอร์ชันเยอะให้เลื่อนซ้ายขวาได้
+        overflow-x: auto;
         padding: 0 0 15px 0;
       }
 
@@ -42,7 +42,6 @@
         overflow-x: auto;
         padding: 0 0 15px 0;
 
-        // ซ่อน scrollbar เพื่อความสวยงาม
         &::-webkit-scrollbar {
           display: none;
         }
@@ -131,11 +130,8 @@
             color: themed("textColor");
             font-size: 14px;
             cursor: pointer;
-
             display: block;
-            /* บังคับให้ขนาดเท่ากับ container */
             overflow-wrap: break-word;
-            /* ตัดคำที่ยาวเกินไปขึ้นบรรทัดใหม่ */
             word-break: break-all;
 
             &:hover {

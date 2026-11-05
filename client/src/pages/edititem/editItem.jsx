@@ -1,6 +1,6 @@
 import "./editItem.scss";
 import { useState, useContext, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";//-------------------------------------
+import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
@@ -9,21 +9,18 @@ import NotFound from "../../components/NotFound/notFound";
 import Loading from "../../components/NotFound/loading";
 
 const EditItem = () => {
-    //---------------------------------------------------------- 
     const navigate = useNavigate();
     const { id: item_id } = useParams();
     const { currentUser } = useContext(AuthContext);
     const [isFree, setIsFree] = useState(false);
     const [previousPrice, setPreviousPrice] = useState("");
 
-    // form data
     const [modelName, setModelName] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [img, setImg] = useState(null);
     const [categoryId, setCategoryId] = useState("");
 
-    // message
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [imgPublicId, setImgPublicId] = useState(null);
@@ -32,7 +29,6 @@ const EditItem = () => {
 
     const { data: items, isLoading, error: itemsError } = useQuery({
         queryKey: ["item", item_id, "edit"],
-        // เปลี่ยน URL จาก /items/ เป็น /items/edit/
         queryFn: () => makeRequest.get(`/items/edit/${item_id}`).then(res => res.data),
         retry: false,
     });   
@@ -48,7 +44,6 @@ const EditItem = () => {
             setDescription(items.description || "");
             setPrice(items.price || "");
 
-            // --------- เพิ่มเงื่อนไขเช็คราคาตรงนี้ ---------
             // ถ้าราคาเท่ากับ 0 (เช็คทั้งแบบตัวเลขและข้อความเผื่อไว้)
             if (items.price === 0) {
                 setIsFree(true); // ให้ติ๊กถูกที่กล่อง Free ทันที
@@ -58,7 +53,6 @@ const EditItem = () => {
                 setIsFree(false);
                 setPreviousPrice(items.price || ""); // ถ้าราคาไม่ฟรี ให้จำราคาเดิมไว้
             }
-            // ------------------------------------------
 
             setImg(items.img || "");
             setImgPublicId(items.img_public_id || null);
@@ -66,7 +60,6 @@ const EditItem = () => {
         }
     }, [items]);
 
-    // ================= UPLOAD FILES TO CLOUDINARY =================
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;

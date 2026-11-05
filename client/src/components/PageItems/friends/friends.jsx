@@ -21,7 +21,7 @@ const Friends = ({ userId, isfriend }) => {
     <h3>All Friends({data.length})</h3>
 
     <div className="friends">
-      {data.map((user) => (  // วนลูปแสดงข้อมูลจริงจาก Database
+      {data.map((user) => (  // วนลูปแสดงข้อมูลจาก Database
         <Friend key={user.user_id} user={user} isfriend={isfriend} />
       ))}
     </div>

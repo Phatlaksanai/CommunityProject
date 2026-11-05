@@ -17,8 +17,8 @@
     overflow: hidden;
 
     @include mobile {
-      width: 90%; // ให้การ์ดกว้างขึ้นบนมือถือ
-      min-height: auto; // ปรับความสูงตามเนื้อหา
+      width: 90%;
+      min-height: auto;
       flex-direction: column;
     }
 
@@ -148,7 +148,7 @@
           gap: 10px;
 
           @include mobile {
-            flex-direction: row; // เรียงปุ่มแนวตั้งบนมือถือ
+            flex-direction: row;
             gap: 15px;
           }
         }
@@ -161,7 +161,7 @@
           color: #555;
 
           @include mobile {
-            display: block; // แสดงเฉพาะบนมือถือ
+            display: block;
           }
 
           a {

@@ -4,7 +4,6 @@
   @include themify($themes) {
     flex: 2;
     top: 70px;
-    // height: calc(100vh - 70px);
     overflow: scroll;
     background-color: themed("bg");
     color: themed("textColor");
@@ -13,70 +12,9 @@
       display: none;
     }
 
-    .profileModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.3);
-      z-index: 9999;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modalContainer {
-      background: themed("bg");
-      width: 350px;
-      max-width: 90%;
-      padding: 20px;
-      border-radius: 12px;
-
-      @include mobile {
-        padding: 15px;
-        max-width: 95%;
-      }
-
-      p {
-        // margin: 8px 0;
-        // font-size: 14px;
-        color: themed("textColorSoft");
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        word-break: break-word;
-        white-space: pre-wrap;
-      }
-    }
-
-    .modalContainer a {
-      color: inherit;
-    }
-
-    .modalHeader {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-
-
-      h2 {
-        font-size: 18px;
-        color: themed("textColorSoft");
-        margin: 0;
-      }
-
-      svg {
-        cursor: pointer;
-        font-size: 22px;
-      }
-    }
-
     .container {
       padding: 0;
 
-      /* ===== COVER ===== */
       .cover {
         width: 100%;
         height: 220px;
@@ -90,7 +28,6 @@
         }
       }
 
-      /* ===== PROFILE HEADER ===== */
       .profileHeader {
         display: flex;
         align-items: flex-start;
@@ -123,7 +60,6 @@
         }
 
         .profileInfo {
-
           @include mobile {
             width: 100%;
             display: flex;
@@ -138,7 +74,7 @@
             gap: 20px;
 
             @include mobile {
-              flex-direction: column; 
+              flex-direction: column;
               justify-content: center;
               gap: 15px;
             }
@@ -155,10 +91,9 @@
             }
 
             .actions {
-
               @include mobile {
                 display: flex;
-                flex-wrap: wrap; // ถ้าปุ่มเยอะให้ตัดขึ้นบรรทัดใหม่
+                flex-wrap: wrap;
                 justify-content: center;
                 gap: 10px;
               }
@@ -183,10 +118,8 @@
             opacity: 0.7;
           }
         }
-
       }
 
-      /* ===== TABS ===== */
       .tabs {
         display: flex;
         align-items: center;
@@ -195,13 +128,13 @@
         border-bottom: 1px solid themed("border");
 
         @include mobile {
-          flex-wrap: wrap; 
+          flex-wrap: wrap;
           justify-content: center;
           gap: 15px;
           padding: 15px 10px;
         }
 
-        .mobile-createCommu{
+        .mobile-createCommu {
           display: none;
 
           @include mobile {
@@ -226,6 +159,7 @@
           background-color: themed("buttonBg");
           color: white;
           border: none;
+          cursor: pointer;
 
           @include mobile {
             display: none;
@@ -233,11 +167,11 @@
         }
 
         .rightSide.mobile-only {
-          display: none; // ซ่อนบนหน้าเว็บปกติ
+          display: none;
           position: relative;
 
           @include mobile {
-            display: flex; // แสดงเฉพาะบนมือถือ
+            display: flex;
             align-items: center;
             gap: 10px;
           }
@@ -247,6 +181,7 @@
             flex-direction: row;
             align-items: center;
             gap: 8px;
+            cursor: pointer;
 
             button {
               display: flex;
@@ -276,11 +211,10 @@
       }
 
       .tabs a {
-        text-decoration: none; // ❌ เอาเส้นใต้ออก
-        color: inherit; // ❌ เอาสีม่วงออก (ใช้สีปกติแทน)
+        text-decoration: none; // เอาเส้นใต้ออก
+        color: inherit; // เอาสีม่วงออก
       }
 
-      /* ===== CONTENT ===== */
       .content {
         padding: 20px;
         font-size: 14px;
@@ -290,6 +224,63 @@
       hr {
         margin: 0;
         border: none;
+      }
+
+      .profileModal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 9999;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .modalContainer {
+          background: themed("bg");
+          width: 350px;
+          max-width: 90%;
+          padding: 20px;
+          border-radius: 12px;
+
+          @include mobile {
+            padding: 15px;
+            max-width: 95%;
+          }
+
+          p {
+            color: themed("textColorSoft");
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: pre-wrap;
+          }
+
+          .modalHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+
+            h2 {
+              font-size: 18px;
+              color: themed("textColorSoft");
+              margin: 0;
+            }
+
+            svg {
+              cursor: pointer;
+              font-size: 22px;
+            }
+          }
+        }
+
+        .modalContainer a {
+          color: inherit;
+        }
       }
     }
   }

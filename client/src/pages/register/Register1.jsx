@@ -7,18 +7,15 @@ import "./register.scss";
 const Register = () => {
   const navigate = useNavigate();
 
-  // step
   const [step, setStep] = useState(1);
 
-  // form data
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
-  const [isdelete, setIsdelete] = useState("active");
+  const [isdelete] = useState("active");
 
-  // message
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -26,7 +23,8 @@ const Register = () => {
   const [otpLoading, setOtpLoading] = useState(false);
 
   const [isshowpassword, setisshowpassword] = useState(false)
-  useEffect(() => { // นับถอยหลัง cooldown OTP
+
+  useEffect(() => {
     if (otpCooldown <= 0) return;
 
     const timer = setInterval(() => {
@@ -36,7 +34,6 @@ const Register = () => {
     return () => clearInterval(timer);
   }, [otpCooldown]);
 
-  // ================= STEP CONTROL =================
   const nextStep = async () => {
 
     const trimmedUsername = username.trim();
@@ -50,7 +47,6 @@ const Register = () => {
       return;
     }
 
-    // เช็ก Username ซ้ำ
     try {
       const res = await makeRequest.post("/check-username", {
         username: trimmedUsername
@@ -86,7 +82,6 @@ const Register = () => {
     setStep(1);
   };
 
-  // ================= SEND OTP =================
   const sendOTP = async () => {
     if (otpCooldown > 0 || otpLoading) return;
     setError("");
@@ -117,7 +112,7 @@ const Register = () => {
       }
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error); // จะแสดง error จาก backend
+        setError(err.response.data.error);
       } else {
         setError("Connect to server failed");
       }
@@ -126,7 +121,6 @@ const Register = () => {
     }
   };
 
-  // ================= REGISTER =================
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
@@ -161,7 +155,6 @@ const Register = () => {
   return (
     <div className="register">
       <div className="container">
-        {/* LEFT */}
         <div className="left">
           <h1>PM.</h1>
           <p>
@@ -178,7 +171,6 @@ const Register = () => {
           </div>
         </div>
 
-        {/* RIGHT */}
         <div className="right">
           <h1>Register</h1>
 
@@ -186,7 +178,6 @@ const Register = () => {
           {success && <p style={{ color: "#00ff00" }}>{success}</p>}
 
           <form onSubmit={handleRegister}>
-            {/* STEP 1 */}
             {step === 1 && (
               <>
                 <input
@@ -224,7 +215,6 @@ const Register = () => {
               </>
             )}
 
-            {/* STEP 2 */}
             {step === 2 && (
               <>
                 <input

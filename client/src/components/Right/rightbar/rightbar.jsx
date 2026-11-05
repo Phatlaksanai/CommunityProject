@@ -25,16 +25,16 @@ const RightBar = () => {
   const { data: contacts } = useQuery({
     queryKey: ["contacts", currentUser?.user_id],
     queryFn: () => makeRequest.get(`/friends/${currentUser?.user_id}/contacts`).then(res => res.data),
-    // เพิ่ม enabled เพื่อไม่ให้ Query ทำงานถ้ายังไม่มี User
-    enabled: !!currentUser?.user_id,
+    
+    enabled: !!currentUser?.user_id, // enabled ไม่ให้ Query ทำงานถ้ายังไม่มี User
   });
 
   const handleAccept = async (requesterId) => {
     try {
       await makeRequest.put("/friends/acceptfriend", { requester_id: requesterId });
-      // สั่งให้โหลดข้อมูลใหม่หลังจากกดรับ (ใช้ Key ให้ตรงกับที่ตั้งไว้)
-      queryClient.invalidateQueries(["rightBar", currentUser?.user_id]);
-      queryClient.invalidateQueries(["friends"]); // ถ้ามีหน้าอื่นที่ใช้ list เพื่อนด้วย
+      
+      queryClient.invalidateQueries(["rightBar", currentUser?.user_id]); // โหลดข้อมูลใหม่หลังจากกดรับ
+      queryClient.invalidateQueries(["friends"]);
     } catch (err) {
       console.log(err);
     }
@@ -55,7 +55,6 @@ const RightBar = () => {
     try {
       const res = await makeRequest.post("/chats/createconversation", { user2Id: contact.user_id });
 
-      // จัดรูปแบบ Object ให้ตรงกับที่ระบบแชทต้องการ
       const chatData = {
         conversation_id: res.data.conversation_id,
         partner_id: contact.user_id,
@@ -66,7 +65,6 @@ const RightBar = () => {
 
       queryClient.invalidateQueries(["rightBar", currentUser?.user_id]);
 
-      // ส่งข้อมูล state ไปกับ navigate
       navigate(`/boxchat/${currentUser?.user_id}`, { state: { selectedChat: chatData } });
     } catch (err) {
       console.log(err);
@@ -76,12 +74,12 @@ const RightBar = () => {
   return (
     <div className="rightBar">
       <div className="container">
-        {/* Section: New Releases */}
+
         <div className="item new-releases">
           <p>New Releases</p>
           {error ? "Something went wrong" : isLoading ? "Loading..." :
             latestItems?.map((item) => (
-              <div className="user" key={item.item_id} onClick={() => navigate(`/descitem/${item.item_id}`)} style={{ cursor: "pointer" }}>
+              <div className="user" key={item.item_id} onClick={() => navigate(`/descitem/${item.item_id}`)} >
                 <div className="userInfo">
                   <img src={item.img} alt="" />
                 </div>
@@ -94,12 +92,11 @@ const RightBar = () => {
           }
         </div>
 
-        {/* Section: Friend Requests */}
         <div className="item">
           <p>Friend Requests</p>
           <div className="community-list-wrapper">
             {displayedFriendRequests?.map((user) => {
-              // เนื่องจาก Backend ส่ง Array ของ User มาแล้ว ใช้ user ได้เลย
+
               const displayName = user?.name || user?.username || "Unknown User";
               const truncatedName = displayName.length > 10 ? `${displayName.substring(0, 8)}...` : displayName;
 
@@ -132,23 +129,22 @@ const RightBar = () => {
             }
           </div>
           {!showAll && FriendRequests?.length > 2 && (
-            <div className="load-more" onClick={() => setShowAll(true)} style={{ cursor: "pointer" }}>
+            <div className="load-more" onClick={() => setShowAll(true)} >
               <span>See more</span>
             </div>
           )}
         </div>
 
-        {/* Section: Contacts */}
         <div className="item">
           <p>Contacts</p>
           {contacts?.map((contact) => {
             const displayName2 = contact?.name || contact?.username || "Unknown User";
             const truncatedName2 = displayName2.length > 15 ? `${displayName2.substring(0, 15)}...` : displayName2;
             return (
-              <div className="user" key={contact.user_id} onClick={() => handleConversation(contact)} style={{ cursor: "pointer" }}>
+              <div className="user" key={contact.user_id} onClick={() => handleConversation(contact)} >
                 <div className="userInfo">
                   <img src={contact.profilePic || defaultPic} alt="" />
-                  <div className="online" />
+                  <div className="gap-contacts" />
                   <span className="custom-tooltip" data-tip={displayName2}>
                     {truncatedName2}
                   </span>

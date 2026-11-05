@@ -1,17 +1,14 @@
 import "./additem.scss";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-//-------------------------------------
+import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { useQuery } from "@tanstack/react-query";
 import { ClipLoader } from "react-spinners";
 
 const AddItem = () => {
-  //----------------------------------------------------------
   const navigate = useNavigate();
   const [isFree, setIsFree] = useState(false);
 
-  // form data
   const [modelName, setModelName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -37,7 +34,6 @@ const AddItem = () => {
     gltf: false,
   });
 
-  // message
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
@@ -48,7 +44,6 @@ const AddItem = () => {
       makeRequest.get("/items/categories").then((res) => res.data),
   });
 
-  // ================= UPLOAD FILES TO CLOUDINARY =================
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -160,7 +155,7 @@ const AddItem = () => {
         return;
       }
 
-      const res = await makeRequest.post("/items/additem", {
+      await makeRequest.post("/items/additem", {
         modelName,
         description,
         price,
@@ -255,7 +250,6 @@ const AddItem = () => {
             />
           </div>
 
-          {/* เพิ่มส่วน Properties */}
           <div className="format-selection">
             <label className="format-selection__title">Model Properties</label>
             <div className="checkbox-container">

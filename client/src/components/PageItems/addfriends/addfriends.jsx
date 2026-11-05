@@ -1,14 +1,13 @@
 import Friend from "../friend/friend";
-
 import "./addfriends.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 
 const Friends = ({ userId }) => {
-  const { isLoading, error, data = []} = useQuery({
+  const { isLoading, error, data = [] } = useQuery({
     queryKey: ["addfriends", userId],
     queryFn: () => {
-        return makeRequest.get(`/friends/${userId}/alluser`).then(res => res.data);
+      return makeRequest.get(`/friends/${userId}/alluser`).then(res => res.data);
     }
   });
 
@@ -16,7 +15,7 @@ const Friends = ({ userId }) => {
   if (error) return "Something went wrong!";
 
   return <div className="addfriends">
-    {data.map((user) => (  // วนลูปแสดงข้อมูลจริงจาก Database
+    {data.map((user) => (  // วนลูปแสดงข้อมูลจาก Database
       <Friend key={user.user_id} user={user} />
     ))}
   </div>

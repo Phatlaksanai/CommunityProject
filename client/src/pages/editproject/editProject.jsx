@@ -24,13 +24,11 @@ const EditProject = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [imgPublicId, setImgPublicId] = useState(null);
 
-  // ดึงข้อมูล Posts
   const { data: posts = [] } = useQuery({
     queryKey: ["editProjectPosts", project_id],
     queryFn: () => makeRequest.get(`/posts/project-edit/${project_id}`).then(res => res.data),
   });
 
-  // ดึงข้อมูล Items
   const { data: items = [] } = useQuery({
     queryKey: ["editProjectItems", project_id],
     queryFn: () => makeRequest.get(`/items/project-edit/${project_id}`).then(res => res.data),
@@ -43,7 +41,6 @@ const EditProject = () => {
     retry: false,
   });
 
-  // ✅ 1. ย้าย useEffect มาไว้ข้างนอก (Top Level)
   useEffect(() => {
     if (posts.length > 0) {
       const initialSelected = posts
@@ -74,17 +71,14 @@ const EditProject = () => {
     setError("");
   };
 
-  // ✅ 2. รวมฟังก์ชัน Submit สำหรับการ Update
   const handleUpdateProject = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
     setIsLoadingSpinner(true);
 
-    // ใช้ .trim() เพื่อตัดช่องว่างหน้า-หลัง และเช็คว่าชื่อว่างหรือไม่
     const trimmedProjectName = projectName.trim();
 
-    // เช็คชื่อโปรเจคที่ตัดช่องว่างออกแล้ว
     if (!trimmedProjectName) {
       setError("Please enter a Project Name (cannot be empty)");
       setIsLoadingSpinner(false);
@@ -100,14 +94,13 @@ const EditProject = () => {
 
     try {
       let imgUrl = img; // ค่าเดิม
-      let newimgPublicId = imgPublicId;  // สำหรับเก็บ public_id ของรูปที่อัปโหลดใหม่ (ถ้ามี)
+      let newimgPublicId = imgPublicId;  // สำหรับเก็บ public_id ของรูปที่อัปโหลดใหม่
 
       // ถ้ามีการเลือกไฟล์ใหม่ (เป็น Object File)
       if (img && typeof img !== 'string') {
         const formData = new FormData();
         formData.append("file", img);
 
-        // ตรวจสอบ Path นี้ที่ Backend ดีๆ ว่าเป็น /upload หรือ /upload/project
         const res = await makeRequest.post("/upload/project", formData);
         imgUrl = res.data.url;
         newimgPublicId = res.data.public_id;
@@ -150,7 +143,6 @@ const EditProject = () => {
     <div className="editProject">
       <div className="container">
         <h1>Edit Project</h1>
-        {/* ✅ เรียกใช้ handleUpdateProject */}
         <form onSubmit={handleUpdateProject}>
           <div className="form-group">
             <label htmlFor="itemName">Project Name</label>

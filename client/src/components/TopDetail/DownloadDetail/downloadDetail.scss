@@ -9,8 +9,8 @@
     color: themed("textColor");
 
     @include mobile {
-       width: 100%; 
-       overflow-x: hidden;
+      width: 100%;
+      overflow-x: hidden;
     }
 
     &::-webkit-scrollbar {
@@ -20,68 +20,48 @@
     .container {
       padding: 0;
       width: 100%;
-    }
 
-    .Header {
-      padding: 40px 60px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      background-color: themed("bgSoft");
-
-      @include mobile {
-        padding: 20px;
-      }
-
-      h1 {
-        margin: 0;
-        font-size: 28px;
-        font-weight: 600;
-        color: themed("textColorSoft");
-
-        @include mobile {
-          font-size: 24px;
-        }
-      }
-
-      span {
-        font-size: 14px;
-        font-weight: 600;
-        color: themed("textColorSoft");
-      }
-
-      .btntabs {
+      .Header {
+        padding: 40px 60px;
         display: flex;
-        align-items: center;
-        gap: 30px;
+        flex-direction: column;
+        gap: 10px;
+        background-color: themed("bgSoft");
 
         @include mobile {
-          gap: 15px;
+          padding: 20px;
         }
 
-        span {
-          cursor: pointer;
-          font-size: 14px;
-          padding-bottom: 8px;
+        h1 {
+          margin: 0;
+          font-size: 28px;
+          font-weight: 600;
+          color: themed("textColorSoft");
+
+          @include mobile {
+            font-size: 24px;
+          }
         }
 
-        .active {
-          font-weight: bold;
-          border-bottom: 2px solid themed("textColor");
+        .btntabs {
+          display: flex;
+          align-items: center;
+          gap: 30px;
+
+          @include mobile {
+            gap: 15px;
+          }
+
+          .active {
+            font-weight: bold;
+            border-bottom: 2px solid themed("textColor");
+          }
         }
 
-        button {
-          padding: 10px 18px;
-          border-radius: 6px;
-          background-color: #555;
-          color: white;
-          border: none;
+        .btntabs a {
+          text-decoration: none; // เอาเส้นใต้ออก
+          color: inherit; // เอาสีม่วงออก
         }
-      }
-
-      .btntabs a {
-        text-decoration: none; // ❌ เอาเส้นใต้ออก
-        color: inherit; // ❌ เอาสีม่วงออก (ใช้สีปกติแทน)
       }
     }
   }

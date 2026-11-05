@@ -22,8 +22,6 @@ const Earn_Pay = () => {
                 <div className="L">
                     <div className="container">
                         <span className="title">Earnings</span>
-
-                        {/* ส่วนหัวที่ต้องการล็อคให้อยู่กับที่ */}
                         <div className="table-header-sticky">
                             <div className="Header">
                                 <h2>Item</h2>
@@ -33,7 +31,6 @@ const Earn_Pay = () => {
                             <hr />
                         </div>
 
-                        {/* ส่วนเนื้อหาที่สามารถเลื่อน (Scroll) ได้ */}
                         <div className="table-scroll-body">
                             <div className="content">
                                 {groupedEarnings.map((item, index) => (
@@ -57,8 +54,6 @@ const Earn_Pay = () => {
                 <div className="R">
                     <div className="container">
                         <span className="title">Payouts</span>
-
-                        {/* ส่วนหัวฝั่งขวาที่ต้องการล็อค */}
                         <div className="table-header-sticky">
                             <div className="Header">
                                 <h2>Amount</h2>
@@ -67,7 +62,6 @@ const Earn_Pay = () => {
                             <hr />
                         </div>
 
-                        {/* ส่วนเนื้อหาฝั่งขวาที่เลื่อนได้ */}
                         <div className="table-scroll-body">
                             <div className="content">
                                 {payouts.map(item => (

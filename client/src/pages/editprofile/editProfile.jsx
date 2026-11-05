@@ -2,7 +2,6 @@ import "./editProfile.scss";
 import { useState, useContext, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
-import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import { ClipLoader } from "react-spinners";
 import NotFound from "../../components/NotFound/notFound";
@@ -30,10 +29,6 @@ const EditProfile = () => {
   // สร้าง State สำหรับเช็คการโหลดข้อมูลจาก Context
   const [isPageLoading, setIsPageLoading] = useState(true);
 
-  // const { data: user } = useQuery({
-  //   queryKey: ["user", id],
-  //   queryFn: () => makeRequest.get(`/${currentUser}`).then(res => res.data),
-  // });
   useEffect(() => {
     if (currentUser) {
       setDisplayName(currentUser.name || "");
@@ -59,8 +54,7 @@ const EditProfile = () => {
   if (!currentUser || String(currentUser.user_id) !== String(id)) {
     return <NotFound />;
   }
-  
-  // ================= UPLOAD FILES TO CLOUDINARY =================
+
   const handleImageChange = (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -83,9 +77,8 @@ const EditProfile = () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    // ใช้ makeRequest แทน fetch เพื่อความสม่ำเสมอ
     const res = await makeRequest.post("/upload/profile", formData);
-    return res.data; // คาดหวัง { url: "...", public_id: "..." }
+    return res.data; // ส่งคืนเป็น { url: "...", public_id: "..." }
   };
 
 
@@ -122,7 +115,7 @@ const EditProfile = () => {
         description,
         city,
         website,
-        profileimg: finalProfileImg, // ส่ง string URL ไปตรงๆ
+        profileimg: finalProfileImg,
         coverimg: finalCoverImg,
         profilePublicId: finalProfilePublicId,
         coverPublicId: finalCoverPublicId,
@@ -145,16 +138,13 @@ const EditProfile = () => {
     } catch (err) {
       console.error(err);
       if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error); // จะแสดง error จาก backend
+        setError(err.response.data.error);
       } else {
         setError("Internal Server Error");
       }
       setIsLoadingSpinner(false);
     }
   };
-
-
-
 
   return (
     <div className="edit-profile">

@@ -1,10 +1,8 @@
 import './descDownload.scss';
-import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { makeRequest } from "../../api/axios";
 
 const DescDownload = () => {
-    const { id } = useParams();
 
     const [downloads, setDownloads] = useState([]);
 
@@ -87,7 +85,7 @@ const DescDownload = () => {
                             <h2>Item</h2>
                             <h2>Price</h2>
                             <h2>Date</h2>
-                            <h2>Version</h2> {/* เพิ่มคอลัมน์ Version */}
+                            <h2>Version</h2>
                             <h2>Type</h2>
                             <h2>Download</h2>
                             <h2>Review</h2>
@@ -178,7 +176,6 @@ const DescDownload = () => {
                 </div>
             </div>
 
-            {/* Review Modal คงเดิม */}
             {openReview && (
                 <div className="ReviewModal">
                     <div className="modalContainer">
@@ -207,7 +204,7 @@ const DescDownload = () => {
 
                         <div className="modalButtons">
                             <button onClick={() => setOpenReview(false)}>Cancel</button>
-                            <button onClick={handleSubmitReview}>Confirm</button>
+                            <button className="modalButtons accept" onClick={handleSubmitReview}>Confirm</button>
                         </div>
                     </div>
                 </div>

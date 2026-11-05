@@ -1,19 +1,16 @@
 import "./addcommu.scss";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";//-------------------------------------
+import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { ClipLoader } from "react-spinners";
 
 const AddCommu = () => {
-  //----------------------------------------------------------
   const navigate = useNavigate();
 
-  // form data
   const [CommunityName, setCommunityName] = useState("");
   const [description, setDescription] = useState("");
   const [img, setImg] = useState(null);
 
-  // message
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
@@ -36,7 +33,7 @@ const AddCommu = () => {
     formData.append("file", file);
 
     const res = await makeRequest.post("/upload/communities", formData);
-    return res.data; // คาดหวัง { url: "...", public_id: "..." }
+    return res.data;
   };
 
   const handleAddcommu = async (e) => {
@@ -50,7 +47,7 @@ const AddCommu = () => {
       setIsLoadingSpinner(false);
       return;
     }
-    
+
     try {
       const imgURL = await uploadFile(img);
 
@@ -59,7 +56,7 @@ const AddCommu = () => {
         return;
       }
 
-      const res = await makeRequest.post("/communities/addcommu", {
+      await makeRequest.post("/communities/addcommu", {
         CommunityName,
         description,
         img: imgURL.url,

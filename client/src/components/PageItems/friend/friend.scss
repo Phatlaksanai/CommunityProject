@@ -2,7 +2,6 @@
 
 .friend {
   max-width: 325px;
-  //   max-height: 170px;
   padding: 20px;
   width: 100%;
   box-sizing: border-box;
@@ -12,10 +11,7 @@
   }
 
   @include themify($themes) {
-    -webkit-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-    -moz-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
     box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-    //border-radius: 20px;
     background-color: themed("bg");
     color: themed("textColor");
 
@@ -25,10 +21,12 @@
       gap: 20px;
 
       @include mobile {
-        gap: 10px; /* ลดช่องว่างระหว่างรูปกับชื่อ */
+        gap: 10px;
       }
 
       .content {
+        cursor: pointer;
+
         img {
           width: 70px;
           height: 70px;
@@ -37,7 +35,7 @@
           display: block;
 
           @include mobile {
-            width: 50px; /* ย่อรูปลงบนมือถือ */
+            width: 50px;
             height: 50px;
           }
         }
@@ -65,9 +63,8 @@
     }
 
     button {
-      display: block; // ต้องเปลี่ยนจาก inline เป็น block ก่อน
+      display: block;
       margin-left: auto;
-
       border-radius: 6px;
       color: #fff;
       background-color: #a0c46e;
@@ -75,7 +72,7 @@
       border: none;
 
       @include mobile {
-        padding: 8px 15px; /* ย่อขนาดปุ่มลง */
+        padding: 8px 15px;
         font-size: 12px;
       }
     }

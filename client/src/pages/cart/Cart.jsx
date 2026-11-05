@@ -17,7 +17,7 @@ const Cart = () => {
     const [selectedSeller, setSelectedSeller] = useState(null);
     const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
-    const { isLoading, error: cartItemsError, data: cartItems } = useQuery({
+    const { data: cartItems } = useQuery({
         queryKey: ["cards", id],
         queryFn: () => {
             return makeRequest.get(`/payments/carditems/${id}`).then(res => res.data);
@@ -110,7 +110,7 @@ const Cart = () => {
                     </div>
 
                     <div className="checkoutBar">
-                        <button onClick={handleCheckout} style={{ cursor: "pointer" }} disabled={isLoadingSpinner}
+                        <button onClick={handleCheckout} disabled={isLoadingSpinner}
                         >
                             {isLoadingSpinner ? (
                                 <ClipLoader size={16} color="#ffffff" />

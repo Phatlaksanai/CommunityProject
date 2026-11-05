@@ -16,8 +16,8 @@
     overflow: hidden;
 
     @include mobile {
-      width: 90%; // ให้การ์ดกว้างขึ้นบนมือถือ
-      min-height: auto; // ปรับความสูงตามเนื้อหา
+      width: 90%;
+      min-height: auto;
       flex-direction: column;
     }
 
@@ -141,7 +141,7 @@
           color: #555;
 
           @include mobile {
-            display: block; // แสดงปุ่มสลับหน้าเฉพาะบนมือถือ
+            display: block;
           }
 
           a {

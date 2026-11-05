@@ -1,41 +1,8 @@
-// import Post from "../post/post";
-// import "./posts.scss";
-// import { useQuery } from "@tanstack/react-query";
-// import { makeRequest } from "../../../api/axios";
-
-// const Posts = ({ userId , project}) => {
-
-//   const { isLoading, error, data } = useQuery({
-//     queryKey: ["posts", userId, project],
-//     queryFn: () => {
-//       if (userId) {
-//         return makeRequest.get(`/posts/user/${userId}`).then(res => res.data);
-//       }
-//       if (project) {
-//         return makeRequest.get(`/posts/project/${project}`).then(res => res.data);
-//       }
-//       return makeRequest.get("/posts").then(res => res.data);
-//     }
-//   });
-
-//   if (isLoading) return "Loading posts...";
-//   if (error) return "Something went wrong!";
-
-//   return <div className="posts">
-//     {data.map((post) => (  // วนลูปแสดงข้อมูลจริงจาก Database
-//       <Post post={post} key={post.post_id} />
-//     ))}
-//   </div>
-
-// };
-
-// export default Posts;
-
 import Post from "../post/post";
 import "./posts.scss";
-import { useInfiniteQuery } from "@tanstack/react-query"; // เปลี่ยนมาใช้ตัวนี้
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
-import { useInView } from "react-intersection-observer"; // เพิ่มเข้ามา
+import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
 
 const Posts = ({ userId, project, commuId, isDescCommu, isDescProject }) => {
@@ -74,8 +41,6 @@ const Posts = ({ userId, project, commuId, isDescCommu, isDescProject }) => {
   }, [inView, hasNextPage, fetchNextPage]);
 
   if (isLoading) return <div className="posts">Loading...</div>;
-
-  // เพิ่มตรงนี้: ถ้า error หรือ data ยังไม่มาจริงๆ ให้หยุดตรงนี้ก่อน ไม่ให้ไปบรรทัด map
   if (error || !data) return <div className="posts">Something went wrong or No data.</div>;
 
   return (

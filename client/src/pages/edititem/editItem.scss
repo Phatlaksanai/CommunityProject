@@ -62,11 +62,8 @@
           color: themed("textColor");
           font-size: 14px;
           cursor: pointer;
-
           display: block;
-          /* บังคับให้ขนาดเท่ากับ container */
           overflow-wrap: break-word;
-          /* ตัดคำที่ยาวเกินไปขึ้นบรรทัดใหม่ */
           word-break: break-all;
 
           &:hover {

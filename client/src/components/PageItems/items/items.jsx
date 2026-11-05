@@ -1,11 +1,10 @@
 import Item from "../item/item";
 import "./items.scss";
-import { useQuery } from "@tanstack/react-query";
-import { useInfiniteQuery } from "@tanstack/react-query"; // เปลี่ยนมาใช้ตัวนี้
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
 import { useContext } from "react";
-import { useInView } from "react-intersection-observer"; // เพิ่มเข้ามา
+import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
 import NotFound from "../../NotFound/notFound";
 import Loading from "../../NotFound/loading";
@@ -32,11 +31,11 @@ const Items = ({ userId, filters, isProfile, isShop }) => {
         });
       }
       query.append("date", filters?.date || "AllTime");
-      
-      // ✅ 1. เพิ่ม page เข้าไปใน query ตรงนี้เลย
+
+      // เพิ่ม page เข้าไปใน query
       query.append("page", pageParam);
 
-      // ✅ 2. สร้าง URL ให้สะอาด
+      // สร้าง URL
       const baseUrl = userId ? `/items/user/${userId}` : `/items`;
 
       if (currentUser?.user_id) {
@@ -60,8 +59,6 @@ const Items = ({ userId, filters, isProfile, isShop }) => {
   }, [inView, hasNextPage, fetchNextPage]);
 
   if (isLoading) return <Loading />;
-
-  // เพิ่มตรงนี้: ถ้า error หรือ data ยังไม่มาจริงๆ ให้หยุดตรงนี้ก่อน ไม่ให้ไปบรรทัด map
   if (error || !data) return <NotFound />;
 
   return <div className="items">

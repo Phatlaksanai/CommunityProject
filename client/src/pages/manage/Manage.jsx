@@ -28,7 +28,6 @@ const Manage = () => {
   const [isLoadingSpinBan, setIsLoadingSpinBan] = useState(false);
   const [isLoadingSpinPost, setIsLoadingSpinPost] = useState(false);
 
-  // ดึงข้อมูลสมาชิก
   const { data: members = [], isLoading: loadingMembers, error: membersError } = useQuery({
     queryKey: ["communityMembers", community_id],
     queryFn: () => makeRequest.get(`/communities/members/${community_id}`).then(res => res.data),
@@ -83,7 +82,7 @@ const Manage = () => {
       setErrorMember("Ban Failed");
       console.error(err);
       if (err.response && err.response.data && err.response.data.error) {
-        setErrorMember(err.response.data.error); // จะแสดง error จาก backend
+        setErrorMember(err.response.data.error);
       } else {
         setErrorMember("Ban Failed");
       }
@@ -132,7 +131,7 @@ const Manage = () => {
   const confirmBan = () => {
     setIsLoadingSpinBan(true);
     banmutation.mutate(selectedUsers);
-    setShowMemberModal(false); // ปิด Pop-up
+    setShowMemberModal(false);
   };
 
   const confirmDeletePosts = () => {
@@ -202,7 +201,6 @@ const Manage = () => {
         </form>
       </div>
 
-      {/*Pop-up Modal */}
       {showMemberModal && (
         <div className="custom-modal-overlay">
           <div className="custom-modal-content">
@@ -279,7 +277,6 @@ const Manage = () => {
         </form>
       </div>
 
-      {/* Pop-up Modal สำหรับ Post */}
       {showPostModal && (
         <div className="custom-modal-overlay">
           <div className="custom-modal-content">
@@ -298,7 +295,6 @@ const Manage = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

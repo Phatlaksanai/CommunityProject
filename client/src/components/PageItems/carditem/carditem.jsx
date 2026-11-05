@@ -1,12 +1,10 @@
 import "./carditem.scss";
-import CloseIcon from '@mui/icons-material/Close';
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { makeRequest } from "../../../api/axios";
 import { useQueryClient } from "@tanstack/react-query";
 
 const CardItem = ({ card, isCart }) => {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { id } = useParams();
 

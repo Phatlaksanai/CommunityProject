@@ -1,5 +1,4 @@
 import "./rightDI.scss";
-import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/authContext";
 import { useContext, useState, useEffect } from "react";
@@ -54,7 +53,6 @@ const RightDI = ({ item }) => {
       }
       setIsLoadingSpinner(false);
     }
-
   }
 
   const handleAddToCart = async () => {
@@ -120,7 +118,7 @@ const RightDI = ({ item }) => {
     <div className="rightDI">
       <div className="container">
         <div className="title"><h2>Timeline</h2></div>
-        <div className="timeline" onClick={() => setTimelineItemId(item.item_id)} style={{ cursor: "pointer" }}>
+        <div className="timeline" onClick={() => setTimelineItemId(item.item_id)} >
           <div className="img">
             <img src={item.img} alt="" />
           </div>
@@ -150,7 +148,7 @@ const RightDI = ({ item }) => {
           <h4>Rating: {averageRating} ★ ( Count: {itemReviews.length} )</h4>
         </div>
 
-        <hr />{/* ส่วน 2 */}
+        <hr />
         <div className="text">
           <div className="row">
             <h3>price</h3>
@@ -158,8 +156,7 @@ const RightDI = ({ item }) => {
           </div>
         </div>
 
-
-        <hr />{/* ส่วน 3 */}
+        <hr />
         <div className="text">
           <div className="row">
             <h3>Subtotal</h3>
@@ -211,7 +208,6 @@ const RightDI = ({ item }) => {
           {error && <span style={{ color: "red", margin: "0px 10px" }}>{error}</span>}
           {success && <span style={{ color: "green", margin: "0px 10px" }}>{success}</span>}
         </div>
-
       </div>
     </div>
   );

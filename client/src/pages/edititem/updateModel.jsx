@@ -25,7 +25,6 @@ const UpdateModel = () => {
     const [previewImg1, setPreviewImg1] = useState(null);
     const [previewImg2, setPreviewImg2] = useState(null);
 
-    // form data
     const [model, setModel] = useState(null);
     const [obj, setObj] = useState(null);
     const [blend, setBlend] = useState(null);
@@ -45,7 +44,6 @@ const UpdateModel = () => {
         gltf: false,
     });
 
-    // message
     const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
@@ -58,7 +56,6 @@ const UpdateModel = () => {
 
     const { data: items, isLoading, error: itemsError } = useQuery({
         queryKey: ["item", item_id, "edit"],
-        // เปลี่ยน URL จาก /items/ เป็น /items/edit/
         queryFn: () => makeRequest.get(`/items/edit/${item_id}`).then(res => res.data),
         retry: false,
     });

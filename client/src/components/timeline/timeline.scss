@@ -14,8 +14,8 @@
     overflow-y: auto;
 
     @include mobile {
-      padding: 15px; // ลดขอบบนมือถือเพื่อให้มีพื้นที่เยอะขึ้น
-      width: 95%; // ขยายความกว้างให้เกือบเต็มหน้าจอมือถือ
+      padding: 15px;
+      width: 95%;
       max-height: 80vh;
     }
 
@@ -35,14 +35,14 @@
       gap: 20px;
 
       @include mobile {
-        display: flex; // บนมือถือเปลี่ยนมาใช้ Flex
-        flex-direction: column; // เรียงทุกอย่างเป็น บน-ล่าง
+        display: flex;
+        flex-direction: column;
         gap: 15px;
       }
 
       @include tablet {
         display: flex;
-        flex-direction: column; // แท็บเล็ตก็จับเรียง บน-ล่าง ป้องกันตารางพัง
+        flex-direction: column;
         gap: 20px;
       }
 
@@ -54,10 +54,10 @@
         max-height: 70vh;
 
         @include mobile {
-          flex-direction: row; // จับรูปภาพ 2 รูปเรียงเป็นซ้ายขวาในมือถือ
+          flex-direction: row;
           max-height: auto;
           overflow-y: visible;
-          overflow-x: auto; // ปัดซ้ายขวาได้ถ้ารูปใหญ่
+          overflow-x: auto;
           gap: 10px;
         }
 
@@ -72,8 +72,8 @@
           background-color: themed("bgSoft");
 
           @include mobile {
-            height: 150px; // ลดความสูงรูปลงบนมือถือ
-            min-width: 150px; // กำหนดขั้นต่ำกันรูปโดนบีบ
+            height: 150px;
+            min-width: 150px;
           }
 
           img {
@@ -113,8 +113,8 @@
           overflow: hidden;
 
           @include mobile {
-            height: 300px; // ลดความสูงของ Model บนจอมือถือ
-            padding: 0; // ลบขอบออกให้เต็มกรอบ
+            height: 300px;
+            padding: 0;
           }
 
           .model-viewer {
@@ -188,18 +188,6 @@
   }
 }
 
-.timeline-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(30, 30, 30, 0.65);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  z-index: 1000;
-}
-
 .timeline-close {
   position: fixed;
   top: 20px;
@@ -216,72 +204,79 @@
   @include mobile {
     top: 10px;
     right: 10px;
-    width: 40px; // เล็กลงในมือถือ
+    width: 40px;
     height: 40px;
     padding: 8px;
   }
 }
 
-.timeline-nav {
+.timeline-overlay {
   position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.08);
-  border: none;
-  color: #fff;
-  padding: 15px;
-  border-radius: 50%;
-  cursor: pointer;
-
-  transition: background 0.2s;
-
+  inset: 0;
+  background-color: rgba(30, 30, 30, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
 
+  .timeline-nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #fff;
+    padding: 15px;
+    border-radius: 50%;
+    cursor: pointer;
 
-  @include mobile {
-    padding: 5px; // เล็กลงในมือถือ
-    // ย้ายปุ่มลงมาด้านล่างเพื่อไม่ให้บังส่วนแสดงผลตรงกลาง
-    top: auto;
-    bottom: 20px;
-    transform: none;
-  }
+    transition: background 0.2s;
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.25);
-    opacity: 1;
-  }
-
-  &.timeline-nav-prev {
-    left: 30px;
-
-    @include mobile {
-      left: 20px;
-    }
-
-    svg {
-      transform: translateX(8px);
-
-      @include mobile {
-        transform: translateX(4px);
-        font-size: 35px !important; // ลดขนาดไอคอน
-      }
-    }
-  }
-
-  &.timeline-nav-next {
-    right: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     @include mobile {
-      right: 20px;
+      padding: 5px;
+      top: auto;
+      bottom: 20px;
+      transform: none;
     }
 
-    svg {
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+      opacity: 1;
+    }
+
+    &.timeline-nav-prev {
+      left: 30px;
+
       @include mobile {
-        font-size: 35px !important; // ลดขนาดไอคอน
+        left: 20px;
+      }
+
+      svg {
+        transform: translateX(8px);
+
+        @include mobile {
+          transform: translateX(4px);
+          font-size: 35px !important;
+        }
       }
     }
-    
+
+    &.timeline-nav-next {
+      right: 30px;
+
+      @include mobile {
+        right: 20px;
+      }
+
+      svg {
+        @include mobile {
+          font-size: 35px !important;
+        }
+      }
+    }
   }
 }

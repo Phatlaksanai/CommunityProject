@@ -16,11 +16,11 @@
 
   .container {
     display: flex;
-    flex-direction: row; // แบ่งซ้ายขวา
+    flex-direction: row;
     gap: 20px;
     width: 100%;
     max-width: 1200px;
-    height: 80vh; // ล็อกความสูงของกล่อง เพื่อให้เกิด Scrollbar ด้านใน
+    height: 80vh;
 
     @include mobile {
       flex-direction: column;
@@ -34,7 +34,7 @@
       gap: 15px;
       padding: 20px;
       border-radius: 10px;
-      overflow-y: auto; // สร้าง Scrollbar ฝั่งซ้าย
+      overflow-y: auto;
 
       @include themify($themes) {
         background: themed("bg");
@@ -83,9 +83,9 @@
     .rightPane {
       flex: 2;
       display: flex;
-      flex-direction: column; // ดันสินค้าขึ้นบน ดันปุ่มลงล่าง
+      flex-direction: column;
       border-radius: 10px;
-      overflow: hidden; // ซ่อนส่วนเกินไม่ให้ทะลุกรอบ
+      overflow: hidden;
 
       @include themify($themes) {
         background: themed("bg");
@@ -93,9 +93,9 @@
       }
 
       .cartItemWrapper {
-        flex: 1; // กินพื้นที่ส่วนที่เหลือทั้งหมด
+        flex: 1;
         padding: 20px;
-        overflow-y: auto; // สร้าง Scrollbar ฝั่งขวา
+        overflow-y: auto;
 
         @include mobile {
           padding: 10px;
@@ -150,6 +150,7 @@
         padding: 20px;
         display: flex;
         justify-content: center;
+        cursor: pointer;
 
         @include mobile {
           padding: 10px;
@@ -162,7 +163,7 @@
         }
 
         button {
-          width: 100%; // ให้ปุ่มกว้างเต็มกล่องฝั่งขวา
+          width: 100%;
           padding: 15px;
           font-size: 18px;
           font-weight: bold;

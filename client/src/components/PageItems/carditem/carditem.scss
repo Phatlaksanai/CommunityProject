@@ -5,7 +5,7 @@
     overflow: scroll;
 
     @include mobile {
-      display: block; // ใส่เป็น block แทน เพื่อให้แสดงผลปกติ
+      display: block;
     }
 
     &::-webkit-scrollbar {
@@ -24,7 +24,7 @@
 
       .info {
         display: flex;
-        flex-direction: column; // ทำให้ price ลงล่าง
+        flex-direction: column;
         align-self: center;
 
         span {

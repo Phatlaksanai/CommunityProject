@@ -22,19 +22,15 @@ const AddProject = () => {
   const [searchItem, setSearchItem] = useState("");
   const [selectedPosts, setSelectedPosts] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["userPosts", currentUser.user_id],
-    queryFn: () =>
-      makeRequest
-        .get(`/posts/user/${currentUser.user_id}/available`)
-        .then((res) => res.data),
+    queryFn: () => makeRequest.get(`/posts/user/${currentUser.user_id}/available`).then((res) => res.data),
   });
+
   const { data: items = [] } = useQuery({
     queryKey: ["userItems", currentUser.user_id],
-    queryFn: () =>
-      makeRequest
-        .get(`/items/user/${currentUser.user_id}/available`)
-        .then((res) => res.data),
+    queryFn: () => makeRequest.get(`/items/user/${currentUser.user_id}/available`).then((res) => res.data),
   });
 
   const handleImageChange = (e) => {
@@ -64,17 +60,15 @@ const AddProject = () => {
     setSuccess("");
     setIsLoadingSpinner(true);
 
-    // ใช้ .trim() เพื่อตัดช่องว่างหน้า-หลัง และเช็คว่าชื่อว่างหรือไม่
     const trimmedProjectName = projectName.trim();
 
-    // 1. เช็คชื่อโปรเจคที่ตัดช่องว่างออกแล้ว
     if (!trimmedProjectName) {
       setError("Please enter a Project Name (cannot be empty)");
       setIsLoadingSpinner(false);
       return;
     }
 
-    // 2. เพิ่มการเช็คว่าเลือก Post อย่างน้อย 1 อันหรือยัง
+    // เพิ่มการเช็คว่าเลือก Post อย่างน้อย 1 อันหรือยัง
     if (selectedPosts.length === 0) {
       setError("Please select at least one related Post");
       setIsLoadingSpinner(false);
@@ -91,7 +85,7 @@ const AddProject = () => {
         imgPublicId = uploadRes.public_id;
       }
 
-      const res = await makeRequest.post("/projects/addproject", {
+      await makeRequest.post("/projects/addproject", {
         projectName,
         description,
         imgUrl,

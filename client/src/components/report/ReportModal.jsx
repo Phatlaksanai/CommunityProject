@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { makeRequest } from "../../api/axios"; // ปรับ path ให้ตรงกับโฟลเดอร์ที่เก็บไฟล์นี้
+import { makeRequest } from "../../api/axios";
 import "./reportModal.scss";
 
 const ReportModal = ({ isOpen, onClose, targetId, entityType, navbar }) => {
@@ -25,7 +25,6 @@ const ReportModal = ({ isOpen, onClose, targetId, entityType, navbar }) => {
         entityType: entityType,
       });
 
-      // ส่งเสร็จแล้วให้เคลียร์ค่าและปิด Modal
       setDescription("");
       setType(navbar ? "technical_issue" : "copyright");
       onClose();
@@ -67,7 +66,6 @@ const ReportModal = ({ isOpen, onClose, targetId, entityType, navbar }) => {
               </select>
             )
             }
-
           </div>
 
           <div className="form-group">

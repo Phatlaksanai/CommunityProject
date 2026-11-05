@@ -1,7 +1,6 @@
 import "./project.scss";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { AuthContext } from "../../../context/authContext";
 import { useContext } from "react";
@@ -10,9 +9,10 @@ import img from "../../../assets/DefaultProject.jpg";
 const Project = ({ project, isProfile }) => {
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
+
   return (
     <div className="project">
-      <div className="container" onClick={() => navigate(`/descproject/${project.project_id}`)} style={{ cursor: "pointer" }}>
+      <div className="container" onClick={() => navigate(`/descproject/${project.project_id}`)}>
         <div className="content" >
           <img src={project.img || img} alt="" />
         </div>

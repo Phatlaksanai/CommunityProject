@@ -1,8 +1,8 @@
 import LeftChat from "../../components/Left/leftChat/leftChat"
-import { useContext, useState, useEffect, useRef, Fragment } from "react";
-import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
+import { useContext, useState, useEffect, Fragment } from "react";
+import {  useParams, useLocation, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { AuthContext } from "../../context/authContext";
 import dayjs from "dayjs";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
@@ -18,7 +18,6 @@ const Chat = () => {
     const { id } = useParams();
     const location = useLocation();
     const { currentUser } = useContext(AuthContext);
-    const navigate = useNavigate();
     const [currentChat, setCurrentChat] = useState(location.state?.selectedChat || null);
     const [newMessage, setNewMessage] = useState("");
 
@@ -126,7 +125,7 @@ const Chat = () => {
             const formData = new FormData();
             formData.append("file", file);
             const res = await makeRequest.post("/upload/chat", formData);
-            return res.data; // คาดหวัง { url: "..." }
+            return res.data;
         } catch (err) {
             console.log(err);
         }
@@ -211,15 +210,12 @@ const Chat = () => {
         const query = searchQuery.toLowerCase();
 
         return username.includes(query) || name.includes(query);
-        // return friend.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        //     friend.name.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
     const handleConversation = async (friend) => {
         try {
             const res = await makeRequest.post("/chats/createconversation", { user2Id: friend.user_id });
 
-            // จัดรูปแบบ Object ให้ตรงกับที่ระบบแชทต้องการ
             const chatData = {
                 conversation_id: res.data.conversation_id,
                 partner_id: friend.user_id,
@@ -256,7 +252,7 @@ const Chat = () => {
                     {searchQuery && filteredFriends?.length > 0 && (
                         <div className="search-dropdown-results">
                             {filteredFriends?.map((friend) => (
-                                <div className="search-hit-item" key={friend.user_id} onClick={() => handleConversation(friend)} style={{ cursor: "pointer" }}>
+                                <div className="search-hit-item" key={friend.user_id} onClick={() => handleConversation(friend)} >
                                     <div className="hit-content">
                                         <img src={friend.profilePic || defaultPic} className="hit-image" />
                                         <div className="hit-info">
@@ -282,7 +278,6 @@ const Chat = () => {
             </div>
 
             <div className="Rchat">
-                {/* ส่วน Header ของแชท */}
                 <div className="chatHeader">
                     <div className="userInfo">
                         {currentChat ? (
@@ -297,7 +292,6 @@ const Chat = () => {
                     </div>
                 </div>
 
-                {/* ส่วนเนื้อหาแชทที่เลื่อนได้ */}
                 <div className="chatContent">
                     {currentChat ? (
                         <>

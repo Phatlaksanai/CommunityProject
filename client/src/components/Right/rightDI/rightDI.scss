@@ -12,10 +12,10 @@
     border-radius: 10px;
 
     @include mobile {
-      display: block; // เปลี่ยนจาก display: none เป็น block
-      position: relative; // เอา sticky ออก ไม่ต้องล็อคติดจอ
+      display: block;
+      position: relative;
       top: 0;
-      height: auto; // ให้ความสูงยืดตามเนื้อหาด้านใน
+      height: auto;
       overflow: visible;
     }
 
@@ -36,7 +36,6 @@
         }
       }
 
-
       hr {
         margin: 20px 0px;
         border: none;
@@ -47,6 +46,7 @@
       .timeline {
         display: flex;
         padding: 0;
+        cursor: pointer;
 
         .img {
           img {
@@ -65,7 +65,6 @@
             color: themed("textColorSoft");
             margin-bottom: 5px;
           }
-
         }
 
         &:hover {
@@ -89,7 +88,6 @@
           margin: 0px;
         }
 
-
         .buttons {
           display: flex;
           align-items: center;
@@ -105,7 +103,6 @@
             border-radius: 10px;
           }
         }
-
       }
 
       .text {

@@ -1,7 +1,6 @@
 import "./editCommu.scss";
-import { useState, useContext, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";//-------------------------------------
-import { AuthContext } from "../../context/authContext";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
 import { ClipLoader } from "react-spinners";
@@ -9,21 +8,16 @@ import NotFound from "../../components/NotFound/notFound";
 import Loading from "../../components/NotFound/loading";
 
 const EditCommu = () => {
-    //---------------------------------------------------------- 
     const navigate = useNavigate();
     const { id: community_id } = useParams();
-    const { currentUser } = useContext(AuthContext);
 
-    // form data
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [img, setImg] = useState(null);
 
-    // message
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [imgPublicId, setImgPublicId] = useState(null);
-    const [modelPublicId, setModelPublicId] = useState(null);
 
     const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
@@ -61,7 +55,7 @@ const EditCommu = () => {
         formData.append("file", file);
 
         const res = await makeRequest.post("/upload/communities", formData);
-        return res.data; // คาดหวัง { url: "...", public_id: "..." }
+        return res.data; // ส่งคืนเป็น { url: "...", public_id: "..." }
     };
 
 
@@ -83,7 +77,6 @@ const EditCommu = () => {
                 finalImgPublicId = res.public_id;
             }
 
-            // ส่งไปที่ API
             await makeRequest.put("/communities/update", {
                 communityId: community_id,
                 name,
@@ -97,7 +90,7 @@ const EditCommu = () => {
         } catch (err) {
             console.error(err);
             if (err.response && err.response.data && err.response.data.error) {
-                setError(err.response.data.error); // จะแสดง error จาก backend
+                setError(err.response.data.error);
             } else {
                 setError("Failed to connect to server");
             }

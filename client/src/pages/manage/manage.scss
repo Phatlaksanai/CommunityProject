@@ -139,7 +139,7 @@
       }
     }
 
-    /* Modal Overlay ทำให้พื้นหลังมืดลง */
+    // Modal Overlay ทำให้พื้นหลังมืดลง
     .custom-modal-overlay {
       position: fixed;
       top: 0;
@@ -150,9 +150,9 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1000; /* ให้อยู่บนสุด */
+      z-index: 1000;
 
-      /* กล่องเนื้อหา Pop-up */
+      
       .custom-modal-content {
         background-color: themed("bgSoft");
         padding: 30px;
@@ -163,8 +163,8 @@
         width: 90%;
 
         @include mobile {
-          padding: 20px 15px; // ลดขอบ pop-up บนมือถือ
-          width: 100%; // ให้ขยายเต็มพื้นที่ที่จำกัดไว้ (90% + padding)
+          padding: 20px 15px;
+          width: 100%;
         }
 
         h3 {
@@ -181,14 +181,13 @@
           }
         }
 
-        /* จัดปุ่มกดยืนยัน / ยกเลิก */
         .modal-buttons {
           display: flex;
           justify-content: space-between;
           gap: 15px;
 
           @include mobile {
-            gap: 10px; // ลดช่องว่างระหว่างปุ่มในมือถือ
+            gap: 10px;
           }
 
           button {
@@ -216,7 +215,7 @@
           }
 
           .btn-confirm {
-            background-color: #dc3545; /* สีแดงสื่อถึงการลบ/แบน */
+            background-color: #dc3545;
             color: white;
 
             &:hover {

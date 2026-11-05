@@ -9,7 +9,6 @@ const ResetPassword = () => {
 
   const navigate = useNavigate()
   const [step, setStep] = useState(1);
-  const { setUser } = useContext(AuthContext);
 
   const [Email, setEmail] = useState("");
   const [OTP, setOTP] = useState("");
@@ -71,7 +70,7 @@ const ResetPassword = () => {
       }
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error); // จะแสดง error จาก backend
+        setError(err.response.data.error);
       } else {
         setError("OTP sending failed");
       }

@@ -6,6 +6,6 @@
   gap: 10px;
 
   @include mobile {
-    grid-template-columns: repeat(2, 1fr); // 2 column on mobile
+    grid-template-columns: repeat(2, 1fr); // 2 column
   }
 }

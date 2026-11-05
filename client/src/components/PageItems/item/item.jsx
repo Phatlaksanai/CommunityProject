@@ -44,7 +44,6 @@ const Item = ({ item, isProfile, isShop }) => {
         setError("Failed to connect to server");
       }
     }
-
   }
 
   const handleAddToCart = async () => {
@@ -90,7 +89,7 @@ const Item = ({ item, isProfile, isShop }) => {
   return (
     <div className="item">
       <div className="container">
-        <div className="content" onClick={() => navigate(`/descitem/${item.item_id}`)} style={{ cursor: "pointer" }}>
+        <div className="content" onClick={() => navigate(`/descitem/${item.item_id}`)}>
           <img src={item.img} alt="" onError={(e) => { e.currentTarget.src = "https://placehold.co/600x400?text=Image+Error"; }} />
         </div>
         <div className="desc">
@@ -104,7 +103,6 @@ const Item = ({ item, isProfile, isShop }) => {
               <DownloadIcon />
               <span>{item.order_count}</span>
             </div>
-
           </div>
 
           {isShop && item.price > 0 ? (

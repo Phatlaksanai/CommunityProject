@@ -1,5 +1,4 @@
 import CardItem from "../carditem/carditem";
-
 import "./carditems.scss";
 
 const CardItems = ({ items ,isCart }) => {
@@ -9,7 +8,7 @@ const CardItems = ({ items ,isCart }) => {
   }
 
   return <div className="carditems">
-    {items.map((card) => (  // วนลูปแสดงข้อมูลจริงจาก Database
+    {items.map((card) => (  // วนลูปแสดงข้อมูลจาก Database
       <CardItem card={card} key={card.cart_items_id} isCart={isCart} />
     ))}
   </div>

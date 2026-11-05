@@ -10,12 +10,15 @@
     color: themed("textColor");
 
     .container {
+      cursor: pointer;
+
       .content {
         max-width: 250px;
         max-height: 250px;
         background-color: rgb(82, 135, 200);
         border-radius: 20px 20px 0px 0px;
         overflow: hidden;
+
         img {
           width: 100%;
           height: 100px;
@@ -23,34 +26,39 @@
           display: block;
         }
       }
-
-      
     }
+
     .desc {
-        padding: 0px 15px;
-        h3{
-          white-space: nowrap;
-          color: themed("textColorSoft");
-          max-width: 0;
-          margin: 0px;
-        }
-         p {
-            margin: 0;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;      // จำกัด 2 บรรทัด
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            word-break: break-word;     // ตัดคำยาว ๆ
-            line-height: 1.4em;
-            max-height: calc(1.4em * 2); // ป้องกันกรอบขยาย
-        }
-      }
-      .price{
-        padding: 0px 15px 10px 15px;
-        display: flex;
-        justify-content: space-between;
-        p{margin: 5px 0px;}
+      padding: 0px 15px;
+
+      h3 {
+        white-space: nowrap;
         color: themed("textColorSoft");
+        max-width: 0;
+        margin: 0px;
       }
+
+      p {
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        word-break: break-word;
+        line-height: 1.4em;
+        max-height: calc(1.4em * 2);
+      }
+    }
+
+    .price {
+      padding: 0px 15px 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      color: themed("textColorSoft");
+
+      p {
+        margin: 5px 0px;
+      }
+    }
   }
 }

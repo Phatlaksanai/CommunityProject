@@ -1,14 +1,11 @@
 import "./share.scss";
-import Image from "../../assets/1.png";
-import Friend from "../../assets/1.png";
 import AttachmentIcon from '@mui/icons-material/Attachment';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../api/axios";
-import { useQuery } from "@tanstack/react-query"; // เพิ่ม useQuery
-import { backdropClasses } from "@mui/material/Backdrop";
+import { useQuery } from "@tanstack/react-query";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 
@@ -23,13 +20,12 @@ const Share = ({ isDescCommu, commuId }) => {
 
   const [filePreviews, setFilePreviews] = useState([]);
   const [search, setSearch] = useState("");
-  const [openProjectModal, setOpenProjectModal] = useState(false); // เพิ่ม State สำหรับเปิด-ปิด Modal
-  const [selectedProject, setSelectedProject] = useState(null); // State สำหรับเก็บ ID โปรเจคที่เลือก
+  const [openProjectModal, setOpenProjectModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const [error, setError] = useState("");
   const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
 
-  // ดึงข้อมูลโปรเจคของผู้ใช้ (ตัวอย่าง API path: /projects)
   const { isLoading, data: projects } = useQuery({
     queryKey: ["userProjects", currentUser?.user_id],
     queryFn: () =>
@@ -58,8 +54,8 @@ const Share = ({ isDescCommu, commuId }) => {
       setDesc("");
       setFiles([]);
       setFilePreviews([]);
-      setSelectedProject(null); // <--- ล้างค่า ID โปรเจกต์ที่เลือกไว้
-      setSearch("");         // (Option) ล้างค่าการค้นหาใน Modal ด้วยก็ได้
+      setSelectedProject(null);
+      setSearch("");
       setIsLoadingSpinner(false);
     },
     onError: (error) => {
@@ -114,12 +110,11 @@ const Share = ({ isDescCommu, commuId }) => {
 
       const isModel = /\.(glb|gltf)$/i.test(file.name);
 
-      // 👉 ถ้าเป็น model ต้องไม่เกิน 10MB
-      if (isModel && file.size > MAX_MODEL_SIZE) {
+      if (isModel && file.size > MAX_MODEL_SIZE) { // model ต้องไม่เกิน 10MB
         setError(`File ${file.name} Over 10MB`);
         return false;
       }
-      setError(""); // ล้าง error ถ้าไฟล์นี้ผ่านการตรวจสอบ
+      setError("");
       return true;
     });
     setFiles((prev) => prev.concat(validFiles));
@@ -181,14 +176,7 @@ const Share = ({ isDescCommu, commuId }) => {
               )}
               <button
                 onClick={() => removeFile(i)}
-                style={{
-                  marginLeft: "10px",
-                  color: "red",
-                  border: "none",
-                  background: "none",
-                  cursor: "pointer",
-                }}
-              >
+                style={{ marginLeft: "10px", color: "red", border: "none", background: "none", cursor: "pointer" }}>
                 X
               </button>
             </div>
@@ -198,14 +186,7 @@ const Share = ({ isDescCommu, commuId }) => {
               Project : {selectedProjectData?.project_name}
               <button
                 onClick={() => setSelectedProject(null)}
-                style={{
-                  marginLeft: "10px",
-                  color: "red",
-                  border: "none",
-                  background: "none",
-                  cursor: "pointer",
-                }}
-              >
+                style={{ marginLeft: "10px", color: "red", border: "none", background: "none", cursor: "pointer" }}>
                 X
               </button>
             </div>
@@ -235,7 +216,7 @@ const Share = ({ isDescCommu, commuId }) => {
                 <span>Image/Model</span>
               </div>
             </label>
-            {/* เพิ่ม onClick เพื่อเปิด Modal */}
+
             {!isDescCommu && (
               <div className="item" onClick={() => {
                 if (!currentUser?.user_id) {
@@ -249,7 +230,9 @@ const Share = ({ isDescCommu, commuId }) => {
               </div>
             )}
           </div>
+
           {error && <p style={{ color: "red", fontSize: "14px" }}>{error}</p>}
+
           <div className="right">
             <button onClick={(e) => {
               if (!currentUser?.user_id) {
@@ -270,7 +253,6 @@ const Share = ({ isDescCommu, commuId }) => {
         </div>
       </div>
 
-      {/* ส่วนของ Popup (Modal) */}
       {openProjectModal && (
         <div className="projectModal">
           <div className="modalContainer">
@@ -310,7 +292,6 @@ const Share = ({ isDescCommu, commuId }) => {
                 )}
               </div>
 
-              {/* ปุ่มควบคุมด้านล่าง */}
               <div className="modalButtons">
                 <button onClick={() => setOpenProjectModal(false)}>Cancel</button>
                 <button onClick={() => setOpenProjectModal(false)} style={{ backgroundColor: "#A0C46E" }}>Confirm</button>
