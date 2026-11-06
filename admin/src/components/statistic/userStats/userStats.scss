@@ -2,7 +2,7 @@
 
 .userstats {
   @include themify($themes) {
-    background-color: #060A0E;
+    background-color: #060a0e;
     color: themed("textColor");
     min-height: 100vh;
     padding: 20px 10px 20px 25px;
@@ -13,7 +13,6 @@
       max-width: 1400px;
       margin: 0 auto;
 
-      // ส่วนหัว Welcome back
       .header-title {
         margin-bottom: 30px;
 
@@ -25,23 +24,21 @@
 
         p {
           margin-top: 8px;
-          color: #A0AEC0;
+          color: #a0aec0;
           font-size: 15px;
         }
       }
 
       .top-overview-section {
         display: grid;
-        grid-template-columns: 1fr 1fr; // แบ่งหน้าจอเป็น 50:50
+        grid-template-columns: 1fr 1fr;
         gap: 20px;
         margin-bottom: 40px;
 
-        // Responsive: ถ้าจอเล็กให้กราฟตกลงมาอยู่ด้านล่าง
         @media (max-width: 1024px) {
           grid-template-columns: 1fr;
         }
 
-        // ฝั่งซ้าย: จัดเรียงกล่องสรุป 4 ใบ แบบ 2x2
         .dashboard-cards {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
@@ -52,8 +49,8 @@
           }
 
           .summary-card {
-            background-color: #090F16;
-            border: 2px solid #161B20;
+            background-color: #090f16;
+            border: 2px solid #161b20;
             border-radius: 12px;
             padding: 24px;
             display: flex;
@@ -66,7 +63,7 @@
               gap: 12px;
 
               .icon {
-                font-size: 24px; // ปรับขนาดไอคอนให้สมส่วนตามรูป
+                font-size: 24px;
                 width: 24px;
                 height: 24px;
               }
@@ -74,16 +71,15 @@
               h3 {
                 font-size: 17px;
                 font-weight: 600;
-                color: #fff; // สีขาวตามรูปตัวอย่าง
+                color: #fff;
                 margin: 0;
               }
             }
 
-            // ส่วนตัวเลข อยู่กึ่งกลางกล่อง
             .card-value {
               display: flex;
-              justify-content: center; // จัดให้อยู่กึ่งกลางแนวนอน
-              align-items: center; // จัดให้อยู่กึ่งกลางแนวตั้ง
+              justify-content: center;
+              align-items: center;
               flex: 1;
 
               h2 {
@@ -96,10 +92,9 @@
           }
         }
 
-        // ฝั่งขวา: สไตล์ของกล่องกราฟ
         .chart-container {
-          background-color: #090F16;
-          border: 2px solid #161B20;
+          background-color: #090f16;
+          border: 2px solid #161b20;
           border-radius: 12px;
           padding: 24px;
           display: flex;
@@ -119,8 +114,6 @@
       }
 
       .user-table-section {
-
-        // 2.1 กล่องค้นหา
         .search-section {
           margin-bottom: 30px;
           display: flex;
@@ -136,15 +129,15 @@
           .search-box {
             display: flex;
             align-items: center;
-            background-color: #0D131A;
-            border: 2px solid #161B20;
+            background-color: #0d131a;
+            border: 2px solid #161b20;
             border-radius: 8px;
             padding: 8px 12px;
             width: 100%;
             max-width: 400px;
 
             .icon {
-              color: #A0AEC0;
+              color: #a0aec0;
               font-size: 20px;
               margin-right: 10px;
             }
@@ -158,13 +151,12 @@
               font-size: 14px;
 
               &::placeholder {
-                color: #4A5568;
+                color: #4a5568;
               }
             }
           }
         }
 
-        // 2.2 ปุ่ม Add Admin
         .action-section {
           display: flex;
           justify-content: flex-end;
@@ -172,38 +164,37 @@
           z-index: 2;
 
           .add-admin-btn {
-            background-color: #E50914;
+            background-color: #e50914;
             color: white;
             border: none;
             padding: 6px 16px;
-            border-radius: 16px 16px 0 0; // โค้งเฉพาะด้านบน
+            border-radius: 16px 16px 0 0;
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s ease;
 
             &:hover {
-              background-color: #B20710;
+              background-color: #b20710;
             }
           }
         }
 
-        // 2.3 ตารางแสดงผล
         .table-container {
-          background-color: #090F16;
-          border: 2px solid #161B20;
-          border-radius: 8px; // ปรับให้ขอบมน
+          background-color: #090f16;
+          border: 2px solid #161b20;
+          border-radius: 8px;
           overflow-x: auto;
-          overflow-y: auto; // เพิ่มให้มีแถบเลื่อนแนวตั้ง
-          max-height: 400px; // กำหนดความสูงสูงสุดของตาราง (ปรับตัวเลขตามชอบได้เลย)
+          overflow-y: auto;
+          max-height: 400px;
 
           &::-webkit-scrollbar {
             width: 5px;
-            height: 5px; // เผื่อแถบแนวนอน
+            height: 5px;
           }
 
           &::-webkit-scrollbar-thumb {
-            background: #E76D09;
+            background: #e76d09;
             border-radius: 4px;
           }
 
@@ -211,20 +202,20 @@
             width: 100%;
             border-collapse: collapse;
             text-align: center;
-            position: relative; // เพิ่มสำหรับ sticky
+            position: relative;
 
             thead {
-              position: sticky; // ทำให้ส่วนหัวตารางติดขอบบนตอนเลื่อนลง
+              position: sticky;
               top: 0;
               z-index: 2;
-              background-color: #090F16; // ใส่สีพื้นหลังทับข้อมูลด้านล่างตอนเลื่อน
+              background-color: #090f16;
 
               tr {
-                border-bottom: 1px solid #161B20;
+                border-bottom: 1px solid #161b20;
 
                 th {
                   padding: 16px 10px;
-                  color: #FFFFFF;
+                  color: #ffffff;
                   font-size: 14px;
                   font-weight: 600;
                   white-space: nowrap;
@@ -234,11 +225,11 @@
 
             tbody {
               tr {
-                border-bottom: 1px solid #161B20;
+                border-bottom: 1px solid #161b20;
                 transition: background-color 0.2s ease;
 
                 &:hover {
-                  background-color: #111820; // ไฮไลท์เมื่อชี้เมาส์
+                  background-color: #111820;
                 }
 
                 &:last-child {
@@ -247,16 +238,24 @@
 
                 td {
                   padding: 16px 10px;
-                  color: #FFFFFF;
+                  color: #ffffff;
                   font-size: 13px;
                   font-weight: 500;
 
                   &.no-data {
-                    color: #4A5568;
+                    color: #4a5568;
                     padding: 30px;
                   }
                 }
               }
+            }
+          }
+
+          .clickable-row {
+            cursor: pointer;
+
+            &:hover {
+              background-color: #111820;
             }
           }
         }
@@ -269,18 +268,6 @@
     }
   }
 
-  // เพิ่มลูกเล่นให้รู้ว่าแถวตารางคลิกได้
-  .clickable-row {
-    cursor: pointer;
-
-    &:hover {
-      background-color: #111820;
-    }
-  }
-
-  // ==========================================
-  // Modal / Pop-up Styles
-  // ==========================================
   .modal-overlay {
     position: fixed;
     top: 0;
@@ -294,8 +281,8 @@
     z-index: 1000;
 
     .modal-content {
-      background-color: #090F16;
-      border: 1px solid #161B20;
+      background-color: #090f16;
+      border: 1px solid #161b20;
       border-radius: 12px;
       padding: 30px;
       width: 100%;
@@ -328,25 +315,22 @@
 
           &.full-width {
             grid-column: span 2;
-            /* บังคับให้ขยายกินพื้นที่ 2 คอลัมน์เต็ม */
 
             @media (max-width: 600px) {
               grid-column: span 1;
-              /* ถ้าจอเล็กให้เหลือ 1 คอลัมน์ปกติ */
             }
           }
 
           label {
-            color: #A0AEC0;
+            color: #a0aec0;
             font-size: 13px;
             font-weight: 600;
           }
 
           input,
           textarea {
-            background-color: #0D131A;
-            // สีขอบตามที่ระบุ
-            border: 1px solid #B87333;
+            background-color: #0d131a;
+            border: 1px solid #b87333;
             border-radius: 6px;
             padding: 10px 12px;
             color: #fff;
@@ -357,7 +341,7 @@
           }
 
           textarea {
-            resize: vertical; // ให้ผู้ใช้ลากขยายกล่องข้อความในแนวตั้งได้
+            resize: vertical;
             min-height: 80px;
           }
 
@@ -368,8 +352,8 @@
 
             select {
               width: 100%;
-              background-color: #0D131A;
-              border: 1px solid #B87333;
+              background-color: #0d131a;
+              border: 1px solid #b87333;
               border-radius: 6px;
               padding: 10px 12px;
               color: #fff;
@@ -382,8 +366,8 @@
             .dropdown-icon {
               position: absolute;
               right: 10px;
-              color: #E48500;
-              pointer-events: none; // ให้เมาส์คลิกผ่านไอคอนไปโดน select ได้
+              color: #e48500;
+              pointer-events: none;
             }
           }
         }
@@ -398,7 +382,7 @@
         justify-content: flex-end;
         gap: 15px;
         padding-top: 30px;
-        border-top: 1px solid #161B20;
+        border-top: 1px solid #161b20;
 
         button {
           padding: 10px 24px;
@@ -420,11 +404,11 @@
           }
 
           &.btn-cancel {
-            background-color: #6A7575;
+            background-color: #6a7575;
           }
 
           &.btn-update {
-            background-color: #B87333;
+            background-color: #b87333;
           }
         }
       }

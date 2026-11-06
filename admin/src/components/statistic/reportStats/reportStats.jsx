@@ -2,7 +2,7 @@ import "./reportStats.scss"
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { makeAdminRequest } from "../../../api/axios";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -15,12 +15,8 @@ const ReportStats = () => {
     const navigate = useNavigate();
     const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
     const [searchTerm, setSearchTerm] = useState("");
-    const queryClient = useQueryClient();
-    const [error, setError] = useState("");
 
-    // ---- State สำหรับ Modal ---- //
     const [selectedReport, setSelectedReport] = useState(null);
-    const [formData, setFormData] = useState({ report_id: "", report_type: "", description: "", created_at: "", status: "" });
 
     const { isLoading: topPostsLoading, isError: topPostsError, data: topPosts } = useQuery({
         queryKey: ["topReportedPosts"],
@@ -58,22 +54,6 @@ const ReportStats = () => {
     const { isLoading: reportsTableLoading, isError: reportsTableError, data: reportsTable } = useQuery({
         queryKey: ["getReportsTable"],
         queryFn: () => makeAdminRequest.get("/admin/reports/reportsTable").then(res => res.data)
-    });
-
-    const updateMutation = useMutation({
-        mutationFn: (updatedData) => {
-            return makeAdminRequest.put(`/admin/reports/updateReport/${updatedData.report_id}`, { status: updatedData.status });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries(["getReportsTable"]);
-            setSelectedReport(null); // ปิด Modal
-        },
-        onError: (err) => {
-            setError("Error updating report: " + err.message);
-            setTimeout(() => {
-                setError("");
-            }, 3000);
-        }
     });
 
     // ฟังก์ชันช่วยใส่ลูกน้ำให้ตัวเลข
@@ -126,15 +106,6 @@ const ReportStats = () => {
         }
 
         setSelectedReport(report);
-    };
-
-    // ---- ฟังก์ชันจัดการฟอร์มใน Modal ---- //
-    const handleChange = (e) => {
-        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    };
-
-    const handleUpdate = () => {
-        updateMutation.mutate(formData);
     };
 
     // ฟังก์ชัน render กล่อง Top Report แต่ละอัน (Top Posts / Communities / Reported Users / Reporting Users)
@@ -198,7 +169,7 @@ const ReportStats = () => {
 
             <div className="main-content">
                 <div className="L">
-                    <div className="user-table-section" style={{ marginTop: '40px' }}>
+                    <div className="report-table-section" style={{ marginTop: '40px' }}>
 
                         <div className="search-section">
                             <label>Search by Username</label>

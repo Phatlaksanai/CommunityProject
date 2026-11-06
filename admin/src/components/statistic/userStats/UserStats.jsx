@@ -14,7 +14,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 const UserStats = () => {
     const location = useLocation();
 
-    // ถ้ามาจากการกดแถวใน Reports จะมี report แปะมาด้วย ให้เอามาโชว์เป็น popup มุมล่างขวาของหน้านี้เลย
+    // popup report
     const [reportPopupData, setReportPopupData] = useState(location.state?.reportPopup ?? null);
 
     const { currentAdmin, setAdmin } = useContext(AuthContext);
@@ -23,7 +23,6 @@ const UserStats = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    // ---- State สำหรับ Modal ---- //
     const [selectedUser, setSelectedUser] = useState(null);
     const [formData, setFormData] = useState({
         user_id: "", username: "", name: "", email: "",
@@ -101,7 +100,7 @@ const UserStats = () => {
                 // อัปเดต Context ทำให้ Navbar เปลี่ยนทันที
                 setAdmin(updatedCurrentAdmin);
 
-                // อัปเดต LocalStorage ด้วย (อ้างอิงจากตอน Logout ที่คุณใช้ LocalStorage)
+                // อัปเดต LocalStorage ด้วย (อ้างอิงจากตอน Logout ที่ใช้ LocalStorage)
                 localStorage.setItem("admin", JSON.stringify(updatedCurrentAdmin));
             }
         },
@@ -116,7 +115,7 @@ const UserStats = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries(["getUsersTable"]);
-            setIsAddAdminOpen(false); // ปิดหน้าต่าง Add Admin
+            setIsAddAdminOpen(false);
             setNewAdminData({ username: "", email: "", password: "", role: "admin" }); // เคลียร์ค่า
             setSuccess("Admin added successfully!");
         },
@@ -174,7 +173,7 @@ const UserStats = () => {
         });
     };
 
-    // ---- ฟังก์ชันจัดการฟอร์มใน Modal ---- //
+    // ฟังก์ชันจัดการฟอร์มใน Modal
     const handleChange = (e) => {
         setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
@@ -188,7 +187,6 @@ const UserStats = () => {
             ...formData,
             role: formattedRole
         };
-
 
         updateMutation.mutate(payload);
     };
@@ -317,10 +315,7 @@ const UserStats = () => {
                     </div>
                 </div>
 
-
-
                 <div className="user-table-section" style={{ marginTop: '40px' }}>
-
                     <div className="search-section">
                         <label>Search by Username</label>
                         <div className="search-box">

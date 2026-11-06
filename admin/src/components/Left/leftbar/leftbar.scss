@@ -2,12 +2,12 @@
 
 .leftBar {
   @include themify($themes) {
-    width: 100px; 
+    width: 100px;
     flex-shrink: 0;
     position: sticky;
     top: 70px;
     height: calc(100vh - 70px);
-    background-color: #03060A;
+    background-color: #03060a;
     color: themed("textColor");
 
     @include mobile {
@@ -33,63 +33,21 @@
         flex-direction: column;
         gap: 5px;
 
-        .menu-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 5px;
-
-          span {
-            font-weight: 500;
-            color: themed("textColorSoft");
-          }
-
-          button {
-            padding: 4px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            background-color: #5271ff;
-            color: white;
-            border: none;
-            font-size: 12px;
-          }
-        }
-
-        .community-list-wrapper {
-          max-height: 188px;
-          overflow-y: auto;
-          // ลบเงาหรือ background แปลกๆ ออกจาก wrapper
-          background: transparent;
-
-          &::-webkit-scrollbar {
-            width: 4px;
-          }
-
-          &::-webkit-scrollbar-thumb {
-            background-color: themed("border");
-            border-radius: 10px;
-          }
-        }
-
-        // ปรับแต่ง Item ทั้งหมด (รวม User, เมนูทั่วไป, และ See more)
-        .item,
-        .user,
-        .load-more {
+        .item {
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 12px;
-          padding: 10px 10px; // เพิ่ม padding ให้ดูโปร่งขึ้น
-          border-radius: 20px; // มนกำลังดี
+          padding: 10px 10px;
+          border-radius: 20px;
           cursor: pointer;
           transition: all 0.2s ease;
-          background-color: transparent; // มั่นใจว่าไม่มีสีพื้นหลังแปลกๆ
-          box-shadow: none !important; // ปิดเงาที่ทำให้ดูเหมือนเฟดดำ
-          position: relative; // สำคัญ: เพื่อใช้จัดวางขีดสีส้มด้านขวา
-          overflow: hidden; // กันขีดส้มล้นกรอบมน
+          background-color: transparent;
+          box-shadow: none !important;
+          position: relative;
+          overflow: hidden;
 
           &:hover {
-            // "เปล่งแสง" หรือ Highlight เหมือนกันทุกตัว
             background-color: themed("bgSoft");
           }
 
@@ -105,49 +63,19 @@
           }
 
           &.active {
-            background-color: #4A2E1B; // สีพื้นหลังน้ำตาล
+            background-color: #4a2e1b;
 
-            // ขีดสีส้มด้านขวา
             &::after {
               content: "";
               position: absolute;
               right: 0;
               top: 50%;
               transform: translateY(-50%);
-              height: 40px; // ความยาวของขีด
-              width: 4px; // ความหนาของขีด
-              background-color: #B87333; // สีส้มของขีด
-              border-radius: 4px 0 0 4px; // ให้มุมด้านซ้ายของขีดมนนิดๆ
+              height: 40px;
+              width: 4px;
+              background-color: #b87333;
+              border-radius: 4px 0 0 4px;
             }
-          }
-        }
-
-        // เฉพาะจุดของ See more ให้จัดกึ่งกลางสวยๆ
-        .load-more {
-          justify-content: center;
-          margin-top: 5px;
-          color: themed("textColorSoft");
-          font-weight: 500;
-
-          span {
-            font-size: 13px;
-          }
-        }
-
-        // จัดการชื่อกลุ่มที่ยาวเกินไป
-        .item.community-item {
-          .community-name {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-
-          .owner-badge {
-            font-size: 18px;
-            color: #888;
-            margin-left: auto;
-            flex-shrink: 0;
           }
         }
       }

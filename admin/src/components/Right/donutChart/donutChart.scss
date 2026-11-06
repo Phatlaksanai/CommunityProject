@@ -1,27 +1,28 @@
 @use "../../../style.scss" as *;
 
-.donutChart{
+.donutChart {
   @include themify($themes) {
-    background-color: #060A0E;
-    // min-height: 100vh;
+    background-color: #060a0e;
     padding: 20px 30px;
 
     @include mobile {
       padding: 10px;
     }
 
-    @include tablet{
+    @include tablet {
       padding: 20px;
     }
   }
-  .chart-title {
-    color: #fff;
-  }
-  .chart-container{
-    background-color: #090F16; 
-    border: 2px solid #161B20; 
+
+  .chart-container {
+    background-color: #090f16;
+    border: 2px solid #161b20;
     border-radius: 12px;
-    box-shadow: none; 
+    box-shadow: none;
     padding: 24px;
+
+    .chart-title {
+      color: #fff;
+    }
   }
- }
+}

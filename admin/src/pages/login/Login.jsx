@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { makeAdminRequest } from "../../api/axios";
 import { ClipLoader } from "react-spinners";
@@ -7,7 +7,7 @@ import "./login.scss";
 
 const Login = () => {
   const navigate = useNavigate()
-  const { setAdmin } = useContext(AuthContext); // ใช้ context ตรง ๆ
+  const { setAdmin } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,7 +41,7 @@ const Login = () => {
         otp
       });
       const data = res.data;
-      // Backend ส่งของ user data มาให้
+
       if (data.success) {
         setAdmin(data);
         localStorage.setItem("admin", JSON.stringify(data));
@@ -76,7 +76,7 @@ const Login = () => {
       }
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error); // จะแสดง error จาก backend
+        setError(err.response.data.error);
       } else {
         setError("Connect to server failed");
       }
@@ -87,7 +87,7 @@ const Login = () => {
 
   return (
     <div className="login">
-      <div className="card">
+      <div className="container">
         <div className="left">
           <h1>PM.</h1>
           <p>
@@ -96,13 +96,10 @@ const Login = () => {
         </div>
         <div className="right">
           <h1>Admin Login</h1>
-          {error && (
-            <div style={{ color: "red", marginBottom: 10 }}>{error}</div>
-          )}
 
-          {success && (
-            <div style={{ color: "#00ff00", marginBottom: 10 }}>{success}</div>
-          )}
+          {error && (<div style={{ color: "red", marginBottom: 10 }}>{error}</div>)}
+          {success && (<div style={{ color: "#00ff00", marginBottom: 10 }}>{success}</div>)}
+
           <form onSubmit={handleLogin} className="form-login">
             <input
               type="text"

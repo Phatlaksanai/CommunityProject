@@ -24,7 +24,7 @@ const ReportPopup = ({ report, onClose }) => {
             return makeAdminRequest.put(`/admin/reports/updateReport/${updatedData.report_id}`, { status: updatedData.status });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(["getReportsTable"]); // เผื่อกลับไปหน้า Reports จะได้เห็นข้อมูลล่าสุด
+            queryClient.invalidateQueries(["getReportsTable"]);
             onClose();
         },
         onError: (err) => {
@@ -62,7 +62,7 @@ const ReportPopup = ({ report, onClose }) => {
         if (parts.length > 0) {
             return `Report: ${parts.join(' , ')}`;
         }
-        
+
         // ถ้าไม่มีข้อมูล target อะไรเลย ให้ใช้ report_id เหมือนเดิม
         return `Report : ${report.report_id}`;
     };

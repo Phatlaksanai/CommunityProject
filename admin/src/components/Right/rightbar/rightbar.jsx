@@ -14,6 +14,7 @@ const RightBar = () => {
     queryKey: ["orders"],
     queryFn: () => makeAdminRequest.get("/admin/dashboard/orders").then((res) => res.data),
   });
+  
   const { data: reports } = useQuery({
     queryKey: ["reports"],
     queryFn: () => makeAdminRequest.get("/admin/dashboard/countReportsType").then((res) => res.data),
@@ -22,7 +23,7 @@ const RightBar = () => {
   return (
     <div className="rightBar">
       <div className="container">
-        <div className="item new-releases">
+        <div className="item recentOrders">
           <span className="box-title">Recent Orders</span>
           {ordersError ? "Something went wrong" : ordersLoading ? "Loading..." :
             orders?.map((order) => {

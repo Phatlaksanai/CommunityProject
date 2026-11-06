@@ -11,10 +11,10 @@
     overflow: scroll;
     background-color: #0a0803;
 
-    @include mobile{
+    @include mobile {
       display: none;
     }
-    @include tablet{
+    @include tablet {
       display: none;
     }
 
@@ -23,12 +23,11 @@
     }
 
     .container {
-
       .item {
-        background-color: #090F16; 
-        border: 2px solid #161B20; 
+        background-color: #090f16;
+        border: 2px solid #161b20;
         border-radius: 12px;
-        box-shadow: none; 
+        box-shadow: none;
         padding: 24px;
         margin-bottom: 20px;
         margin-top: 30px;
@@ -48,7 +47,7 @@
 
           .report-item {
             display: flex;
-            justify-content: space-between; // ผลักให้ซ้าย-ขวา ห่างกันสุด
+            justify-content: space-between;
             align-items: center;
             padding: 12px 10px;
             border-radius: 8px;
@@ -60,12 +59,12 @@
               gap: 15px;
 
               .icon {
-                color: #E76D09; // สีไอคอนสีส้ม
+                color: #e76d09;
                 font-size: 22px;
               }
 
               span {
-                color: #FFFFFF;
+                color: #ffffff;
                 font-size: 14px;
                 font-weight: 500;
                 text-transform: capitalize;
@@ -73,14 +72,15 @@
             }
 
             .report-count {
-              color: #E76D09; // ตัวเลขสีส้ม
+              color: #e76d09;
               font-size: 15px;
               font-weight: 600;
             }
           }
         }
       }
-      .new-releases {
+
+      .recentOrders {
         .user {
           display: flex;
           justify-content: space-between;
@@ -93,9 +93,9 @@
           .userInfo {
             display: flex;
             align-items: center;
-            
+
             img {
-              width: 50px; 
+              width: 50px;
               height: 50px;
               border-radius: 8px;
               object-fit: cover;
@@ -108,15 +108,15 @@
             align-items: flex-start;
             gap: 4px;
             flex: 1;
-            padding-left: 15px; // ดันข้อความให้ห่างจากรูปนิดนึง
+            padding-left: 15px;
 
             span {
               font-size: 13px;
               font-weight: 500;
-              color: #A0AEC0; // สีเทา
+              color: #a0aec0;
             }
-            span:first-child { 
-              color: #FFFFFF; // Order ID เป็นสีขาว
+            span:first-child {
+              color: #ffffff;
               font-size: 15px;
             }
           }
@@ -124,11 +124,11 @@
           .price {
             display: flex;
             flex-direction: column;
-            align-items: flex-end; // ชิดขวา
+            align-items: flex-end;
             gap: 8px;
 
             > span {
-              color: #FFFFFF;
+              color: #ffffff;
               font-weight: 600;
               font-size: 14px;
             }
@@ -148,16 +148,15 @@
               }
 
               &.completed {
-                background-color: #35955C;
+                background-color: #35955c;
               }
               &.pending {
-                background-color: #E76D09;
+                background-color: #e76d09;
               }
             }
           }
         }
       }
-  
     }
   }
 }

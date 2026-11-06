@@ -16,7 +16,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 const ContentStats = () => {
     const location = useLocation();
 
-    // ถ้ามาจากการกดแถวใน Reports จะมี report แปะมาด้วย ให้เอามาโชว์เป็น popup มุมล่างขวาของหน้านี้เลย
+    // popup report
     const [reportPopupData, setReportPopupData] = useState(location.state?.reportPopup ?? null);
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -27,7 +27,6 @@ const ContentStats = () => {
     const [activeTab, setActiveTab] = useState("Posts"); // ตรวจสอบว่าตอนนี้กำลังเลือกแท็บไหนอยู่
     const [isPanelOpen, setIsPanelOpen] = useState(true); // State ควบคุมลูกศรเปิด/ปิด (ค่าเริ่มต้นคือ true = เปิด)
 
-    // ---- State สำหรับ Modal ---- //
     const [selectedUser, setSelectedUser] = useState(null);
     const [formData, setFormData] = useState({});
 
@@ -160,7 +159,7 @@ const ContentStats = () => {
         onSuccess: () => {
             // โหลดตารางคอนเทนต์ใหม่หลังอัปเดตเสร็จ
             queryClient.invalidateQueries(["contentTableData", activeTab]);
-            setSelectedUser(null); // ปิด Modal
+            setSelectedUser(null);
             setSuccess("Updated successfully!");
         },
         onError: (err) => {
@@ -180,7 +179,7 @@ const ContentStats = () => {
         return date.toLocaleDateString("en-GB");
     };
 
-    // ฟังก์ชันกรองข้อมูลแบบครอบคลุม (Search by ID, Username)
+    // ฟังก์ชันกรองข้อมูล Search ID, Username
     const filteredData = tableData?.filter((item) => {
         if (!searchTerm) return true; // ถ้าช่องค้นหาว่างเปล่า ให้แสดงข้อมูลทั้งหมด
 
@@ -195,12 +194,12 @@ const ContentStats = () => {
         // ดึงข้อมูล Username และ Name ของคนที่โพสต์
         const username = item.users?.username || "";
 
-        // เงื่อนไขที่ 1: ค้นหาด้วย ID ตรงเป๊ะ (ขึ้นแค่บรรทัดเดียว)
+        // เงื่อนไขที่ 1: ค้นหาด้วย ID ขึ้นแค่บรรทัดเดียว
         if (id === term) {
             return true;
         }
 
-        // เงื่อนไขที่ 2: ค้นหาด้วย Username หรือ Name ของคนโพสต์ (ขึ้นทุกโพสต์ของคนนั้น)
+        // เงื่อนไขที่ 2: ค้นหาด้วย Username หรือ Name ของคนโพสต์ ขึ้นทุกโพสต์ของคนนั้น
         if (
             username.toLowerCase().includes(term)
         ) {
@@ -253,7 +252,7 @@ const ContentStats = () => {
         }
     };
 
-    // ---- ฟังก์ชันจัดการฟอร์มใน Modal ---- //
+    // ฟังก์ชันจัดการฟอร์มใน Modal
     const handleChange = (e) => {
         setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
@@ -275,13 +274,13 @@ const ContentStats = () => {
 
         updateMutation.mutate(payload);
     };
-    
+
     const addCategoryMutation = useMutation({
         mutationFn: (newCategory) => {
             return makeAdminRequest.post(`/admin/content/addNewCategory`, newCategory);
         },
         onSuccess: () => {
-            setIsAddCategoryOpen(false); // ปิดหน้าต่าง Add Category
+            setIsAddCategoryOpen(false);
             setNewCategoryData({ newCategory: "" }); // เคลียร์ค่า
             setSuccess("Category added successfully!");
         },
@@ -432,7 +431,7 @@ const ContentStats = () => {
                         </div>
                     </div>
 
-                    <div className="user-table-section" style={{ marginTop: '40px' }}>
+                    <div className="content-table-section" style={{ marginTop: '40px' }}>
 
                         <div className="search-section">
                             <label>Search {activeTab}</label>
@@ -623,7 +622,7 @@ const ContentStats = () => {
                                     </div>
                                     <div className="input-group">
                                         <label>Price (Price must be 0 or more than 10 THB)</label>
-                                        <input type="number" name="price" value={formData.price || 0 } onChange={handleChange} />
+                                        <input type="number" name="price" value={formData.price || 0} onChange={handleChange} />
                                     </div>
                                     <div className="input-group">
                                         <label>Status</label>
@@ -640,7 +639,6 @@ const ContentStats = () => {
                                         <div className="select-wrapper">
                                             <select name="category_id" value={formData.category_id || ""} onChange={handleChange}>
                                                 <option value="" disabled>Select Category</option>
-                                                {/* วนลูปดึงหมวดหมู่จาก Database มาแสดง */}
                                                 {categoriesData?.map((cat) => (
                                                     <option key={cat.category_id} value={cat.category_id}>
                                                         {cat.type}
@@ -694,7 +692,7 @@ const ContentStats = () => {
                 </div>
             )}
 
-            {/* ฝั่งขวา (R) แสดง DonutChart */}
+            {/* DonutChart */}
             <div className="R" >
                 <div className="right-header" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '30px' }}>
                     <div className="tab-buttons" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

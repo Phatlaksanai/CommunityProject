@@ -12,17 +12,16 @@ const TransactionStats = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterType, setFilterType] = useState("all");
 
-
     const { isLoading: summaryLoading, data: summaryData, isError: isSummaryError, } = useQuery({
         queryKey: ["transactionSummary"],
         queryFn: () => {
-            return makeAdminRequest.get(`/admin/transactions/transactionSummary`).then(res => res.data); // ผู้ใช้ทั้งหมด ✅
+            return makeAdminRequest.get(`/admin/transactions/transactionSummary`).then(res => res.data); // ผู้ใช้ทั้งหมด
         }
     });
 
     const { isLoading: chartLoading, data: chartData, isError: isChartError } = useQuery({
         queryKey: ["WeeklyOrders"],
-        queryFn: () => makeAdminRequest.get(`/admin/transactions/WeeklyOrders`).then(res => res.data) // ผู้ใช้อาทิตนี้ ✅
+        queryFn: () => makeAdminRequest.get(`/admin/transactions/WeeklyOrders`).then(res => res.data) // ผู้ใช้อาทิตนี้
     });
 
     const { isLoading: ordertableLoading, isError: ordertableError, data: ordertable } = useQuery({
@@ -52,7 +51,6 @@ const TransactionStats = () => {
         else if (entry.name.includes("฿101–฿500")) cellColor = "#D97773";
         else if (entry.name.includes("฿501+")) cellColor = "#4C8DF5";
 
-        // เอา users: ... ออก เหลือแค่นี้พอครับ
         return { ...entry, fill: cellColor };
     });
 
@@ -86,8 +84,8 @@ const TransactionStats = () => {
         );
     };
 
-    if (summaryLoading || chartLoading || ordertableLoading || RangeLoading) return <div className="loading">Loading dashboard...</div>;
-    if (isSummaryError || isChartError || ordertableError || RangeError) return <div className="error">Error loading dashboard data.</div>;
+    if (summaryLoading || chartLoading || ordertableLoading || RangeLoading || salesChartLoading) return <div className="loading">Loading dashboard...</div>;
+    if (isSummaryError || isChartError || ordertableError || RangeError || isSalesChartError) return <div className="error">Error loading dashboard data.</div>;
 
     return (
         <div className="transactionstats">
@@ -187,10 +185,7 @@ const TransactionStats = () => {
                     </div>
                 </div>
 
-
-
-                <div className="user-table-section" style={{ marginTop: '40px' }}>
-
+                <div className="transaction-table-section" style={{ marginTop: '40px' }}>
                     <div className="search-section">
                         <label>Search by Username</label>
                         <div className="filter-controls">
@@ -280,7 +275,7 @@ const TransactionStats = () => {
                                     itemStyle={{ color: '#33A7E5' }}
                                     formatter={(value) => [formatNumber(value), "Sales (฿)"]}
                                 />
-                                {/* ปรับสีแท่งกราฟให้ตรงกับ figma (สีฟ้า) */}
+
                                 <Bar dataKey="total_sales" fill="#33A7E5" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
@@ -288,7 +283,6 @@ const TransactionStats = () => {
                 </div>
 
                 <div className="donut-charts-section">
-
                     <div >
                         <DonutChart
                             data={formattedRangeData}

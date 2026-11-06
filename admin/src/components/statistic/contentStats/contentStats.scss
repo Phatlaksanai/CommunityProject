@@ -10,7 +10,7 @@
 
     .L {
       flex: 2;
-      transition: flex 0.3s ease; // อนิเมชันตอนยืดหด
+      transition: flex 0.3s ease;
 
       .container {
         max-width: 1400px;
@@ -18,7 +18,7 @@
 
         .top-header {
           display: flex;
-          justify-content: space-between; /* ดันหัวข้อไปซ้ายสุด ดันปุ่มไปขวาสุด */
+          justify-content: space-between;
           align-items: center;
           margin-bottom: 30px;
           width: 100%;
@@ -40,16 +40,14 @@
 
         .top-overview-section {
           display: grid;
-          grid-template-columns: 1fr 1fr; // แบ่งหน้าจอเป็น 50:50
+          grid-template-columns: 1fr 1fr;
           gap: 20px;
           margin-bottom: 40px;
 
-          // Responsive: ถ้าจอเล็กให้กราฟตกลงมาอยู่ด้านล่าง
           @media (max-width: 1024px) {
             grid-template-columns: 1fr;
           }
 
-          // ฝั่งซ้าย: จัดเรียงกล่องสรุป 4 ใบ แบบ 2x2
           .dashboard-cards {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -74,7 +72,7 @@
                 gap: 12px;
 
                 .icon {
-                  font-size: 24px; // ปรับขนาดไอคอนให้สมส่วนตามรูป
+                  font-size: 24px;
                   width: 24px;
                   height: 24px;
                 }
@@ -82,16 +80,15 @@
                 h3 {
                   font-size: 17px;
                   font-weight: 600;
-                  color: #fff; // สีขาวตามรูปตัวอย่าง
+                  color: #fff;
                   margin: 0;
                 }
               }
 
-              // ส่วนตัวเลข อยู่กึ่งกลางกล่อง
               .card-value {
                 display: flex;
-                justify-content: center; // จัดให้อยู่กึ่งกลางแนวนอน
-                align-items: center; // จัดให้อยู่กึ่งกลางแนวตั้ง
+                justify-content: center;
+                align-items: center;
                 flex: 1;
 
                 h2 {
@@ -104,7 +101,6 @@
             }
           }
 
-          // ฝั่งขวา: สไตล์ของกล่องกราฟ
           .chart-container {
             background-color: #090f16;
             border: 2px solid #161b20;
@@ -126,8 +122,7 @@
           }
         }
 
-        .user-table-section {
-          // 2.1 กล่องค้นหา
+        .content-table-section {
           .search-section {
             margin-bottom: 30px;
             display: flex;
@@ -171,11 +166,10 @@
             }
           }
 
-          // 2.2 ปุ่ม Add Admin
           .action-section {
             display: flex;
             justify-content: flex-end;
-            margin-bottom: -15px; // ดึงให้ชิดขอบตาราง
+            margin-bottom: -15px;
             position: relative;
             z-index: 2;
 
@@ -184,7 +178,7 @@
               color: white;
               border: none;
               padding: 6px 16px;
-              border-radius: 16px 16px 0 0; // โค้งเฉพาะด้านบน
+              border-radius: 16px 16px 0 0;
               font-size: 12px;
               font-weight: 600;
               cursor: pointer;
@@ -196,18 +190,17 @@
             }
           }
 
-          // 2.3 ตารางแสดงผล
           .table-container {
             background-color: #090f16;
             border: 2px solid #161b20;
-            border-radius: 8px; // ปรับให้ขอบมน
+            border-radius: 8px;
             overflow-x: auto;
-            overflow-y: auto; // เพิ่มให้มีแถบเลื่อนแนวตั้ง
-            max-height: 400px; // กำหนดความสูงสูงสุดของตาราง (ปรับตัวเลขตามชอบได้เลย)
+            overflow-y: auto;
+            max-height: 400px;
 
             &::-webkit-scrollbar {
               width: 5px;
-              height: 5px; // เผื่อแถบแนวนอน
+              height: 5px;
             }
 
             &::-webkit-scrollbar-thumb {
@@ -219,13 +212,13 @@
               width: 100%;
               border-collapse: collapse;
               text-align: center;
-              position: relative; // เพิ่มสำหรับ sticky
+              position: relative;
 
               thead {
-                position: sticky; // ทำให้ส่วนหัวตารางติดขอบบนตอนเลื่อนลง
+                position: sticky;
                 top: 0;
                 z-index: 2;
-                background-color: #090f16; // ใส่สีพื้นหลังทับข้อมูลด้านล่างตอนเลื่อน
+                background-color: #090f16;
 
                 tr {
                   border-bottom: 1px solid #161b20;
@@ -246,7 +239,7 @@
                   transition: background-color 0.2s ease;
 
                   &:hover {
-                    background-color: #111820; // ไฮไลท์เมื่อชี้เมาส์
+                    background-color: #111820;
                   }
 
                   &:last-child {
@@ -267,6 +260,13 @@
                 }
               }
             }
+
+            .clickable-row {
+              cursor: pointer;
+              &:hover {
+                background-color: #111820;
+              }
+            }
           }
         }
       }
@@ -277,7 +277,6 @@
       display: flex;
       flex-direction: column;
 
-      // สไตล์สำหรับ Header ฝั่งขวา (ปุ่ม Tab และปุ่มลูกศร)
       .right-header {
         display: flex;
         justify-content: flex-end;
@@ -331,17 +330,6 @@
     }
   }
 
-  // เพิ่มลูกเล่นให้รู้ว่าแถวตารางคลิกได้
-  .clickable-row {
-    cursor: pointer;
-    &:hover {
-      background-color: #111820;
-    }
-  }
-
-  // ==========================================
-  // Modal / Pop-up Styles
-  // ==========================================
   .modal-overlay {
     position: fixed;
     top: 0;
@@ -367,7 +355,7 @@
 
       &::-webkit-scrollbar {
         width: 5px;
-        height: 5px; // เผื่อแถบแนวนอน
+        height: 5px;
       }
 
       &::-webkit-scrollbar-thumb {
@@ -401,10 +389,10 @@
           gap: 8px;
 
           &.full-width {
-            grid-column: span 2; /* บังคับให้ขยายกินพื้นที่ 2 คอลัมน์เต็ม */
+            grid-column: span 2;
 
             @media (max-width: 600px) {
-              grid-column: span 1; /* ถ้าจอเล็กให้เหลือ 1 คอลัมน์ปกติ */
+              grid-column: span 1;
             }
 
             .cover-preview {
@@ -425,7 +413,6 @@
           input,
           textarea {
             background-color: #0d131a;
-            // สีขอบตามที่ระบุ
             border: 1px solid #b87333;
             border-radius: 6px;
             padding: 10px 12px;
@@ -436,7 +423,7 @@
             font-family: inherit;
           }
           textarea {
-            resize: vertical; // ให้ผู้ใช้ลากขยายกล่องข้อความในแนวตั้งได้
+            resize: vertical;
             min-height: 80px;
           }
 
@@ -462,7 +449,7 @@
               position: absolute;
               right: 10px;
               color: #e48500;
-              pointer-events: none; // ให้เมาส์คลิกผ่านไอคอนไปโดน select ได้
+              pointer-events: none;
             }
           }
         }

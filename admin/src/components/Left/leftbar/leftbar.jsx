@@ -1,6 +1,5 @@
 import "./leftbar.scss";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useContext } from "react";
 import HomeFilledIcon from '@mui/icons-material/HomeFilled';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import ArchiveIcon from '@mui/icons-material/Archive';
@@ -13,7 +12,7 @@ const LeftBar = () => {
 
   // ฟังก์ชันเช็กว่า URL ปัจจุบันตรงกับเมนูหรือไม่
   const isActive = (path) => location.pathname.includes(path);
-  
+
   return (
     <div className="leftBar">
       <div className="container">

@@ -1,124 +1,121 @@
 @use "../../../style.scss" as *;
 
 .dashboard {
-    @include themify($themes) {
-        background-color: #060A0E;
-        color: themed("textColor");
-        min-height: 100vh;
-        padding-bottom: 40px;
+  @include themify($themes) {
+    background-color: #060a0e;
+    color: themed("textColor");
+    min-height: 100vh;
+    padding-bottom: 40px;
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
 
-            // ส่วนหัว Welcome back
-            .header-title {
-                margin-bottom: 30px;
-                
-                h1 {
-                    margin: 0;
-                    font-size: 28px;
-                    font-weight: 600;
-                }
-                
-                p {
-                    margin-top: 8px;
-                    color: #A0AEC0;
-                    font-size: 15px;
-                }
-            }
-            // จัดเรียงกล่องสรุป 4 ใบ
-            .dashboard-cards {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 20px;
+      .header-title {
+        margin-bottom: 30px;
 
-                // Responsive สำหรับจอเล็ก
-                @media (max-width: 1024px) {
-                    grid-template-columns: repeat(2, 1fr);
-                }
-                @media (max-width: 600px) {
-                    grid-template-columns: 1fr;
-                }
-
-                // สไตล์ของกล่องแต่ละใบ
-                .summary-card {
-                    background-color: #090F16; 
-                    border: 2px solid #161B20; 
-                    border-radius: 12px;
-                    padding: 24px;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-between;
-
-                    .card-info {
-                        display: flex;
-                        align-items: center; // จัดไอคอนกับตัวหนังสือให้อยู่กึ่งกลางแนวตั้ง
-                        gap: 16px; // ระยะห่างระหว่างไอคอนกับฝั่งข้อความ
-
-                        .icon {
-                            font-size: 36px;
-                            width: 36px;
-                            height: 36px;
-                        }
-
-                        .text-info {
-                            display: flex;
-                            flex-direction: column; // ให้ข้อความเรียงบน-ล่าง
-
-                            h3 {
-                                font-size: 14px;
-                                font-weight: 600;
-                                color: #A0AEC0;
-                                margin: 0 0 8px 0;
-                            }
-                            
-                            h2 {
-                                font-size: 28px;
-                                font-weight: 700;
-                                margin: 0;
-                                color: #fff;
-                            }
-                        }
-                    }
-                    .card-footer {
-                        margin-top: 20px;
-                        font-size: 13px;
-                        color: #718096; // สีข้อความเปรียบเทียบ
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-
-                        .trend {
-                            font-weight: 600;
-                            
-                            &.up {
-                                color: #F6AD55; // สีส้มเปอร์เซ็นต์
-                            }
-                        }
-                    }
-                }
-            }
-            // สไตล์ของกล่องกราฟด้านล่าง
-            .chart-container {
-                background-color: #090F16;
-                border: 2px solid #161B20;
-                border-radius: 12px;
-                padding: 24px;
-                margin-top: 30px; // ระยะห่างจากกล่อง 4 ใบด้านบน
-
-                .chart-title {
-                    font-size: 20px;
-                    font-weight: 600;
-                    margin: 0 0 40px 0;
-                    color: #fff;
-                }
-                
-                // ปรับแต่ง Custom Tooltip ของ Recharts ไม่ให้มีเส้นขอบรบกวนเวลาโฟกัส
-                .recharts-tooltip-wrapper {
-                    outline: none;
-                }
-            }
+        h1 {
+          margin: 0;
+          font-size: 28px;
+          font-weight: 600;
         }
+
+        p {
+          margin-top: 8px;
+          color: #a0aec0;
+          font-size: 15px;
+        }
+      }
+
+      .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+
+        @media (max-width: 1024px) {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        @media (max-width: 600px) {
+          grid-template-columns: 1fr;
+        }
+
+        .summary-card {
+          background-color: #090f16;
+          border: 2px solid #161b20;
+          border-radius: 12px;
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+
+          .card-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            .icon {
+              font-size: 36px;
+              width: 36px;
+              height: 36px;
+            }
+
+            .text-info {
+              display: flex;
+              flex-direction: column;
+
+              h3 {
+                font-size: 14px;
+                font-weight: 600;
+                color: #a0aec0;
+                margin: 0 0 8px 0;
+              }
+
+              h2 {
+                font-size: 28px;
+                font-weight: 700;
+                margin: 0;
+                color: #fff;
+              }
+            }
+          }
+          
+          .card-footer {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #718096;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .trend {
+              font-weight: 600;
+
+              &.up {
+                color: #f6ad55;
+              }
+            }
+          }
+        }
+      }
+
+      .chart-container {
+        background-color: #090f16;
+        border: 2px solid #161b20;
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 30px;
+
+        .chart-title {
+          font-size: 20px;
+          font-weight: 600;
+          margin: 0 0 40px 0;
+          color: #fff;
+        }
+
+        .recharts-tooltip-wrapper {
+          outline: none;
+        }
+      }
     }
+  }
 }

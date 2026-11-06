@@ -1,17 +1,17 @@
 @use "../../style.scss" as *;
 
-.home{
+.home {
   @include themify($themes) {
     padding: 20px 30px;
-    background-color: #060A0E;
+    background-color: #060a0e;
     min-height: 100vh;
 
     @include mobile {
       padding: 10px;
     }
 
-    @include tablet{
+    @include tablet {
       padding: 20px;
     }
   }
- }
+}

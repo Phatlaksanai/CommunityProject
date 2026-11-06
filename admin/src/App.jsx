@@ -1,16 +1,13 @@
 import "./style.scss";
-
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 import User from "./pages/user/User";
 import Content from "./pages/content/Content";
 import Transaction from "./pages/transaction/transaction";
 import Report from "./pages/report/Report";
-
 import Navbar from "./components/navbar/navbar";
 import LeftBar from "./components/Left/leftbar/leftbar";
 import RightBar from "./components/Right/rightbar/rightbar";
-
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "./context/authContext";
@@ -75,7 +72,6 @@ function App() {
     {
       path: "/users",
       element: (
-        // 🚀 เพิ่ม ProtectedRoute ครอบ Layout ตรงนี้
         <ProtectedRoute>
           <Layout />
         </ProtectedRoute>
@@ -90,7 +86,6 @@ function App() {
     {
       path: "/content&assets",
       element: (
-        // 🚀 เพิ่ม ProtectedRoute ครอบ Layout ตรงนี้
         <ProtectedRoute>
           <Layout />
         </ProtectedRoute>
@@ -105,7 +100,6 @@ function App() {
     {
       path: "/transactions",
       element: (
-        // 🚀 เพิ่ม ProtectedRoute ครอบ Layout ตรงนี้
         <ProtectedRoute>
           <Layout />
         </ProtectedRoute>
@@ -120,7 +114,6 @@ function App() {
     {
       path: "/reports",
       element: (
-        // 🚀 เพิ่ม ProtectedRoute ครอบ Layout ตรงนี้
         <ProtectedRoute>
           <Layout />
         </ProtectedRoute>
