@@ -129,7 +129,7 @@ const Comments = ({ postId }) => {
             }
           }}
         >
-          <PhotoIcon />
+          <PhotoIcon style={{cursor:"pointer"}}/>
         </label>
 
         <div className="preview-container">
