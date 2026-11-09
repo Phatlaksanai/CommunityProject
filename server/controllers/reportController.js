@@ -19,6 +19,7 @@ exports.addReport = async (req, res) => {
                     post_id: entityType === "post" ? id : null,
                     report_type: type || null,
                     description: description.trim(),
+                    status: "pending",
                 },
             ])
             .select()
