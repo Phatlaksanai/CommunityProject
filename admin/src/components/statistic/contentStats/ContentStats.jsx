@@ -200,9 +200,7 @@ const ContentStats = () => {
         }
 
         // เงื่อนไขที่ 2: ค้นหาด้วย Username หรือ Name ของคนโพสต์ ขึ้นทุกโพสต์ของคนนั้น
-        if (
-            username.toLowerCase().includes(term)
-        ) {
+        if (username.toLowerCase().includes(term)) {
             return true;
         }
 

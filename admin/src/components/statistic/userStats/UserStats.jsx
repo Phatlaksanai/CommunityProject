@@ -142,9 +142,20 @@ const UserStats = () => {
 
     // ฟังก์ชันกรองข้อมูลตาม Username
     const filteredUsers = usertable?.filter((user) => {
-        if (!user.username) return false;
+        const term = searchTerm.toLowerCase().trim();
 
-        return user.username.toLowerCase().includes(searchTerm.toLowerCase());
+        let id = String(user.user_id || "");
+        const username = user.username || "";
+
+        if (id === term) {
+            return true;
+        }
+
+        if (username.toLowerCase().includes(term)) {
+            return true;
+        }
+
+        return false;
     }) || [];
 
     // ฟังก์ชันช่วยตัดคำและใส่ Tooltip
@@ -317,12 +328,12 @@ const UserStats = () => {
 
                 <div className="user-table-section" style={{ marginTop: '40px' }}>
                     <div className="search-section">
-                        <label>Search by Username</label>
+                        <label>Search by Users</label>
                         <div className="search-box">
                             <SearchOutlinedIcon className="icon" />
                             <input
                                 type="text"
-                                placeholder="Search username..."
+                                placeholder="Search by ID, Username..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
