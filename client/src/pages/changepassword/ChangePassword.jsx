@@ -1,6 +1,6 @@
 import "./changepassword.scss";
 import { useContext, useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { makeRequest } from "../../api/axios";
 import { ClipLoader } from "react-spinners";
@@ -49,9 +49,6 @@ const ChangePassword = () => {
         } catch (err) {
             setError(err.response?.data?.error || "OTP is incorrect");
         }
-    };
-    const prevStep = () => {
-        setStep(1);
     };
 
     const handleSendOTP = async () => {

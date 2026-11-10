@@ -1,6 +1,6 @@
 import LeftChat from "../../components/Left/leftChat/leftChat"
 import { useContext, useState, useEffect, Fragment } from "react";
-import {  useParams, useLocation, useNavigate } from "react-router-dom";
+import {  useParams, useLocation } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { AuthContext } from "../../context/authContext";
@@ -120,6 +120,7 @@ const Chat = () => {
         setFilePreviews((prev) => prev.concat(previews));
         e.target.value = ""; // ล้างค่า input
     };
+
     const uploadFile = async (file) => {
         try {
             const formData = new FormData();
@@ -130,6 +131,7 @@ const Chat = () => {
             console.log(err);
         }
     };
+
     const removeFile = (index) => {
         setFiles((prev) => prev.filter((_, i) => i !== index));
         setFilePreviews((prev) => prev.filter((_, i) => i !== index));
@@ -299,7 +301,7 @@ const Chat = () => {
                             {messagesData?.pages?.map((page, pageIndex) => (
                                 // Fragment เอาไว้แทน div คือไม่มีแท็กครอบ
                                 <Fragment key={pageIndex}>
-                                    {[...page].reverse().map((chat, index) => (
+                                    {[...page].map((chat, index) => (
                                         <div
                                             key={chat.id || index}
                                             className={chat.sender_id === parseInt(id) ? "message own" : "message"}

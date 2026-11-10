@@ -7,7 +7,6 @@ import { useEffect, useState, useRef } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import stripePromise from "../../api/stripe";
 import CloseIcon from '@mui/icons-material/Close';
-
 import { useQuery } from "@tanstack/react-query";
 
 const Buyitem = () => {

@@ -1,7 +1,6 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
 const cloudinary = require("../config/cloudinary");
 const algoliaClient = require("../config/algolia");
 const rateLimit = require("express-rate-limit");
@@ -12,7 +11,7 @@ const segmenter = new Intl.Segmenter("th", { granularity: "word" });
 function tokenizeThai(text) {
   if (!text) return "";
   const segments = segmenter.segment(String(text));
-  // แยกคำแล้วเอามาต่อกันด้วยช่องว่าง (Space) เพื่อให้ Algolia มองเป็นคนละคำ
+  // แยกคำแล้วเอามาต่อกันด้วยช่องว่างให้ Algolia มองเป็นคนละคำ
   return Array.from(segments)
     .map((s) => s.segment.trim())
     .filter(Boolean)
@@ -20,8 +19,8 @@ function tokenizeThai(text) {
 }
 
 const awakeRenderLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 นาที
-  limit: 5, // จำกัด 5 ครั้งต่อ IP
+  windowMs: 60 * 1000, 
+  limit: 5, // เรียกได้ 5 รอบ / นาที
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -45,7 +44,6 @@ exports.login = async (req, res) => {
         .json({ error: "Please enter username and password" });
     }
 
-    // ดึงข้อมูล user จาก Supabase
     const { data: user, error } = await db
       .from("users")
       .select("*")
@@ -69,12 +67,11 @@ exports.login = async (req, res) => {
       { expiresIn: "30d" },
     );
 
-    res
-      .cookie("accessToken", token, {
+    res.cookie("accessToken", token, {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 วัน (หน่วยเป็นมิลลิวินาที)
+        maxAge: 30 * 24 * 60 * 60 * 1000,
       })
       .status(200)
       .json({
@@ -137,7 +134,9 @@ exports.register = async (req, res) => {
         .status(400)
         .json({ error: "Please enter all required fields" });
     }
+
     username = username.trim();
+
     if (!/^(?=(?:.*[a-zA-Z]){3})[a-zA-Z0-9_ ]+$/.test(username)) {
       return res.status(400).json({
         error:
@@ -165,7 +164,6 @@ exports.register = async (req, res) => {
       return res.status(400).json({ error: "Passwords don't match" });
     }
 
-    // 1. หา user_id จาก email ในตาราง users ก่อน
     const { data: user, error: userError } = await db
       .from("users")
       .select("user_id, username")
@@ -180,29 +178,24 @@ exports.register = async (req, res) => {
       return res.status(400).json({ error: "Email has been used" });
     }
 
-    // 2. ไปเช็ค OTP ในตาราง otps โดยใช้ user_id ที่หามาได้
     const { data: otpRecord, error: otpError } = await db
       .from("otps")
       .select("*")
       .eq("user_id", user.user_id)
       .single();
 
-    // --- จุดที่ทำให้เกิด Error "กดรับ OTP ก่อนลงทะเบียน" ---
     if (otpError || !otpRecord) {
       return res.status(400).json({ error: "Please request OTP first" });
     }
 
-    // 3. ตรวจสอบความถูกต้องของ OTP
     if (String(otp) !== String(otpRecord.otp)) {
       return res.status(400).json({ error: "Invalid OTP" });
     }
 
-    // 4. ตรวจสอบวันหมดอายุ
     if (new Date() > new Date(otpRecord.otp_expire)) {
       return res.status(400).json({ error: "OTP has expired" });
     }
 
-    // 5. เข้ารหัสผ่านและ Update ข้อมูลลงในตาราง users
     let hashedPassword = await bcrypt.hash(password, 8);
     const { error: updateError } = await db
       .from("users")
@@ -219,11 +212,11 @@ exports.register = async (req, res) => {
       await algoliaClient.saveObject({
         indexName: "WebCommunity_Search",
         body: {
-          objectID: `user_${user.user_id}`, // ใช้ prefix user_ นำหน้า
-          title: username, // ผู้ใช้ใหม่ยังไม่มี DisplayName ให้เอา username ไปใช้ค้นหาก่อน
+          objectID: `user_${user.user_id}`,
+          title: username,
           searchable_title: tokenizeThai(username),
-          img: null, // ยังไม่มีรูปโปรไฟล์
-          type: "user", // ระบุประเภทเป็น user
+          img: null,
+          type: "user",
           targetId: user.user_id,
         },
       });
@@ -250,15 +243,14 @@ exports.sendOtpRegister = async (req, res) => {
     const { error: cleanupError } = await db
       .from("users")
       .delete()
-      .is("username", null) // เช็คว่ายังสมัครไม่เสร็จ (ไม่มี username)
-      .lt("created_at", oneHourAgo); // เช็คว่าสร้างมานานกว่า 1 ชั่วโมงแล้ว
+      .is("username", null)
+      .lt("created_at", oneHourAgo);
 
     if (cleanupError) {
       console.error("Cleanup incomplete users error:", cleanupError);
     }
 
-    // --- 1. จัดการตาราง 'users' ---
-    // ใช้ upsert เพื่อสร้าง user เปล่าๆ ถ้ายังไม่มี หรือดึงข้อมูลถ้ามีอยู่แล้ว
+    // insert + update = upsert แก้อันที่มีหรือเพิ่ม row ใหม่
     const { data: user, error: userError } = await db
       .from("users")
       .upsert({ email: email }, { onConflict: "email" })
@@ -267,24 +259,23 @@ exports.sendOtpRegister = async (req, res) => {
 
     if (userError) throw userError;
 
-    // ถ้าสมัครไปแล้ว (มี username) ไม่ต้องส่ง OTP
     if (user.username) {
       return res.status(400).json({ error: "Email has been used" });
     }
-    // --- 2. สร้าง OTP ---
+
     const otp = Math.floor(100000 + Math.random() * 900000);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    // --- 3. จัดการตาราง 'otps' ---
-    // ตอนนี้เรามี user.user_id แล้ว เอามาใช้เชื่อมตารางได้เลย
-    const { error: otpError } = await db.from("otps").upsert(
+    const { error: otpError } = await db
+    .from("otps")
+    .upsert(
       {
-        user_id: user.user_id, // ใช้ ID จากตาราง users
+        user_id: user.user_id,
         otp: String(otp),
         otp_expire: expiresAt,
       },
-      { onConflict: "user_id" },
-    ); // ป้องกันการสร้าง OTP ซ้ำซ้อนให้ user คนเดิม
+      { onConflict: "user_id" }, // ใช้กับ upsert อิง user_id
+    );
 
     if (otpError) throw otpError;
 
@@ -323,11 +314,11 @@ exports.sendOtpRegister = async (req, res) => {
       .json({ success: false, error: "Failed to send OTP email" });
   }
 };
-
+// forgot + chane ตอน submit (otp)
 exports.sendOtpResetPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    // เช็คว่ามี user นี้จริงไหม
+
     const { data: user, error: userError } = await db
       .from("users")
       .select("user_id")
@@ -338,12 +329,12 @@ exports.sendOtpResetPassword = async (req, res) => {
       return res.status(400).json({ error: "Email not found" });
     }
 
-    // สร้าง OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    // บันทึก OTP
-    const { error: otpError } = await db.from("otps").upsert(
+    const { error: otpError } = await db
+    .from("otps")
+    .upsert(
       {
         user_id: user.user_id,
         otp: String(otp),
@@ -354,7 +345,6 @@ exports.sendOtpResetPassword = async (req, res) => {
 
     if (otpError) throw otpError;
 
-    // ส่ง Email (Brevo API)
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
@@ -387,11 +377,10 @@ exports.sendOtpResetPassword = async (req, res) => {
     return res.status(500).json({ error: "Failed to send OTP" });
   }
 };
-
+// forgot + chane ตอน next (otp)
 exports.verifyOtpResetPassword = async (req, res) => {
   const { email, otp } = req.body;
 
-  // หา user
   const { data: user } = await db
     .from("users")
     .select("user_id")
@@ -402,7 +391,6 @@ exports.verifyOtpResetPassword = async (req, res) => {
     return res.status(400).json({ error: "Email not found" });
   }
 
-  // หา OTP
   const { data: otpData } = await db
     .from("otps")
     .select("*")
@@ -427,17 +415,7 @@ exports.verifyOtpResetPassword = async (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-  const {
-    userId,
-    displayName,
-    description,
-    city,
-    website,
-    profileimg,
-    coverimg,
-    profilePublicId,
-    coverPublicId,
-  } = req.body;
+  const { userId, displayName, description, city, website, profileimg, coverimg, profilePublicId, coverPublicId } = req.body;
 
   try {
     const { data: user, error } = await db
@@ -449,7 +427,6 @@ exports.updateProfile = async (req, res) => {
       return res.status(500).json(error);
     }
 
-    // 2. สร้าง Object สำหรับ Update (เช็คเฉพาะที่มีค่าจริงๆ)
     const updateData = {};
 
     // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
@@ -475,14 +452,13 @@ exports.updateProfile = async (req, res) => {
     if (profilePublicId) updateData.profile_public_id = profilePublicId;
     if (coverPublicId) updateData.cover_public_id = coverPublicId;
 
-    // ตรวจสอบว่ามีข้อมูลที่จะ update ไหม (ป้องกันการยิง update เปล่าๆ)
+    // เปลี่ยนเป็น array แล้วนับ
     if (Object.keys(updateData).length === 0) {
       return res
         .status(200)
         .json({ success: true, message: "Nothing to update" });
     }
 
-    // 3. Update ลง DB
     const { error: updateError } = await db
       .from("users")
       .update(updateData) // ส่งเฉพาะ field ที่มีค่าไป
@@ -492,15 +468,12 @@ exports.updateProfile = async (req, res) => {
 
     finalname = updateData.name || user.name || user.username;
     finaldescription = updateData.description || user.description || "";
-    // ============================================================
-    // 🚀 [เพิ่มคำสั่ง Algolia v5] อัปเดตข้อมูลผู้ใช้บนคลังค้นหา
-    // ============================================================
+
     try {
       await algoliaClient.saveObject({
         indexName: "WebCommunity_Search",
         body: {
-          objectID: `user_${userId}`, // ทับ objectID เดิม
-          // ถ้าตั้ง Display Name แล้วให้ใช้คู่กับ Username เพื่อให้เสิร์ชเจอทั้งสองแบบ
+          objectID: `user_${userId}`,
           title: finalname,
           description: finaldescription,
           searchable_title: tokenizeThai(finalname),
@@ -514,11 +487,9 @@ exports.updateProfile = async (req, res) => {
       console.error("Algolia Update Profile Warning:", algoliaErr);
     }
 
-    // เก็บ id เก่าไว้ก่อน
     const oldProfileId = user?.profile_public_id;
     const oldCoverId = user?.cover_public_id;
 
-    // แล้วค่อยลบ
     if (profilePublicId && oldProfileId && oldProfileId !== profilePublicId) {
       await cloudinary.uploader.destroy(oldProfileId);
     }
@@ -532,7 +503,7 @@ exports.updateProfile = async (req, res) => {
     return res.status(500).json(err);
   }
 };
-
+// forgot + chane ตอน submit (password)
 exports.resetPassword = async (req, res) => {
   const { email, password, confirmpassword } = req.body;
   if (password !== confirmpassword) {
@@ -570,12 +541,10 @@ exports.deleteAccount = async (req, res) => {
 
   if (!email || !otp || !userId) {
     return res
-      .status(400)
-      .json({ error: "Email, OTP, and User ID are required" });
+      .status(400).json({ error: "Email, OTP, and User ID are required" });
   }
 
   try {
-    // ค้นหา user_id จากอีเมลก่อน
     const { data: users, error: userError } = await db
       .from("users")
       .select("user_id, email, username")
@@ -588,12 +557,11 @@ exports.deleteAccount = async (req, res) => {
 
     const user = users[0];
 
-    // ดึงข้อมูล OTP ล่าสุดของ user_id นี้มาเช็ค
     const { data: otpData, error: otpError } = await db
       .from("otps")
       .select("otp, otp_expire")
       .eq("user_id", user.user_id)
-      .maybeSingle();
+      .maybeSingle(); // กัน error ถ้าไม่มี row
 
     if (otpError || !otpData) {
       return res
@@ -601,22 +569,18 @@ exports.deleteAccount = async (req, res) => {
         .json({ error: "Invalid OTP request or OTP not found" });
     }
 
-    // ตรวจสอบว่า OTP ตรงกันไหม
     if (otpData.otp !== otp) {
       return res.status(400).json({ error: "OTP incorrect" });
     }
 
-    // ตรวจสอบว่า OTP หมดอายุหรือยัง
     if (new Date(otpData.otp_expire) < new Date()) {
       return res.status(400).json({ error: "OTP expired" });
     }
 
-    // ผ่านทุกเงื่อนไข -> เตรียมแปลงอีเมลเพื่อหลบสัญญลักษณ์ UNIQUE ประจำคอลัมน์
     const timestamp = Date.now();
     const maskedEmail = `${user.email}_deleted_${timestamp}`;
     const maskedUsername = `${user.username}_deleted_${timestamp}`;
 
-    // ผ่านทุกเงื่อนไข -> ทำการเปลี่ยนสถานะเป็นลบบัญชี (Soft Delete)
     const { error: updateError } = await db
       .from("users")
       .update({
@@ -647,20 +611,15 @@ exports.deleteAccount = async (req, res) => {
       console.error("Delete Member Error:", DeleteMemberError);
     }
 
-    // ============================================================
-    // 🔥 [เพิ่มคำสั่ง Algolia v5] สั่งลบชื่อผู้ใช้นี้ออกจากคลังค้นหาทันที
-    // ============================================================
     try {
       await algoliaClient.deleteObject({
-        indexName: "WebCommunity_Search", // ชื่อคลังที่คุณตั้งไว้บนเว็บ Algolia
-        objectID: `user_${user.user_id}`, // ID อ้างอิงเดียวกับตอนที่คุณใช้เซฟข้อมูลขึ้นไป
+        indexName: "WebCommunity_Search",
+        objectID: `user_${user.user_id}`,
       });
     } catch (algoliaErr) {
-      // แยก try/catch ไว้ป้องกันกรณีที่ผู้ใช้คนนี้ยังไม่เคยถูกบันทึกในคลัง Algolia
       console.error("Algolia Delete Warning:", algoliaErr);
     }
 
-    // (เลือกทำ) ลบแถว OTP นี้ทิ้งไปเลยเพื่อไม่ให้เอามาใช้ซ้ำได้อีก
     await db.from("otps").delete().eq("user_id", user.user_id);
 
     return res
@@ -675,7 +634,7 @@ exports.deleteAccount = async (req, res) => {
     return res.status(500).json({ error: "Failed to delete account" });
   }
 };
-
+// navbar
 exports.getUserById = async (req, res) => {
   const userId = req.params.userId;
 

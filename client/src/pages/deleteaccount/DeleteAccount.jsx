@@ -1,6 +1,6 @@
 import "./deleteaccount.scss";
 import { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { AuthContext } from "../../context/authContext";
 import { ClipLoader } from "react-spinners";
