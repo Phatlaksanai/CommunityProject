@@ -2,13 +2,11 @@ const db = require("../config/db");
 const cloudinary = require("../config/cloudinary");
 const algoliaClient = require("../config/algolia");
 
-// Intl.Segmenter ตัดคำไทยใส่ช่องว่างก่อนส่งเข้า Algolia
 const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
 
 function tokenizeThai(text) {
   if (!text) return "";
   const segments = segmenter.segment(String(text));
-  // แยกคำแล้วเอามาต่อกันด้วยช่องว่าง (Space) เพื่อให้ Algolia มองเป็นคนละคำ
   return Array.from(segments)
     .map(s => s.segment.trim())
     .filter(Boolean)
@@ -42,7 +40,7 @@ exports.addCommunity = async (req, res) => {
           cover_public_id: public_id || null,
           user_id: userId,
           totalUsers: 1,
-          status: "show", // กำหนดค่าเริ่มต้นเป็น 'show' หรือ 'active' ตามที่คุณต้องการ
+          status: "show",
         },
       ])
       .select()
@@ -50,34 +48,31 @@ exports.addCommunity = async (req, res) => {
 
     if (communityError) return res.status(500).json(communityError);
 
-    // 🚀 2. [เพิ่มคำสั่ง Algolia v5] ส่งข้อมูลคอมมูนิตี้ใหม่ขึ้นคลังค้นหาทันที
     try {
       await algoliaClient.saveObject({
-        indexName: 'WebCommunity_Search', // ชื่อดัชนีตรงกลางของคุณ
+        indexName: 'WebCommunity_Search',
         body: {
-          objectID: `commu_${newCommunity.communities_id}`, // ใช้รูปแบบ commu_รหัส เพื่อแยกหมวดหมู่
+          objectID: `commu_${newCommunity.communities_id}`,
           title: newCommunity.name,
           description: newCommunity.description,
           searchable_title: tokenizeThai(newCommunity.name),
           searchable_description: tokenizeThai(newCommunity.description),
-          img: newCommunity.cover_img, // แมป URL รูปภาพเข้าช่อง img (ถ้ามี)
+          img: newCommunity.cover_img,
           type: 'community',
           targetId: newCommunity.communities_id
         }
       });
     } catch (algoliaErr) {
-      // ดักจับ error แยกส่วน เผื่อกรณีคีย์มีปัญหา ระบบลงทะเบียนหลักในฐานข้อมูลจะได้ไม่ล่มตามครับ
       console.error("Algolia Insert Warning:", algoliaErr);
     }
-    // เพิ่มผู้สร้างลงในตาราง community_members ทันที
-    // เพื่อให้ระบบนับว่าผู้สร้างเป็นสมาชิกคนแรกอย่างสมบูรณ์
+
     const { error: memberError } = await db
       .from("community_members")
       .insert([
         {
           user_id: userId,
           community_id: newCommunity.communities_id,
-          status: "active", // หรือ status ตามที่คุณตั้งไว้ใน Enum
+          status: "active",
         },
       ]);
     if (memberError) {
@@ -129,7 +124,7 @@ exports.getCommunityById = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
-
+// ดึงข้อมูลมาอสดงหน้า edit commu
 exports.getCommunityForEdit = async (req, res) => {
   try {
     const { id } = req.params;
@@ -151,7 +146,7 @@ exports.getCommunityForEdit = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
-
+// เอากลุ่มที่เราสร้าง
 exports.getCommunitiesByUserId = async (req, res) => {
   const { id } = req.params;
 
@@ -160,45 +155,43 @@ exports.getCommunitiesByUserId = async (req, res) => {
     .select(`
       *, 
       users!inner(isdelete)
-    `) // ใส่ !inner เพื่อบอกว่าถ้าเงื่อนไขตาราง users ไม่ผ่าน ไม่ต้องดึง communities แถวนั้นออกมาเลย
+    `)
     .eq("status", "show")
     .eq("user_id", id)
-    .eq("users.isdelete", "active") // กรองเฉพาะคอมมูนิตี้ที่เจ้าของยังไม่ถูกลบ
+    .eq("users.isdelete", "active")
     .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
 
   return res.status(200).json(data);
 };
-
+// กลุ่มที่เราเข้าร่วม
 exports.getJoinedCommunities = async (req, res) => {
   const { id } = req.params;
   try {
-    // ไปดึงข้อมูลจากตาราง community_members และ Join เอาข้อมูลตาราง communities มาด้วย
     const { data, error } = await db
       .from("community_members")
       .select(`
         community_id,
         status,
-        communities (
+        communities!inner (
           *,
           users!inner(isdelete) 
         )
       `)
       .eq("user_id", id)
-      .eq("status", "active") // ดึงเฉพาะกลุ่มที่สถานะยัง active (ไม่ได้ถูกแบนหรือออก)
+      .eq("status", "active")
       .eq("communities.users.isdelete", "active")
       .eq("communities.status", "show")
       .order("created_at", { ascending: false });
 
     if (error) return res.status(500).json(error);
 
-    // ข้อมูลที่ Supabase คืนมาจะซ้อนกันอยู่ เราจึงต้อง map เอาเฉพาะข้อมูลด้านใน (communities) ออกมาส่งให้หน้าบ้าน
-    const joinedCommunities = data
-      .map(item => item.communities)
-      .filter(commu => commu !== null); // กรองเผื่อมีค่า null ติดมา
+    // ตัดส่วนของ commu_member ส่งออกแค่ commu
+    const Communities = data
+      .map(commu => commu.communities)
 
-    return res.status(200).json(joinedCommunities);
+    return res.status(200).json(Communities);
   } catch (err) {
     return res.status(500).json(err);
   }
@@ -220,8 +213,8 @@ exports.updateCommunity = async (req, res) => {
     if (!description.trim()) {
       return res.status(400).json({ error: "Description cannot be empty" });
     }
-    // 0. ดึง public_id เดิมก่อน
-    const { data: oldCommunity, error } = await db
+
+    const { data: oldCoverPb_Ib, error } = await db
       .from("communities")
       .select("cover_public_id")
       .eq("communities_id", communityId)
@@ -229,14 +222,17 @@ exports.updateCommunity = async (req, res) => {
     if (error) {
       return res.status(500).json(error);
     }
-    // ถ้ามีการอัปโหลดรูปใหม่ และ public_id เปลี่ยน
-    if (imgPublicId && oldCommunity?.cover_public_id && oldCommunity.cover_public_id !== imgPublicId) {
+
+    // ตรวจสอบการเปลี่ยนรูป
+    if (imgPublicId && oldCoverPb_Ib?.cover_public_id && oldCoverPb_Ib.cover_public_id !== imgPublicId) {
       try {
-        await cloudinary.uploader.destroy(oldCommunity.cover_public_id);
+        await cloudinary.uploader.destroy(oldCoverPb_Ib.cover_public_id);
       } catch (cloudErr) {
         console.log("CLOUD DELETE ERROR:", cloudErr);
       }
     }
+
+    // update ข้อมูลชุมชน
     const { error: updateError } = await db
       .from("communities")
       .update({
@@ -252,17 +248,16 @@ exports.updateCommunity = async (req, res) => {
       return res.status(500).json(updateError);
     }
 
-    // 🚀 3. [เพิ่มคำสั่ง Algolia v5] สั่งบันทึกทับ (Update) ข้อมูลใหม่ลงคลังค้นหาด้วย objectID เดิม
     try {
       await algoliaClient.saveObject({
         indexName: 'WebCommunity_Search',
         body: {
-          objectID: `commu_${communityId}`, // อ้างอิง ID แถวเดิมให้ตรงกัน ระบบจะสลับข้อมูลไส้ในให้เองอัตโนมัติ
+          objectID: `commu_${communityId}`,
           title: name,
           description: description,
           searchable_title: tokenizeThai(name),
           searchable_description: tokenizeThai(description),
-          img: img, // แมป URL รูปภาพเข้าช่อง img (ถ้ามี)
+          img: img,
           type: 'community',
           targetId: communityId
         }
@@ -282,25 +277,24 @@ exports.addFollower = async (req, res) => {
   const user_id = req.user.user_id;
 
   try {
-    const { error } = await db
+    await db
       .from("community_members")
       .insert([
         {
           community_id: commu_id,
           user_id: user_id,
-          status: "active" // กำหนด status เริ่มต้น
+          status: "active"
         }
       ]);
-    // ดึงยอด totalUsers เดิมมา เพื่อเตรียมบวก 1
+
     const { data: commuData } = await db
       .from("communities")
-      .select('"totalUsers"')
+      .select("totalUsers")
       .eq("communities_id", commu_id)
       .single();
 
     const currentTotal = commuData?.totalUsers || 0;
 
-    // อัปเดตตาราง communities ให้ totalUsers + 1
     await db
       .from("communities")
       .update({ totalUsers: currentTotal + 1 })
@@ -317,7 +311,6 @@ exports.removeFollower = async (req, res) => {
   const user_id = req.user.user_id;
 
   try {
-    // ลบคนออกจากตาราง community_members
     const { error: deleteError } = await db
       .from("community_members")
       .delete()
@@ -326,16 +319,14 @@ exports.removeFollower = async (req, res) => {
 
     if (deleteError) return res.status(500).json(deleteError);
 
-    // ดึงยอด totalUsers เดิมมา เพื่อเตรียมลบ 1
     const { data: commuData } = await db
       .from("communities")
-      .select('"totalUsers"')
+      .select("totalUsers")
       .eq("communities_id", id)
       .single();
 
     const currentTotal = commuData?.totalUsers || 0;
 
-    // อัปเดตตาราง communities ให้ totalUsers - 1 (เช็คไม่ให้ติดลบด้วย)
     await db
       .from("communities")
       .update({ totalUsers: Math.max(0, currentTotal - 1) })
@@ -346,7 +337,7 @@ exports.removeFollower = async (req, res) => {
     return res.status(500).json(err);
   }
 };
-
+// ดูว่าติดตามยัง และนับจน.ผู้ติดตาม (CommuDetail, DescCommu)
 exports.getFollwersByCommunityId = async (req, res) => {
   const { id } = req.params;
   try {
@@ -354,13 +345,12 @@ exports.getFollwersByCommunityId = async (req, res) => {
       .from("community_members")
       .select("user_id")
       .eq("community_id", id)
-      // สมมติว่าใน Enum ของคุณมีค่า 'active'
       .eq("status", "active");
 
     if (error) return res.status(500).json(error);
 
-    // แปลงให้เป็น Array ของตัวเลข [1, 4, 15] 
-    const followerIds = data.map(item => item.user_id);
+    // จัด id ผู้ติดตามเป็น Array [1, 4, 15] 
+    const followerIds = data.map(id => id.user_id);
     return res.status(200).json(followerIds);
 
   } catch (err) {
@@ -370,7 +360,7 @@ exports.getFollwersByCommunityId = async (req, res) => {
 };
 
 exports.getLatestCommunityImages = async (req, res) => {
-  const { id } = req.params; // id ของคอมมูนิตี้
+  const { id } = req.params;
 
   try {
     const { data, error } = await db
@@ -385,7 +375,6 @@ exports.getLatestCommunityImages = async (req, res) => {
 
     if (error) throw error;
 
-    // แปลงข้อมูลให้เหลือแค่ array ของ URL รูปภาพเพื่อให้ใช้ง่ายขึ้น
     const images = data.map(item => item.img);
 
     return res.status(200).json(images);
@@ -398,14 +387,14 @@ exports.getLatestCommunityImages = async (req, res) => {
 exports.getMembersByCommunityId = async (req, res) => {
   const { id } = req.params;
   try {
-    // ดึงข้อมูล Community เพื่อเอาไปใช้กรองออก 
+
     const { data: community, error: commuError } = await db
       .from("communities")
       .select("user_id")
       .eq("communities_id", id)
       .eq("status", "show")
       .eq("user_id", req.user.user_id)
-      .maybeSingle(); // ใช้ maybeSingle เพื่อป้องกัน error กรณีไม่พบข้อมูล
+      .maybeSingle();
 
     if (commuError) {
       console.error("Get Community Error:", commuError);
@@ -414,34 +403,29 @@ exports.getMembersByCommunityId = async (req, res) => {
 
     const ownerId = community?.user_id;
 
-    // ดึงข้อมูลจากตาราง community_members และ Join เอาข้อมูลตาราง users
     const { data, error } = await db
       .from("community_members")
       .select(`
         user_id,
         status,
-        users (
-          user_id,
+        users!inner (
           username,
           name,
           profilePic
         )
       `)
       .eq("community_id", id)
-      // .eq("user_id", req.user.user_id)
-      .neq("user_id", ownerId); // กรองเจ้าของกลุ่มออก
+      .neq("user_id", ownerId);
 
     if (error) {
       console.error("GET MEMBERS ERROR:", error);
       return res.status(500).json(error);
     }
 
-    // ข้อมูลที่ Supabase คืนมาจะซ้อนกันอยู่ (item.users) 
-    // เราจึง map กระจาย (spread) ข้อมูลออกมาให้เป็น Object ชั้นเดียว เพื่อให้หน้าบ้านใช้ง่ายๆ
     const members = data.map(item => ({
       user_id: item.user_id,
       status: item.status,
-      ...(item.users || {}) // แตก properties ของ users ออกมา
+      ...(item.users || {})
     }));
 
     return res.status(200).json(members);
@@ -458,7 +442,7 @@ exports.banMember = async (req, res) => {
     if (!communityId) {
       return res.status(400).json({ error: "Community ID not found" });
     }
-    // ดึงรายชื่อคนที่กำลังถูกแบนอยู่ปัจจุบัน
+
     const { data: currentBanned, error: fetchError } = await db
       .from("community_members")
       .select("user_id")
@@ -469,15 +453,14 @@ exports.banMember = async (req, res) => {
       console.error("FETCH BANNED USERS ERROR:", fetchError);
       return res.status(500).json(fetchError);
     }
-
+    // แบนเก่า
     const currentBannedIds = currentBanned.map(user => user.user_id);
 
-    // คัดแยกคนที่ต้อง "ปลดแบน" (คือคนที่เคยโดนแบน แต่ไม่มีชื่อใน userIds ล่าสุดที่ส่งมา)
+    // หาคนที่ปลดแบน / (Set) currentBannedIds[1,2,3] - userIds[1,4] = [2,3] 
     const usersToUnban = currentBannedIds.filter(id => !userIds.includes(id));
 
-    // ดำเนินการ "ปลดแบน" และ "โชว์โพสต์"
+    // ปลดแบน + โชว์โพสต์
     if (usersToUnban.length > 0) {
-      // ปลดแบนสมาชิก
       const { error: unbanError } = await db
         .from("community_members")
         .update({ status: "active" })
@@ -486,20 +469,18 @@ exports.banMember = async (req, res) => {
 
       if (unbanError) return res.status(500).json(unbanError);
 
-      // โชว์โพสต์กลับมา (เปลี่ยนกลับเป็น 'show' หรือ 'active' ตามที่คุณใช้ใน Database)
       const { error: showPostError } = await db
         .from("posts")
-        .update({ status: "show" }) // ตรวจสอบว่า Status โพสต์ปกติของคุณคือคำว่าอะไร (เช่น 'show', 'active')
+        .update({ status: "show" })
         .eq("community_id", communityId)
         .in("user_id", usersToUnban)
-        .eq("status", "hide"); // ป้องกันการไปโชว์โพสต์ที่อาจถูกลบไปแล้ว ให้เปลี่ยนเฉพาะโพสต์ที่ถูกซ่อนอยู่
+        .eq("status", "hide");
 
       if (showPostError) return res.status(500).json(showPostError);
     }
 
-    // 4. ดำเนินการ "แบน" และ "ซ่อนโพสต์" (ตามรายชื่อ userIds ล่าสุด)
+    // แบน
     if (userIds.length > 0) {
-      // 4.1 แบนสมาชิก
       const { error: banError } = await db
         .from("community_members")
         .update({ status: "banned" })
@@ -508,7 +489,6 @@ exports.banMember = async (req, res) => {
 
       if (banError) return res.status(500).json(banError);
 
-      // 4.2 ซ่อนโพสต์
       const { error: hidePostError } = await db
         .from("posts")
         .update({ status: "hide" })
@@ -529,33 +509,29 @@ exports.deleteCommunity = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.user_id;
 
-  // 1. ซ่อน Community
   const { error: commuError } = await db
     .from("communities")
-    .update({ status: "hide" }) // เอา Array ออก
+    .update({ status: "hide" })
     .eq("user_id", userId)
     .eq("communities_id", id);
 
   if (commuError) return res.status(500).json(commuError);
 
-  // 2. ซ่อน Posts ทั้งหมดใน Community นั้น
   const { error: postsError } = await db
     .from("posts")
     .update({ status: "hide" })
-    // ลบ .eq("user_id", userId) ออก เพื่อให้ซ่อนโพสต์ของทุกคนในคอมมูนี้
     .eq("community_id", id);
 
   if (postsError) return res.status(500).json(postsError);
 
   try {
-      await algoliaClient.deleteObject({
-        indexName: 'WebCommunity_Search',
-        objectID: `commu_${id}`,
-      });
-    } catch (algoliaErr) {
-      // ดักจับ error แยกส่วน เผื่อกรณีคีย์มีปัญหา ระบบลงทะเบียนหลักในฐานข้อมูลจะได้ไม่ล่มตามครับ
-      console.error("Algolia Delete Warning:", algoliaErr);
-    }
+    await algoliaClient.deleteObject({
+      indexName: 'WebCommunity_Search',
+      objectID: `commu_${id}`,
+    });
+  } catch (algoliaErr) {
+    console.error("Algolia Delete Warning:", algoliaErr);
+  }
 
   return res.status(200).json("Community has been deleted.");
 };

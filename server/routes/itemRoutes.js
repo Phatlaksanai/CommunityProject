@@ -12,7 +12,7 @@ router.get("/user/:id", itemController.getItemsByUserId);
 
 router.get("/categories", itemController.getCategories);
 router.get("/:id", itemController.getItemsById);
-router.get("/:id/versions", itemController.getItemAllVersions); //ยังไม่ปรับให้เข้าไม่ได้
+router.get("/:id/versions", itemController.getItemAllVersions);
 
 
 router.get("/edit/:id", verifyToken, itemController.getItemForEdit);
