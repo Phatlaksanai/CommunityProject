@@ -19,7 +19,7 @@ function tokenizeThai(text) {
 }
 
 const awakeRenderLimiter = rateLimit({
-  windowMs: 60 * 1000, 
+  windowMs: 60 * 1000,
   limit: 5, // เรียกได้ 5 รอบ / นาที
   standardHeaders: true,
   legacyHeaders: false,
@@ -68,11 +68,11 @@ exports.login = async (req, res) => {
     );
 
     res.cookie("accessToken", token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-      })
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    })
       .status(200)
       .json({
         success: true,
@@ -267,15 +267,15 @@ exports.sendOtpRegister = async (req, res) => {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     const { error: otpError } = await db
-    .from("otps")
-    .upsert(
-      {
-        user_id: user.user_id,
-        otp: String(otp),
-        otp_expire: expiresAt,
-      },
-      { onConflict: "user_id" }, // ใช้กับ upsert อิง user_id
-    );
+      .from("otps")
+      .upsert(
+        {
+          user_id: user.user_id,
+          otp: String(otp),
+          otp_expire: expiresAt,
+        },
+        { onConflict: "user_id" }, // ใช้กับ upsert อิง user_id
+      );
 
     if (otpError) throw otpError;
 
@@ -333,15 +333,15 @@ exports.sendOtpResetPassword = async (req, res) => {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     const { error: otpError } = await db
-    .from("otps")
-    .upsert(
-      {
-        user_id: user.user_id,
-        otp: String(otp),
-        otp_expire: expiresAt,
-      },
-      { onConflict: "user_id" },
-    );
+      .from("otps")
+      .upsert(
+        {
+          user_id: user.user_id,
+          otp: String(otp),
+          otp_expire: expiresAt,
+        },
+        { onConflict: "user_id" },
+      );
 
     if (otpError) throw otpError;
 

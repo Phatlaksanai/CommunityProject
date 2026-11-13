@@ -3,12 +3,10 @@ const db = require("../config/db");
 exports.getPosts = async (req, res) => {
   try {
     const currentUserId = req.user ? req.user.user_id : null;
-
-    // หน้าบ้านขอมาทีละ 5 โพสต์
     const limit = 5;
     const page = parseInt(req.query.page) || 0;
 
-    // ดึงรายชื่อกลุ่มที่ผู้ใช้งานคนนี้ "ไม่โดนแบน" เตรียมไว้ก่อน
+    // ดึง id กลุ่มที่เราเข้าแล้วยังไม่โดนแบน
     let myGroupIds = [];
     if (currentUserId) {
       const { data: memberData } = await db
@@ -21,10 +19,10 @@ exports.getPosts = async (req, res) => {
 
     let finalPosts = [];
     let currentOffset = page * limit;
-    let fetchSize = 10; // ดึงมาตรวจสอบทีละ 10 โพสต์เพื่อความเร็ว
+    let fetchSize = 10; // ดึงมาตรวจสอบทีละ 10 
 
-    // ลูปนี้จะทำงานไปเรื่อย ๆ จนกว่าจะได้โพสต์ที่กรองผ่านครบ 5 โพสต์ หรือจนกว่าจะไม่มีข้อมูลให้ดึงแล้ว
-    while (finalPosts.length < limit) {
+    // ลูปดึงให้ครบ 5 โพส
+    while (finalPosts.length < limit) { // รอบแรก 0 < 5
       let query = db
         .from("posts")
         .select(
@@ -49,54 +47,42 @@ exports.getPosts = async (req, res) => {
         .eq("status", "show")
         .eq("users.isdelete", "active");
 
-      // Logic การกรองเกี่ยวกับกลุ่ม
-      if (currentUserId) {
-        if (myGroupIds.length > 0) {
-          query = query.or(
-            `community_id.is.null,community_id.in.(${myGroupIds.join(",")})`,
-          );
-        } else {
-          query = query.is("community_id", null);
-        }
+      // กรองโพสจากในคอมมูที่หน้า feed
+      if (currentUserId && myGroupIds.length > 0) {
+        query = query.or(`community_id.is.null,community_id.in.(${myGroupIds.join(",")})`);
       } else {
         query = query.is("community_id", null);
       }
 
-      // ดึงข้อมูลตามขอบเขต Offset ปัจจุบัน
+      // ดึง .range
       const { data: dbData, error } = await query
         .order("created_at", { ascending: false })
         .range(currentOffset, currentOffset + fetchSize - 1);
 
       if (error) throw error;
 
-      // ถ้าไม่มีข้อมูลใน Database เหลือให้ดึงแล้ว ให้หยุดลูปทันที
+      // ถ้าข้อมูลใน DB หมดให้หยุดลูปทันที
       if (!dbData || dbData.length === 0) {
         break;
       }
 
-      // กรองข้อมูลที่ดึงมารอบนี้
+      // กรองโพสที่เจ้าของ commu ยังไม่ลบบัญชี
       const approvedPosts = dbData.filter((post) => {
         if (post.community_id !== null) {
-          if (
-            !post.communities ||
-            !post.communities.users ||
-            post.communities.users.isdelete === "deleted"
-          ) {
-            return false; // เจ้าของกลุ่มโดนลบ -> คัดออก
+          if (!post.communities || !post.communities.users || post.communities.users.isdelete === "deleted") {
+            return false; // เจ้าของกลุ่มลบบัญชี
           }
         }
         return true;
       });
 
-      // เติมโพสต์ที่ผ่านการกรองลงในอาเรย์หลัก
       finalPosts = [...finalPosts, ...approvedPosts];
 
-      // ขยับพิกัดตัวชี้ Offset ไปข้างหน้าเพื่อเตรียมดึงรอบถัดไป (กรณีที่ข้อมูลยังได้ไม่ครบ 5)
-      currentOffset += fetchSize;
+      currentOffset += fetchSize; // รอบแรก 0 + 10
     }
 
     // ตัดเอาข้อมูลให้เหลือพอดี 5 รายการตามต้องการ
-    const resultPosts = finalPosts.slice(0, limit);
+    const resultPosts = finalPosts.slice(0, limit); // arr 0 ถึง (limit-1)
 
     // Format โครงสร้าง Object ก่อนส่งกลับหน้าบ้าน
     const formatted = resultPosts.map((post) => ({
@@ -116,18 +102,18 @@ exports.getPosts = async (req, res) => {
   }
 };
 
+// Profile
 exports.getPostsByUserId = async (req, res) => {
   const { id } = req.params;
 
   try {
     const page = parseInt(req.query.page) || 0;
-    const limit = 5; // หน้าบ้านต้องการแสดงผลรอบละ 5 โพสต์
+    const limit = 5;
 
     let finalPosts = [];
     let currentOffset = page * limit;
-    let fetchSize = 10; // ดึงมาตรวจสอบทีละ 10 โพสต์เพื่อความรวดเร็ว
+    let fetchSize = 10;
 
-    // ลูปตรวจสอบข้อมูลจนกว่าจะได้โพสต์ที่ปลอดภัยครบ 5 รายการ หรือจนกว่าข้อมูลใน DB จะหมด
     while (finalPosts.length < limit) {
       const { data: dbData, error } = await db
         .from("posts")
@@ -161,28 +147,20 @@ exports.getPostsByUserId = async (req, res) => {
       // กรองเอาเฉพาะโพสต์ที่ไม่อยู่ในกลุ่มที่เจ้าของกลุ่มลบบัญชีไปแล้ว
       const approvedPosts = dbData.filter((post) => {
         if (post.community_id !== null) {
-          if (
-            !post.communities ||
-            !post.communities.users ||
-            post.communities.users.isdelete === "deleted"
-          ) {
-            return false; // เจ้าของกลุ่มโดนลบ -> คัดออก
+          if (!post.communities || !post.communities.users || post.communities.users.isdelete === "deleted") {
+            return false;
           }
         }
         return true;
       });
 
-      // เติมโพสต์ที่ผ่านการกรองลงในอาเรย์หลัก
       finalPosts = [...finalPosts, ...approvedPosts];
 
-      // ขยับพิกัดตัวชี้ Offset ไปข้างหน้าเพื่อเตรียมดึงรอบถัดไป (กรณีที่ข้อมูลยังได้ไม่ครบ 5)
       currentOffset += fetchSize;
     }
 
-    // ตัดเอาข้อมูลให้เหลือพอดี 5 รายการตามต้องการ
     const resultPosts = finalPosts.slice(0, limit);
 
-    // Format ข้อมูลส่งกลับหน้าบ้าน
     const formatted = resultPosts.map((post) => ({
       ...post,
       username: post.users?.username || null,
@@ -202,7 +180,6 @@ exports.getPostsByUserId = async (req, res) => {
 exports.getPostsByProjectId = async (req, res) => {
   const { id } = req.params;
 
-  // 1. เพิ่ม Logic การคำนวณ Page เหมือนใน getPosts
   const page = parseInt(req.query.page) || 0;
   const limit = 5;
   const from = page * limit;
@@ -222,10 +199,10 @@ exports.getPostsByProjectId = async (req, res) => {
       )
     `,
     )
-    .eq("project_id", id) // ตรวจสอบชื่อ Column ใน DB ให้แม่นยำ (บางที่ใช้ community_id)
-    .eq("status", "show") // ควรเช็ค status ด้วยเพื่อให้เหมือนหน้า Feed หลัก
+    .eq("project_id", id)
+    .eq("status", "show")
     .order("created_at", { ascending: false })
-    .range(from, to); // 2. เพิ่ม .range() เพื่อดึงข้อมูลตามหน้า
+    .range(from, to);
 
   if (error) return res.status(500).json(error);
 
@@ -244,13 +221,12 @@ exports.getPostsByCommunityId = async (req, res) => {
 
   try {
     const page = parseInt(req.query.page) || 0;
-    const limit = 5; // ดึงรอบละ 5 โพสต์ส่งให้หน้าบ้าน
+    const limit = 5;
 
     let finalPosts = [];
     let currentOffset = page * limit;
-    let fetchSize = 10; // ดึงมาสแกนทีละ 10 โพสต์
+    let fetchSize = 10;
 
-    // ลูปตรวจสอบข้อมูลจนกว่าจะได้โพสต์ที่ปลอดภัยครบ 5 รายการ หรือข้อมูลในระบบหมด
     while (finalPosts.length < limit) {
       const { data: dbData, error } = await db
         .from("posts")
@@ -262,9 +238,9 @@ exports.getPostsByCommunityId = async (req, res) => {
           users!inner(user_id, username, name, profilePic, isdelete)
         `,
         )
-        .eq("community_id", id) // ดึงเฉพาะโพสต์ของกลุ่มนี้เท่านั้น ไม่เอาของกลุ่มอื่นมาปน
+        .eq("community_id", id)
         .eq("status", "show")
-        .eq("users.isdelete", "active") // กรองเอาเฉพาะโพสต์ที่คนโพสต์ยังไม่ลบบัญชี
+        .eq("users.isdelete", "active")
         .order("created_at", { ascending: false })
         .range(currentOffset, currentOffset + fetchSize - 1);
 
@@ -274,18 +250,13 @@ exports.getPostsByCommunityId = async (req, res) => {
       if (!dbData || dbData.length === 0) {
         break;
       }
-
-      // ในกลุ่มนี้ โพสต์ที่ดึงมาผ่านเงื่อนไข active ทั้งหมดแล้ว สามารถเติมลงอาเรย์หลักได้เลย
       finalPosts = [...finalPosts, ...dbData];
 
-      // ขยับพิกัดตัวชี้ Offset ไปข้างหน้าเพื่อเตรียมดึงรอบถัดไป
       currentOffset += fetchSize;
     }
 
-    // ตัดเอาข้อมูลให้เหลือพอดี 5 รายการตามความต้องการของหน้าบ้าน
     const resultPosts = finalPosts.slice(0, limit);
 
-    // Format ข้อมูลให้โครงสร้างตรงกับหน้าบ้านเหมือนเดิม
     const formatted = resultPosts.map((post) => ({
       ...post,
       username: post.users?.username || null,
@@ -300,6 +271,7 @@ exports.getPostsByCommunityId = async (req, res) => {
   }
 };
 
+// add project
 exports.getPostsByUserIdAvailable = async (req, res) => {
   const { id } = req.params;
 
@@ -343,21 +315,21 @@ exports.addPost = async (req, res) => {
 
     if (postError) throw postError;
 
-    const postId = postData.post_id; // ดึง ID ของโพสต์ที่เพิ่งสร้าง
+    const postId = postData.post_id;
 
-    // 2. จัดการรูปภาพ (รองรับทั้งรูปเดียว และ หลายรูปเป็น Array)
     if (img) {
-      // ทำให้เป็น Array เสมอเพื่อความง่ายในการจัดการ
-      const imageList = Array.isArray(img) ? img : [img];
+      const imageList = Array.isArray(img) ? img : [img]; // เช็คตัวมันว่าเป็น arr ยัง [1,2] -> [1,2] / 1 -> [1]
 
-      // เตรียมข้อมูลสำหรับ Bulk Insert
       const imagesToInsert = imageList.map((url) => ({
         post_id: postId,
         img: url,
-        message_id: null, // ใส่ไว้กัน Error ตามที่คุณเจอตอนแรก
+        message_id: null,
       }));
 
-      const { error: imgError } = await db.from("imgs").insert(imagesToInsert);
+      const { error: imgError } = await db
+        .from("imgs")
+        .insert(imagesToInsert);
+
       if (imgError) console.error("Image upload error:", imgError);
     }
 
@@ -376,7 +348,6 @@ exports.addPost = async (req, res) => {
       if (modelError) console.error("Model upload error:", modelError);
     }
 
-    // 5. ส่งข้อมูลโพสต์ที่สร้างเสร็จแล้วกลับไป
     return res.status(200).json({ ...postData, img, model });
   } catch (error) {
     console.error("Server Error:", error.message);
@@ -384,7 +355,7 @@ exports.addPost = async (req, res) => {
   }
 };
 
-// postController.js
+// editProject
 exports.getPostsForEditProject = async (req, res) => {
   const { projectId } = req.params;
   const userId = req.user.user_id;
@@ -393,11 +364,8 @@ exports.getPostsForEditProject = async (req, res) => {
     .from("posts")
     .select("*")
     .eq("status", "show")
-    // ดึงอันที่เป็นของโปรเจกต์นี้ OR (เป็นของเรา AND ยังไม่มีโปรเจกต์)
-    .or(
-      `project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`,
-    )
-    .is("community_id", null) // เพิ่มเงื่อนไขว่าไม่เอาโพสต์ที่อยู่ในคอมมูนิตี้
+    .or(`project_id.eq.${projectId},and(user_id.eq.${userId},project_id.is.null)`) // เลือกโพสที่อยู่ในและนอก pj
+    .is("community_id", null)
     .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json(error);
@@ -437,9 +405,8 @@ exports.addComment = async (req, res) => {
 
 exports.getCommentsByPostId = async (req, res) => {
   const { id } = req.params;
-  // 1. รับค่า page จาก Query String (เช่น /comments/123?page=0)
   const page = parseInt(req.query.page) || 0;
-  const limit = 5; // โหลดทีละ 5 คอมเมนต์ (หรือ 10 ก็ได้ตามเหมาะสม)
+  const limit = 5;
   const from = page * limit;
   const to = from + limit - 1;
 
@@ -461,8 +428,8 @@ exports.getCommentsByPostId = async (req, res) => {
       `,
       )
       .eq("post_id", id)
-      .order("created_at", { ascending: false }) // เอาคอมเมนต์ใหม่ขึ้นก่อน
-      .range(from, to); // 2. ดึงข้อมูลตามช่วง
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
     if (error) throw error;
 
@@ -479,7 +446,6 @@ exports.getCommentsByPostId = async (req, res) => {
 
     res.status(200).json(formatted);
   } catch (err) {
-    console.log(err);
     res.status(500).json(err);
   }
 };
@@ -492,26 +458,26 @@ exports.getLikes = async (req, res) => {
 
   if (error) return res.status(500).json(error);
 
-  // แปลงจาก [{userId: 1}, {userId: 2}] เป็น [1, 2]
+  // [{userId: 1}, {userId: 2}] เป็น [1, 2]
   return res.status(200).json(data ? data.map((like) => like.user_id) : []);
 };
 
-// POST: เพิ่ม Like
 exports.addLike = async (req, res) => {
   const userId = req.user.user_id;
-  // ดึงค่าได้ทั้งสองแบบกันพลาด
   const postId = req.body.post_id;
 
   if (!postId) {
     return res.status(400).json("post_id is required");
   }
 
-  const { error } = await db.from("likes").insert([
-    {
-      user_id: userId,
-      post_id: postId,
-    },
-  ]);
+  const { error } = await db
+    .from("likes")
+    .insert([
+      {
+        user_id: userId,
+        post_id: postId,
+      },
+    ]);
 
   if (error) {
     console.error("Like Error:", error);
@@ -520,7 +486,6 @@ exports.addLike = async (req, res) => {
   return res.status(200).json("Post has been liked.");
 };
 
-// DELETE: ลบ Like
 exports.deleteLike = async (req, res) => {
   const userId = req.user.user_id;
 
@@ -534,14 +499,13 @@ exports.deleteLike = async (req, res) => {
   return res.status(200).json("Like has been removed.");
 };
 
-// postController.js
-
+// นับจำนวนคอมเม้น
 exports.getCommentsCount = async (req, res) => {
   const { post_id } = req.params;
 
   const { count, error } = await db
     .from("comments")
-    .select("*", { count: "exact", head: true }) // head: true คือเอาเฉพาะ count ไม่เอาเนื้อหา
+    .select("comment_id", { count: "exact", head: true }) // count นับ head เอาแค่เลขที่ count ได้ส่งคืนไม่เอา select
     .eq("post_id", post_id);
 
   if (error) return res.status(500).json(error);
@@ -554,7 +518,7 @@ exports.deletePost = async (req, res) => {
 
   const { error } = await db
     .from("posts")
-    .update([{ status: "hide" }]) // เปลี่ยนสถานะเป็น "hide"
+    .update([{ status: "hide" }])
     .eq("user_id", userId)
     .eq("post_id", req.params.post_id);
 
@@ -562,6 +526,7 @@ exports.deletePost = async (req, res) => {
   return res.status(200).json("Post has been deleted.");
 };
 
+// leftDC ของ profile
 exports.getLatestUserImages = async (req, res) => {
   const { id } = req.params;
 
@@ -580,9 +545,7 @@ exports.getLatestUserImages = async (req, res) => {
 
     if (error) throw error;
 
-    // แปลงข้อมูลให้เหลือแค่ array ของ URL รูปภาพเพื่อให้ใช้ง่ายขึ้น
     const images = data.map((item) => item.img);
-
     return res.status(200).json(images);
   } catch (err) {
     console.error(err);
@@ -596,9 +559,8 @@ exports.getPostsForManageCommunity = async (req, res) => {
   try {
     const { data, error } = await db
       .from("posts")
-      .select("*, users(name, username)") // Join เอาชื่อคนโพสต์มาแสดงด้วย
-      .eq("community_id", id) // ดึงเฉพาะโพสต์ที่อยู่ในคอมมูนิตี้นี้
-      .in("status", ["show", "hide"])
+      .select("*, users(name, username)")
+      .eq("community_id", id)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -611,15 +573,14 @@ exports.getPostsForManageCommunity = async (req, res) => {
 };
 
 exports.deletePostsCommunity = async (req, res) => {
-  const { communityId, postIds = [] } = req.body; // postid ที่ถูกติ๊ก
+  const { communityId, postIds = [] } = req.body;
 
   try {
     if (!communityId) {
       return res.status(400).json({ error: "Community ID not found" });
     }
 
-    // 1. ดึงโพสต์ในคอมมูนิตี้นี้ที่สถานะเป็น 'hide' อยู่ในปัจจุบัน
-    const { data: currentHidden, error: fetchError } = await db // หาโพสต์ที่ซ่อนอยู่ในปัจจุบัน
+    const { data: currentHidden, error: fetchError } = await db
       .from("posts")
       .select("post_id")
       .eq("community_id", communityId)
@@ -627,13 +588,11 @@ exports.deletePostsCommunity = async (req, res) => {
 
     if (fetchError) throw fetchError;
 
-    // ทำให้โพสต์ที่ซ่อนอยู่ ในรูปแบบ Array ของ ID
     const currentHiddenIds = currentHidden.map((post) => post.post_id);
+    // Set = currentHiddenIds - postIds
+    const postsToShow = currentHiddenIds.filter((id) => !postIds.includes(id));
 
-    // 2. คัดแยกโพสต์ที่ต้อง "โชว์กลับ" (เคยถูกซ่อน แต่ไม่มีชื่อใน postIds ล่าสุดที่ส่งมา)
-    const postsToShow = currentHiddenIds.filter((id) => !postIds.includes(id)); // หาโพสต์ที่ถูกติ๊กเทียบกับโพสต์ที่ซ่อนอยู่ในปัจจุบัน
-
-    // 3. ดำเนินการ "โชว์โพสต์กลับมา" (เอาติ๊กออก)
+    // โชว์โพสต์กลับมา postsToShow
     if (postsToShow.length > 0) {
       const { error: showError } = await db
         .from("posts")
@@ -643,7 +602,7 @@ exports.deletePostsCommunity = async (req, res) => {
       if (showError) throw showError;
     }
 
-    // 4. ดำเนินการ "ซ่อนโพสต์" (ตามรายชื่อ postIds ล่าสุดที่ถูกติ๊ก)
+    // ซ่อนโพสต์ที่ติ๊กล่าสุด postIds
     if (postIds.length > 0) {
       const { error: hideError } = await db
         .from("posts")

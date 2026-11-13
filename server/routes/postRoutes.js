@@ -15,13 +15,8 @@ router.get("/comments/:id", postController.getCommentsByPostId);
 router.get("/user/:id/images", verifyToken, postController.getLatestUserImages);
 router.get("/manage/community/:id", verifyToken, postController.getPostsForManageCommunity);
 
-// 1. ดึงข้อมูล Like (GET /api/posts/likes/post/:post_id)
 router.get("/likes/post/:post_id", postController.getLikes);
-
-// 2. เพิ่ม Like (POST /api/posts/likes)
 router.post("/likes", verifyToken, postController.addLike);
-
-// 3. ลบ Like (DELETE /api/posts/likes/post/:post_id)
 router.delete("/likes/post/:post_id", verifyToken, postController.deleteLike);
 
 router.get("/comments/count/:post_id", postController.getCommentsCount);

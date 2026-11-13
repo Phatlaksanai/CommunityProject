@@ -67,9 +67,7 @@ exports.createConversation = async (req, res) => {
         const { data: friendship, error: friendError } = await db
             .from("friendships")
             .select("friendship_id")
-            .or(`and(status.eq.accepted,requester_id.eq.${myuserId},receiver_id.eq.${user2Id}),
-                and(status.eq.accepted,requester_id.eq.${user2Id},receiver_id.eq.${myuserId})
-                `)
+            .or(`and(status.eq.accepted,requester_id.eq.${myuserId},receiver_id.eq.${user2Id}),and(status.eq.accepted,requester_id.eq.${user2Id},receiver_id.eq.${myuserId})`)
             .maybeSingle(); // ใช้ maybeSingle เพื่อไม่ให้ throw error ถ้าไม่เจอ
 
         if (friendError) throw friendError;
