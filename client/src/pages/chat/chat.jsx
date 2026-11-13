@@ -1,13 +1,13 @@
 import LeftChat from "../../components/Left/leftChat/leftChat"
-import { useContext, useState, useEffect, Fragment } from "react";
-import {  useParams, useLocation } from "react-router-dom";
+import { useContext, useState, useEffect, Fragment, useRef } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import { makeRequest } from "../../api/axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { AuthContext } from "../../context/authContext";
 import dayjs from "dayjs";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
-
+import { ClipLoader } from "react-spinners";
 import "./chat.scss"
 import ImageIcon from '@mui/icons-material/Image';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
@@ -31,6 +31,8 @@ const Chat = () => {
     const queryClient = useQueryClient();
 
     const { ref: loadMoreRef, inView } = useInView(); // ตรวจสอบว่าจุดโหลดข้อความเก่าด้านบนอยู่ในหน้าจอหรือไม่
+    const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
+    const enterSendingLock = useRef(false);
 
     // ดึงรายชื่อเพื่อนทั้งหมด เพื่อเอามาใช้เสิร์ช
     const { data: myFriends } = useQuery({
@@ -141,9 +143,16 @@ const Chat = () => {
         if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
 
+            // ป้องกันการกด Enter ซ้ำ
+            if (enterSendingLock.current) return;
+
             const cleanMessage = newMessage.trim();
             if (!cleanMessage && files.length === 0) return;
             if (!currentChat) return;
+
+            // ล็อกทันที
+            enterSendingLock.current = true;
+            setIsLoadingSpinner(true);
 
             try {
                 if (cleanMessage) {
@@ -181,6 +190,9 @@ const Chat = () => {
                 queryClient.invalidateQueries({ queryKey: ["chats", id] });
             } catch (err) {
                 console.log("Error sending message:", err);
+            } finally {
+                enterSendingLock.current = false;
+                setIsLoadingSpinner(false);
             }
         }
     };
@@ -404,7 +416,11 @@ const Chat = () => {
                                     onKeyDown={handleKeyDown}
                                     rows={1}
                                     className="chatTextArea"
+                                    disabled={isLoadingSpinner}
                                 />
+                                {isLoadingSpinner && (
+                                    <ClipLoader size={16} color="#ffffff" />
+                                )}
                             </div>
                             <ThumbUpAltIcon onClick={handleLikeSubmit} style={{ cursor: "pointer", color: "#A0C46E" }} />
                         </div>

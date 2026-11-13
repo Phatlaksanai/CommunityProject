@@ -39,9 +39,7 @@ exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
-      return res
-        .status(400)
-        .json({ error: "Please enter username and password" });
+      return res.status(400).json({ error: "Please enter username and password" });
     }
 
     const { data: user, error } = await db
@@ -130,36 +128,27 @@ exports.register = async (req, res) => {
     let { username, password, password2, email, otp, isdelete } = req.body;
 
     if (!email || !username || !password) {
-      return res
-        .status(400)
-        .json({ error: "Please enter all required fields" });
+      return res.status(400).json({ error: "Please enter all required fields" });
     }
 
     username = username.trim();
 
     if (!/^(?=(?:.*[a-zA-Z]){3})[a-zA-Z0-9_ ]+$/.test(username)) {
-      return res.status(400).json({
-        error:
-          "Username must contain at least 3 letters and can only letters, include numbers, spaces, and underscores",
-      });
+      return res.status(400).json({ error:"Username must contain at least 3 letters and can only letters, include numbers, spaces, and underscores"});
     }
+
     if (username.length < 3 || username.length > 35) {
-      return res
-        .status(400)
-        .json({ error: "Username must be between 3 and 35 characters" });
+      return res.status(400).json({ error: "Username must be between 3 and 35 characters" });
     }
+
     if (password.length < 10 || password.length > 20) {
-      return res
-        .status(400)
-        .json({ error: "Password must be between 10 and 20 characters" });
+      return res.status(400).json({ error: "Password must be between 10 and 20 characters" });
     }
 
     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$/.test(password)) {
-      return res.status(400).json({
-        error:
-          "Password must contain at least one uppercase letter, one lowercase letter, and one special character",
-      });
+      return res.status(400).json({ error: "Password must contain at least one uppercase letter, one lowercase letter, and one special character" });
     }
+
     if (password !== password2) {
       return res.status(400).json({ error: "Passwords don't match" });
     }
@@ -301,17 +290,13 @@ exports.sendOtpRegister = async (req, res) => {
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Brevo API Error:", errorData);
-      return res
-        .status(500)
-        .json({ success: false, error: "Failed to send OTP email" });
+      return res.status(500).json({ success: false, error: "Failed to send OTP email" });
     }
 
     return res.json({ success: true });
   } catch (err) {
     console.error("Fetch Error:", err);
-    return res
-      .status(500)
-      .json({ success: false, error: "Failed to send OTP email" });
+    return res.status(500).json({ success: false, error: "Failed to send OTP email" });
   }
 };
 // forgot + chane ตอน submit (otp)
@@ -366,9 +351,7 @@ exports.sendOtpResetPassword = async (req, res) => {
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Brevo API Error:", errorData);
-      return res
-        .status(500)
-        .json({ success: false, error: "Failed to send OTP email" });
+      return res.status(500).json({ success: false, error: "Failed to send OTP email" });
     }
 
     return res.json({ success: true });
@@ -432,16 +415,12 @@ exports.updateProfile = async (req, res) => {
     // ใช้ .trim() เพื่อเช็คว่าไม่ใช่การเคาะ Space bar ว่างๆ
     if (displayName && displayName.trim() !== "") updateData.name = displayName;
     if (displayName.length < 3 || displayName.length > 35) {
-      return res
-        .status(400)
-        .json({ error: "Display name must be between 3 and 35 characters" });
+      return res.status(400).json({ error: "Display name must be between 3 and 35 characters" });
     }
-    if (description && description.trim() !== "")
-      updateData.description = description;
+
+    if (description && description.trim() !== "") updateData.description = description;
     if (description.length < 3 || description.length > 500) {
-      return res
-        .status(400)
-        .json({ error: "Description must be between 3 and 500 characters" });
+      return res.status(400).json({ error: "Description must be between 3 and 500 characters" });
     }
     if (city && city.trim() !== "") updateData.city = city;
     if (website && website.trim() !== "") updateData.website = website;
@@ -454,9 +433,7 @@ exports.updateProfile = async (req, res) => {
 
     // เปลี่ยนเป็น array แล้วนับ
     if (Object.keys(updateData).length === 0) {
-      return res
-        .status(200)
-        .json({ success: true, message: "Nothing to update" });
+      return res.status(200).json({ success: true, message: "Nothing to update" });
     }
 
     const { error: updateError } = await db
@@ -510,15 +487,10 @@ exports.resetPassword = async (req, res) => {
     return res.status(400).json({ error: "Passwords don't match" });
   }
   if (password.length < 10 || password.length > 20) {
-    return res
-      .status(400)
-      .json({ error: "Password must be between 10 and 20 characters" });
+    return res.status(400).json({ error: "Password must be between 10 and 20 characters" });
   }
   if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$/.test(password)) {
-    return res.status(400).json({
-      error:
-        "Password must contain at least one uppercase letter, one lowercase letter, and one special character",
-    });
+    return res.status(400).json({ error: "Password must contain at least one uppercase letter, one lowercase letter, and one special character" });
   }
 
   try {
@@ -540,8 +512,7 @@ exports.deleteAccount = async (req, res) => {
   const { email, otp, userId } = req.body;
 
   if (!email || !otp || !userId) {
-    return res
-      .status(400).json({ error: "Email, OTP, and User ID are required" });
+    return res.status(400).json({ error: "Email, OTP, and User ID are required" });
   }
 
   try {
@@ -564,9 +535,7 @@ exports.deleteAccount = async (req, res) => {
       .maybeSingle(); // กัน error ถ้าไม่มี row
 
     if (otpError || !otpData) {
-      return res
-        .status(400)
-        .json({ error: "Invalid OTP request or OTP not found" });
+      return res.status(400).json({ error: "Invalid OTP request or OTP not found" });
     }
 
     if (otpData.otp !== otp) {

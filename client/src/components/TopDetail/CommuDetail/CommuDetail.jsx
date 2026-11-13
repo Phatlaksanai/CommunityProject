@@ -1,6 +1,6 @@
 import "./commuDetail.scss";
 import { AuthContext } from "../../../context/authContext";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../../api/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -13,6 +13,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import BlockIcon from '@mui/icons-material/Block';
 import dayjs from "dayjs";
 import ReportModal from "../../report/ReportModal";
+import { ClipLoader } from "react-spinners";
 
 const CommuDetail = () => {
   const { currentUser } = useContext(AuthContext);
@@ -24,6 +25,9 @@ const CommuDetail = () => {
 
   const queryClient = useQueryClient();
   const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
+
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
+  const followLock = useRef(false);
 
   const { data: community, isLoading, error } = useQuery({
     queryKey: ["community", id],
@@ -54,8 +58,20 @@ const CommuDetail = () => {
     },
   });
 
-  const handleFollow = () => {
-    followMutation.mutate(isFollowing);
+  const handleFollow = async () => {
+    if (followLock.current) return; // ป้องกันการกดซ้ำ
+
+    followLock.current = true;
+    setIsLoadingSpinner(true);
+
+    try {
+      await followMutation.mutateAsync(isFollowing);
+    } catch (error) {
+      console.error("Follow error:", error);
+    } finally {
+      followLock.current = false;
+      setIsLoadingSpinner(false);
+    }
   };
 
   const deleteMutation = useMutation({
@@ -139,11 +155,17 @@ const CommuDetail = () => {
                       }
                       handleFollow();
                     }}
-                    style={{ backgroundColor: isFollowing ? "#C0903B" : "#A0C46E", cursor: "pointer" }}
+                    disabled={isLoadingSpinner}
+                    style={{ backgroundColor: isFollowing ? "#C0903B" : "#A0C46E", cursor: isLoadingSpinner ? "not-allowed" : "pointer" }}
                   >
-
-                    {isFollowing ? <GroupRemoveIcon style={{ width: "15px", height: "15px" }} /> : <GroupAddIcon style={{ width: "15px", height: "15px" }} />}
-                    {isFollowing ? "Unfollow" : "Follow"}
+                    {isLoadingSpinner ? (
+                      <ClipLoader size={16} color="#ffffff" />
+                    ) : (
+                      <>
+                        {isFollowing ? <GroupRemoveIcon style={{ width: "15px", height: "15px" }} /> : <GroupAddIcon style={{ width: "15px", height: "15px" }} />}
+                        {isFollowing ? "Unfollow" : "Follow"}
+                      </>
+                    )}
                   </button>
 
                   <button onClick={() => {
