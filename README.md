@@ -41,13 +41,13 @@ npm install @tanstack/react-query
 npm install three
 npm install react-spinners
 npm install sweetalert2
+npm install react-intersection-observer
 ```
 
 ## Client
 
 ```bash
 npm install swiper
-npm install react-intersection-observer
 npm install algoliasearch react-instantsearch
 ```
 

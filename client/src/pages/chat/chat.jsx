@@ -15,23 +15,28 @@ import CloseIcon from '@mui/icons-material/Close';
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 
 const Chat = () => {
+    // รับค่า id จาก URL และรับข้อมูลห้องแชทที่ถูกเลือกมาจากหน้าอื่น
     const { id } = useParams();
     const location = useLocation();
     const { currentUser } = useContext(AuthContext);
     const [currentChat, setCurrentChat] = useState(location.state?.selectedChat || null);
     const [newMessage, setNewMessage] = useState("");
 
+    // State สำหรับจัดการไฟล์แนบรูปภาพ พรีวิว
     const [files, setFiles] = useState([]);
     const [filePreviews, setFilePreviews] = useState([]);
     const [error, setError] = useState("");
 
+    // State สำหรับช่องค้นหารายชื่อเพื่อนทางซ้าย
     const [searchQuery, setSearchQuery] = useState("");
 
     const defaultPic = "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
     const queryClient = useQueryClient();
 
-    const { ref: loadMoreRef, inView } = useInView(); // ตรวจสอบว่าจุดโหลดข้อความเก่าด้านบนอยู่ในหน้าจอหรือไม่
+    const { ref: loadMoreRef, inView } = useInView(); // ตัวจับสัญญาณว่าผู้ใช้เลื่อนหน้าจอไปถึงจุดบนสุดเพื่อโหลดข้อความเก่าหรือยัง
     const [isLoadingSpinner, setIsLoadingSpinner] = useState(false);
+
+    // ตัวล็อคสำหรับป้องกันการกด Enter ส่งข้อความซ้ำรัวๆ
     const enterSendingLock = useRef(false);
 
     // ดึงรายชื่อเพื่อนทั้งหมด เพื่อเอามาใช้เสิร์ช
@@ -40,6 +45,7 @@ const Chat = () => {
         queryFn: () => makeRequest.get(`/friends/${id}`).then((res) => res.data),
     });
 
+    // ดึงข้อมูลข้อความสนทนาแบบแบ่งหน้า (Infinite Scroll)
     const {
         data: messagesData,
         fetchNextPage,
@@ -54,19 +60,18 @@ const Chat = () => {
                 .then((res) => res.data);
         },
 
-        enabled: !!currentChat,
-
+        enabled: !!currentChat,// จะทำงานก็ต่อเมื่อมีการเลือกห้องแชทแล้วเท่านั้น
         getNextPageParam: (lastPage, allPages) => {
             return lastPage.length === 15
                 ? allPages.length
                 : undefined;
         },
-        refetchInterval: 3000, // เพิ่มบรรทัดนี้เพื่อดึงข้อมูลซ้ำอัตโนมัติทุกๆ 3 วินาที (3000 ms)
+        refetchInterval: 3000, // ดึงข้อมูลใหม่ทุกๆ 3 วินาที
     });
 
     useEffect(() => {
         if (!currentChat) return;
-
+        // ฟังก์ชันสำหรับส่งคำสั่งเปลี่ยนสถานะข้อความเป็น "อ่านแล้ว"
         const markAsRead = async () => {
             try {
                 await makeRequest.put(
@@ -84,26 +89,28 @@ const Chat = () => {
             }
         };
 
-        markAsRead(); // เรียกทำงานทันทีครั้งแรกที่เปิดแชท
+        markAsRead(); // เรียกอัปเดตสถานะทันทีเมื่อเปิดห้องแชท
 
-        // ตั้งค่า Polling ดึงข้อความแชทใหม่ และอัปเดตสถานะ "อ่านแล้ว" ทุกๆ 3 วินาที
+        // ตั้งเวลาตรวจสอบข้อความใหม่และปรับสถานะการอ่านทุก ๆ 3 วินาที
         const intervalId = setInterval(() => {
             // สั่งให้ React Query รีเฟรชข้อมูลข้อความแชท (เพื่อให้สถานะฝั่งคนส่งเปลี่ยนเป็น Read)
             queryClient.invalidateQueries({ queryKey: ["messages", currentChat.conversation_id] });
             markAsRead();// ส่งคำสั่งอัปเดตสถานะการอ่าน (เพื่อให้คนส่งรู้ว่าเราอ่านข้อความใหม่ที่เพิ่งเข้ามาแล้ว)
         }, 3000);
 
-        // Cleanup interval ออกเมื่อผู้ใช้เปลี่ยนห้องแชทหรือออกนอกหน้า
+        // ล้างรอบการทำงานเมื่อเปลี่ยนแชทหรือออกนอกหน้า
         return () => clearInterval(intervalId);
 
     }, [currentChat, id, queryClient]);
 
+    // ทริกเกอร์ให้โหลดหน้าถัดไปเมื่อเลื่อนแชทไปถึงด้านบน
     useEffect(() => {
         if (inView && hasNextPage && !isFetchingNextPage) {
             fetchNextPage();
         }
     }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+    // ฟังก์ชันจัดการการเลือกไฟล์รูปภาพ
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
         const validFiles = selectedFiles.filter(file => {
@@ -120,9 +127,10 @@ const Chat = () => {
         // สร้าง URL สำหรับพรีวิวภาพ
         const previews = validFiles.map((file) => URL.createObjectURL(file));
         setFilePreviews((prev) => prev.concat(previews));
-        e.target.value = ""; // ล้างค่า input
+        e.target.value = ""; // รีเซ็ต input ให้กดเลือกไฟล์เดิมซ้ำได้ถ้าต้องการ
     };
 
+    // ฟังก์ชันอัปโหลดรูป
     const uploadFile = async (file) => {
         try {
             const formData = new FormData();
@@ -134,16 +142,19 @@ const Chat = () => {
         }
     };
 
+    // ลบไฟล์รูปภาพที่พรีวิวไว้ก่อนกดส่ง
     const removeFile = (index) => {
         setFiles((prev) => prev.filter((_, i) => i !== index));
         setFilePreviews((prev) => prev.filter((_, i) => i !== index));
     };
 
+    // จัดการเมื่อกด Enter เพื่อส่งข้อความ
     const handleKeyDown = async (event) => {
+        // ต้องกด Enter โดยไม่กด Shift
         if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
 
-            // ป้องกันการกด Enter ซ้ำ
+            // ป้องกันการส่งซ้ำขณะโหลด
             if (enterSendingLock.current) return;
 
             const cleanMessage = newMessage.trim();
@@ -155,6 +166,7 @@ const Chat = () => {
             setIsLoadingSpinner(true);
 
             try {
+                // ส่งข้อความอักษร
                 if (cleanMessage) {
                     await makeRequest.post(`/chats/${currentChat.conversation_id}/messages`, {
                         text: cleanMessage,
@@ -163,6 +175,7 @@ const Chat = () => {
                     });
                 }
 
+                // ส่งรูปภาพ (ถ้ามี) อัปโหลดและส่งเข้าห้องแชททีละรูป
                 if (files.length > 0) { // ถ้ามีการเลือกรูปภาพ ให้อัปโหลดรูปภาพก่อน
                     for (const file of files) {
                         const uploadRes = await uploadFile(file); // อัปโหลดรูปนี้
@@ -178,12 +191,13 @@ const Chat = () => {
                     }
                 }
 
+                // รีเฟรชแชทให้โชว์ข้อความใหม่
                 queryClient.invalidateQueries({ queryKey: ["messages", currentChat.conversation_id] });
 
-                // 4. ล้างหน่วยความจำของรูปพรีวิว (ป้องกัน Memory Leak)
+                // ล้างหน่วยความจำของรูปพรีวิว (ป้องกัน Memory Leak)
                 filePreviews.forEach(url => URL.revokeObjectURL(url));
 
-                // 5. เคลียร์ค่าทั้งหมดหลังส่งสำเร็จ 🎉
+                // เคลียร์สถานะกลับเป็นค่าเริ่มต้น
                 setNewMessage("");   // เคลียร์ช่องพิมพ์
                 setFiles([]);        // เคลียร์ไฟล์
                 setFilePreviews([]); // เคลียร์รูปพรีวิว
@@ -197,6 +211,7 @@ const Chat = () => {
         }
     };
 
+    // ฟังก์ชันสำหรับปุ่มส่งไลค์
     const handleLikeSubmit = async () => {
         if (!currentChat) return;
 
@@ -215,7 +230,7 @@ const Chat = () => {
         }
     };
 
-    // ฟังก์ชันกรองรายชื่อเพื่อนตามคำที่พิมพ์ค้นหา
+    // ระบบค้นหาเพื่อน พิมพ์หาตามชื่อ (name) หรือ (username)
     const filteredFriends = myFriends?.filter(friend => {
         if (!searchQuery) return false; // ถ้าไม่ได้พิมพ์อะไรเลย ก็ไม่ต้องโชว์
 
@@ -226,6 +241,7 @@ const Chat = () => {
         return username.includes(query) || name.includes(query);
     });
 
+    // เริ่มต้นหรือเข้าห้องแชทกับเพื่อนที่เสิร์ชเจอ
     const handleConversation = async (friend) => {
         try {
             const res = await makeRequest.post("/chats/createconversation", { user2Id: friend.user_id });
@@ -249,6 +265,7 @@ const Chat = () => {
 
     return (
         <div className="chat">
+            {/* ซีกซ้ายของหน้าจอ: สำหรับค้นหาเพื่อนและแสดงประวัติแชท */}
             <div className="Lchat">
                 <div className="search-container-local">
                     <div className="search-box-wrapper">
@@ -291,6 +308,7 @@ const Chat = () => {
                 <LeftChat userId={id} currentChat={currentChat} setCurrentChat={setCurrentChat} />
             </div>
 
+            {/* ซีกขวาของหน้าจอ: บริเวณห้องสนทนา */}
             <div className="Rchat">
                 <div className="chatHeader">
                     <div className="userInfo">
@@ -306,6 +324,7 @@ const Chat = () => {
                     </div>
                 </div>
 
+                {/* พื้นที่โชว์แชท */}
                 <div className="chatContent">
                     {currentChat ? (
                         <>
@@ -316,9 +335,11 @@ const Chat = () => {
                                     {[...page].map((chat, index) => (
                                         <div
                                             key={chat.id || index}
-                                            className={chat.sender_id === parseInt(id) ? "message own" : "message"}
+                                            className={chat.sender_id === parseInt(id) ? "message own" : "message"} 
+                                            // แยก class ดูว่าข้อความใคร
                                         >
                                             <div className="messageWrapper">
+                                                {/* ข้อความฝั่งคนอื่น */}
                                                 {chat.sender_id !== parseInt(id) && (
                                                     <>
                                                         <div className="messageContent">
@@ -332,7 +353,7 @@ const Chat = () => {
                                                         </div>
                                                     </>
                                                 )}
-
+                                                {/* ข้อความฝั่งเรา (ส่งเอง) */}
                                                 {chat.sender_id === parseInt(id) && (
                                                     <>
                                                         <div className="messageInfo">
@@ -352,7 +373,7 @@ const Chat = () => {
                                     ))}
                                 </Fragment>
                             ))}
-
+                            {/* ตัวตรวจสอบตำแหน่งการเลื่อนจอ เพื่อทริกเกอร์โหลดข้อความหน้าถัดไป (เก่าขึ้น) */}
                             <div
                                 ref={loadMoreRef}
                                 style={{
@@ -375,6 +396,7 @@ const Chat = () => {
                     )}
                 </div>
 
+                {/* กล่องพรีวิวรูปภาพก่อนกดส่ง */}
                 {filePreviews.length > 0 && (
                     <div className="imagePreviewContainer">
                         {filePreviews.map((preview, i) => (
@@ -387,9 +409,9 @@ const Chat = () => {
                 )}
                 {error && <span style={{ color: "red", padding: "0 20px", fontSize: "12px" }}>{error}</span>}
 
-                {/* ค้นหา tag โครงสร้าง <div className="chatInput"> เดิมของคุณ แล้วแก้สลับโครงสร้างแบบนี้ */}
+                {/* ช่องพิมพ์ข้อความด้านล่างสุด */}
                 {currentChat ? (
-                    // ตรวจสอบว่าคู่สนทนาที่เลือกพิมพ์ลบบัญชีไปแล้วหรือไม่ (อิงค่า isdelete ที่ส่งมาจากตารางร่วม)
+                    // หากผู้ใช้ปลายทางลบบัญชีแล้ว จะแสดงหน้าต่างแจ้งเตือนและปิดกล่องพิมพ์
                     currentChat.isdelete === "deleted" ? (
                         <div className="chatInputDisabled">
                             This account has been deleted. You can no longer send messages to this conversation.

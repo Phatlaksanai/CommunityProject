@@ -11,12 +11,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { ClipLoader } from "react-spinners";
 import ReportModal from "../../report/ReportModal";
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Comments from "../../comments/comments";
 import { useState, useContext, useEffect } from "react";
 import { createPortal } from "react-dom";
+
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
@@ -59,38 +61,45 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
     };
   }, [activeImageIndex, openReport]);
 
-  // ฟังก์ชันเลื่อนรูปซ้าย-ขวาใน Lightbox
+  // ฟังก์ชันเลื่อนรูปซ้าย-ขวา
   const handlePrevImage = (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // กันไม่ให้คลิกทะลุไปโดนพื้นหลัง (ซึ่งจะทำให้หน้าต่างรูปปิด)
     setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : imageList.length - 1));
+    // ถ้า index > 0 ให้ลบ 1 แต่ถ้าอยู่ที่รูปแรกแล้วให้วนไปรูปสุดท้าย
   };
 
   const handleNextImage = (e) => {
     e.stopPropagation();
     setActiveImageIndex((prev) => (prev < imageList.length - 1 ? prev + 1 : 0));
+    // ถ้า index ยังไม่ถึงรูปสุดท้ายให้บวก 1 แต่ถ้าถึงแล้วให้วนกลับมารูปแรก (0)
   };
 
+  // จำนวนคอมเม้น
   const { isLoading: commentLoading, data: commentCount } = useQuery({
     queryKey: ["commentCount", post.post_id],
     queryFn: () => makeRequest.get(`/posts/comments/count/${post.post_id}`).then((res) => res.data),
   });
 
+  // ใครกดไลค์โพสนี้แล้วบ้าง
   const { isLoading, error, data } = useQuery({
     queryKey: ["likes", post.post_id],
     queryFn: () => makeRequest.get(`/posts/likes/post/${post.post_id}`).then((res) => res.data),
   });
+
   const queryClient = useQueryClient();
 
+  // จัดการไลก์
   const mutation = useMutation({
     mutationFn: async (liked) => {
-      setLoadingSpin(true);
+      setLoadingSpin(true); // เปิด Loading ห้ามผู้ใช้กดซ้ำ
       if (liked) {
-        return await makeRequest.delete(`/posts/likes/post/${post.post_id}`);
+        return await makeRequest.delete(`/posts/likes/post/${post.post_id}`);// ถ้าเคยไลก์แล้ว = ลบไลก์ออก
       } else {
-        return await makeRequest.post("/posts/likes", { post_id: post.post_id });
+        return await makeRequest.post("/posts/likes", { post_id: post.post_id });// ถ้ายัง = เพิ่มไลก์
       }
     },
     onSuccess: async () => {
+      // ถ้ายิง API สำเร็จ สั่งให้ เคลียแคชยอดไลค์เก่า โหลดข้อมูลยอดไลก์มาแสดงใหม่ทันที
       await queryClient.invalidateQueries(["likes", post.post_id]);
       setLoadingSpin(false);
     },
@@ -101,16 +110,18 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
 
   const handleLike = () => {
     if (LoadingSpin) return;
-
-    const isAlreadyLiked = !!data?.includes(currentUser?.user_id);
+    // !! บังคับผลลัพเป็น boolean
+    const isAlreadyLiked = !!data?.includes(currentUser?.user_id);  // เช็คใน arr คนที่กดไลค์มีเรารึยัง มี = 1 
     mutation.mutate(isAlreadyLiked);
   };
 
+  // ลบโพสต์
   const deleteMutation = useMutation({
     mutationFn: (post_id) => {
       return makeRequest.post(`/posts/delete/post/${post.post_id}`);
     },
     onSuccess: () => {
+      // ลบสำเร็จ ให้รีเฟรชรายการโพสต์ทั้งหมดที่โชว์ในหน้าเว็บใหม่
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
@@ -119,7 +130,7 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
     deleteMutation.mutate(post.post_id);
   };
 
-  dayjs.extend(relativeTime);
+  dayjs.extend(relativeTime);// เปิดใช้งานปลั๊กอินจัดการเวลาให้เป็นข้อความ (เช่น 3 วันที่แล้ว)
 
   return (
     <div className="post">
@@ -159,13 +170,13 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
           {((post.imgs?.length > 0) || (post.models?.length > 0)) && (
             <div className="postMediaSlider">
               <Swiper
-                modules={[Navigation, Pagination]}
-                spaceBetween={0}
-                slidesPerView={1}
-                navigation
-                pagination={{ clickable: true }}
+                modules={[Navigation, Pagination]} //Plugins ปุ่มลูกศรและจุดไข่ปลา
+                spaceBetween={0} // รูปภาพจะชนกันพอดีไม่มีช่องว่าง
+                slidesPerView={1} // กำหนดให้โชว์เนื้อหาบนหน้าจอทีละ 1 สไลด์
+                navigation // แสดงปุ่มลูกศร ซ้าย-ขวา
+                pagination={{ clickable: true }} // สั่งให้แสดงจุดไข่ปลา
               >
-                {/* ส่วนของรูปภาพ (ผูก Event onClick เพื่อเปิด Lightbox) */}
+                {/* ส่วนของรูปภาพ */}
                 {post.imgs?.map((item, index) => (
                   <SwiperSlide key={`img-${index}`}>
                     <div
@@ -178,7 +189,7 @@ const Post = ({ post, isDescCommu, isDescProject }) => {
                   </SwiperSlide>
                 ))}
 
-                {/* ส่วนของโมเดล 3D (แยกทำงานอิสระตามเดิม ไม่โดนแทรกแซง) */}
+                {/* ส่วนของโมเดล 3D */}
                 {post.models?.map((item, index) => (
                   <SwiperSlide key={`model-${index}`}>
                     <div className="postModel">
