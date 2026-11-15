@@ -416,7 +416,7 @@ const UpdateModel = () => {
                                 {img1 instanceof File
                                     ? img1.name
                                     : previewImg1
-                                        ? previewImg1.split("/").pop()
+                                        ? previewImg1?.split("/").pop()
                                         : "No file selected"
                                 }
                             </label>
@@ -435,7 +435,7 @@ const UpdateModel = () => {
                                 {img2 instanceof File
                                     ? img2.name
                                     : previewImg2
-                                        ? previewImg2.split("/").pop()
+                                        ? previewImg2?.split("/").pop()
                                         : "No file selected"
                                 }
                             </label>
@@ -487,7 +487,7 @@ const UpdateModel = () => {
                                 {model instanceof File // เช็กว่า model เป็น File object หรือไม่
                                     ? model.name
                                     : model
-                                        ? model.split("/").pop() // split แยกทุก "/" แล้ว pop ตัวท้ายออกมาเป็นชื่อ
+                                        ? model?.split("/").pop() // split แยกทุก "/" แล้ว pop ตัวท้ายออกมาเป็นชื่อ
                                         : "No file selected"
                                 }
                             </label>
@@ -519,7 +519,7 @@ const UpdateModel = () => {
                                     {obj instanceof File
                                         ? obj.name
                                         : model
-                                            ? obj.split("/").pop()
+                                            ? obj?.split("/").pop()
                                             : "No file selected"
                                     }
                                 </label>
@@ -534,7 +534,7 @@ const UpdateModel = () => {
                                     {blend instanceof File
                                         ? blend.name
                                         : model
-                                            ? blend.split("/").pop()
+                                            ? blend?.split("/").pop()
                                             : "No file selected"
                                     }
                                 </label>
@@ -549,7 +549,7 @@ const UpdateModel = () => {
                                     {fbx instanceof File
                                         ? fbx.name
                                         : model
-                                            ? fbx.split("/").pop()
+                                            ? fbx?.split("/").pop()
                                             : "No file selected"
                                     }
                                 </label>
@@ -564,7 +564,7 @@ const UpdateModel = () => {
                                     {usdz instanceof File
                                         ? usdz.name
                                         : model
-                                            ? usdz.split("/").pop()
+                                            ? usdz?.split("/").pop()
                                             : "No file selected"
                                     }
                                 </label>
@@ -579,7 +579,7 @@ const UpdateModel = () => {
                                     {gltf instanceof File
                                         ? gltf.name
                                         : model
-                                            ? gltf.split("/").pop()
+                                            ? gltf?.split("/").pop()
                                             : "No file selected"
                                     }
                                 </label>
