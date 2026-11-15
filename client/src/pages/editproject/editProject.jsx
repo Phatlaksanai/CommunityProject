@@ -19,7 +19,8 @@ const EditProject = () => {
   const [img, setImg] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [search, setSearch] = useState("");
+  const [searchPost, setSearchPost] = useState("");
+  const [searchItem, setSearchItem] = useState("");
   const [selectedPosts, setSelectedPosts] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [imgPublicId, setImgPublicId] = useState(null);
@@ -172,10 +173,10 @@ const EditProject = () => {
           {/* ส่วนของ Posts */}
           <div className="form-group">
             <label>Related Posts</label>
-            <input type="text" placeholder="Search Posts" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <input type="text" placeholder="Search Posts" value={searchPost} onChange={(e) => setSearchPost(e.target.value)} />
             <div className="post-list">
               {posts
-                .filter(post => post.description.toLowerCase().includes(search.toLowerCase()))
+                .filter(post => post.description.toLowerCase().includes(searchPost.toLowerCase()))
                 .map(post => (
                   <label key={post.post_id} className="post-item">
                     <input
@@ -202,12 +203,12 @@ const EditProject = () => {
             <input
               type="text"
               placeholder="Search Items"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchItem}
+              onChange={(e) => setSearchItem(e.target.value)}
             />
             <div className="post-list">
               {items
-                .filter(item => item.modelName.toLowerCase().includes(search.toLowerCase()))
+                .filter(item => item.modelName.toLowerCase().includes(searchItem.toLowerCase()))
                 .map(item => (
                   <label key={item.item_id} className="post-item">
                     <input
