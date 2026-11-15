@@ -60,16 +60,16 @@ const LeftDC = ({ project, commuId, isProfile, userId }) => {
 
   return (
     <div className="leftDC">
-      {/* --- ส่วนของหน้าจอปกติ --- */}
       <div className="container">
         <div className="gallery">
           <h2>Gallery ({latestImages.length})</h2>
 
-          {/* เปิดระบบ Scroll แนวตั้งเฉพาะตอนที่เปิดสถานะ expanded เท่านั้น */}
+          {/* กล่องเก็บรูปภาพ ถ้า isExpanded เป็น true (กด View All) จะเพิ่มคลาส "expanded" เข้าไปให้ scoll แกน y ได้ */}
           <div className={`img-container ${isExpanded ? "expanded" : ""}`}>
             {isLoading ? (
               <div>Loading...</div>
             ) : (
+              // (displayImages น่าจะถูกตัดมาแค่ 4 รูปในกรณีที่ยังไม่ได้กด View All) บรรทัด 59
               displayImages.map((imgUrl, index) => (
                 <div className="img" key={index} onClick={() => setActiveImageIndex(index)}>
                   <img src={imgUrl} alt={`latest-${index}`} />
@@ -77,7 +77,8 @@ const LeftDC = ({ project, commuId, isProfile, userId }) => {
               ))
             )}
 
-            {/* ช่องว่างตัวอย่าง (Empty Slot) แสดงเฉพาะตอนยังไม่ขยาย และรูปที่มีจริงดันน้อยกว่า 4 รูป */}
+            {/* มีรูปทั้งหมดน้อยกว่า 4 รูป ระบบจะคำนวณว่าขาดอีกกี่รูปถึงจะครบ 4 (เช่น 4 - 2 = ขาด 2) 
+            แล้วสร้างกล่องเปล่า "No Image" มาเติมให้เต็มเลย์เอาต์ */}
             {!isLoading && !isExpanded && latestImages.length < 4 &&
               Array(4 - latestImages.length).fill(0).map((_, i) => (
                 <div className="img empty-slot" key={`empty-${i}`}>
@@ -85,16 +86,9 @@ const LeftDC = ({ project, commuId, isProfile, userId }) => {
                 </div>
               ))
             }
-
-            {/* กรณีไม่มีรูปในกลุ่มนี้เลยแม้แต่รูปเดียว */}
-            {!isLoading && latestImages.length === 0 && (
-              <div className="img empty-slot main-empty">
-                <div className="no-image-text"><span>No Image</span></div>
-              </div>
-            )}
           </div>
 
-          {/* ปุ่มสลับสถานะ: แสดงเมื่อรูปภาพทั้งหมดในระบบมีมากกว่า 4 รูปขึ้นไป */}
+          {/* มีรูปรวมทั้งหมด "มากกว่า 4 รูป" ถึงจะโชว์ปุ่มนี้ (View All / Show Less) */}
           {!isLoading && latestImages.length > 4 && (
             <button
               className="view-all-btn"
@@ -106,7 +100,6 @@ const LeftDC = ({ project, commuId, isProfile, userId }) => {
         </div>
       </div>
 
-      {/* --- LIGHTBOX: หน้าต่างดูรูปใหญ่เต็มจอ ซ้อนทับอีกชั้น ยิงพอร์ทัลออกไปครอบสูงสุด --- */}
       {activeImageIndex !== null && createPortal(
         <div className="FullSizeImg" onClick={() => setActiveImageIndex(null)}>
           {/* ปุ่มปิดรูปใหญ่ */}
