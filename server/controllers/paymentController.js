@@ -16,7 +16,7 @@ exports.createPayment = async (req, res) => {
       )
       .eq("carts.cart_id", cartId)
       .eq("carts.user_id", userId)
-      .eq("items.users.username", sellerUsername);
+      .eq("items.users.username", sellerUsername); // กรองเอาเฉพาะสินค้าของร้านค้านี้ร้านเดียว
 
     if (error) {
       throw error;
@@ -26,7 +26,7 @@ exports.createPayment = async (req, res) => {
       return res.status(404).json({ error: "Cart is empty" });
     }
 
-    // [เพิ่มเติม] ตรวจสอบว่าสินค้าในตะกร้ามาจากร้านเดียวกันทั้งหมดหรือไม่ 
+    // [ตรวจสอบซ้ำเพื่อความชัวร์] ตรวจสอบว่าสินค้าทุกชิ้นมาจากร้านเดียวกันทั้งหมด
     // เพราะ Destination Charge รองรับการโอนเข้า 1 ปลายทางต่อ 1 PaymentIntent
     const firstSellerId = cartItems[0].items.user_id;
     const isSameSeller = cartItems.every(cartitem => cartitem.items.user_id === firstSellerId);
@@ -36,16 +36,19 @@ exports.createPayment = async (req, res) => {
         error: "Destination Charge requires all items in the cart to be from the same store. Please checkout store by store."
       });
     }
-
+    // 2. คำนวณราคาสินค้าและค่าธรรมเนียมต่างๆ
+    // 2.1 หาราคาสินค้ารวม (Subtotal)
     const subtotal = cartItems.reduce((sum, cartItem) => sum + cartItem.items.price, 0);
+    const platformFee = subtotal * 0.035; // 2.2 คำนวณค่าคอมมิชชันที่แพลตฟอร์มจะหัก
+    const netTarget = subtotal + platformFee;// 2.3 ยอดสุทธิที่แพลตฟอร์มต้องการ (ราคาสินค้า + คอมมิชชัน)
 
-    const platformFee = subtotal * 0.035;
-    const netTarget = subtotal + platformFee;
+    // 2.4 คำนวณค่าธรรมเนียมของ Payment Gateway (เช่น Stripe คิด 1.65% + VAT 7%)
+    // เพื่อบวกกลับเข้าไปในราคาสุทธิ ให้ลูกค้าเป็นคนจ่ายค่าธรรมเนียมการโอนนี้
     const effectiveFeeRate = 0.0165 * (1 + 0.07);
-    const totalAmount = netTarget / (1 - effectiveFeeRate);
-    // const paymentFee = totalAmount - netTarget;
 
-    // 2. สร้าง Order
+    const totalAmount = netTarget / (1 - effectiveFeeRate);// ยอดรวมทั้งหมดที่ลูกค้าต้องจ่ายจริง
+
+    // 3. สร้างบิลคำสั่งซื้อ (Order) ในฐานข้อมูล
     const { data: order, error: orderError } = await db
       .from("orders")
       .insert({
@@ -60,6 +63,7 @@ exports.createPayment = async (req, res) => {
       throw orderError;
     }
 
+    // เตรียมข้อมูลสินค้าแต่ละชิ้นเพื่อบันทึกลงตาราง order_items (รายละเอียดบิล)
     const orderItems = cartItems.map((cartItem) => {
       const itemPrice = cartItem.items.price;
       const itemPlatformFee = itemPrice * 0.035;
@@ -73,7 +77,7 @@ exports.createPayment = async (req, res) => {
       };
     });
 
-    const { data: orderItemsData, error: orderItemsError } = await db
+    const { error: orderItemsError } = await db
       .from("order_items")
       .insert(orderItems);
 
@@ -81,15 +85,17 @@ exports.createPayment = async (req, res) => {
       throw orderItemsError;
     }
 
+    // 4. เชื่อมต่อระบบจ่ายเงิน Stripe
+    // Stripe รับยอดเงินเป็นหน่วย "สตางค์" เสมอ (เช่น 100 บาท ต้องส่งเป็น 10000)
     const amount = Math.round(order.total_amount * 100);
 
-    if (amount < 10) {
+    if (amount < 10) { // ขั้นตํ่า 10 บาท
       return res.status(400).json({
         error: "Minimum payment amount is 10 THB",
       });
     }
 
-    // --- ส่วนที่ 1: ดึง stripe_connect_id ของร้านค้านั้น ---
+    // 4.1 ดึงรหัสกระเป๋าเงิน Stripe (stripe_connect_id) ของร้านค้าเพื่อเตรียมโอนเงินให้
     const { data: sellerData, error: sellerError } = await db
       .from("users")
       .select("stripe_connect_id")
@@ -100,23 +106,25 @@ exports.createPayment = async (req, res) => {
       return res.status(400).json({ error: "Seller Stripe Connect ID not found" });
     }
 
-    // คำนวณค่าธรรมเนียมแพลตฟอร์มที่จะหักไว้ (หน่วยเป็นสตางค์)
-    const netAmountCents = Math.round(subtotal * 100);
-    const applicationFeeAmount = amount - netAmountCents;
+    // 4.2 คำนวณส่วนแบ่ง: ยอดที่จะหักเข้ากระเป๋าแพลตฟอร์ม (ค่าคอมมิชชัน + ค่าธรรมเนียม Payment)
+    const netAmountCents = Math.round(subtotal * 100); // ยอดที่ร้านจะได้ (ราคาสินค้าเพียวๆ)
+    const applicationFeeAmount = amount - netAmountCents; // ยอดรวมทั้งหมด - ยอดของร้าน = ยอดของแพลตฟอร์ม
 
-    // --- ส่วนที่ 2: สร้าง PaymentIntent แบบ Destination Charge ---
-    // --- ส่วนที่ 2: สร้าง PaymentIntent แบบ Destination Charge ---
+    // 4.3 สั่งให้ Stripe สร้างคำขอรับเงิน (PaymentIntent)
     const paymentIntent = await stripe.paymentIntents.create({
-      amount,
+      amount,// ยอดเก็บเงินลูกค้าทั้งหมด (สตางค์)
       currency: "thb",
-      payment_method_types: ["promptpay"],
-      application_fee_amount: applicationFeeAmount, // ยอดเงินที่หักเข้า Platform
+      payment_method_types: ["promptpay"],// รับชำระผ่าน PromptPay (สแกน QR)
+      application_fee_amount: applicationFeeAmount, // ** Stripe จะหักเงินก้อนนี้เก็บไว้ที่แพลตฟอร์ม **
       transfer_data: {
-        destination: sellerData.stripe_connect_id, // ยอดที่เหลือโอนเข้าบัญชีร้านค้านี้อัตโนมัติ
+        destination: sellerData.stripe_connect_id, // ** ส่วนที่เหลือ จะโอนเข้าบัญชีร้านค้านี้ให้อัตโนมัติ **
       },
     });
 
-    const { data, error: updateError } = await db
+    // 5. อัปเดตบิล & ส่งข้อมูลให้หน้าบ้าน
+    // เอา ID การจ่ายเงินของ Stripe (pi_xxxx) มาแปะไว้ที่บิลในฐานข้อมูล 
+    // เพื่อเอาไว้เช็คสถานะภายหลังใน Webhook
+    const { error: updateError } = await db
       .from("orders")
       .update({ stripe_pi_id: paymentIntent.id })
       .eq("order_id", order.order_id);
@@ -126,6 +134,9 @@ exports.createPayment = async (req, res) => {
       return res.status(500).json({ error: "Failed to update order" });
     }
 
+    // ส่งคืนข้อมูลให้ Frontend: 
+    // 1. Order ID ของเรา 
+    // 2. clientSecret ของ Stripe (เอาไว้ไป render QR Code ให้ลูกค้าสแกนจ่ายหน้าเว็บ)
     res.json({
       orderId: order.order_id,
       clientSecret: paymentIntent.client_secret,
@@ -385,7 +396,7 @@ exports.getDownloads = async (req, res) => {
           created_at,
           user_id
         ),
-        items(
+        items!inner(
           item_id,
           modelName,
           price,
@@ -400,7 +411,7 @@ exports.getDownloads = async (req, res) => {
     if (error) throw error;
 
     // 1. ดึง item_id ทั้งหมดจาก data ที่ได้มา
-    const itemIds = data.filter((d) => d.items).map((d) => d.items.item_id);;
+    const itemIds = data.map((d) => d.items.item_id);
 
     // 2. ค้นหาตาราง reviews ด้วย user_id ปัจจุบัน และ item_id ที่อยู่ในรายการดาวน์โหลด
     const { data: reviewsData, error: reviewsError } = await db
@@ -495,28 +506,32 @@ exports.getDownloadFile = async (req, res) => {
 
 exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โดยอัตโนมัติจากฝั่ง Stripe"
   const sig = req.headers["stripe-signature"];
-  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  const connectEndpointSecret = process.env.STRIPE_CONNECT_WEBHOOK_SECRET;
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET; // Secret ปกติก่อน
+  const connectEndpointSecret = process.env.STRIPE_CONNECT_WEBHOOK_SECRET; // (ถอนเงิน)
 
   let event;
 
   try {
+    // พยายามแกะกล่องข้อมูลด้วย Secret ปกติก่อน
     event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
   } catch (err) {
     try {
+      // ถ้าพลาด ลองแกะด้วย Secret ของ Stripe Connect (ถอนเงิน)
       if (!connectEndpointSecret) throw new Error("STRIPE_CONNECT_WEBHOOK_SECRET is not defined");
       event = stripe.webhooks.constructEvent(req.body, sig, connectEndpointSecret);
     } catch (connectErr) {
+      // ถ้าแกะไม่ได้ทั้งคู่ แสดงว่ามาจากคนอื่นที่พยายามแฮ็ก เตะออก
       console.error("Webhook signature verification failed for both secrets.");
       return res.status(400).send(`Webhook Error: Verification failed`);
     }
   }
 
+  // เหตุการณ์ที่ 1: "ลูกค้าจ่ายเงินซื้อของสำเร็จ"
   if (event.type === "payment_intent.succeeded") {
     const paymentIntent = event.data.object;
 
     try {
-      // 1. ค้นหา Order จาก stripe_pi_id
+      // 1.1 หาออร์เดอร์ที่เพิ่งจ่ายเงินเข้ามา
       const { data: order, error: orderError } = await db
         .from("orders")
         .select("order_id, user_id")
@@ -527,7 +542,7 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
         throw new Error("Order not found for this PaymentIntent");
       }
 
-      // 2. อัปเดตสถานะ Order เป็น 'completed'
+      // 1.2 อัปเดตสถานะ Order เป็น 'completed'
       const { error: updateOrderError } = await db
         .from("orders")
         .update({ status: "completed" })
@@ -535,18 +550,19 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
 
       if (updateOrderError) throw updateOrderError;
 
-      // เช็คสถานะ completed แล้วเพิ่มข้อมูลลง transactions
-      // 3. ดึงรายการสินค้าในออร์เดอร์นี้
+      // 1.3 เช็คสถานะ completed แล้วเพิ่มข้อมูลลง transactions
+      // ดึงรายการสินค้าในออร์เดอร์นี้
       const { data: items, error: itemsErr } = await db
         .from("order_items")
         .select("order_item_id, seller_net, seller_id, users(balance)")
         .eq("order_id", order.order_id);
 
       if (!itemsErr && items && items.length > 0) {
+        // บันทึกประวัติรายได้ (transaction) ลงตาราง
         const transactions = items.map((item) => ({
           user_id: order.user_id,
           order_item_id: item.order_item_id,
-          amount: item.seller_net,
+          amount: item.seller_net, // เงินส่วนแบ่งที่ร้านได้
           created_at: new Date(),
           transaction_type: "sale",
         }));
@@ -560,6 +576,7 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
           throw insertErr;
         }
 
+        // อัปเดตกระเป๋าเงิน (balance) ของร้านค้าให้เพิ่มขึ้น
         const sellerId = items[0].seller_id; // id คนขาย
         const currentBalance = items[0].users?.balance || 0; // เงินคนขายปัจจุบัน
         const totalEarned = items.reduce((acc, item) => acc + Number(item.seller_net), 0);
@@ -618,6 +635,7 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
     }
   }
 
+  // เหตุการณ์ที่ 2: "ลูกค้าจ่ายเงินล้มเหลว หรือ ยกเลิก"
   else if (event.type === 'payment_intent.payment_failed' || event.type === 'payment_intent.canceled') {
     const paymentIntent = event.data.object;
 
@@ -635,18 +653,17 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
     }
   }
 
+  // เหตุการณ์ที่ 3: "ร้านค้าถอนเงินสำเร็จ (โอนเข้าบัญชีธนาคาร)"
   else if (event.type === "payout.paid") {
     const payout = event.data.object;
 
-    // ยอดเงินที่ Stripe ส่งมาจะเป็นหน่วยสตางค์ (Cents) ต้องหาร 100 เพื่อให้เป็นบาท
-    const withdrawAmount = payout.amount / 100;
-
-    // ดึง stripe_connect_id ของร้านค้าที่ทำการถอนเงิน
-    const stripeConnectId = event.account;
+    const withdrawAmount = payout.amount / 100; // แปลงหน่วยสตางค์ (Cents) กลับเป็นหน่วยบาท
+    const stripeConnectId = event.account; // ID ร้านค้าที่ถอนเงิน
 
     if (stripeConnectId) {
       try {
-        // 1. ค้นหา User จาก stripe_connect_id
+
+        // 3.1 หาร้านค้าจาก ID
         const { data: user, error: userError } = await db
           .from("users")
           .select("user_id, balance")
@@ -657,7 +674,7 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
           throw new Error("User not found for this Payout");
         }
 
-        // 2. คำนวณยอดเงินคงเหลือ และอัปเดตลงตาราง users
+        // 3.2 หักเงินออกจากกระเป๋า (balance) ในระบบ
         const newBalance = user.balance - withdrawAmount;
 
         const { error: updateError } = await db
@@ -667,7 +684,7 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
 
         if (updateError) throw updateError;
 
-        // 3. บันทึกประวัติการถอนเงินลงตาราง transactions
+        // 3.3 บันทึกประวัติการถอนลงตาราง
         const { error: insertTxError } = await db
           .from("transactions")
           .insert({
@@ -688,7 +705,7 @@ exports.stripeWebhook = async (req, res) => { //ถูกเรียก "โด
     }
   }
 
-  res.status(200).send();
+  res.status(200).send();// ต้องตอบ 200 (OK) กลับไปเสมอ ไม่งั้น Stripe จะพยายามยิงซ้ำเรื่อยๆ
 };
 
 exports.CheckStripeId = async (req, res) => {
@@ -735,7 +752,7 @@ exports.CheckStripeId = async (req, res) => {
 exports.CreateStripeAccount = async (req, res) => {
   const { userId, email } = req.body;
   const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
-  
+
   try {
     const account = await stripe.accounts.create({
       type: "standard",
@@ -767,6 +784,7 @@ exports.CreateStripeAccount = async (req, res) => {
   }
 };
 
+// สำหรับของฟรี
 exports.addItemToDownload = async (req, res) => {
   const { item_id } = req.body;
   const user_id = req.user.user_id;

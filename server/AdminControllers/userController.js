@@ -15,6 +15,7 @@ function tokenizeThai(text) {
     .join(" ");
 }
 
+// โดนัทบน
 exports.getuserRegistrations = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_yearly_user_stats");
@@ -63,6 +64,7 @@ exports.getuserRegistrations = async (req, res) => {
   }
 };
 
+// โดนัทล่าง
 exports.getUserRolesProportion = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_user_roles_proportion");
@@ -109,6 +111,7 @@ exports.getUserRolesProportion = async (req, res) => {
   }
 };
 
+// ดึงบือ
 exports.getUsersTable = async (req, res) => {
   try {
     const { data, error } = await db
@@ -188,6 +191,7 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+// 4 กล่อง
 exports.getUserSummary = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_users_summary");
@@ -201,6 +205,7 @@ exports.getUserSummary = async (req, res) => {
   }
 };
 
+// กราฟขวา 4 กล่อง
 exports.getWeeklyUsers = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_weekly_users_chart");
@@ -243,6 +248,7 @@ exports.addAdmin = async (req, res) => {
         email: email,
         password: hashedPassword,
         role: role,
+        isdelete: "active",
       },
     ]);
 

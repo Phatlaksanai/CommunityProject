@@ -56,6 +56,7 @@ exports.getTopReportingUsers = async (req, res) => {
   }
 };
 
+// (จน.รายงานแต่ละประเภท)
 exports.getCountReportsType = async (req, res) => {
   try {
     const { data, error } = await db
@@ -78,6 +79,7 @@ exports.getCountReportsType = async (req, res) => {
   }
 };
 
+// ดึงมาแสดงเฉย ๆ หน้า report
 exports.getReportsTable = async (req, res) => {
   try {
     const { data, error } = await db

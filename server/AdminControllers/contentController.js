@@ -14,6 +14,7 @@ function tokenizeThai(text) {
     .join(" ");
 }
 
+// กราฟโดนัทแรก Post,commu,item
 // ฟังก์ชันกลางสำหรับคำนวณ
 const formatDonutYearlyStats = async (rpcName) => {
   const { data, error } = await db.rpc(rpcName);
@@ -77,6 +78,7 @@ exports.getDonutYearlyItemStats = async (req, res) => {
   }
 };
 
+// อัน 2 //
 exports.getDonutDistributionPost = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_post_media_stats");
@@ -117,7 +119,6 @@ exports.getDonutDistributionPost = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 exports.getDonutDistributionCommunity = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_community_proportion_stats");
@@ -158,7 +159,6 @@ exports.getDonutDistributionCommunity = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 exports.getDonutDistributionItem = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_item_price_stats");
@@ -206,7 +206,9 @@ exports.getDonutDistributionItem = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+// อัน 2 //
 
+// 4 กล่อง //
 exports.getPostSummary = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_posts_summary");
@@ -219,7 +221,6 @@ exports.getPostSummary = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 exports.getCommunitySummary = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_communities_summary");
@@ -232,7 +233,6 @@ exports.getCommunitySummary = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 exports.getItemSummary = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_items_summary");
@@ -245,7 +245,10 @@ exports.getItemSummary = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+// 4 กล่อง //
 
+
+// ขวา 4 กล่อง //
 exports.getWeeklyPosts = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_weekly_posts_chart");
@@ -258,7 +261,6 @@ exports.getWeeklyPosts = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 exports.getWeeklyCommunities = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_weekly_communities_chart");
@@ -271,7 +273,6 @@ exports.getWeeklyCommunities = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 exports.getWeeklyItems = async (req, res) => {
   try {
     const { data, error } = await db.rpc("get_weekly_items_chart");
@@ -284,7 +285,9 @@ exports.getWeeklyItems = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+// ขวา 4 กล่อง //
 
+// ดึงบือ
 exports.getPostsTable = async (req, res) => {
   try {
     const { data, error } = await db
@@ -302,7 +305,6 @@ exports.getPostsTable = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 exports.getCommunitiesTable = async (req, res) => {
   try {
     const { data, error } = await db
@@ -320,7 +322,6 @@ exports.getCommunitiesTable = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 exports.getItemsTable = async (req, res) => {
   try {
     const { data, error } = await db
@@ -383,7 +384,6 @@ exports.updatePost = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 exports.updateCommunity = async (req, res) => {
   const { communityId } = req.params;
   const { status, description, cover_img } = req.body;
@@ -443,7 +443,6 @@ exports.updateCommunity = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 exports.updateItem = async (req, res) => {
   const { itemId } = req.params;
   const { modelName, description, price, status, category_id, new_category_name, img } = req.body;
@@ -518,6 +517,7 @@ exports.updateItem = async (req, res) => {
   }
 };
 
+// ดึงไปใส่ dropdown (contentStat(item))
 exports.getCategories = async (req, res) => { // เพิ่มฟังก์ชันดึง Category ทั้งหมดไปแสดงที่ Dropdown หน้าบ้าน
   try {
     const { data, error } = await db

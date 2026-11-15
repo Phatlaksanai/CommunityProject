@@ -27,6 +27,7 @@ exports.getWeeklyOrders = async (req, res) => {
   }
 };
 
+// ดึงบือ
 exports.getTransactionsTable = async (req, res) => {
   try {
     const { data, error } = await db

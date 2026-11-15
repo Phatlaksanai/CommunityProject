@@ -46,7 +46,7 @@ exports.getItems = async (req, res) => {
         query = query.neq("user_id", user_id);
       }
 
-      // ✅ filter category
+      // filter category
       if (category_id) {
         const categoryIds = Array.isArray(category_id)
           ? category_id
@@ -54,14 +54,14 @@ exports.getItems = async (req, res) => {
         query = query.in("category_id", categoryIds);
       }
 
-      // ✅ filter date
+      // filter date
       let itemIdsFromDateFilter = null;
       if (date && date !== "AllTime") {
         const now = new Date();
         let pastDate = new Date();
 
         if (date === "ThisMonth") {
-          pastDate.setMonth(now.getMonth() - 1);
+          pastDate.setMonth(now.getMonth() - 1); // ย้อน 1 เดือน
         } else if (date === "ThisWeek") {
           pastDate.setDate(now.getDate() - 7);
         } else if (date === "ThisDay") {
@@ -77,19 +77,21 @@ exports.getItems = async (req, res) => {
           return res.status(500).json(updateError);
         }
 
-        const latestUpdates = new Map();
-        updates.forEach((update) => {
-          if (!latestUpdates.has(update.item_id)) {
-            latestUpdates.set(update.item_id, update.created_at);
+        const latestUpdates = new Map(); // รอยัดข้อมูล
+        updates.forEach((update) => { // วนทีละตัวใน arr ทั้งหมดให้ครบ
+          if (!latestUpdates.has(update.item_id)) { // ถ้าไม่มีอันนั้นก็ยัด
+            latestUpdates.set(update.item_id, update.created_at); //ยัดไป
           }
         });
 
-        itemIdsFromDateFilter = [...latestUpdates.entries()]
+        itemIdsFromDateFilter = [...latestUpdates.entries()] // ดึง key & value มา
+          // นำข้อมูลใน Map มาเช็คว่าวันที่อัปเดต (createdAt) ใหม่กว่าหรือเท่ากับ pastDate หรือไม่
           .filter(([itemId, createdAt]) => new Date(createdAt) >= pastDate)
           .map(([itemId]) => itemId);
 
         // หากมีการกรองวันที่ แต่ไม่มีข้อมูลตรงกับช่วงเวลานั้นเลย ให้หยุดแล้วส่งอาเรย์ว่าง (เฉพาะการโหลดรอบแรก)
         if (itemIdsFromDateFilter.length === 0) {
+          // ดึงมาเฉพาะรหัสสินค้าเพื่อให้อยู่ในรูปแบบ Array
           return res.status(200).json([]);
         }
 
@@ -124,7 +126,7 @@ exports.getItems = async (req, res) => {
       return res.status(200).json([]);
     }
 
-    // ✅ นับจำนวนการสั่งซื้อของแต่ละ item จาก order ที่ complete
+    // นับจำนวนการสั่งซื้อของแต่ละ item จาก order ที่ complete
     const finalItemIds = resultItems.map((item) => item.item_id);
     let orderCountMap = {};
 
@@ -145,9 +147,9 @@ exports.getItems = async (req, res) => {
       }
 
       if (completedOrders) {
-        completedOrders.forEach((orderItem) => {
-          const itemId = orderItem.item_id;
-          orderCountMap[itemId] = (orderCountMap[itemId] || 0) + 1;
+        completedOrders.forEach((orderItem) => { // นับว่าใน arr มีแต่ละอันซํ้าเท่าไร
+          const itemId = orderItem.item_id; // [1,1,2]
+          orderCountMap[itemId] = (orderCountMap[itemId] || 0) + 1; // มี 1 สองตัว
         });
       }
     }
@@ -205,7 +207,7 @@ exports.getItemsById = async (req, res) => {
 
   const latestUpdate = data.update_models?.sort(
     (update1, update2) => new Date(update2.created_at) - new Date(update1.created_at),
-  )[0]; // เอาตัวแรกที่มีวันที่ใหม่ที่สุด
+  )[0]; // เอาตัวแรกที่มีวันที่ใหม่ที่สุดส่งหน้า decsItem
 
   const formatted = {
     ...data,
@@ -269,14 +271,15 @@ exports.getItemsByProjectId = async (req, res) => {
     };
   });
 
-  formatted.sort( // .sort() ที่ formatted เรียง Item ทั้งหมด ตาม update ล่าสุด
-    (item1, item2) =>
-      new Date(item2.created_at) - new Date(item1.created_at)
-  );
+  // formatted.sort( // .sort() ที่ formatted เรียง Item ทั้งหมด ตาม update ล่าสุด
+  //   (item1, item2) =>
+  //     new Date(item2.created_at) - new Date(item1.created_at)
+  // );
 
   return res.json(formatted);
 };
 
+// addProject
 exports.getItemsByUserIdAvailable = async (req, res) => {
   const { id } = req.params;
 
@@ -292,18 +295,20 @@ exports.getItemsByUserIdAvailable = async (req, res) => {
   if (error) return res.status(500).json(error);
 
   const formatted = data.map((item) => {
-    const latestUpdate = [...(item.update_models || [])].sort( // .sort() ข้างใน latestUpdate หา update ล่าสุดของ แต่ละ Item
+    // ดึงเอาเวลา (created_at) ของการอัปเดตครั้งล่าสุด ออกมา
+    const latestUpdate = [...(item.update_models || [])].sort(
       (update1, update2) =>
         new Date(update2.created_at) - new Date(update1.created_at)
     )[0];
 
     return {
       ...item,
-      created_at: latestUpdate?.created_at || null,
+      created_at: latestUpdate?.created_at || null,// อัปเดตค่า created_at ของ Item ตัวนี้ ให้กลายเป็นเวลาของการแก้ไขล่าสุด
     };
   });
 
-  formatted.sort( // .sort() ที่ formatted เรียง Item ทั้งหมด ตาม update ล่าสุด
+  // เรียง Item ทุกชิ้น โดยดันชิ้นที่มีการอัปเดตล่าสุดขึ้นไปอยู่บนสุด (index 0)
+  formatted.sort(
     (item1, item2) =>
       new Date(item2.created_at) - new Date(item1.created_at)
   );
@@ -352,7 +357,7 @@ exports.getItemsByUserId = async (req, res) => {
       new Date(item2.created_at || 0) - new Date(item1.created_at || 0)
     );
 
-    // 5. ✅ ตัดแบ่งข้อมูลให้เหลือแค่ 15 ชิ้น ตรงนี้เลย! 
+    // 5. ตัดแบ่งข้อมูลให้เหลือแค่ 15 ชิ้น ตรงนี้เลย! 
     const paginatedItems = formatted.slice(offset, offset + limit);
 
     // ถ้าตัดมาแล้วไม่มีข้อมูล (ผู้ใช้เลื่อนลงไปลึกจนสุดแล้ว) ก็ส่งอาเรย์ว่างกลับได้เลย ไม่ต้องไปดึง Order ให้เหนื่อย
@@ -365,7 +370,7 @@ exports.getItemsByUserId = async (req, res) => {
     let orderItems = [];
 
     if (itemIds.length > 0) {
-      const { data: completedOrders, error: orderError } = await db
+      const { data: completedOrders, error: orderError } = await db // หายอดดาวโหลด
         .from("order_items")
         .select(`
           item_id,
@@ -406,7 +411,7 @@ exports.getItemsByUserId = async (req, res) => {
 
 exports.addItem = async (req, res) => {
   const {
-    modelName, description, price, isFree, img, model, obj, blend, fbx, usdz, gltf, category_id,
+    modelName, description, price, img, model, obj, blend, fbx, usdz, gltf, category_id,
     imgPublicId, modelPublicId, objPublicId, blendPublicId, fbxPublicId, usdzPublicId, gltfPublicId,
     polygon_count, has_textures, is_rigged, is_uv_mapped
   } = req.body;
@@ -475,7 +480,7 @@ exports.addItem = async (req, res) => {
       .from("categories")
       .select("type")
       .eq("category_id", itemData.category_id)
-      .single();
+      .single(); // เอาชื่อ catagory
 
     // 3. ส่งข้อมูลเข้า Algolia
     try {
@@ -509,7 +514,7 @@ exports.addItem = async (req, res) => {
 exports.editItem = async (req, res) => {
   const userid = req.user.user_id;
   const {
-    itemId, modelName, description, price, img, category_id, imgPublicId // เพิ่ม imgPublicId ตรงนี้
+    itemId, modelName, description, price, img, category_id, imgPublicId
   } = req.body;
 
   try {
@@ -527,7 +532,7 @@ exports.editItem = async (req, res) => {
     }
 
     // 2. สร้าง Object สำหรับ Update
-    const updateData = {};
+    const updateData = {}; // เก็บค่าใหม่ที่เข้ามา
 
     if (modelName && modelName.trim() !== "") updateData.modelName = modelName;
     if (description && description.trim() !== "") updateData.description = description;
@@ -591,7 +596,6 @@ exports.editItem = async (req, res) => {
     return res.status(200).json({ success: true });
   } catch (err) {
     console.error(err);
-    // แปลง error เป็น string ข้อความให้ฝั่งหน้าบ้านจับได้
     return res.status(500).json({ error: err.message || "Internal server error" });
   }
 };
@@ -609,14 +613,16 @@ exports.updateVersion = async (req, res) => {
 
     // 1. ตรวจสอบและดึงข้อมูลเป้าหมาย
     if (isNewVersion) {
-      // กรณีสร้างใหม่ ดึงเวอร์ชันล่าสุดมาเป็น Base สำหรับ fallback ข้อมูล (ตามลอจิกเดิม)
+      // เพิ่มเวอร์ชันใหม่
+      // เราจะดึงประวัติการอัปเดต "ล่าสุด" (order by created_at descending) ของ Item นั้น
+      // เพื่อเอามาเป็น "ข้อมูลตั้งต้น" (Baseline) สำหรับเปรียบเทียบว่ามีอะไรเปลี่ยนไปบ้าง
       const { data, error } = await db
         .from("update_models")
         .select("*, imgs(*), items!inner(status,user_id)")
         .eq("item_id", itemId)
         .eq("items.status", "show")
         .eq("items.user_id", req.user.user_id)
-        .order("created_at", { ascending: false })
+        .order("created_at", { ascending: false }) // ใหม่ไปเก่าเอาบนสุด
         .limit(1)
         .maybeSingle();
 
@@ -625,9 +631,9 @@ exports.updateVersion = async (req, res) => {
       targetItem = data;
 
     } else {
-      // กรณีบันทึกทับ ต้องดึงข้อมูลของเวอร์ชันนั้นๆ มาเทียบโดยตรง
       if (!updateModelsId) return res.status(400).json({ error: "Missing version ID" });
 
+      // ถ้าไม่เพิ่ม ver ใหม่ เอา ver ที่แก้มา
       const { data, error } = await db
         .from("update_models")
         .select("*, imgs(*), items!inner(status, user_id)")
@@ -641,7 +647,7 @@ exports.updateVersion = async (req, res) => {
       targetItem = data;
     }
 
-    // 2. ฟังก์ชันตรวจสอบการเปลี่ยนแปลง (เปลี่ยนจาก latestItem เป็น targetItem)
+    // 2. ฟังก์ชันตรวจสอบการเปลี่ยนแปลง ว่าได้แก้ค่าอะไรไหม
     const checkIsChanged = () => {
       if (version && version.trim() !== targetItem.version) return true;
       if (summary && summary.trim() !== targetItem.update_summary) return true;
@@ -662,6 +668,7 @@ exports.updateVersion = async (req, res) => {
       if (img1 !== undefined && img1 !== oldImg1) return true;
       if (img2 !== undefined && img2 !== oldImg2) return true;
 
+      // ถ้าไม่เข้า if สักอัน แปลว่า "ไม่มีอะไรเปลี่ยนแปลงเลย"
       return false;
     };
 
@@ -732,12 +739,19 @@ exports.updateVersion = async (req, res) => {
       if (is_uv_mapped !== undefined && is_uv_mapped !== targetItem.is_uv_mapped) updateData.is_uv_mapped = is_uv_mapped;
 
       // Helper function: เช็คเฉพาะช่องที่ส่งมาไม่เท่ากับ undefined เท่านั้น
+      // รับค่าพารามิเตอร์ 6 ตัว: ชื่อช่องเก็บURL, ชื่อช่องเก็บID, URLใหม่, IDใหม่, IDเดิม, เป็นไฟล์ดิบ(Raw)ไหม
       const handleFileUpdate = (field, pubField, reqUrl, reqPubId, dbPubId, isRawType) => {
+        // เช็คว่าหน้าบ้านส่งข้อมูลมาไหม และ ไฟล์ที่ส่งมาเป็นไฟล์ใหม่ที่ต่างจากของเดิมใช่ไหม
         if (reqPubId !== undefined && reqPubId !== dbPubId) {
+          // ถ้าเป็นไฟล์ใหม่เอา URL และ ID ของไฟล์ใหม่ ยัดใส่ตัวแปร updateData 
+          // เพื่อเตรียมเอาไปเซฟลง Database ในขั้นตอนถัดไป
           updateData[field] = reqUrl;
           updateData[pubField] = reqPubId;
           // ถ้ามีรหัสเดิมอยู่ใน DB เอาใส่คิวรอเผาทิ้ง
           if (dbPubId) {
+            // เอา ID ของไฟล์เก่า ยัดใส่คิว filesToDelete เอาไว้
+            // พร้อมระบุว่ามันเป็นไฟล์ประเภท Raw ไหม (Cloudinary จะได้ลบถูกประเภท)
+            // เพื่อเดี๋ยวเราจะเอาคิวนี้ไปสั่งลบรูปใน Cloudinary ไฟล์เก่าจะได้ไม่ค้างเซิร์ฟเวอร์
             filesToDelete.push({ id: dbPubId, isRaw: isRawType });
           }
         }
@@ -758,7 +772,7 @@ exports.updateVersion = async (req, res) => {
 
       if (updateError) return res.status(500).json({ error: updateError.message });
 
-      await db.from("imgs").delete().eq("update_models_id", targetItem.update_models_id);
+      await db.from("imgs").delete().eq("update_models_id", targetItem.update_models_id);// ลบรูป ver เก่าทิ้ง
 
       const updatedImgs = [];
       if (img1) updatedImgs.push({ update_models_id: targetItem.update_models_id, img: img1 });
@@ -802,7 +816,6 @@ exports.updateVersion = async (req, res) => {
   }
 };
 
-// itemController.js (ทำเหมือนกัน)
 exports.getItemsForEditProject = async (req, res) => {
   const { projectId } = req.params;
   const userId = req.user.user_id;
@@ -851,6 +864,7 @@ exports.getLatestItems = async (req, res) => {
   }
 };
 
+// related item (leftDI)
 exports.getItemsByCategory = async (req, res) => {
   const { categoryId } = req.params; // รับค่า :categoryId จาก path
   const { limit } = req.query; // รับค่า ?limit=5 จาก query
@@ -863,7 +877,7 @@ exports.getItemsByCategory = async (req, res) => {
       .from("items")
       .select(`item_id, modelName, description, img, price, user_id,
         update_models(created_at)
-        `) // เลือกเฉพาะฟิลด์ที่ใช้แสดงใน Card
+        `) // เลือกเฉพาะฟิลด์ที่ใช้แสดงใน Cart
       .eq("category_id", categoryId)
       .eq("status", "show");
 
@@ -872,7 +886,7 @@ exports.getItemsByCategory = async (req, res) => {
     }
 
     const formatted = data.map((item) => {
-      const latestUpdate = [...(item.update_models || [])].sort( // .sort() ข้างใน latestUpdate หา update ล่าสุดของ แต่ละ Item
+      const latestUpdate = [...(item.update_models || [])].sort( // หา update ล่าสุดของ แต่ละ Item
         (update1, update2) =>
           new Date(update2.created_at) - new Date(update1.created_at)
       )[0];
@@ -883,7 +897,7 @@ exports.getItemsByCategory = async (req, res) => {
       };
     });
 
-    formatted.sort((item1, item2) => // .sort() ที่ formatted เรียง Item ทั้งหมด ตาม update ล่าสุด
+    formatted.sort((item1, item2) => // เรียง Item ทั้งหมด ตาม update ล่าสุด
       new Date(item2.created_at) - new Date(item1.created_at)
     );
 
@@ -944,6 +958,7 @@ exports.getReviewsByItemId = async (req, res) => {
   }
 };
 
+// leftMarket
 exports.getCategories = async (req, res) => {
   const { data, error } = await db
     .from("categories")
@@ -955,6 +970,7 @@ exports.getCategories = async (req, res) => {
   res.status(200).json(data);
 };
 
+// updateModel
 exports.getItemAllVersions = async (req, res) => {
   const { id } = req.params;
 
@@ -970,6 +986,7 @@ exports.getItemAllVersions = async (req, res) => {
   return res.json(data);
 };
 
+// Timeline
 exports.getItemTimeline = async (req, res) => {
   const { itemId } = req.params;
 
@@ -1026,6 +1043,7 @@ exports.getItemTimeline = async (req, res) => {
   }
 };
 
+// ดึงมาแสดงสำรับ Edit ท่าไป ส่วน update ใช้ item_id
 exports.getItemForEdit = async (req, res) => {
   const { id } = req.params;
 

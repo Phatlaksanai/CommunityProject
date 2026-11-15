@@ -27,6 +27,7 @@ exports.getRevenueOverview = async (req, res) => {
   }
 };
 
+// rightBar (รายการสั่งซื้อล่าสุด)
 exports.getOrder = async (req, res) => {
   try {
     const { data, error } = await db
@@ -59,6 +60,7 @@ exports.getOrder = async (req, res) => {
   }
 };
 
+// rightBar (จน.รายงานแต่ละประเภท)
 exports.getCountReportsType = async (req, res) => {
   try {
     const { data, error } = await db
