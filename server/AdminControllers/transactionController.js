@@ -53,29 +53,33 @@ exports.getOrderByRange = async (req, res) => {
 
     if (error) throw error;
 
-    const rangeCount = {
+    // สร้าง Object เตรียมไว้เก็บผลรวมของออเดอร์แต่ละช่วงราคา (ค่าเริ่มต้นคือ 0)
+    const rangeCount = { // ค่าช่วงเขียนตาม range_name ที่กำหนดไว้ใน SQL
       "฿1–฿100": 0,
       "฿101–฿500": 0,
       "฿501+": 0,
     };
-
+    // เอาข้อมูลที่ได้จาก Database มาจับคู่และอัปเดตใส่ใน rangeCount
     if (data && data.length > 0) {
       data.forEach((row) => {
+        // เช็คก่อนว่า range_name ตรงกับ Key เราไหม (rangeCount)
         if (rangeCount[row.range_name] !== undefined) {
-          rangeCount[row.range_name] = Number(row.total);
+          rangeCount[row.range_name] = Number(row.total);// ถ้าตรงใส่ค่าลงตัวแปร
         }
       });
     }
-
+    // รวมจำนวนเตรียมคิด %
     const totalItems = rangeCount["฿1–฿100"] + rangeCount["฿101–฿500"] + rangeCount["฿501+"];
 
+    // แปลง Object rangeCount ให้กลายเป็น Array 
+    // เพื่อให้ฝั่ง Frontend (เช่น กราฟ Recharts) สามารถนำไป map() หรือใช้วาดกราฟได้ทันที
     const formattedData = Object.keys(rangeCount).map((range) => {
       const count = rangeCount[range];
       const percent = totalItems > 0 ? ((count / totalItems) * 100).toFixed(0) : 0;
 
       return {
-        name: `${range} - ${percent}% (${count})`, 
-        value: count, // เปลี่ยน key ให้กราฟใช้ค่าตัวเลขนี้
+        name: `${range} - ${percent}% (${count})`, // ชื่อ - % (จน.order)
+        value: count, // จำนวนที่ส่งไปให้ทำกราฟ
       };
     });
 
